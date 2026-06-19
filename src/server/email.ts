@@ -16,6 +16,38 @@ export type SendEmailParams = {
 }
 
 /**
+ * Wrap content in the branded UnSwap email shell (navy header, gold CTA).
+ * Keeps all transactional emails visually consistent.
+ */
+export function renderEmail(opts: {
+  heading: string
+  body: string // HTML (paragraphs)
+  ctaLabel?: string
+  ctaUrl?: string
+}): string {
+  const { heading, body, ctaLabel, ctaUrl } = opts
+  const cta =
+    ctaLabel && ctaUrl
+      ? `<a href="${ctaUrl}" style="display:inline-block;margin-top:20px;background:#9A7C2C;color:#ffffff;text-decoration:none;font-weight:bold;font-size:14px;padding:12px 22px;border-radius:10px">${ctaLabel}</a>`
+      : ""
+  return `
+  <div style="font-family:Helvetica,Arial,sans-serif;max-width:560px;margin:0 auto;border:1px solid #E3E7EE;border-radius:16px;overflow:hidden">
+    <div style="background:#0B1F3A;padding:20px 28px">
+      <span style="color:#ffffff;font-size:22px;font-weight:bold;font-family:Georgia,'Times New Roman',serif">UnSwap</span>
+    </div>
+    <div style="padding:28px">
+      <h1 style="color:#0B1F3A;font-size:20px;margin:0 0 14px;font-family:Georgia,'Times New Roman',serif">${heading}</h1>
+      <div style="color:#3A4357;font-size:14px;line-height:1.65">${body}</div>
+      ${cta}
+      <p style="color:#6B7689;font-size:11px;margin-top:28px;border-top:1px solid #E3E7EE;padding-top:16px">
+        UnSwap — Enabling Mobility. Empowering Community.<br/>
+        An independent, staff-led platform, not affiliated with the United Nations.
+      </p>
+    </div>
+  </div>`
+}
+
+/**
  * Send an email via Resend. If RESEND_API_KEY isn't configured, the message is
  * logged to the console instead (dev fallback) so flows don't break locally.
  * Returns true if the email was actually dispatched.

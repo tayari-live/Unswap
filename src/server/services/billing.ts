@@ -2,7 +2,7 @@ import Stripe from "stripe"
 import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
 import { logAudit } from "@/server/services/audit"
-import { sendEmail } from "@/server/email"
+import { sendEmail, renderEmail } from "@/server/email"
 
 // Tier catalogue — the single source of truth for entitlements and pricing.
 export const TIERS = {
@@ -114,6 +114,20 @@ export async function cancelSubscription(userId: string) {
   }
   await prisma.subscription.update({ where: { userId }, data: { status: "cancelled" } })
   await logAudit({ actorId: userId, action: "SUBSCRIPTION_CANCELLED", subject: "Cancelled subscription" })
+
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true, firstName: true } })
+  if (user) {
+    await sendEmail({
+      to: user.email,
+      subject: "Your UnSwap membership is cancelled",
+      html: renderEmail({
+        heading: "Membership cancelled",
+        body: `<p>Hello ${user.firstName},</p><p>Your membership won't renew. You'll keep access until the end of the current period. You can resubscribe any time.</p>`,
+        ctaLabel: "View membership",
+        ctaUrl: `${baseUrl()}/dashboard/subscription`,
+      }),
+    }).catch((e) => console.error("Cancel email failed:", e))
+  }
   return { ok: true }
 }
 
@@ -142,15 +156,45 @@ export async function handleWebhookEvent(event: Stripe.Event) {
       const inv = event.data.object as any
       const subId = inv.subscription
       if (typeof subId === "string") {
-        const sub = await prisma.subscription.findFirst({ where: { stripeSubscriptionId: subId } })
-        if (sub) await prisma.subscription.update({ where: { id: sub.id }, data: { status: "past_due" } })
+        const sub = await prisma.subscription.findFirst({
+          where: { stripeSubscriptionId: subId },
+          include: { user: { select: { email: true, firstName: true } } },
+        })
+        if (sub) {
+          await prisma.subscription.update({ where: { id: sub.id }, data: { status: "past_due" } })
+          await sendEmail({
+            to: sub.user.email,
+            subject: "Action needed: your UnSwap payment didn't go through",
+            html: renderEmail({
+              heading: "Payment unsuccessful",
+              body: `<p>Hello ${sub.user.firstName},</p><p>We couldn't process your latest membership payment. Please update your payment method to keep your access. Your membership stays active during a short grace period.</p>`,
+              ctaLabel: "Update billing",
+              ctaUrl: `${baseUrl()}/dashboard/subscription`,
+            }),
+          }).catch((e) => console.error("Dunning email failed:", e))
+        }
       }
       break
     }
     case "customer.subscription.deleted": {
       const s = event.data.object as any
-      const sub = await prisma.subscription.findFirst({ where: { stripeSubscriptionId: s.id } })
-      if (sub) await prisma.subscription.update({ where: { id: sub.id }, data: { status: "cancelled" } })
+      const sub = await prisma.subscription.findFirst({
+        where: { stripeSubscriptionId: s.id },
+        include: { user: { select: { email: true, firstName: true } } },
+      })
+      if (sub) {
+        await prisma.subscription.update({ where: { id: sub.id }, data: { status: "cancelled" } })
+        await sendEmail({
+          to: sub.user.email,
+          subject: "Your UnSwap membership has been cancelled",
+          html: renderEmail({
+            heading: "Membership cancelled",
+            body: `<p>Hello ${sub.user.firstName},</p><p>Your membership has been cancelled and won't renew. You're always welcome back to the network.</p>`,
+            ctaLabel: "Rejoin UnSwap",
+            ctaUrl: `${baseUrl()}/dashboard/subscription`,
+          }),
+        }).catch((e) => console.error("Cancellation email failed:", e))
+      }
       break
     }
   }

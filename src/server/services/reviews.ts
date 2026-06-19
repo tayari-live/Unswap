@@ -1,5 +1,8 @@
 import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
+import { sendEmail, renderEmail } from "@/server/email"
+
+const APP = () => process.env.AUTH_URL || "http://localhost:3000"
 
 const WINDOW_DAYS = 7
 const WINDOW_MS = WINDOW_DAYS * 24 * 60 * 60 * 1000
@@ -95,6 +98,25 @@ export async function createReview(input: CreateReviewInput) {
 
   await recomputeTrustScore(subjectId)
   if (aboutHost && listingId) await recomputeListingRating(listingId)
+
+  // Notify the reviewed member.
+  const [subject, author] = await Promise.all([
+    prisma.user.findUnique({ where: { id: subjectId }, select: { email: true, firstName: true } }),
+    prisma.user.findUnique({ where: { id: input.authorId }, select: { fullName: true } }),
+  ])
+  if (subject && author) {
+    const stars = "★".repeat(overall) + "☆".repeat(5 - overall)
+    await sendEmail({
+      to: subject.email,
+      subject: "You received a new review on UnSwap",
+      html: renderEmail({
+        heading: "New review received",
+        body: `<p>Hello ${subject.firstName},</p><p><strong>${author.fullName}</strong> left you a review: <span style="color:#C9A84C">${stars}</span></p>`,
+        ctaLabel: "View your reviews",
+        ctaUrl: `${APP()}/dashboard/profile`,
+      }),
+    }).catch((e) => console.error("Review email failed:", e))
+  }
 
   return review
 }

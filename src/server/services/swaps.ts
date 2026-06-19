@@ -1,6 +1,13 @@
 import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
 import { logAudit } from "@/server/services/audit"
+import { sendEmail, renderEmail } from "@/server/email"
+
+const APP = () => process.env.AUTH_URL || "http://localhost:3000"
+const esc = (s: string) =>
+  s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c] as string))
+const fmtD = (d: Date) =>
+  new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(d)
 
 export function listSwaps() {
   return prisma.swapRequest.findMany({
@@ -140,6 +147,25 @@ export async function createSwapRequest(input: {
     action: "SWAP_REQUESTED",
     subject: `Swap requested for ${listing.title}`,
   })
+
+  // Notify the host of the incoming request.
+  const host = await prisma.user.findUnique({
+    where: { id: listing.ownerId },
+    select: { email: true, firstName: true },
+  })
+  if (host) {
+    await sendEmail({
+      to: host.email,
+      subject: `New swap request for ${listing.title}`,
+      html: renderEmail({
+        heading: `${esc(requester.fullName)} requested a swap`,
+        body: `<p>Hello ${esc(host.firstName)},</p><p><strong>${esc(requester.fullName)}</strong> would like to stay at <strong>${esc(listing.title)}</strong> from ${fmtD(start)} to ${fmtD(end)} (${guests} guest${guests === 1 ? "" : "s"}).</p>${input.message?.trim() ? `<p style="background:#F7F3E8;border-radius:8px;padding:10px 14px">“${esc(input.message.trim())}”</p>` : ""}`,
+        ctaLabel: "View request",
+        ctaUrl: `${APP()}/dashboard/swaps`,
+      }),
+      text: `${requester.fullName} requested a swap at ${listing.title}. View: ${APP()}/dashboard/swaps`,
+    })
+  }
   return swap
 }
 
@@ -153,7 +179,11 @@ export async function respondToSwap(input: {
 }) {
   const swap = await prisma.swapRequest.findUnique({
     where: { id: input.id },
-    include: { listing: { select: { title: true } } },
+    include: {
+      listing: { select: { title: true } },
+      host: { select: { email: true, firstName: true, fullName: true } },
+      requester: { select: { email: true, firstName: true, fullName: true } },
+    },
   })
   if (!swap) throw new ApiError(404, "Swap not found.")
 
@@ -211,6 +241,76 @@ export async function respondToSwap(input: {
     subject: `Swap for ${swap.listing.title}`,
     metadata: { status: data.status },
   })
+
+  // Notify the relevant counterparty of the outcome.
+  const L = esc(swap.listing.title)
+  const start = (data.startDate as Date) ?? swap.startDate
+  const end = (data.endDate as Date) ?? swap.endDate
+  const range = `${fmtD(start)} – ${fmtD(end)}`
+  const exchangesUrl = `${APP()}/dashboard/exchanges`
+  const swapsUrl = `${APP()}/dashboard/swaps`
+
+  try {
+    if (input.action === "accept" || input.action === "accept_counter") {
+      const recip = input.action === "accept" ? swap.requester : swap.host
+      await sendEmail({
+        to: recip.email,
+        subject: "Your UnSwap exchange is confirmed",
+        html: renderEmail({
+          heading: "Exchange confirmed",
+          body: `<p>Hello ${esc(recip.firstName)},</p><p>Your exchange at <strong>${L}</strong> for <strong>${range}</strong> is confirmed. You can download the Swap Agreement from My Exchanges.</p>`,
+          ctaLabel: "View exchange",
+          ctaUrl: exchangesUrl,
+        }),
+      })
+    } else if (input.action === "decline") {
+      await sendEmail({
+        to: swap.requester.email,
+        subject: "Update on your swap request",
+        html: renderEmail({
+          heading: "Request not accepted",
+          body: `<p>Hello ${esc(swap.requester.firstName)},</p><p>Your request for <strong>${L}</strong> wasn't accepted this time. Plenty of other verified homes await.</p>`,
+          ctaLabel: "Discover homes",
+          ctaUrl: `${APP()}/dashboard/browse`,
+        }),
+      })
+    } else if (input.action === "counter") {
+      await sendEmail({
+        to: swap.requester.email,
+        subject: `Counter-offer for ${swap.listing.title}`,
+        html: renderEmail({
+          heading: "Counter-offer received",
+          body: `<p>Hello ${esc(swap.requester.firstName)},</p><p><strong>${esc(swap.host.fullName)}</strong> proposed new dates for <strong>${L}</strong>: <strong>${range}</strong>. Review and accept in your swap requests.</p>`,
+          ctaLabel: "Review counter-offer",
+          ctaUrl: swapsUrl,
+        }),
+      })
+    } else if (input.action === "cancel") {
+      await sendEmail({
+        to: swap.host.email,
+        subject: "A swap request was withdrawn",
+        html: renderEmail({
+          heading: "Request withdrawn",
+          body: `<p>${esc(swap.requester.fullName)} withdrew their request for <strong>${L}</strong>.</p>`,
+        }),
+      })
+    } else if (input.action === "complete") {
+      const other = isHost ? swap.requester : swap.host
+      await sendEmail({
+        to: other.email,
+        subject: "How was your exchange?",
+        html: renderEmail({
+          heading: "Exchange complete",
+          body: `<p>Hello ${esc(other.firstName)},</p><p>Your exchange at <strong>${L}</strong> is marked complete. Leave a review to support the community and build trust.</p>`,
+          ctaLabel: "Leave a review",
+          ctaUrl: exchangesUrl,
+        }),
+      })
+    }
+  } catch (err) {
+    console.error("Swap notification email failed:", err)
+  }
+
   return { ok: true, status: data.status }
 }
 

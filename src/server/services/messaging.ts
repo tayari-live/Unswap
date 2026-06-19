@@ -1,5 +1,10 @@
 import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
+import { sendEmail, renderEmail } from "@/server/email"
+
+const APP = () => process.env.AUTH_URL || "http://localhost:3000"
+const esc = (s: string) =>
+  s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c] as string))
 
 const ATTACH_MAX_CHARS = 13_000_000 // ~10 MB encoded
 const IMAGE_DATA_URL = /^data:image\/(png|jpe?g|webp|gif);base64,/
@@ -127,11 +132,18 @@ export async function sendMessage(input: {
   body?: string
   attachmentUrl?: string
 }) {
-  await assertCanMessage(input.userId)
+  const me = await assertCanMessage(input.userId)
   const member = await prisma.conversationParticipant.findUnique({
     where: { conversationId_userId: { conversationId: input.conversationId, userId: input.userId } },
   })
   if (!member) throw new ApiError(403, "You are not part of this conversation.")
+
+  // Capture the prior message to throttle email notifications to one per turn.
+  const prev = await prisma.message.findFirst({
+    where: { conversationId: input.conversationId },
+    orderBy: { createdAt: "desc" },
+    select: { senderId: true },
+  })
 
   const body = input.body?.trim() ?? ""
   let attachmentUrl = input.attachmentUrl
@@ -153,5 +165,28 @@ export async function sendMessage(input: {
     where: { id: input.conversationId },
     data: { lastMessageAt: new Date() },
   })
+
+  // Email the other participant — but only when this starts a new "turn"
+  // (the previous message wasn't also from this sender), to avoid spamming.
+  if (!prev || prev.senderId !== input.userId) {
+    const other = await prisma.conversationParticipant.findFirst({
+      where: { conversationId: input.conversationId, userId: { not: input.userId } },
+      include: { user: { select: { email: true, firstName: true } } },
+    })
+    if (other?.user) {
+      const snippet = body ? esc(body.slice(0, 140)) : "Sent a photo"
+      await sendEmail({
+        to: other.user.email,
+        subject: `New message from ${me.fullName} on UnSwap`,
+        html: renderEmail({
+          heading: `${esc(me.fullName)} sent you a message`,
+          body: `<p>Hello ${esc(other.user.firstName)},</p><p style="background:#F1F3F7;border-radius:8px;padding:10px 14px">${snippet}</p>`,
+          ctaLabel: "Open conversation",
+          ctaUrl: `${APP()}/dashboard/messages/${input.conversationId}`,
+        }),
+      }).catch((e) => console.error("Message email failed:", e))
+    }
+  }
+
   return message
 }
