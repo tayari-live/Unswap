@@ -1,0 +1,137 @@
+import Link from "next/link"
+import { redirect } from "next/navigation"
+import { MapPin, Star, BadgeCheck, ShieldAlert, SearchX } from "lucide-react"
+import { auth } from "@/server/auth"
+import { prisma } from "@/server/prisma"
+import { searchListings } from "@/server/services/discovery"
+import { PageHeader } from "@/components/ui/page-header"
+import { BrowseControls } from "./browse-controls"
+import { FavouriteButton } from "./favourite-button"
+
+export const dynamic = "force-dynamic"
+
+const EXCHANGE_LABEL: Record<string, string> = {
+  simultaneous: "Simultaneous",
+  credits: "Credits",
+  either: "Simultaneous or credits",
+}
+
+export default async function BrowsePage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | undefined>>
+}) {
+  const session = await auth()
+  const userId = (session?.user as any)?.id as string | undefined
+  if (!userId) redirect("/login")
+
+  const user = await prisma.user.findUnique({ where: { id: userId } })
+
+  // Browsing is gated behind full verification (the walled garden).
+  if (user?.verificationStatus !== "FULLY_VERIFIED") {
+    return (
+      <div className="max-w-2xl mx-auto pb-12">
+        <PageHeader title="Discover Homes" subtitle="Browse verified homes across the network." />
+        <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-10 text-center">
+          <div className="mx-auto w-14 h-14 rounded-2xl bg-[var(--parchment)] text-[var(--gold-dark)] flex items-center justify-center mb-5">
+            <ShieldAlert size={26} />
+          </div>
+          <h2 className="font-display text-2xl font-bold text-[var(--navy)]">Verification required</h2>
+          <p className="mt-3 text-neutral leading-relaxed">
+            Browsing is reserved for verified members. Complete your verification to explore homes and arrange exchanges.
+          </p>
+          <Link
+            href="/verify-identity"
+            className="mt-7 inline-flex items-center justify-center py-3 px-6 rounded-xl text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] transition-colors"
+          >
+            Get verified
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  const sp = await searchParams
+  const filters = {
+    q: sp.q ?? "",
+    propertyType: sp.type ?? "",
+    bedrooms: sp.beds ?? "",
+    guests: sp.guests ?? "",
+    exchangeType: sp.exchange ?? "",
+    savedOnly: sp.saved === "1",
+  }
+
+  const listings = await searchListings({
+    viewerId: userId,
+    q: filters.q,
+    propertyType: filters.propertyType || undefined,
+    bedrooms: filters.bedrooms ? Number(filters.bedrooms) : undefined,
+    guests: filters.guests ? Number(filters.guests) : undefined,
+    exchangeType: filters.exchangeType || undefined,
+    savedOnly: filters.savedOnly,
+  })
+
+  return (
+    <div className="max-w-6xl mx-auto pb-12">
+      <PageHeader title="Discover Homes" subtitle="Browse verified homes across the network." />
+      <BrowseControls initial={filters} />
+
+      <p className="text-sm text-neutral mb-4">
+        {listings.length} {listings.length === 1 ? "home" : "homes"}{filters.savedOnly ? " saved" : " available"}
+      </p>
+
+      {listings.length === 0 ? (
+        <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-12 text-center">
+          <div className="mx-auto w-14 h-14 rounded-2xl bg-neutral-light text-neutral flex items-center justify-center mb-4">
+            <SearchX size={26} />
+          </div>
+          <h2 className="font-display text-xl font-bold text-[var(--navy)]">No homes match</h2>
+          <p className="mt-2 text-sm text-neutral">Try a different city or relax your filters.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {listings.map((l) => (
+            <Link
+              key={l.id}
+              href={`/dashboard/browse/${l.id}`}
+              className="group bg-surface rounded-2xl border border-[var(--border)] shadow-sm overflow-hidden hover:shadow-md hover:border-[var(--gold)]/50 transition-all"
+            >
+              <div className="relative h-44 bg-[var(--background)]">
+                {l.primaryPhotoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={l.primaryPhotoUrl} alt={l.title} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-neutral/30">
+                    <MapPin size={30} />
+                  </div>
+                )}
+                <div className="absolute top-3 right-3">
+                  <FavouriteButton listingId={l.id} initial={l.favourited} />
+                </div>
+                <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide bg-white/90 text-[var(--navy)] px-2.5 py-1 rounded-full">
+                  <BadgeCheck size={12} className="text-[var(--teal)]" /> Verified host
+                </span>
+              </div>
+              <div className="p-4">
+                <div className="flex items-center gap-1.5 text-xs text-neutral">
+                  <MapPin size={13} /> {l.city}, {l.country}
+                </div>
+                <h3 className="mt-1 font-display font-bold text-[var(--navy)] leading-snug">{l.title}</h3>
+                <div className="mt-1 text-xs text-neutral">
+                  {l.propertyType} · {l.bedrooms} {l.bedrooms === 1 ? "bed" : "beds"} · up to {l.maxGuests} guests
+                </div>
+                <div className="mt-3 pt-3 border-t border-[var(--border)] flex items-center justify-between">
+                  <span className="text-xs text-neutral">{EXCHANGE_LABEL[l.exchangeType] ?? l.exchangeType}</span>
+                  <span className="flex items-center gap-1 text-xs font-bold text-[var(--navy)]">
+                    <Star size={12} className="text-[var(--gold)]" />
+                    {l.owner.trustScore != null ? l.owner.trustScore.toFixed(1) : "New"}
+                  </span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}

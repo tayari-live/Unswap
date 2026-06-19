@@ -1,0 +1,317 @@
+// UnSwap admin dashboard — Prisma schema.
+// Learn more: https://pris.ly/d/prisma-schema
+//
+// Local default is SQLite for zero-setup runs. To use Postgres, change
+// `provider` to "postgresql" and set DATABASE_URL accordingly.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// A platform user. Covers both verified/applicant members and admins.
+// `role` is "member" or "admin". Statuses are stored as strings (no enums)
+// so the schema stays portable across SQLite and Postgres.
+model User {
+  id                 String    @id @default(uuid())
+  email              String    @unique
+  passwordHash       String
+  firstName          String
+  lastName           String
+  fullName           String
+  role               String    // "member" | "admin"
+  avatarInitials     String
+  imageUrl           String?
+
+  // Member profile
+  organisation       String?   // e.g. "UNDP", "World Bank Group"
+  nationality        String?
+  dutyStation        String?   // current posting city
+  languages          String?   // comma-separated languages spoken
+  bio                String?
+  linkedinUrl        String?
+  profileCompletion  Int       @default(0) // percentage 0-100
+  onboardedAt        DateTime? // set when the member finishes the onboarding wizard
+
+  // Verification: PENDING_EMAIL | EMAIL_VERIFIED | PENDING_ID_REVIEW |
+  //               FULLY_VERIFIED | REJECTED | SUSPENDED
+  verificationStatus String    @default("PENDING_EMAIL")
+  trustScore         Float?    // weighted average of host reviews
+  stripeCustomerId   String?   @unique // Stripe customer for billing
+
+  createdAt          DateTime  @default(now())
+
+  // Relations
+  submissions        VerificationSubmission[] @relation("SubmissionMember")
+  reviewed           VerificationSubmission[] @relation("SubmissionReviewer")
+  listings           Listing[]
+  sentRequests       SwapRequest[]            @relation("Requester")
+  hostedRequests     SwapRequest[]            @relation("Host")
+  subscription       Subscription?
+  auditLogs          AuditLog[]               @relation("ActorRelation")
+  resetTokens        PasswordResetToken[]
+  emailTokens        EmailVerificationToken[]
+  favourites         Favourite[]
+  conversations      ConversationParticipant[]
+  messages           Message[]
+  reviewsWritten     Review[]                 @relation("ReviewAuthor")
+  reviewsReceived    Review[]                 @relation("ReviewSubject")
+
+  @@index([verificationStatus])
+  @@index([role])
+}
+
+// A private thread between verified members, optionally tied to a swap request.
+model Conversation {
+  id            String   @id @default(uuid())
+  swapRequestId String?  @unique // optional 1:1 link to a swap for context
+  createdAt     DateTime @default(now())
+  lastMessageAt DateTime @default(now())
+
+  participants  ConversationParticipant[]
+  messages      Message[]
+
+  @@index([lastMessageAt])
+}
+
+model ConversationParticipant {
+  id             String   @id @default(uuid())
+  conversationId String
+  userId         String
+  lastReadAt     DateTime @default(now())
+
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id             String   @id @default(uuid())
+  conversationId String
+  senderId       String
+  body           String
+  attachmentUrl  String?  // inline base64 image data URL
+  createdAt      DateTime @default(now())
+
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+}
+
+// A member's private saved/favourite listing.
+model Favourite {
+  id        String   @id @default(uuid())
+  userId    String
+  listingId String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, listingId])
+  @@index([userId])
+}
+
+// One-time token emailed to a new member to confirm their institutional address.
+model EmailVerificationToken {
+  id        String    @id @default(uuid())
+  token     String    @unique
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  token     String    @unique
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// Admin-editable allowlist of approved institutional email domains.
+// `fastTrack` domains skip manual review and go straight to email verification.
+model AllowedDomain {
+  id        String   @id @default(uuid())
+  domain    String   @unique // e.g. "un.org"
+  label     String   // human-readable org name, e.g. "United Nations"
+  fastTrack Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+// A document submission entering the admin verification queue.
+model VerificationSubmission {
+  id           String    @id @default(uuid())
+  memberId     String
+  type         String    // "fast_track" | "manual"
+  idCardUrl    String?
+  proofUrl     String?   // proof of employment (manual review only)
+  status       String    @default("PENDING") // PENDING | APPROVED | REJECTED
+  reviewNote   String?
+  reviewerId   String?
+  reviewedAt   DateTime?
+  createdAt    DateTime  @default(now())
+
+  member       User      @relation("SubmissionMember", fields: [memberId], references: [id], onDelete: Cascade)
+  reviewer     User?     @relation("SubmissionReviewer", fields: [reviewerId], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
+}
+
+// A member's active subscription tier.
+model Subscription {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  tier              String   // limited_1x | standard_2x | professional_4x | unlimited_pro | lifetime
+  status            String   @default("active") // active | past_due | cancelled
+  exchangesPerYear  Int      // -1 for unlimited
+  priceAnnual       Int      // in whole currency units (annual; one-time for lifetime)
+  propertyGuarantee Int      // guarantee amount
+  renewsAt          DateTime?
+  stripeSubscriptionId String? @unique // Stripe subscription (null for lifetime/dev)
+  createdAt         DateTime @default(now())
+
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// A home listing.
+model Listing {
+  id              String   @id @default(uuid())
+  ownerId         String
+  title           String
+  propertyType    String   // Apartment | House | Villa | Studio | Townhouse
+  city            String
+  country         String
+  neighbourhood   String?
+  bedrooms        Int      @default(1)
+  bathrooms       Int      @default(1)
+  maxGuests       Int      @default(2)
+  description     String?
+  primaryPhotoUrl String?
+  exchangeType    String   @default("either") // simultaneous | credits | either
+  status          String   @default("DRAFT")  // DRAFT | ACTIVE | PAUSED | ARCHIVED
+  flagged         Boolean  @default(false)
+  rating          Float?
+  createdAt       DateTime @default(now())
+
+  owner           User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  swapRequests    SwapRequest[]
+  favourites      Favourite[]
+  reviews         Review[]
+
+  @@index([status])
+  @@index([city])
+}
+
+// A swap request between two members for a listing.
+model SwapRequest {
+  id          String   @id @default(uuid())
+  requesterId String
+  hostId      String
+  listingId   String
+  mode        String   // simultaneous | credits
+  startDate   DateTime
+  endDate     DateTime
+  guests      Int      @default(1)
+  // REQUESTED | COUNTER_OFFERED | ACCEPTED | CONFIRMED | IN_PROGRESS | COMPLETED | CANCELLED
+  status      String   @default("REQUESTED")
+  disputed    Boolean  @default(false)
+  message     String?
+  createdAt   DateTime @default(now())
+  completedAt DateTime? // set when the exchange is marked COMPLETED (review window start)
+
+  requester   User     @relation("Requester", fields: [requesterId], references: [id], onDelete: Cascade)
+  host        User     @relation("Host", fields: [hostId], references: [id], onDelete: Cascade)
+  listing     Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  reviews     Review[]
+
+  @@index([status, createdAt])
+}
+
+// Pre-launch waitlist signups with referral tracking.
+model WaitlistEntry {
+  id           String   @id @default(uuid())
+  firstName    String
+  lastName     String
+  email        String   @unique
+  organisation String?
+  referralCode String   @unique
+  referredBy   String?  // referralCode of the referrer
+  referrals    Int      @default(0)
+  status       String   @default("pending") // pending | invited | converted
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  actorId   String?
+  action    String   // e.g. "MEMBER_VERIFIED", "DOMAIN_ADDED"
+  subject   String   // human-readable description
+  metadata  String?
+  createdAt DateTime @default(now())
+
+  actor     User?    @relation("ActorRelation", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+}
+
+// In-app notifications shown to admins via the header bell.
+model Notification {
+  id        String   @id @default(uuid())
+  type      String   // "verification" | "dispute" | "system" | ...
+  title     String
+  body      String?
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([read, createdAt])
+}
+
+// A post-exchange review. Each party reviews the other once per completed swap.
+// `aboutHost` marks reviews of the host (these feed the host's trust score and
+// the listing rating). Sub-ratings apply to host reviews; guest reviews use
+// `overall` + `communication` only.
+model Review {
+  id                  String   @id @default(uuid())
+  swapId              String
+  authorId            String   // who wrote the review
+  subjectId           String   // who the review is about
+  listingId           String?  // set on host reviews (the home stayed in)
+  aboutHost           Boolean  // true when the subject was the swap's host
+  overall             Int      // 1-5
+  communication       Int      // 1-5
+  propertyAccuracy    Int?     // host reviews only
+  cleanliness         Int?     // host reviews only
+  neighbourhoodSafety Int?     // host reviews only
+  body                String
+  createdAt           DateTime @default(now())
+
+  swap     SwapRequest @relation(fields: [swapId], references: [id], onDelete: Cascade)
+  author   User        @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  subject  User        @relation("ReviewSubject", fields: [subjectId], references: [id], onDelete: Cascade)
+  listing  Listing?    @relation(fields: [listingId], references: [id], onDelete: SetNull)
+
+  @@unique([swapId, authorId])
+  @@index([subjectId])
+  @@index([listingId])
+}

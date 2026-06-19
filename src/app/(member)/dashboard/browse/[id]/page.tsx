@@ -1,0 +1,179 @@
+import Link from "next/link"
+import { redirect } from "next/navigation"
+import {
+  MapPin, Star, BadgeCheck, BedDouble, Bath, Users, ArrowLeft, ShieldAlert,
+} from "lucide-react"
+import { auth } from "@/server/auth"
+import { prisma } from "@/server/prisma"
+import { getListingDetail } from "@/server/services/discovery"
+import { listReviewsForListing } from "@/server/services/reviews"
+import { FavouriteButton } from "../favourite-button"
+import { SwapRequestForm } from "./swap-request-form"
+import { MessageButton } from "../../messages/message-button"
+
+export const dynamic = "force-dynamic"
+
+const EXCHANGE_LABEL: Record<string, string> = {
+  simultaneous: "Simultaneous only",
+  credits: "Credits only",
+  either: "Simultaneous or credits",
+}
+
+export default async function ListingDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
+  const session = await auth()
+  const userId = (session?.user as any)?.id as string | undefined
+  if (!userId) redirect("/login")
+
+  const { id } = await params
+  const [viewer, listing] = await Promise.all([
+    prisma.user.findUnique({ where: { id: userId } }),
+    getListingDetail(userId, id),
+  ])
+  if (!listing) redirect("/dashboard/browse")
+
+  const reviews = await listReviewsForListing(listing.id)
+  const isOwner = listing.ownerId === userId
+  const canRequest = viewer?.verificationStatus === "FULLY_VERIFIED" && !isOwner
+
+  return (
+    <div className="max-w-5xl mx-auto pb-12">
+      <Link href="/dashboard/browse" className="inline-flex items-center gap-1.5 text-sm font-semibold text-neutral hover:text-[var(--navy)] mb-4">
+        <ArrowLeft size={15} /> Back to browse
+      </Link>
+
+      <div className="grid lg:grid-cols-3 gap-6">
+        {/* Main */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="relative rounded-2xl overflow-hidden border border-[var(--border)] bg-[var(--background)] h-72 sm:h-96">
+            {listing.primaryPhotoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={listing.primaryPhotoUrl} alt={listing.title} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-neutral/30">
+                <MapPin size={40} />
+              </div>
+            )}
+            <div className="absolute top-4 right-4">
+              <FavouriteButton listingId={listing.id} initial={listing.favourited} />
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center gap-1.5 text-sm text-neutral">
+              <MapPin size={15} /> {listing.neighbourhood ? `${listing.neighbourhood}, ` : ""}{listing.city}, {listing.country}
+            </div>
+            <h1 className="mt-1 font-display text-3xl font-bold text-[var(--navy)]">{listing.title}</h1>
+            <div className="mt-4 flex flex-wrap gap-5 text-sm text-neutral-dark">
+              <span className="inline-flex items-center gap-1.5"><BedDouble size={16} className="text-neutral" /> {listing.bedrooms} {listing.bedrooms === 1 ? "bedroom" : "bedrooms"}</span>
+              <span className="inline-flex items-center gap-1.5"><Bath size={16} className="text-neutral" /> {listing.bathrooms} {listing.bathrooms === 1 ? "bathroom" : "bathrooms"}</span>
+              <span className="inline-flex items-center gap-1.5"><Users size={16} className="text-neutral" /> up to {listing.maxGuests} guests</span>
+            </div>
+          </div>
+
+          {listing.description && (
+            <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6">
+              <h2 className="font-display font-bold text-lg text-[var(--navy)] mb-2">About this home</h2>
+              <p className="text-sm text-neutral-dark leading-relaxed whitespace-pre-line">{listing.description}</p>
+            </div>
+          )}
+
+          <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6">
+            <h2 className="font-display font-bold text-lg text-[var(--navy)] mb-1">{listing.propertyType}</h2>
+            <p className="text-sm text-neutral">Exchange preference: {EXCHANGE_LABEL[listing.exchangeType] ?? listing.exchangeType}</p>
+          </div>
+
+          {/* Reviews */}
+          <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-display font-bold text-lg text-[var(--navy)]">Reviews</h2>
+              {listing.rating != null && (
+                <span className="flex items-center gap-1 text-sm font-bold text-[var(--navy)]">
+                  <Star size={15} className="text-[var(--gold)]" fill="currentColor" />
+                  {listing.rating.toFixed(1)} · {reviews.length}
+                </span>
+              )}
+            </div>
+            {reviews.length === 0 ? (
+              <p className="text-sm text-neutral">No reviews yet for this home.</p>
+            ) : (
+              <div className="space-y-5">
+                {reviews.map((rv) => (
+                  <div key={rv.id} className="border-b border-[var(--border)] last:border-0 pb-5 last:pb-0">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-9 h-9 rounded-full bg-[var(--navy)]/10 text-[var(--navy)] flex items-center justify-center text-xs font-bold">
+                          {rv.author.avatarInitials}
+                        </span>
+                        <div>
+                          <div className="text-sm font-semibold text-[var(--navy)]">{rv.author.fullName}</div>
+                          <div className="text-xs text-neutral">{rv.author.organisation ?? ""}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-0.5">
+                        {[1, 2, 3, 4, 5].map((n) => (
+                          <Star key={n} size={13} className={rv.overall >= n ? "text-[var(--gold)]" : "text-[var(--border)]"} fill={rv.overall >= n ? "currentColor" : "none"} />
+                        ))}
+                      </div>
+                    </div>
+                    <p className="mt-2.5 text-sm text-neutral-dark leading-relaxed">{rv.body}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Sidebar */}
+        <div className="space-y-6">
+          {/* Host card */}
+          <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6">
+            <div className="flex items-center gap-3">
+              <span className="w-12 h-12 rounded-full bg-[var(--navy)]/10 text-[var(--navy)] flex items-center justify-center font-bold">
+                {listing.owner.avatarInitials}
+              </span>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <span className="font-display font-bold text-[var(--navy)]">{listing.owner.fullName}</span>
+                  {listing.owner.verificationStatus === "FULLY_VERIFIED" && (
+                    <BadgeCheck size={15} className="text-[var(--teal)]" />
+                  )}
+                </div>
+                <div className="text-xs text-neutral">{listing.owner.organisation ?? ""}{listing.owner.dutyStation ? ` · ${listing.owner.dutyStation}` : ""}</div>
+              </div>
+            </div>
+            <div className="mt-4 flex items-center justify-between text-sm border-t border-[var(--border)] pt-3">
+              <span className="text-neutral">Trust score</span>
+              <span className="flex items-center gap-1 font-bold text-[var(--navy)]">
+                <Star size={14} className="text-[var(--gold)]" />
+                {listing.owner.trustScore != null ? listing.owner.trustScore.toFixed(1) : "New host"}
+              </span>
+            </div>
+            {listing.owner.bio && <p className="mt-3 text-xs text-neutral-dark leading-relaxed">{listing.owner.bio}</p>}
+          </div>
+
+          {/* Request action */}
+          {isOwner ? (
+            <div className="bg-[var(--parchment)] border border-[var(--gold)]/20 rounded-2xl p-4 text-sm text-neutral-dark text-center">
+              This is your own listing.
+            </div>
+          ) : canRequest ? (
+            <div className="space-y-3">
+              <SwapRequestForm listingId={listing.id} exchangeType={listing.exchangeType} maxGuests={listing.maxGuests} />
+              <MessageButton otherUserId={listing.owner.id} label="Message host" />
+            </div>
+          ) : (
+            <div className="bg-[var(--parchment)] border border-[var(--gold)]/30 rounded-2xl p-5 text-center">
+              <ShieldAlert size={22} className="mx-auto text-[var(--gold-dark)]" />
+              <p className="mt-2 text-sm text-neutral-dark">Get verified to request a swap.</p>
+              <Link href="/verify-identity" className="mt-3 inline-block text-sm font-semibold text-[var(--gold-dark)] underline">Verify now</Link>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}

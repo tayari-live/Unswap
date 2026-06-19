@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+/*
+ * UnSwap brand palette — luxury-institutional.
+ * Obsidian Navy + Diplomatic Gold, with Verified Teal for trust and
+ * Alert Crimson for warnings. Parchment/Stark White surfaces.
+ */
+@theme {
+  --color-navy: #0B1F3A;
+  --color-navy-light: #13355f;
+  --color-navy-dark: #07172b;
+
+  --color-gold: #C9A84C;
+  --color-gold-hover: #b8973d;
+  --color-gold-dark: #9a7c2c;
+
+  --color-teal: #2A9D8F;
+  --color-teal-light: #d7efeb;
+
+  --color-crimson: #C1121F;
+
+  --color-primary: #0B1F3A;
+  --color-primary-hover: #13355f;
+  --color-primary-dark: #07172b;
+
+  --color-tertiary: #0B1F3A;
+
+  --color-neutral: #6B7689;
+  --color-neutral-light: #F1F3F7;
+  --color-neutral-dark: #3A4357;
+
+  --color-surface: #ffffff;
+  --color-parchment: #F7F3E8;
+
+  --color-success: #2A9D8F;
+  --color-warning: #C9A84C;
+  --color-danger: #C1121F;
+
+  --color-border: #E3E7EE;
+  --color-background: #F5F6F8;
+  --color-foreground: #0B1F3A;
+  --color-ring: #C9A84C;
+
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+
+  --font-sans: var(--font-dm-sans), "Helvetica Neue", Arial, sans-serif;
+  --font-display: var(--font-cormorant), Georgia, "Times New Roman", serif;
+}
+
+:root {
+  --background: #F5F6F8;
+  --foreground: #0B1F3A;
+  --surface: #ffffff;
+  --border: #E3E7EE;
+  --ring: #C9A84C;
+
+  --navy: #0B1F3A;
+  --navy-light: #13355f;
+  --navy-dark: #07172b;
+
+  --gold: #C9A84C;
+  --gold-hover: #b8973d;
+  --gold-dark: #9a7c2c;
+
+  --teal: #2A9D8F;
+  --teal-light: #d7efeb;
+
+  --crimson: #C1121F;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9aa3b2;
+}
