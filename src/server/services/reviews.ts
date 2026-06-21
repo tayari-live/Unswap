@@ -1,6 +1,7 @@
 import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
 import { sendEmail, renderEmail } from "@/server/email"
+import { notifyAllowed } from "@/server/services/notify"
 
 const APP = () => process.env.AUTH_URL || "http://localhost:3000"
 
@@ -104,7 +105,7 @@ export async function createReview(input: CreateReviewInput) {
     prisma.user.findUnique({ where: { id: subjectId }, select: { email: true, firstName: true } }),
     prisma.user.findUnique({ where: { id: input.authorId }, select: { fullName: true } }),
   ])
-  if (subject && author) {
+  if (subject && author && (await notifyAllowed(subjectId, "reviews"))) {
     const stars = "★".repeat(overall) + "☆".repeat(5 - overall)
     await sendEmail({
       to: subject.email,

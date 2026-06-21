@@ -1,6 +1,7 @@
 import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
 import { sendEmail, renderEmail } from "@/server/email"
+import { notifyAllowed } from "@/server/services/notify"
 
 const APP = () => process.env.AUTH_URL || "http://localhost:3000"
 const esc = (s: string) =>
@@ -173,7 +174,7 @@ export async function sendMessage(input: {
       where: { conversationId: input.conversationId, userId: { not: input.userId } },
       include: { user: { select: { email: true, firstName: true } } },
     })
-    if (other?.user) {
+    if (other?.user && (await notifyAllowed(other.userId, "messages"))) {
       const snippet = body ? esc(body.slice(0, 140)) : "Sent a photo"
       await sendEmail({
         to: other.user.email,

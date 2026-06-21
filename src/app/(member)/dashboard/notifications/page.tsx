@@ -4,8 +4,10 @@ import {
   ArrowLeftRight, Repeat, CalendarCheck, MessageSquare, Star, ShieldAlert, UserCircle, Bell,
 } from "lucide-react"
 import { auth } from "@/server/auth"
+import { prisma } from "@/server/prisma"
 import { getMemberNotifications, type MemberNotification } from "@/server/services/member-notifications"
 import { PageHeader } from "@/components/ui/page-header"
+import { NotificationPrefs } from "./notification-prefs"
 
 export const dynamic = "force-dynamic"
 
@@ -32,11 +34,19 @@ export default async function NotificationsPage() {
   const userId = (session?.user as any)?.id as string | undefined
   if (!userId) redirect("/login")
 
-  const items = await getMemberNotifications(userId)
+  const [items, user] = await Promise.all([
+    getMemberNotifications(userId),
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { notifySwaps: true, notifyMessages: true, notifyReviews: true, notifyReminders: true, notifyMarketing: true },
+    }),
+  ])
 
   return (
     <div className="max-w-2xl mx-auto pb-12">
       <PageHeader title="Notifications" subtitle="Everything that needs your attention, in one place." />
+
+      {user && <NotificationPrefs initial={user} />}
 
       {items.length === 0 ? (
         <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-12 text-center">

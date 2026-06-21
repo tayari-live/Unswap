@@ -96,6 +96,25 @@ export async function updateProfile(userId: string, input: ProfileInput) {
   return { completion }
 }
 
+const NOTIFY_FIELDS = [
+  "notifySwaps",
+  "notifyMessages",
+  "notifyReviews",
+  "notifyReminders",
+  "notifyMarketing",
+] as const
+
+/** Update a member's email notification preferences (per category). */
+export async function updateNotificationPrefs(userId: string, prefs: Record<string, unknown>) {
+  const data: Record<string, boolean> = {}
+  for (const f of NOTIFY_FIELDS) {
+    if (typeof prefs[f] === "boolean") data[f] = prefs[f] as boolean
+  }
+  if (Object.keys(data).length === 0) throw new ApiError(400, "No valid preferences provided.")
+  await prisma.user.update({ where: { id: userId }, data })
+  return { ok: true }
+}
+
 /** Mark the onboarding wizard complete. */
 export async function finishOnboarding(userId: string) {
   await prisma.user.update({

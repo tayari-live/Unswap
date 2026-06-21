@@ -2,6 +2,7 @@ import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
 import { logAudit } from "@/server/services/audit"
 import { sendEmail, renderEmail } from "@/server/email"
+import { notifyAllowed } from "@/server/services/notify"
 
 const APP = () => process.env.AUTH_URL || "http://localhost:3000"
 const esc = (s: string) =>
@@ -153,7 +154,7 @@ export async function createSwapRequest(input: {
     where: { id: listing.ownerId },
     select: { email: true, firstName: true },
   })
-  if (host) {
+  if (host && (await notifyAllowed(listing.ownerId, "swaps"))) {
     await sendEmail({
       to: host.email,
       subject: `New swap request for ${listing.title}`,
@@ -250,7 +251,18 @@ export async function respondToSwap(input: {
   const exchangesUrl = `${APP()}/dashboard/exchanges`
   const swapsUrl = `${APP()}/dashboard/swaps`
 
-  try {
+  // The email recipient depends on the action; gate on their swap-email pref.
+  const recipientId =
+    input.action === "accept" || input.action === "decline" || input.action === "counter"
+      ? swap.requesterId
+      : input.action === "accept_counter" || input.action === "cancel"
+        ? swap.hostId
+        : isHost
+          ? swap.requesterId
+          : swap.hostId
+
+  if (await notifyAllowed(recipientId, "swaps")) {
+   try {
     if (input.action === "accept" || input.action === "accept_counter") {
       const recip = input.action === "accept" ? swap.requester : swap.host
       await sendEmail({
@@ -307,8 +319,9 @@ export async function respondToSwap(input: {
         }),
       })
     }
-  } catch (err) {
+   } catch (err) {
     console.error("Swap notification email failed:", err)
+   }
   }
 
   return { ok: true, status: data.status }

@@ -43,6 +43,14 @@ model User {
   trustScore         Float?    // weighted average of host reviews
   stripeCustomerId   String?   @unique // Stripe customer for billing
 
+  // Email notification preferences (opt-out per category; transactional emails
+  // such as verification, password reset, and billing are always sent).
+  notifySwaps        Boolean   @default(true)
+  notifyMessages     Boolean   @default(true)
+  notifyReviews      Boolean   @default(true)
+  notifyReminders    Boolean   @default(true)
+  notifyMarketing    Boolean   @default(true)
+
   createdAt          DateTime  @default(now())
 
   // Relations

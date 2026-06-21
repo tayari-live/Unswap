@@ -1,5 +1,6 @@
 import { prisma } from "@/server/prisma"
 import { sendEmail, renderEmail } from "@/server/email"
+import { notifyAllowed } from "@/server/services/notify"
 
 const APP = () => process.env.AUTH_URL || "http://localhost:3000"
 const esc = (s: string) =>
@@ -35,7 +36,12 @@ export async function sendSwapReminders(): Promise<number> {
   for (const s of swaps) {
     const when = fmtD(s.startDate)
     const place = `${esc(s.listing.city)}, ${esc(s.listing.country)}`
-    for (const p of [s.host, s.requester]) {
+    const parties = [
+      { id: s.hostId, p: s.host },
+      { id: s.requesterId, p: s.requester },
+    ]
+    for (const { id, p } of parties) {
+      if (!(await notifyAllowed(id, "reminders"))) continue
       await sendEmail({
         to: p.email,
         subject: "Your UnSwap exchange starts in 48 hours",
@@ -73,6 +79,7 @@ export async function sendRenewalReminders(): Promise<number> {
 
   let sent = 0
   for (const sub of subs) {
+    if (await notifyAllowed(sub.userId, "reminders")) {
     await sendEmail({
       to: sub.user.email,
       subject: "Your UnSwap membership renews soon",
@@ -83,8 +90,9 @@ export async function sendRenewalReminders(): Promise<number> {
         ctaUrl: `${APP()}/dashboard/subscription`,
       }),
     }).catch((e) => console.error("Renewal reminder email failed:", e))
-    await prisma.subscription.update({ where: { id: sub.id }, data: { renewalReminderSentAt: new Date() } })
-    sent++
+      await prisma.subscription.update({ where: { id: sub.id }, data: { renewalReminderSentAt: new Date() } })
+      sent++
+    }
   }
   return sent
 }
