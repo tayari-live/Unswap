@@ -23,6 +23,22 @@ export const stripe = key ? new Stripe(key) : null
 const baseUrl = () => process.env.AUTH_URL || "http://localhost:3000"
 const YEAR_MS = 365 * 24 * 60 * 60 * 1000
 
+/** On subscription lapse: pause the member's ACTIVE listings (flagged auto-paused). */
+async function pauseListingsForLapse(userId: string) {
+  await prisma.listing.updateMany({
+    where: { ownerId: userId, status: "ACTIVE" },
+    data: { status: "PAUSED", autoPaused: true },
+  })
+}
+
+/** On resubscription: restore listings that were auto-paused by a lapse. */
+async function restoreAutoPausedListings(userId: string) {
+  await prisma.listing.updateMany({
+    where: { ownerId: userId, autoPaused: true },
+    data: { status: "ACTIVE", autoPaused: false },
+  })
+}
+
 /** Create/activate the member's subscription record for a tier. */
 export async function activateSubscription(
   userId: string,
@@ -47,6 +63,9 @@ export async function activateSubscription(
       ...(stripeSubscriptionId !== undefined ? { stripeSubscriptionId } : {}),
     },
   })
+
+  // Restore any listings that a previous lapse auto-paused.
+  await restoreAutoPausedListings(userId)
 
   const user = await prisma.user.findUnique({ where: { id: userId } })
   if (user) {
@@ -113,6 +132,7 @@ export async function cancelSubscription(userId: string) {
     await stripe.subscriptions.update(sub.stripeSubscriptionId, { cancel_at_period_end: true })
   }
   await prisma.subscription.update({ where: { userId }, data: { status: "cancelled" } })
+  await pauseListingsForLapse(userId)
   await logAudit({ actorId: userId, action: "SUBSCRIPTION_CANCELLED", subject: "Cancelled subscription" })
 
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true, firstName: true } })
@@ -162,6 +182,7 @@ export async function handleWebhookEvent(event: Stripe.Event) {
         })
         if (sub) {
           await prisma.subscription.update({ where: { id: sub.id }, data: { status: "past_due" } })
+          await pauseListingsForLapse(sub.userId)
           await sendEmail({
             to: sub.user.email,
             subject: "Action needed: your UnSwap payment didn't go through",
@@ -184,6 +205,7 @@ export async function handleWebhookEvent(event: Stripe.Event) {
       })
       if (sub) {
         await prisma.subscription.update({ where: { id: sub.id }, data: { status: "cancelled" } })
+        await pauseListingsForLapse(sub.userId)
         await sendEmail({
           to: sub.user.email,
           subject: "Your UnSwap membership has been cancelled",

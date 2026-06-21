@@ -109,7 +109,10 @@ export async function createSwapRequest(input: {
 
   await assertWithinExchangeLimit(input.requesterId)
 
-  const listing = await prisma.listing.findUnique({ where: { id: input.listingId } })
+  const listing = await prisma.listing.findUnique({
+    where: { id: input.listingId },
+    include: { blackouts: true },
+  })
   if (!listing || listing.status !== "ACTIVE") throw new ApiError(404, "Listing not available.")
   if (listing.ownerId === input.requesterId) throw new ApiError(400, "You cannot request your own listing.")
 
@@ -128,6 +131,21 @@ export async function createSwapRequest(input: {
 
   const guests = Math.max(1, Math.round(Number(input.guests) || 1))
   if (guests > listing.maxGuests) throw new ApiError(400, `This home hosts up to ${listing.maxGuests} guests.`)
+
+  // Reject dates overlapping any blackout range.
+  const clash = listing.blackouts.some((b) => start <= b.endDate && end >= b.startDate)
+  if (clash) throw new ApiError(409, "Those dates fall within the host's blackout period.")
+
+  // Requested length must match one of the listing's offered duration types.
+  const offered = listing.swapDurations ? listing.swapDurations.split(",").filter(Boolean) : []
+  if (offered.length) {
+    const nights = Math.round((end.getTime() - start.getTime()) / 86_400_000)
+    const ranges: Record<string, [number, number]> = {
+      short_term: [7, 14], medium_term: [15, 90], long_term: [91, 180], extended: [181, 548],
+    }
+    const fits = offered.some((d) => ranges[d] && nights >= ranges[d][0] && nights <= ranges[d][1])
+    if (!fits) throw new ApiError(400, "Your stay length doesn't match this home's offered swap durations.")
+  }
 
   const swap = await prisma.swapRequest.create({
     data: {

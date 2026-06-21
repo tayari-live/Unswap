@@ -233,20 +233,62 @@ model Listing {
   bathrooms       Int      @default(1)
   maxGuests       Int      @default(2)
   description     String?
-  primaryPhotoUrl String?
+  primaryPhotoUrl String?  // mirrors the first gallery photo, for card rendering
   exchangeType    String   @default("either") // simultaneous | credits | either
   status          String   @default("DRAFT")  // DRAFT | ACTIVE | PAUSED | ARCHIVED
   flagged         Boolean  @default(false)
+  autoPaused      Boolean  @default(false) // paused by the system on subscription lapse
   rating          Float?
   createdAt       DateTime @default(now())
+
+  // Richer property details
+  wifiSpeed       String?  // under_50 | 50_200 | 200_plus | gigabit
+  amenities       String?  // comma-separated amenity keys
+  swapDurations   String?  // comma-separated: short_term,medium_term,long_term,extended
+  houseRules      String?
+
+  // Private, encrypted-at-rest. Only revealed to a confirmed swap partner.
+  fullAddressEnc       String?
+  emergencyNameEnc     String?
+  emergencyPhoneEnc    String?
+  emergencyRelationEnc String?
 
   owner           User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   swapRequests    SwapRequest[]
   favourites      Favourite[]
   reviews         Review[]
+  photos          ListingPhoto[]
+  blackouts       BlackoutDate[]
 
   @@index([status])
   @@index([city])
+}
+
+// A gallery photo for a listing. position 0 is the primary card image.
+model ListingPhoto {
+  id        String   @id @default(uuid())
+  listingId String
+  url       String   // base64 data URL (the app's inline-image pattern)
+  caption   String?
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId, position])
+}
+
+// An unavailable date range on a listing's calendar.
+model BlackoutDate {
+  id        String   @id @default(uuid())
+  listingId String
+  startDate DateTime
+  endDate   DateTime
+  createdAt DateTime @default(now())
+
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId])
 }
 
 // A swap request between two members for a listing.

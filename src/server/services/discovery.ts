@@ -81,6 +81,7 @@ export async function getListingDetail(viewerId: string, id: string) {
           verificationStatus: true,
         },
       },
+      photos: { orderBy: { position: "asc" } },
     },
   })
   if (!listing) return null
@@ -89,7 +90,16 @@ export async function getListingDetail(viewerId: string, id: string) {
   const fav = await prisma.favourite.findUnique({
     where: { userId_listingId: { userId: viewerId, listingId: id } },
   })
-  return { ...listing, favourited: !!fav }
+
+  // Never expose the encrypted private fields to the public detail view.
+  const { fullAddressEnc, emergencyNameEnc, emergencyPhoneEnc, emergencyRelationEnc, ...pub } = listing
+  void fullAddressEnc; void emergencyNameEnc; void emergencyPhoneEnc; void emergencyRelationEnc
+  return {
+    ...pub,
+    favourited: !!fav,
+    amenities: listing.amenities ? listing.amenities.split(",").filter(Boolean) : [],
+    swapDurations: listing.swapDurations ? listing.swapDurations.split(",").filter(Boolean) : [],
+  }
 }
 
 /** Toggle a listing in the viewer's private favourites. */

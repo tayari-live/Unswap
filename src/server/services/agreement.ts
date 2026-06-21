@@ -1,6 +1,7 @@
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib"
 import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
+import { decryptField } from "@/server/crypto"
 
 const NAVY = rgb(0.043, 0.122, 0.227) // #0B1F3A
 const GOLD = rgb(0.788, 0.659, 0.298) // #C9A84C
@@ -80,7 +81,22 @@ export async function buildAgreementPdf(userId: string, swapId: string): Promise
   row("Home", swap.listing.title)
   row("Location", [swap.listing.neighbourhood, swap.listing.city, swap.listing.country].filter(Boolean).join(", "))
   row("Type", `${swap.listing.propertyType} · ${swap.listing.bedrooms} bed · ${swap.listing.bathrooms} bath`)
+  // Full address is decrypted and disclosed only in the confirmed agreement.
+  const address = decryptField(swap.listing.fullAddressEnc)
+  if (address) row("Full address", address)
+  if (swap.listing.houseRules) { y -= 2; para(`House rules: ${swap.listing.houseRules}`) }
   y -= 6
+
+  // Emergency contact — decrypted, disclosed only to the confirmed partner.
+  const emName = decryptField(swap.listing.emergencyNameEnc)
+  const emPhone = decryptField(swap.listing.emergencyPhoneEnc)
+  const emRel = decryptField(swap.listing.emergencyRelationEnc)
+  if (emName || emPhone) {
+    heading("Emergency contact")
+    if (emName) row("Name", emRel ? `${emName} (${emRel})` : emName)
+    if (emPhone) row("Phone", emPhone)
+    y -= 6
+  }
 
   heading("Exchange details")
   row("Dates", `${fmt(swap.startDate)} – ${fmt(swap.endDate)}`)
