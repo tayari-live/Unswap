@@ -7,6 +7,7 @@ import {
   ListChecks,
   Globe,
   LineChart,
+  Flag,
   type LucideIcon,
 } from "lucide-react"
 
@@ -19,6 +20,7 @@ export const adminNavigation: NavItem[] = [
   { name: "Members", href: "/members", icon: Users },
   { name: "Listings", href: "/listings", icon: Home },
   { name: "Swaps", href: "/swaps", icon: ArrowLeftRight },
+  { name: "Moderation", href: "/moderation", icon: Flag },
   { name: "Waitlist", href: "/waitlist", icon: ListChecks },
   { name: "Domains", href: "/domains", icon: Globe },
   { name: "Analytics", href: "/analytics", icon: LineChart },

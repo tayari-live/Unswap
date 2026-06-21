@@ -68,9 +68,29 @@ model User {
   messages           Message[]
   reviewsWritten     Review[]                 @relation("ReviewAuthor")
   reviewsReceived    Review[]                 @relation("ReviewSubject")
+  reportsMade        Report[]                 @relation("ReportReporter")
 
   @@index([verificationStatus])
   @@index([role])
+}
+
+// A member-submitted report on a message or review, for admin moderation.
+// Target is polymorphic (no FK) so one queue covers multiple content types.
+model Report {
+  id           String    @id @default(uuid())
+  reporterId   String
+  targetType   String    // "message" | "review"
+  targetId     String
+  reason       String?
+  status       String    @default("open") // open | dismissed | actioned
+  resolvedById String?
+  resolvedAt   DateTime?
+  createdAt    DateTime  @default(now())
+
+  reporter     User      @relation("ReportReporter", fields: [reporterId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt])
+  @@index([targetType, targetId])
 }
 
 // A private thread between verified members, optionally tied to a swap request.

@@ -8,6 +8,7 @@ import { prisma } from "@/server/prisma"
 import { getListingDetail } from "@/server/services/discovery"
 import { listReviewsForListing } from "@/server/services/reviews"
 import { FavouriteButton } from "../favourite-button"
+import { ReportButton } from "@/components/report-button"
 import { SwapRequestForm } from "./swap-request-form"
 import { MessageButton } from "../../messages/message-button"
 
@@ -120,6 +121,7 @@ export default async function ListingDetailPage({
                       </div>
                     </div>
                     <p className="mt-2.5 text-sm text-neutral-dark leading-relaxed">{rv.body}</p>
+                    <div className="mt-2"><ReportButton targetType="review" targetId={rv.id} variant="link" /></div>
                   </div>
                 ))}
               </div>

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react"
 import Link from "next/link"
 import { ArrowLeft, Send, ImagePlus, X, BadgeCheck } from "lucide-react"
+import { ReportButton } from "@/components/report-button"
 
 type Msg = { id: string; senderId: string; body: string; attachmentUrl: string | null; createdAt: string }
 type Other = { id: string; fullName: string; avatarInitials: string; verificationStatus: string } | null
@@ -115,7 +116,7 @@ export function Thread({
         {messages.map((m) => {
           const mine = m.senderId === currentUserId
           return (
-            <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
+            <div key={m.id} className={`flex items-end gap-1.5 ${mine ? "justify-end" : "justify-start"}`}>
               <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${mine ? "bg-[var(--navy)] text-white" : "bg-surface border border-[var(--border)] text-[var(--navy)]"}`}>
                 {m.attachmentUrl && (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -124,6 +125,7 @@ export function Thread({
                 {m.body && <p className="text-sm whitespace-pre-wrap break-words">{m.body}</p>}
                 <div className={`text-[10px] mt-1 ${mine ? "text-white/50" : "text-neutral"}`}>{clock(m.createdAt)}</div>
               </div>
+              {!mine && <ReportButton targetType="message" targetId={m.id} />}
             </div>
           )
         })}
