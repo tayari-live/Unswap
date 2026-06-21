@@ -4,6 +4,16 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { MapPin, Calendar, Users, Check, X, Repeat, CheckCheck } from "lucide-react"
 import { MessageButton } from "../messages/message-button"
+import { useToast } from "@/components/ui/toast"
+
+const ACTION_MSG: Record<string, string> = {
+  accept: "Swap accepted",
+  accept_counter: "Exchange confirmed",
+  decline: "Request declined",
+  counter: "Counter-offer sent",
+  cancel: "Request cancelled",
+  complete: "Marked as completed",
+}
 
 type Party = { id: string; fullName: string; avatarInitials: string; organisation: string | null }
 export type SwapRow = {
@@ -34,6 +44,7 @@ function fmt(d: string) {
 
 function SwapCard({ swap, role }: { swap: SwapRow; role: "incoming" | "outgoing" | "past" }) {
   const router = useRouter()
+  const toast = useToast()
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState("")
   const [countering, setCountering] = useState(false)
@@ -54,7 +65,9 @@ function SwapCard({ swap, role }: { swap: SwapRow; role: "incoming" | "outgoing"
       if (!res.ok) {
         const d = await res.json().catch(() => ({}))
         setError(d.error || "Action failed.")
+        toast(d.error || "Action failed.", "error")
       } else {
+        toast(ACTION_MSG[action] ?? "Done", "success")
         router.refresh()
       }
     } finally {

@@ -12,6 +12,14 @@ import {
   PauseCircle,
   Archive,
 } from "lucide-react"
+import { useToast } from "@/components/ui/toast"
+
+const STATUS_MSG: Record<string, string> = {
+  ACTIVE: "Listing published",
+  PAUSED: "Listing paused",
+  ARCHIVED: "Listing archived",
+  DRAFT: "Listing updated",
+}
 
 type Listing = {
   id: string
@@ -39,6 +47,7 @@ export function ListingsClient({
   canPublish: boolean
 }) {
   const router = useRouter()
+  const toast = useToast()
   const [busyId, setBusyId] = useState<string | null>(null)
   const [error, setError] = useState("")
 
@@ -54,7 +63,9 @@ export function ListingsClient({
       if (!res.ok) {
         const d = await res.json().catch(() => ({}))
         setError(d.error || "Could not update the listing.")
+        toast(d.error || "Could not update the listing.", "error")
       } else {
+        toast(STATUS_MSG[status] ?? "Listing updated", "success")
         router.refresh()
       }
     } finally {
@@ -71,7 +82,9 @@ export function ListingsClient({
       if (!res.ok) {
         const d = await res.json().catch(() => ({}))
         setError(d.error || "Could not delete the listing.")
+        toast(d.error || "Could not delete the listing.", "error")
       } else {
+        toast("Listing deleted", "success")
         router.refresh()
       }
     } finally {

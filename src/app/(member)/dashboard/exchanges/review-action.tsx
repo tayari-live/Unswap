@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Star, Check } from "lucide-react"
+import { useToast } from "@/components/ui/toast"
 
 function StarRating({
   label,
@@ -49,6 +50,7 @@ export function ReviewAction({
   otherName: string
 }) {
   const router = useRouter()
+  const toast = useToast()
   const [open, setOpen] = useState(false)
   const [overall, setOverall] = useState(0)
   const [communication, setCommunication] = useState(0)
@@ -84,9 +86,11 @@ export function ReviewAction({
       const data = await res.json()
       if (!res.ok) {
         setError(data.error || "Could not submit your review.")
+        toast(data.error || "Could not submit your review.", "error")
         setLoading(false)
         return
       }
+      toast("Review submitted — thank you!", "success")
       router.refresh()
     } catch {
       setError("Something went wrong. Please try again.")

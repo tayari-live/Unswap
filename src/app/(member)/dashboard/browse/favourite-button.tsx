@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { Heart } from "lucide-react"
+import { useToast } from "@/components/ui/toast"
 
 export function FavouriteButton({
   listingId,
@@ -14,6 +15,7 @@ export function FavouriteButton({
 }) {
   const [fav, setFav] = useState(initial)
   const [busy, setBusy] = useState(false)
+  const toast = useToast()
 
   async function toggle(e: React.MouseEvent) {
     e.preventDefault()
@@ -29,10 +31,16 @@ export function FavouriteButton({
         body: JSON.stringify({ listingId }),
       })
       const data = await res.json()
-      if (res.ok) setFav(data.favourited)
-      else setFav(!optimistic)
+      if (res.ok) {
+        setFav(data.favourited)
+        toast(data.favourited ? "Saved to favourites" : "Removed from favourites", "success")
+      } else {
+        setFav(!optimistic)
+        toast("Could not update favourites", "error")
+      }
     } catch {
       setFav(!optimistic)
+      toast("Something went wrong", "error")
     } finally {
       setBusy(false)
     }

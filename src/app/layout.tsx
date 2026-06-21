@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import { CookieConsent } from "@/components/site/cookie-consent";
+import { ToastProvider } from "@/components/ui/toast";
 
 // Body / UI — DM Sans (300, 400, 500)
 const dmSans = DM_Sans({
@@ -57,8 +58,10 @@ export default function RootLayout({
       className={`${dmSans.variable} ${cormorant.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans bg-background text-foreground">
-        {children}
-        <CookieConsent />
+        <ToastProvider>
+          {children}
+          <CookieConsent />
+        </ToastProvider>
       </body>
     </html>
   );

@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { Flag } from "lucide-react"
+import { useToast } from "@/components/ui/toast"
 
 /** Lets a member report a message or review for moderation. */
 export function ReportButton({
@@ -15,6 +16,7 @@ export function ReportButton({
 }) {
   const [done, setDone] = useState(false)
   const [busy, setBusy] = useState(false)
+  const toast = useToast()
 
   async function report() {
     if (done || busy) return
@@ -26,7 +28,12 @@ export function ReportButton({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ targetType, targetId, reason }),
       })
-      if (res.ok) setDone(true)
+      if (res.ok) {
+        setDone(true)
+        toast("Thanks — our team will review this.", "success")
+      } else {
+        toast("Could not submit the report", "error")
+      }
     } finally {
       setBusy(false)
     }
