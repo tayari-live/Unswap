@@ -185,6 +185,7 @@ model Subscription {
   priceAnnual       Int      // in whole currency units (annual; one-time for lifetime)
   propertyGuarantee Int      // guarantee amount
   renewsAt          DateTime?
+  renewalReminderSentAt DateTime? // set when the 7-day renewal reminder is sent
   stripeSubscriptionId String? @unique // Stripe subscription (null for lifetime/dev)
   createdAt         DateTime @default(now())
 
@@ -236,6 +237,7 @@ model SwapRequest {
   message     String?
   createdAt   DateTime @default(now())
   completedAt DateTime? // set when the exchange is marked COMPLETED (review window start)
+  reminderSentAt DateTime? // set when the 48h "exchange starts soon" reminder is sent
 
   requester   User     @relation("Requester", fields: [requesterId], references: [id], onDelete: Cascade)
   host        User     @relation("Host", fields: [hostId], references: [id], onDelete: Cascade)
