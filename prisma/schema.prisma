@@ -1,15 +1,15 @@
-// UnSwap admin dashboard — Prisma schema.
+// UnSwap — Prisma schema (PostgreSQL).
 // Learn more: https://pris.ly/d/prisma-schema
 //
-// Local default is SQLite for zero-setup runs. To use Postgres, change
-// `provider` to "postgresql" and set DATABASE_URL accordingly.
+// Set DATABASE_URL to a Postgres connection string (Vercel Postgres, Neon,
+// Supabase, or a local Docker Postgres). Apply with `prisma migrate deploy`.
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
