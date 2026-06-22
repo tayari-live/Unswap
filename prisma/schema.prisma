@@ -1,16 +1,19 @@
 // UnSwap — Prisma schema (PostgreSQL).
 // Learn more: https://pris.ly/d/prisma-schema
 //
-// Set DATABASE_URL to a Postgres connection string (Vercel Postgres, Neon,
-// Supabase, or a local Docker Postgres). Apply with `prisma migrate deploy`.
+// DATABASE_URL  — pooled connection used at runtime (Neon "-pooler" host).
+// DIRECT_URL    — direct, unpooled connection used by `prisma migrate`.
+// On Neon both come from the dashboard; DIRECT_URL drops the "-pooler" suffix.
+// Falls back to DATABASE_URL if DIRECT_URL is unset (e.g. local Docker Postgres).
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // A platform user. Covers both verified/applicant members and admins.

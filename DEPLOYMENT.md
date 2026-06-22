@@ -3,18 +3,35 @@
 This app is a Next.js (App Router) project backed by PostgreSQL via Prisma,
 NextAuth v5 sessions, Stripe billing, Resend email, and an hourly Vercel Cron.
 
-## 1. Provision a PostgreSQL database
+## 1. Provision a Neon database
 
-Vercel Postgres, Neon, or Supabase all work. Copy the connection string. For
-serverless, prefer the pooled connection URL (e.g. PgBouncer / `?pgbouncer=true`).
+1. Create a project at [neon.tech](https://neon.tech) and a database named `unswap`.
+2. From the project dashboard, open **Connection Details** and copy **two** strings:
+   - the **Pooled** connection (host contains `-pooler`) → `DATABASE_URL`
+   - the **Direct** connection (same host without `-pooler`) → `DIRECT_URL`
+
+   Both include `?sslmode=require`. The pooled URL is used by the app at runtime
+   (safe for serverless); the direct URL is used by `prisma migrate`, which can't
+   run through the pooler.
+
+The Prisma datasource already reads both:
+
+```prisma
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")  // pooled
+  directUrl = env("DIRECT_URL")    // direct, for migrations
+}
+```
 
 ## 2. Apply the schema (one-time)
 
-From your machine or a CI step, against the production database:
+From your machine or a CI step, against the Neon database. `migrate deploy`
+uses `DIRECT_URL` automatically:
 
 ```bash
-DATABASE_URL="<prod-postgres-url>" npx prisma migrate deploy
-DATABASE_URL="<prod-postgres-url>" npx prisma db seed   # optional reference data
+DATABASE_URL="<neon-pooled-url>" DIRECT_URL="<neon-direct-url>" npx prisma migrate deploy
+DATABASE_URL="<neon-pooled-url>" DIRECT_URL="<neon-direct-url>" npx prisma db seed   # optional
 ```
 
 `migrate deploy` applies `prisma/migrations/0_init` and any later migrations. It
@@ -26,7 +43,8 @@ Set these in **Vercel → Project → Settings → Environment Variables**.
 
 | Variable | Required? | Notes |
 |---|---|---|
-| `DATABASE_URL` | **Required** | PostgreSQL connection string |
+| `DATABASE_URL` | **Required** | Neon **pooled** connection string (host contains `-pooler`) |
+| `DIRECT_URL` | **Required** | Neon **direct** connection string (no `-pooler`) — used by migrations |
 | `AUTH_SECRET` | **Required** | `openssl rand -base64 32` — signs NextAuth sessions |
 | `AUTH_URL` | **Required** | Production URL, e.g. `https://unswap.net`. Used for email links, sitemap, robots, and Stripe redirects |
 | `ENCRYPTION_KEY` | Strongly recommended | Key for AES-256-GCM at-rest encryption of addresses / emergency contacts. Falls back to `AUTH_SECRET`, but **set it explicitly and never change it** — rotating it makes already-encrypted data unreadable |
@@ -69,8 +87,10 @@ runs 48-hour swap reminders, 7-day renewal reminders, and the swap lifecycle
 
 ## Local development
 
-Local dev also requires PostgreSQL (SQLite is no longer supported). Set
-`DATABASE_URL` in `.env` to a local or hosted Postgres instance, then:
+Local dev also requires PostgreSQL (SQLite is no longer supported). You can use
+the same Neon database, or a local Docker Postgres. Set `DATABASE_URL` (and
+`DIRECT_URL` for Neon — for a local plain Postgres, point both at the same URL)
+in `.env`, then:
 
 ```bash
 npx prisma migrate deploy   # or: npx prisma db push
