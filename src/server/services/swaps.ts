@@ -72,25 +72,82 @@ export async function listMemberSwaps(userId: string) {
   }
 }
 
-/** A verified member requests a swap on another member's active listing. */
-const ACTIVE_EXCHANGE = ["CONFIRMED", "IN_PROGRESS", "COMPLETED"]
+const DAY = 24 * 60 * 60 * 1000
+const nightsBetween = (s: Date, e: Date) => Math.max(1, Math.round((e.getTime() - s.getTime()) / DAY))
+// Short-term hosting (7–14 nights) earns credits at an accelerated 1.5× rate.
+const earnAmount = (n: number) => (n >= 7 && n <= 14 ? Math.ceil(n * 1.5) : n)
 
-/** Enforce the requester's annual exchange allowance from their subscription tier. */
+/**
+ * Enforce the requester's per-period exchange allowance. A slot is consumed when
+ * a request is created and returned when it's declined or cancelled-before-
+ * confirmation (tracked via `consumesSlot`). The period is anchored to the
+ * subscription renewal date.
+ */
 async function assertWithinExchangeLimit(requesterId: string) {
   const sub = await prisma.subscription.findUnique({ where: { userId: requesterId } })
-  // Nothing to enforce without an active, finite-allowance plan.
   if (!sub || sub.status !== "active" || sub.exchangesPerYear === -1) return
 
-  const since = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000)
+  const periodStart = sub.renewsAt ? new Date(sub.renewsAt.getTime() - 365 * DAY) : new Date(Date.now() - 365 * DAY)
   const used = await prisma.swapRequest.count({
-    where: { requesterId, status: { in: ACTIVE_EXCHANGE }, createdAt: { gte: since } },
+    where: { requesterId, consumesSlot: true, createdAt: { gte: periodStart } },
   })
   if (used >= sub.exchangesPerYear) {
     throw new ApiError(
       402,
-      `You've used all ${sub.exchangesPerYear} exchange${sub.exchangesPerYear === 1 ? "" : "s"} in your plan this year. Upgrade your membership to request more.`,
+      `You've used all ${sub.exchangesPerYear} exchange${sub.exchangesPerYear === 1 ? "" : "s"} in your plan this period. Upgrade your membership to request more.`,
     )
   }
+}
+
+/**
+ * Finalise a completed exchange: set status, post credits (host earns, requester
+ * spends), and prompt both parties to review. Shared by manual completion and
+ * the auto-complete cron. Idempotent — only acts on confirmed/in-progress swaps.
+ */
+export async function completeSwap(swapId: string) {
+  const swap = await prisma.swapRequest.findUnique({
+    where: { id: swapId },
+    include: {
+      listing: { select: { title: true } },
+      host: { select: { id: true, email: true, firstName: true } },
+      requester: { select: { id: true, email: true, firstName: true } },
+    },
+  })
+  if (!swap || !["CONFIRMED", "IN_PROGRESS"].includes(swap.status)) return { ok: false }
+
+  await prisma.swapRequest.update({ where: { id: swapId }, data: { status: "COMPLETED", completedAt: new Date() } })
+
+  if (swap.mode === "credits") {
+    const nights = nightsBetween(swap.startDate, swap.endDate)
+    // Confirm the host's pending earn (or create it), and record the spend.
+    const earned = await prisma.creditTransaction.updateMany({
+      where: { swapId, type: "earned", status: "pending" },
+      data: { status: "confirmed" },
+    })
+    if (earned.count === 0) {
+      await prisma.creditTransaction.create({ data: { userId: swap.hostId, swapId, type: "earned", amount: earnAmount(nights), status: "confirmed" } })
+    }
+    await prisma.creditTransaction.create({ data: { userId: swap.requesterId, swapId, type: "spent", amount: nights, status: "confirmed" } })
+  }
+
+  // Prompt both parties to review.
+  for (const p of [swap.host, swap.requester]) {
+    if (await notifyAllowed(p.id, "swaps")) {
+      await sendEmail({
+        to: p.email,
+        subject: "How was your exchange?",
+        html: renderEmail({
+          heading: "Exchange complete",
+          body: `<p>Hello ${esc(p.firstName)},</p><p>Your exchange at <strong>${esc(swap.listing.title)}</strong> is complete. Leave a review to support the community and build trust.</p>`,
+          ctaLabel: "Leave a review",
+          ctaUrl: `${APP()}/dashboard/exchanges`,
+        }),
+      }).catch((e) => console.error("Completion email failed:", e))
+    }
+  }
+
+  await logAudit({ action: "SWAP_COMPLETED", subject: `Swap for ${swap.listing.title}` })
+  return { ok: true }
 }
 
 export async function createSwapRequest(input: {
@@ -210,6 +267,13 @@ export async function respondToSwap(input: {
   const isRequester = swap.requesterId === input.userId
   if (!isHost && !isRequester) throw new ApiError(403, "You are not part of this swap.")
 
+  // Completion runs through the shared helper (posts credits, prompts reviews).
+  if (input.action === "complete") {
+    if (!["CONFIRMED", "IN_PROGRESS"].includes(swap.status)) throw new ApiError(409, "Only a confirmed exchange can be completed.")
+    await completeSwap(swap.id)
+    return { ok: true, status: "COMPLETED" }
+  }
+
   const data: Record<string, unknown> = {}
 
   switch (input.action) {
@@ -222,6 +286,7 @@ export async function respondToSwap(input: {
       if (!isHost) throw new ApiError(403, "Only the host can decline.")
       if (!["REQUESTED", "COUNTER_OFFERED"].includes(swap.status)) throw new ApiError(409, "This request can no longer be declined.")
       data.status = "CANCELLED"
+      data.consumesSlot = false // a declined request returns the requester's slot
       break
     case "counter": {
       if (!isHost) throw new ApiError(403, "Only the host can counter-offer.")
@@ -232,6 +297,7 @@ export async function respondToSwap(input: {
       data.status = "COUNTER_OFFERED"
       data.startDate = start
       data.endDate = end
+      data.counteredAt = new Date()
       break
     }
     case "accept_counter": // requester accepts the host's counter
@@ -239,21 +305,31 @@ export async function respondToSwap(input: {
       if (swap.status !== "COUNTER_OFFERED") throw new ApiError(409, "There is no counter-offer to accept.")
       data.status = "CONFIRMED"
       break
-    case "cancel": // requester withdraws
-      if (!isRequester) throw new ApiError(403, "Only the requester can cancel.")
-      if (!["REQUESTED", "COUNTER_OFFERED"].includes(swap.status)) throw new ApiError(409, "This request can no longer be cancelled.")
-      data.status = "CANCELLED"
-      break
-    case "complete": // either party marks a confirmed exchange complete
-      if (!["CONFIRMED", "IN_PROGRESS"].includes(swap.status)) throw new ApiError(409, "Only a confirmed exchange can be completed.")
-      data.status = "COMPLETED"
-      data.completedAt = new Date()
+    case "cancel": // either party may cancel
+      if (["REQUESTED", "COUNTER_OFFERED"].includes(swap.status)) {
+        data.status = "CANCELLED"
+        data.consumesSlot = false // cancelling before confirmation returns the slot
+      } else if (swap.status === "CONFIRMED") {
+        data.status = "CANCELLED"
+        // Cancelling within 48h of the start date forfeits the exchange slot.
+        data.consumesSlot = swap.startDate.getTime() - Date.now() <= 48 * 60 * 60 * 1000
+      } else {
+        throw new ApiError(409, "This exchange can no longer be cancelled.")
+      }
       break
     default:
       throw new ApiError(400, "Unknown action.")
   }
 
   await prisma.swapRequest.update({ where: { id: swap.id }, data })
+
+  // Credits mode: confirming creates the host's pending earn (posted on completion).
+  if ((input.action === "accept" || input.action === "accept_counter") && swap.mode === "credits") {
+    await prisma.creditTransaction.create({
+      data: { userId: swap.hostId, swapId: swap.id, type: "earned", amount: earnAmount(nightsBetween(swap.startDate, swap.endDate)), status: "pending" },
+    })
+  }
+
   await logAudit({
     actorId: input.userId,
     action: `SWAP_${input.action.toUpperCase()}`,
@@ -273,11 +349,13 @@ export async function respondToSwap(input: {
   const recipientId =
     input.action === "accept" || input.action === "decline" || input.action === "counter"
       ? swap.requesterId
-      : input.action === "accept_counter" || input.action === "cancel"
+      : input.action === "accept_counter"
         ? swap.hostId
-        : isHost
-          ? swap.requesterId
-          : swap.hostId
+        : input.action === "cancel"
+          ? (isHost ? swap.requesterId : swap.hostId) // notify the other party
+          : isHost
+            ? swap.requesterId
+            : swap.hostId
 
   if (await notifyAllowed(recipientId, "swaps")) {
    try {
@@ -316,24 +394,16 @@ export async function respondToSwap(input: {
         }),
       })
     } else if (input.action === "cancel") {
-      await sendEmail({
-        to: swap.host.email,
-        subject: "A swap request was withdrawn",
-        html: renderEmail({
-          heading: "Request withdrawn",
-          body: `<p>${esc(swap.requester.fullName)} withdrew their request for <strong>${L}</strong>.</p>`,
-        }),
-      })
-    } else if (input.action === "complete") {
       const other = isHost ? swap.requester : swap.host
+      const canceller = isHost ? swap.host : swap.requester
       await sendEmail({
         to: other.email,
-        subject: "How was your exchange?",
+        subject: "A swap was cancelled",
         html: renderEmail({
-          heading: "Exchange complete",
-          body: `<p>Hello ${esc(other.firstName)},</p><p>Your exchange at <strong>${L}</strong> is marked complete. Leave a review to support the community and build trust.</p>`,
-          ctaLabel: "Leave a review",
-          ctaUrl: exchangesUrl,
+          heading: "Swap cancelled",
+          body: `<p>Hello ${esc(other.firstName)},</p><p>${esc(canceller.fullName)} cancelled the exchange for <strong>${L}</strong>.</p>`,
+          ctaLabel: "Discover homes",
+          ctaUrl: `${APP()}/dashboard/browse`,
         }),
       })
     }
@@ -365,4 +435,46 @@ export async function updateSwap(input: { actorId: string; id: string; status?: 
     metadata: { status: input.status, disputed: input.disputed },
   })
   return { ok: true }
+}
+
+// ---- Scheduled lifecycle (run by the cron) -----------------------------------
+
+/** Auto-cancel counter-offers left unanswered for 7+ days; returns the slot. */
+async function expireCounterOffers(): Promise<number> {
+  const cutoff = new Date(Date.now() - 7 * DAY)
+  const stale = await prisma.swapRequest.findMany({
+    where: { status: "COUNTER_OFFERED", counteredAt: { lt: cutoff } },
+    select: { id: true },
+  })
+  for (const s of stale) {
+    await prisma.swapRequest.update({ where: { id: s.id }, data: { status: "CANCELLED", consumesSlot: false } })
+  }
+  return stale.length
+}
+
+/** Advance confirmed swaps to IN_PROGRESS once their start date arrives. */
+async function progressConfirmed(): Promise<number> {
+  const r = await prisma.swapRequest.updateMany({
+    where: { status: "CONFIRMED", startDate: { lte: new Date() } },
+    data: { status: "IN_PROGRESS" },
+  })
+  return r.count
+}
+
+/** Auto-complete swaps whose end date has passed (posts credits, prompts reviews). */
+async function autoCompleteDue(): Promise<number> {
+  const due = await prisma.swapRequest.findMany({
+    where: { status: { in: ["CONFIRMED", "IN_PROGRESS"] }, endDate: { lte: new Date() } },
+    select: { id: true },
+  })
+  for (const s of due) await completeSwap(s.id)
+  return due.length
+}
+
+/** Run all swap lifecycle transitions. Called by the cron endpoint. */
+export async function runSwapLifecycle() {
+  const expiredCounters = await expireCounterOffers()
+  const completed = await autoCompleteDue() // complete first (handles end-dated swaps)
+  const inProgress = await progressConfirmed()
+  return { expiredCounters, inProgress, completed }
 }

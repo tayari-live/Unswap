@@ -1,9 +1,5 @@
 import { prisma } from "@/server/prisma"
 
-function nights(a: Date, b: Date) {
-  return Math.max(0, Math.round((b.getTime() - a.getTime()) / 86_400_000))
-}
-
 export type CreditTxn = {
   id: string
   type: "earned" | "spent"
@@ -14,38 +10,38 @@ export type CreditTxn = {
 }
 
 /**
- * Derive a member's UnSwap Credits from completed credit-mode swaps.
- * 1 night hosted = 1 credit earned; 1 night stayed = 1 credit spent.
+ * A member's UnSwap Credits from the confirmed CreditTransaction ledger.
+ * Host earns on a completed credits swap (1.5× for short-term); requester spends.
  */
 export async function getCreditsLedger(userId: string) {
-  const swaps = await prisma.swapRequest.findMany({
-    where: {
-      status: "COMPLETED",
-      mode: "credits",
-      OR: [{ hostId: userId }, { requesterId: userId }],
-    },
-    include: {
-      host: { select: { fullName: true } },
-      requester: { select: { fullName: true } },
-      listing: { select: { title: true } },
-    },
-    orderBy: [{ completedAt: "desc" }, { endDate: "desc" }],
+  const txns = await prisma.creditTransaction.findMany({
+    where: { userId, status: "confirmed" },
+    orderBy: { createdAt: "desc" },
   })
 
-  const transactions: CreditTxn[] = swaps.map((s) => {
-    const earned = s.hostId === userId
-    const n = nights(s.startDate, s.endDate)
+  const swapIds = [...new Set(txns.map((t) => t.swapId).filter(Boolean) as string[])]
+  const swaps = await prisma.swapRequest.findMany({
+    where: { id: { in: swapIds } },
+    include: { host: { select: { fullName: true } }, requester: { select: { fullName: true } }, listing: { select: { title: true } } },
+  })
+  const byId = new Map(swaps.map((s) => [s.id, s]))
+
+  const transactions: CreditTxn[] = txns.map((t) => {
+    const s = t.swapId ? byId.get(t.swapId) : null
+    const earned = t.type === "earned"
     return {
-      id: s.id,
+      id: t.id,
       type: earned ? "earned" : "spent",
-      amount: earned ? n : -n,
-      title: earned ? `Hosted ${s.requester.fullName}` : `Stayed with ${s.host.fullName}`,
-      listing: s.listing.title,
-      date: s.completedAt ?? s.endDate,
+      amount: earned ? t.amount : -t.amount,
+      title: s
+        ? earned ? `Hosted ${s.requester.fullName}` : `Stayed with ${s.host.fullName}`
+        : earned ? "Credits earned" : "Credits spent",
+      listing: s?.listing.title ?? "—",
+      date: t.createdAt,
     }
   })
 
-  const earned = transactions.filter((t) => t.amount > 0).reduce((a, t) => a + t.amount, 0)
-  const spent = transactions.filter((t) => t.amount < 0).reduce((a, t) => a - t.amount, 0)
+  const earned = txns.filter((t) => t.type === "earned").reduce((a, t) => a + t.amount, 0)
+  const spent = txns.filter((t) => t.type === "spent").reduce((a, t) => a + t.amount, 0)
   return { balance: earned - spent, earned, spent, transactions }
 }

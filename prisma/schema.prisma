@@ -69,6 +69,7 @@ model User {
   reviewsWritten     Review[]                 @relation("ReviewAuthor")
   reviewsReceived    Review[]                 @relation("ReviewSubject")
   reportsMade        Report[]                 @relation("ReportReporter")
+  creditTransactions CreditTransaction[]      @relation("CreditUser")
 
   @@index([verificationStatus])
   @@index([role])
@@ -264,6 +265,22 @@ model Listing {
   @@index([city])
 }
 
+// A credit ledger entry. Host earns on a completed credits swap; requester
+// spends. Earned credits are PENDING on confirmation, CONFIRMED on completion.
+model CreditTransaction {
+  id        String   @id @default(uuid())
+  userId    String
+  swapId    String?
+  type      String   // earned | spent
+  amount    Int      // whole credits (positive)
+  status    String   @default("confirmed") // pending | confirmed
+  createdAt DateTime @default(now())
+
+  user      User     @relation("CreditUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+}
+
 // A gallery photo for a listing. position 0 is the primary card image.
 model ListingPhoto {
   id        String   @id @default(uuid())
@@ -308,6 +325,8 @@ model SwapRequest {
   createdAt   DateTime @default(now())
   completedAt DateTime? // set when the exchange is marked COMPLETED (review window start)
   reminderSentAt DateTime? // set when the 48h "exchange starts soon" reminder is sent
+  consumesSlot Boolean  @default(true) // counts against requester's annual exchange limit
+  counteredAt DateTime? // when the host last counter-offered (drives 7-day expiry)
 
   requester   User     @relation("Requester", fields: [requesterId], references: [id], onDelete: Cascade)
   host        User     @relation("Host", fields: [hostId], references: [id], onDelete: Cascade)

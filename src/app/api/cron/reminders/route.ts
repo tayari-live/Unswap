@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { runReminders } from "@/server/services/reminders"
+import { runSwapLifecycle } from "@/server/services/swaps"
 
 export const dynamic = "force-dynamic"
 
@@ -20,10 +21,11 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const result = await runReminders()
-    return NextResponse.json({ ok: true, ...result })
+    const reminders = await runReminders()
+    const lifecycle = await runSwapLifecycle()
+    return NextResponse.json({ ok: true, ...reminders, ...lifecycle })
   } catch (err) {
-    console.error("Reminder cron failed:", err)
-    return NextResponse.json({ error: "Reminder run failed" }, { status: 500 })
+    console.error("Cron run failed:", err)
+    return NextResponse.json({ error: "Cron run failed" }, { status: 500 })
   }
 }
