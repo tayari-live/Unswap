@@ -82,6 +82,7 @@ export async function getListingDetail(viewerId: string, id: string) {
         },
       },
       photos: { orderBy: { position: "asc" } },
+      blackouts: { orderBy: { startDate: "asc" } },
     },
   })
   if (!listing) return null
@@ -99,6 +100,10 @@ export async function getListingDetail(viewerId: string, id: string) {
     favourited: !!fav,
     amenities: listing.amenities ? listing.amenities.split(",").filter(Boolean) : [],
     swapDurations: listing.swapDurations ? listing.swapDurations.split(",").filter(Boolean) : [],
+    blackouts: listing.blackouts.map((b) => ({
+      start: b.startDate.toISOString().slice(0, 10),
+      end: b.endDate.toISOString().slice(0, 10),
+    })),
   }
 }
 

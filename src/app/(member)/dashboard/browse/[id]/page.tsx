@@ -202,7 +202,13 @@ export default async function ListingDetailPage({
             </div>
           ) : canRequest ? (
             <div className="space-y-3">
-              <SwapRequestForm listingId={listing.id} exchangeType={listing.exchangeType} maxGuests={listing.maxGuests} />
+              <SwapRequestForm
+                listingId={listing.id}
+                exchangeType={listing.exchangeType}
+                maxGuests={listing.maxGuests}
+                swapDurations={listing.swapDurations}
+                blackouts={listing.blackouts}
+              />
               <MessageButton otherUserId={listing.owner.id} label="Message host" />
             </div>
           ) : (
