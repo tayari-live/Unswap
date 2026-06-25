@@ -13,10 +13,9 @@ export function listListings() {
 const STATUSES = ["DRAFT", "ACTIVE", "PAUSED", "ARCHIVED"]
 const PROPERTY_TYPES = ["Apartment", "House", "Villa", "Studio", "Townhouse"]
 const EXCHANGE_TYPES = ["simultaneous", "credits", "either"]
-const WIFI_SPEEDS = ["under_50", "50_200", "200_plus", "gigabit"]
 export const DURATION_TYPES = ["short_term", "medium_term", "long_term", "extended"]
 export const AMENITIES = [
-  "home_office", "parking", "garden", "pool", "dishwasher",
+  "wifi", "home_office", "parking", "garden", "pool", "dishwasher",
   "washing_machine", "air_conditioning", "lift", "pet_friendly", "accessible",
 ]
 const IMAGE_DATA_URL = /^data:image\/(png|jpe?g|webp);base64,/
@@ -39,7 +38,6 @@ export type ListingInput = {
   bathrooms?: number
   maxGuests?: number
   description?: string
-  wifiSpeed?: string
   amenities?: string[]
   photos?: PhotoInput[]
   swapDurations?: string[]
@@ -119,7 +117,6 @@ function validateFull(input: ListingInput) {
   if (!country) throw new ApiError(400, "Country is required.")
   const description = input.description?.trim() ?? ""
   if (description.length < 100) throw new ApiError(400, "Description must be at least 100 characters.")
-  if (!input.wifiSpeed || !WIFI_SPEEDS.includes(input.wifiSpeed)) throw new ApiError(400, "Select a Wi-Fi speed.")
   const amenities = (input.amenities ?? []).filter((a) => AMENITIES.includes(a))
   const durations = (input.swapDurations ?? []).filter((d) => DURATION_TYPES.includes(d))
   if (durations.length === 0) throw new ApiError(400, "Select at least one swap duration type.")
@@ -159,7 +156,6 @@ export async function createListing(ownerId: string, input: ListingInput) {
         bathrooms: clampInt(input.bathrooms, 1, 1, 6),
         maxGuests: clampInt(input.maxGuests, 2, 1, 12),
         description: v.description,
-        wifiSpeed: input.wifiSpeed,
         amenities: v.amenities.join(",") || null,
         swapDurations: v.durations.join(","),
         exchangeType: input.exchangeType || "either",
@@ -225,7 +221,6 @@ export async function updateMemberListing(ownerId: string, id: string, input: Li
         bathrooms: clampInt(input.bathrooms, existing.bathrooms, 1, 6),
         maxGuests: clampInt(input.maxGuests, existing.maxGuests, 1, 12),
         description: v.description,
-        wifiSpeed: input.wifiSpeed,
         amenities: v.amenities.join(",") || null,
         swapDurations: v.durations.join(","),
         exchangeType: input.exchangeType || existing.exchangeType,

@@ -19,14 +19,11 @@ const EXCHANGE_LABEL: Record<string, string> = {
   credits: "Credits only",
   either: "Simultaneous or credits",
 }
-const WIFI_LABEL: Record<string, string> = {
-  under_50: "Under 50 Mbps", "50_200": "50–200 Mbps", "200_plus": "200 Mbps+", gigabit: "Gigabit",
-}
 const DURATION_LABEL: Record<string, string> = {
   short_term: "Short-term", medium_term: "Medium-term", long_term: "Long-term", extended: "Extended rotation",
 }
 const AMENITY_LABEL: Record<string, string> = {
-  home_office: "Home office", parking: "Parking", garden: "Garden", pool: "Pool", dishwasher: "Dishwasher",
+  wifi: "Wi-Fi", home_office: "Home office", parking: "Parking", garden: "Garden", pool: "Pool", dishwasher: "Dishwasher",
   washing_machine: "Washing machine", air_conditioning: "Air conditioning", lift: "Lift access", pet_friendly: "Pet-friendly", accessible: "Accessible",
 }
 
@@ -97,9 +94,6 @@ export default async function ListingDetailPage({
               <h2 className="font-display font-bold text-lg text-[var(--navy)] mb-1">{listing.propertyType}</h2>
               <p className="text-sm text-neutral">Exchange preference: {EXCHANGE_LABEL[listing.exchangeType] ?? listing.exchangeType}</p>
             </div>
-            {listing.wifiSpeed && (
-              <p className="text-sm text-neutral-dark"><span className="font-semibold text-[var(--navy)]">Wi-Fi:</span> {WIFI_LABEL[listing.wifiSpeed] ?? listing.wifiSpeed}</p>
-            )}
             {listing.swapDurations.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {listing.swapDurations.map((d) => (

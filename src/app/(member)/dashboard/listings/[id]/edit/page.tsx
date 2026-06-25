@@ -33,7 +33,6 @@ export default async function EditListingPage({ params }: { params: Promise<{ id
     bathrooms: listing.bathrooms,
     maxGuests: listing.maxGuests,
     description: listing.description ?? "",
-    wifiSpeed: listing.wifiSpeed ?? "",
     amenities: listing.amenities,
     photos: listing.photos.map((p) => ({ url: p.url, caption: p.caption ?? "" })),
     swapDurations: listing.swapDurations,
