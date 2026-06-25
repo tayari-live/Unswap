@@ -6,7 +6,6 @@ import {
   ArrowRight,
   Lock,
   Users,
-  Home,
   FileCheck,
   Globe2,
   CreditCard,
@@ -87,6 +86,28 @@ const protectionCards = [
   { label: "EXCHANGE AGREEMENT", value: "Auto-generated", status: "ACTIVE" },
 ]
 
+const stats = [
+  { stat: "$110", label: "Average daily cost without UnSwap" },
+  { stat: "50+", label: "Duty station cities covered" },
+  { stat: "100,000+", label: "Eligible IO professionals globally" },
+]
+
+/* ------------------------------------------------------------------ */
+/*  Small presentational helpers                                       */
+/* ------------------------------------------------------------------ */
+
+function Eyebrow({ children, tone = "dark" }: { children: React.ReactNode; tone?: "dark" | "light" }) {
+  return (
+    <span
+      className={`text-[11px] font-bold uppercase tracking-[0.25em] ${
+        tone === "light" ? "text-gold" : "text-gold-dark"
+      }`}
+    >
+      {children}
+    </span>
+  )
+}
+
 /* ------------------------------------------------------------------ */
 /*  Page                                                               */
 /* ------------------------------------------------------------------ */
@@ -95,35 +116,23 @@ export default function LandingPage() {
   return (
     <div className="bg-white text-navy">
       {/* ============================================================ */}
-      {/*  Navigation                                                   */}
+      {/*  Navigation — navy chrome over the hero                       */}
       {/* ============================================================ */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-border">
+      <header className="sticky top-0 z-50 bg-[var(--navy)]/95 backdrop-blur-md border-b border-white/10">
         <div className="max-w-[1200px] mx-auto flex items-center justify-between px-6 h-[72px]">
-          <Logo wordClassName="text-navy text-xl" />
+          <Logo wordClassName="text-white text-xl" />
 
-          <nav className="hidden md:flex items-center gap-10 text-[13px] font-semibold tracking-wide uppercase text-neutral-dark">
-            <a
-              href="#network"
-              className="hover:text-navy transition-colors duration-200"
-            >
+          <nav className="hidden md:flex items-center gap-10 text-[13px] font-semibold tracking-wide uppercase text-white/65">
+            <a href="#network" className="hover:text-white transition-colors duration-200">
               The Network
             </a>
-            <a
-              href="#homes"
-              className="hover:text-navy transition-colors duration-200"
-            >
+            <a href="#homes" className="hover:text-white transition-colors duration-200">
               Homes
             </a>
-            <a
-              href="#how"
-              className="hover:text-navy transition-colors duration-200"
-            >
+            <a href="#how" className="hover:text-white transition-colors duration-200">
               How It Works
             </a>
-            <a
-              href="#pricing"
-              className="hover:text-navy transition-colors duration-200"
-            >
+            <a href="#pricing" className="hover:text-white transition-colors duration-200">
               Membership
             </a>
           </nav>
@@ -131,13 +140,13 @@ export default function LandingPage() {
           <div className="flex items-center gap-3">
             <Link
               href="/login"
-              className="hidden sm:inline-block text-[13px] font-semibold text-navy hover:text-gold-dark transition-colors duration-200 px-2"
+              className="hidden sm:inline-block text-[13px] font-semibold text-white/80 hover:text-white transition-colors duration-200 px-2"
             >
               Log In
             </Link>
             <Link
               href="/register"
-              className="text-[13px] font-bold uppercase tracking-wider text-white bg-gold-dark hover:bg-gold-hover px-5 py-2.5 rounded-lg transition-colors duration-200"
+              className="text-[13px] font-bold uppercase tracking-wider text-navy bg-gold hover:bg-gold-hover px-5 py-2.5 rounded-lg transition-colors duration-200"
             >
               Request Access
             </Link>
@@ -146,87 +155,75 @@ export default function LandingPage() {
       </header>
 
       {/* ============================================================ */}
-      {/*  Hero                                                         */}
+      {/*  Hero — full navy, serif, left-aligned                        */}
       {/* ============================================================ */}
-      <section className="max-w-[1200px] mx-auto px-6 pt-16 pb-20 lg:pt-20 lg:pb-28">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Left — copy */}
-          <div>
-            <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-gold-dark block">
-              Verified Home Exchange
-            </span>
-            <h1 className="mt-5 font-display text-[clamp(2.25rem,5vw,3.75rem)] font-bold leading-[1.08] tracking-tight">
+      <section className="relative bg-[var(--navy)] text-white overflow-hidden">
+        {/* Soft light from upper-right + faint gold wash, per the concept */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_72%_35%,rgba(255,255,255,0.10),transparent_55%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_0%_100%,rgba(201,168,76,0.08),transparent_50%)]" />
+
+        <div className="relative max-w-[1200px] mx-auto px-6 pt-24 pb-14 lg:pt-32 lg:pb-16">
+          <div className="max-w-[760px]">
+            <Eyebrow tone="light">Verified Home Exchange</Eyebrow>
+            <h1 className="mt-6 font-display font-bold leading-[1.05] tracking-tight text-[clamp(2.75rem,6.5vw,5rem)]">
               Exchange Homes.
               <br />
               Not Money.
             </h1>
-            <p className="mt-6 text-[16px] text-neutral leading-[1.7] max-w-[480px]">
+            <p className="mt-7 text-[17px] text-white/65 leading-[1.7] max-w-[520px]">
               The home exchange network built exclusively for UN, World Bank,
               IMF, and international organisation professionals. Eliminate
               $40,000–$80,000 a year in accommodation costs on rotation.
             </p>
-            <div className="mt-9 flex flex-wrap gap-3">
+
+            <div className="mt-10 flex flex-wrap gap-3">
               <Link
                 href="/register"
-                className="inline-flex items-center gap-2 text-[13px] font-bold uppercase tracking-wider text-white bg-gold-dark hover:bg-gold-hover px-7 py-3.5 rounded-lg transition-colors duration-200"
+                className="inline-flex items-center gap-2 text-[13px] font-bold uppercase tracking-wider text-navy bg-gold hover:bg-gold-hover px-8 py-4 rounded-lg transition-colors duration-200"
               >
                 Request Access
               </Link>
               <a
                 href="#network"
-                className="inline-flex items-center gap-2 text-[13px] font-bold uppercase tracking-wider text-navy border border-border hover:border-navy px-7 py-3.5 rounded-lg transition-colors duration-200"
+                className="inline-flex items-center gap-2 text-[13px] font-bold uppercase tracking-wider text-white border border-white/25 hover:border-white/60 px-8 py-4 rounded-lg transition-colors duration-200"
               >
                 Learn More
               </a>
             </div>
-          </div>
 
-          {/* Right — hero visual */}
-          <div className="relative">
-            <div className="relative aspect-[3/4] lg:aspect-[4/5] rounded-2xl overflow-hidden shadow-2xl">
-              <Image
-                src="/images/hero-sovereign.png"
-                alt="A bright, light-filled member home available for exchange on the UnSwap network"
-                fill
-                priority
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-cover"
-              />
-            </div>
-
-            {/* Floating guarantee card */}
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 lg:bottom-8 lg:left-auto lg:right-[-24px] lg:translate-x-0 bg-white rounded-xl shadow-xl border border-border px-5 py-4 min-w-[220px]">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-teal-light flex items-center justify-center">
-                  <ShieldCheck size={18} className="text-teal" />
-                </div>
-                <div>
-                  <div className="font-display font-bold text-lg leading-none">
-                    $2,000,000
-                  </div>
-                  <div className="text-[12px] text-neutral mt-1">
-                    Property protection per exchange
-                  </div>
-                </div>
-              </div>
+            <div className="mt-10 inline-flex items-center gap-3 text-white/55">
+              <ShieldCheck size={18} className="text-gold" />
+              <span className="text-[13px]">
+                Up to <span className="text-white font-semibold">$2,000,000</span> property
+                protection per exchange
+              </span>
             </div>
           </div>
+        </div>
+
+        {/* Full-width hero image, sitting directly under the hero copy */}
+        <div className="relative w-full h-[360px] sm:h-[480px] lg:h-[600px]">
+          <Image
+            src="/images/hero-sovereign.png"
+            alt="A bright, light-filled member home available for exchange on the UnSwap network"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+          {/* Soft blend from the navy copy above into the image */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[var(--navy)] via-transparent to-transparent" />
         </div>
       </section>
 
       {/* ============================================================ */}
-      {/*  The Exclusive Network — Core Pillars                         */}
+      {/*  The Exclusive Network — Core Pillars (parchment)            */}
       {/* ============================================================ */}
-      <section
-        id="network"
-        className="border-y border-border bg-white"
-      >
-        <div className="max-w-[1200px] mx-auto px-6 py-20 lg:py-24">
-          <div className="text-center max-w-[560px] mx-auto mb-16">
-            <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-gold-dark">
-              The Closed Loop
-            </span>
-            <h2 className="mt-4 font-display text-3xl lg:text-[2.5rem] font-bold leading-tight">
+      <section id="network" className="bg-parchment">
+        <div className="max-w-[1200px] mx-auto px-6 py-20 lg:py-28">
+          <div className="max-w-[620px] mb-14">
+            <Eyebrow>The Closed Loop</Eyebrow>
+            <h2 className="mt-4 font-display text-3xl lg:text-[2.75rem] font-bold leading-tight">
               The Exclusive Network
             </h2>
             <p className="mt-4 text-[15px] text-neutral leading-relaxed">
@@ -236,15 +233,14 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-10 lg:gap-14">
+          <div className="grid md:grid-cols-3 gap-5 lg:gap-6">
             {pillars.map((p) => (
-              <div key={p.title} className="text-center px-2">
-                <div className="mx-auto w-14 h-14 rounded-2xl border border-border bg-white flex items-center justify-center mb-6">
-                  <p.icon
-                    size={24}
-                    strokeWidth={1.5}
-                    className="text-navy"
-                  />
+              <div
+                key={p.title}
+                className="bg-white border border-border rounded-2xl p-7 hover:border-gold/50 transition-colors duration-300"
+              >
+                <div className="w-12 h-12 rounded-lg border border-gold/40 flex items-center justify-center mb-6">
+                  <p.icon size={22} strokeWidth={1.5} className="text-gold-dark" />
                 </div>
                 <h3 className="font-display text-xl font-bold">{p.title}</h3>
                 <p className="mt-3 text-[14px] text-neutral leading-relaxed">
@@ -257,87 +253,79 @@ export default function LandingPage() {
       </section>
 
       {/* ============================================================ */}
-      {/*  Featured Residences                                          */}
+      {/*  Featured Residences — Curated Portfolio (overlay cards)     */}
       {/* ============================================================ */}
-      <section id="homes" className="bg-background">
-        <div className="max-w-[1200px] mx-auto px-6 py-20 lg:py-24">
-          <div className="flex items-end justify-between mb-12">
-            <div>
-              <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-gold-dark">
-                Curation
-              </span>
-              <h2 className="mt-3 font-display text-3xl lg:text-[2.5rem] font-bold">
-                Featured Residences
-              </h2>
-            </div>
-            <Link
-              href="/register"
-              className="hidden sm:inline-flex items-center gap-1.5 text-[13px] font-semibold text-gold-dark hover:text-gold-hover transition-colors uppercase tracking-wide"
-            >
-              View Collection <ArrowRight size={14} />
-            </Link>
+      <section id="homes" className="bg-white">
+        <div className="max-w-[1200px] mx-auto px-6 py-20 lg:py-28">
+          <div className="flex items-center justify-center gap-5 mb-12">
+            <span className="hidden sm:block h-px w-16 bg-border" />
+            <Eyebrow>Curated Portfolio</Eyebrow>
+            <span className="hidden sm:block h-px w-16 bg-border" />
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
             {residences.map((r) => (
-              <div
+              <Link
                 key={r.name}
-                className="group bg-white rounded-2xl border border-border overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                href="/register"
+                className="group relative h-80 rounded-2xl overflow-hidden border border-border"
               >
-                {/* Image */}
-                <div className="relative h-56 overflow-hidden">
-                  <Image
-                    src={r.img}
-                    alt={`${r.name} — ${r.location}`}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <span className="absolute top-4 left-4 inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest bg-white/95 text-navy px-3 py-1.5 rounded-md backdrop-blur-sm">
-                    <BadgeCheck size={12} className="text-teal" />
-                    Verified
-                  </span>
-                </div>
+                <Image
+                  src={r.img}
+                  alt={`${r.name} — ${r.location}`}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                {/* Bottom-up navy gradient for legible serif title */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[var(--navy-dark)]/90 via-[var(--navy-dark)]/20 to-transparent" />
 
-                {/* Details */}
-                <div className="p-5">
-                  <h3 className="font-display text-lg font-bold leading-snug">
+                <span className="absolute top-4 left-4 inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest bg-white/95 text-navy px-3 py-1.5 rounded-md backdrop-blur-sm">
+                  <BadgeCheck size={12} className="text-teal" />
+                  Verified
+                </span>
+
+                <div className="absolute inset-x-0 bottom-0 p-6">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gold">
+                    {r.location}
+                  </span>
+                  <h3 className="mt-1.5 font-display text-2xl font-bold text-white leading-snug">
                     {r.name}
                   </h3>
-                  <p className="text-[13px] text-neutral mt-1">
-                    {r.location} · {r.beds}
-                  </p>
-
-                  <div className="mt-4 flex items-center justify-between pt-4 border-t border-border">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-dark">
-                      {r.access}
-                    </span>
-                    <span className="text-[13px] font-semibold text-teal">
-                      {r.duration}
-                    </span>
+                  <div className="mt-3 flex items-center gap-3 text-[12px] text-white/70">
+                    <span>{r.beds}</span>
+                    <span className="w-1 h-1 rounded-full bg-white/40" />
+                    <span className="text-teal font-semibold">{r.duration}</span>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
+          </div>
+
+          <div className="mt-12 text-center">
+            <Link
+              href="/register"
+              className="inline-flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-[0.2em] text-navy border-b border-gold pb-1 hover:text-gold-dark transition-colors"
+            >
+              View Complete Inventory <ArrowRight size={13} />
+            </Link>
           </div>
         </div>
       </section>
 
       {/* ============================================================ */}
-      {/*  How It Works — 3 Steps                                       */}
+      {/*  How It Works — 3 Steps (parchment)                          */}
       {/* ============================================================ */}
-      <section id="how" className="bg-white border-y border-border">
-        <div className="max-w-[1200px] mx-auto px-6 py-20 lg:py-24">
-          <div className="text-center max-w-[560px] mx-auto mb-16">
-            <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-gold-dark">
-              Three Steps
-            </span>
-            <h2 className="mt-4 font-display text-3xl lg:text-[2.5rem] font-bold leading-tight">
+      <section id="how" className="bg-parchment">
+        <div className="max-w-[1200px] mx-auto px-6 py-20 lg:py-28">
+          <div className="max-w-[620px] mb-14">
+            <Eyebrow>Three Steps</Eyebrow>
+            <h2 className="mt-4 font-display text-3xl lg:text-[2.75rem] font-bold leading-tight">
               How It Works
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-5 lg:gap-6">
             {[
               {
                 n: "01",
@@ -355,16 +343,11 @@ export default function LandingPage() {
                 body: "Swap simultaneously with a peer, or host now and earn UnSwap Credits for later. Sign the exchange agreement and travel protected — up to $2,000,000.",
               },
             ].map((s) => (
-              <div
-                key={s.n}
-                className="relative bg-background rounded-2xl border border-border p-7"
-              >
-                <span className="font-display text-5xl font-bold text-gold/25 leading-none">
+              <div key={s.n} className="bg-white rounded-2xl border border-border p-7">
+                <span className="font-display text-5xl font-bold text-gold/30 leading-none">
                   {s.n}
                 </span>
-                <h3 className="mt-4 font-display text-xl font-bold">
-                  {s.title}
-                </h3>
+                <h3 className="mt-4 font-display text-xl font-bold">{s.title}</h3>
                 <p className="mt-3 text-[14px] text-neutral leading-relaxed">
                   {s.body}
                 </p>
@@ -378,17 +361,14 @@ export default function LandingPage() {
       {/*  Trust & Protection — Dark Section                            */}
       {/* ============================================================ */}
       <section className="relative bg-navy text-white overflow-hidden">
-        {/* Subtle radial gradient overlay */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(201,168,76,0.08),transparent_60%)]" />
 
         <div className="relative max-w-[1200px] mx-auto px-6 py-20 lg:py-28">
           <div className="grid lg:grid-cols-2 gap-14 lg:gap-20 items-start">
             {/* Left — copy + features */}
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-gold">
-                Trust, by Design
-              </span>
-              <h2 className="mt-4 font-display text-3xl lg:text-[2.5rem] font-bold leading-tight">
+              <Eyebrow tone="light">Trust, by Design</Eyebrow>
+              <h2 className="mt-4 font-display text-3xl lg:text-[2.75rem] font-bold leading-tight">
                 Built on Institutional
                 <br />
                 Trust. Protected by Design.
@@ -407,9 +387,7 @@ export default function LandingPage() {
                       <f.icon size={20} strokeWidth={1.5} />
                     </div>
                     <div>
-                      <h3 className="font-display font-bold text-[17px]">
-                        {f.title}
-                      </h3>
+                      <h3 className="font-display font-bold text-[17px]">{f.title}</h3>
                       <p className="text-[13px] text-white/50 mt-1 leading-relaxed">
                         {f.body}
                       </p>
@@ -430,9 +408,7 @@ export default function LandingPage() {
                     <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">
                       {card.label}
                     </div>
-                    <div className="text-[16px] font-bold mt-1">
-                      {card.value}
-                    </div>
+                    <div className="text-[16px] font-bold mt-1">{card.value}</div>
                   </div>
                   <span className="text-[11px] font-bold uppercase tracking-wider text-teal bg-teal/10 px-3 py-1.5 rounded-md">
                     {card.status}
@@ -445,15 +421,36 @@ export default function LandingPage() {
       </section>
 
       {/* ============================================================ */}
+      {/*  By the Numbers — navy stat band                              */}
+      {/* ============================================================ */}
+      <section className="relative bg-[var(--navy-dark)] text-white overflow-hidden">
+        <Globe2
+          size={300}
+          strokeWidth={0.5}
+          className="absolute -right-12 top-1/2 -translate-y-1/2 text-white/[0.04] hidden lg:block"
+        />
+        <div className="relative max-w-[1200px] mx-auto px-6 py-16 grid grid-cols-1 sm:grid-cols-3 gap-10 sm:gap-8 divide-y sm:divide-y-0 sm:divide-x divide-white/10">
+          {stats.map((s) => (
+            <div key={s.label} className="text-center sm:px-6 pt-8 sm:pt-0 first:pt-0">
+              <div className="font-display text-4xl lg:text-5xl font-bold text-gold">
+                {s.stat}
+              </div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/50 mt-3">
+                {s.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ============================================================ */}
       {/*  Membership Tiers                                             */}
       {/* ============================================================ */}
       <section id="pricing" className="bg-white">
-        <div className="max-w-[1200px] mx-auto px-6 py-20 lg:py-24">
+        <div className="max-w-[1200px] mx-auto px-6 py-20 lg:py-28">
           <div className="text-center max-w-[560px] mx-auto mb-14">
-            <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-gold-dark">
-              Membership
-            </span>
-            <h2 className="mt-4 font-display text-3xl lg:text-[2.5rem] font-bold leading-tight">
+            <Eyebrow>Membership</Eyebrow>
+            <h2 className="mt-4 font-display text-3xl lg:text-[2.75rem] font-bold leading-tight">
               Choose Your Tier
             </h2>
             <p className="mt-4 text-[15px] text-neutral">
@@ -470,11 +467,7 @@ export default function LandingPage() {
                 per: "/yr",
                 exchanges: "1 exchange per year",
                 guarantee: "$500,000 property guarantee",
-                features: [
-                  "Verified peer network",
-                  "Exchange agreement",
-                  "Email support",
-                ],
+                features: ["Verified peer network", "Exchange agreement", "Email support"],
               },
               {
                 name: "Standard 2X",
@@ -482,11 +475,7 @@ export default function LandingPage() {
                 per: "/yr",
                 exchanges: "2 exchanges per year",
                 guarantee: "$1,000,000 property guarantee",
-                features: [
-                  "Verified peer network",
-                  "Exchange agreement",
-                  "UnSwap Credits",
-                ],
+                features: ["Verified peer network", "Exchange agreement", "UnSwap Credits"],
               },
               {
                 name: "Professional 4X",
@@ -519,9 +508,7 @@ export default function LandingPage() {
               <div
                 key={t.name}
                 className={`relative rounded-2xl border p-6 flex flex-col ${
-                  t.popular
-                    ? "border-gold shadow-lg ring-1 ring-gold"
-                    : "border-border shadow-sm"
+                  t.popular ? "border-gold shadow-lg ring-1 ring-gold" : "border-border shadow-sm"
                 }`}
               >
                 {t.popular && (
@@ -531,32 +518,21 @@ export default function LandingPage() {
                 )}
                 <h3 className="font-display text-lg font-bold">{t.name}</h3>
                 <div className="mt-3 flex items-baseline gap-1">
-                  <span className="font-display text-3xl font-bold">
-                    {t.price}
-                  </span>
+                  <span className="font-display text-3xl font-bold">{t.price}</span>
                   <span className="text-sm text-neutral">{t.per}</span>
                 </div>
                 <ul className="mt-5 space-y-2.5 text-[13px] text-neutral-dark flex-1">
                   <li className="flex gap-2 font-semibold text-navy">
-                    <ShieldCheck
-                      size={15}
-                      className="text-teal flex-shrink-0 mt-0.5"
-                    />
+                    <ShieldCheck size={15} className="text-teal flex-shrink-0 mt-0.5" />
                     {t.exchanges}
                   </li>
                   <li className="flex gap-2 font-semibold text-navy">
-                    <ShieldCheck
-                      size={15}
-                      className="text-teal flex-shrink-0 mt-0.5"
-                    />
+                    <ShieldCheck size={15} className="text-teal flex-shrink-0 mt-0.5" />
                     {t.guarantee}
                   </li>
                   {t.features.map((f) => (
                     <li key={f} className="flex gap-2">
-                      <ShieldCheck
-                        size={15}
-                        className="text-teal flex-shrink-0 mt-0.5"
-                      />
+                      <ShieldCheck size={15} className="text-teal flex-shrink-0 mt-0.5" />
                       {f}
                     </li>
                   ))}
@@ -583,9 +559,7 @@ export default function LandingPage() {
               </span>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="font-display text-xl font-bold">
-                    Lifetime Access
-                  </h3>
+                  <h3 className="font-display text-xl font-bold">Lifetime Access</h3>
                   <span className="text-[10px] font-bold uppercase tracking-wide bg-gold text-navy px-2.5 py-1 rounded-full">
                     Best Value
                   </span>
@@ -613,34 +587,12 @@ export default function LandingPage() {
       </section>
 
       {/* ============================================================ */}
-      {/*  The Financial Wake-Up — Stats Bar                            */}
+      {/*  Final CTA — Join the Network (parchment)                    */}
       {/* ============================================================ */}
-      <section className="border-y border-border bg-background">
-        <div className="max-w-[1200px] mx-auto px-6 py-12 grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
-          {[
-            { stat: "$110", label: "Average daily cost without UnSwap" },
-            { stat: "50+", label: "Duty station cities covered" },
-            { stat: "100,000+", label: "Eligible IO professionals globally" },
-          ].map((s) => (
-            <div key={s.label}>
-              <div className="font-display text-3xl lg:text-4xl font-bold text-navy">
-                {s.stat}
-              </div>
-              <div className="text-[13px] text-neutral mt-2">{s.label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ============================================================ */}
-      {/*  Final CTA — Join the Network                                 */}
-      {/* ============================================================ */}
-      <section className="bg-white">
+      <section className="bg-parchment">
         <div className="max-w-[680px] mx-auto px-6 py-24 text-center">
-          <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-gold-dark">
-            By Invitation Only
-          </span>
-          <h2 className="mt-4 font-display text-3xl lg:text-[2.5rem] font-bold leading-tight">
+          <Eyebrow>By Invitation Only</Eyebrow>
+          <h2 className="mt-4 font-display text-3xl lg:text-[2.75rem] font-bold leading-tight">
             Join the Network
           </h2>
           <p className="mt-5 text-[15px] text-neutral leading-[1.7] max-w-[520px] mx-auto">
@@ -651,7 +603,7 @@ export default function LandingPage() {
           <div className="mt-10">
             <Link
               href="/register"
-              className="inline-flex items-center gap-2 text-[13px] font-bold uppercase tracking-wider text-white bg-gold-dark hover:bg-gold-hover px-9 py-4 rounded-lg transition-colors duration-200"
+              className="inline-flex items-center gap-2 text-[13px] font-bold uppercase tracking-wider text-navy bg-gold hover:bg-gold-hover px-9 py-4 rounded-lg transition-colors duration-200"
             >
               Access the Network
             </Link>
@@ -662,7 +614,7 @@ export default function LandingPage() {
       {/* ============================================================ */}
       {/*  Non-affiliation disclaimer                                   */}
       {/* ============================================================ */}
-      <div className="bg-background border-t border-border">
+      <div className="bg-white border-t border-border">
         <div className="max-w-[1200px] mx-auto px-6 py-5">
           <p className="text-[11px] text-neutral text-center leading-relaxed">
             UnSwap is an independent, staff-led platform. It is not affiliated
@@ -675,81 +627,68 @@ export default function LandingPage() {
       </div>
 
       {/* ============================================================ */}
-      {/*  Footer                                                       */}
+      {/*  Footer — navy, multi-column                                  */}
       {/* ============================================================ */}
-      <footer className="border-t border-white/10 bg-[var(--navy)] text-white">
-        <div className="max-w-[1200px] mx-auto px-6 py-12">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            {/* Left — logo + legal */}
-            <div>
+      <footer className="bg-[var(--navy)] text-white">
+        <div className="max-w-[1200px] mx-auto px-6 py-16">
+          <div className="grid gap-10 md:grid-cols-12">
+            {/* Brand */}
+            <div className="md:col-span-5">
               <Logo wordClassName="text-white text-lg" />
-              <p className="mt-3 text-[12px] text-white/50 max-w-[360px] leading-relaxed">
-                Enabling Mobility. Empowering Community.
-                <br />© {new Date().getFullYear()} UnSwap. All rights reserved.
+              <p className="mt-4 text-[13px] text-white/50 max-w-[320px] leading-relaxed">
+                Enabling mobility. Empowering community. The verified home
+                exchange network for international organisation professionals.
               </p>
             </div>
 
-            {/* Centre — links */}
-            <nav className="flex flex-wrap gap-6 text-[12px] font-medium text-white/60">
-              <Link
-                href="/privacy"
-                className="hover:text-white transition-colors"
-              >
-                Privacy Policy
-              </Link>
-              <Link
-                href="/terms"
-                className="hover:text-white transition-colors"
-              >
-                Terms of Service
-              </Link>
-              <a
-                href="#how"
-                className="hover:text-white transition-colors"
-              >
-                How It Works
-              </a>
-              <a
-                href="#network"
-                className="hover:text-white transition-colors"
-              >
-                The Network
-              </a>
-              <Link
-                href="/early-access"
-                className="hover:text-white transition-colors"
-              >
-                Early Access
-              </Link>
-            </nav>
+            {/* Link columns */}
+            <div className="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8">
+              <div>
+                <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-gold mb-4">
+                  Network
+                </h4>
+                <ul className="space-y-2.5 text-[13px] text-white/60">
+                  <li><a href="#network" className="hover:text-white transition-colors">The Network</a></li>
+                  <li><a href="#homes" className="hover:text-white transition-colors">Homes</a></li>
+                  <li><a href="#how" className="hover:text-white transition-colors">How It Works</a></li>
+                  <li><a href="#pricing" className="hover:text-white transition-colors">Membership</a></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-gold mb-4">
+                  Company
+                </h4>
+                <ul className="space-y-2.5 text-[13px] text-white/60">
+                  <li><Link href="/about" className="hover:text-white transition-colors">About</Link></li>
+                  <li><Link href="/early-access" className="hover:text-white transition-colors">Early Access</Link></li>
+                  <li><Link href="/register" className="hover:text-white transition-colors">Request Access</Link></li>
+                  <li><Link href="/login" className="hover:text-white transition-colors">Log In</Link></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-gold mb-4">
+                  Legal
+                </h4>
+                <ul className="space-y-2.5 text-[13px] text-white/60">
+                  <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+                  <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
+                </ul>
+              </div>
+            </div>
+          </div>
 
-            {/* Right — social icons */}
-            <div className="flex items-center gap-4 text-white/60">
-              <a
-                href="#"
-                aria-label="LinkedIn"
-                className="hover:text-white transition-colors"
-              >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
+          <div className="mt-12 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-[12px] text-white/45">
+              © {new Date().getFullYear()} UnSwap. All rights reserved.
+            </p>
+            <div className="flex items-center gap-4 text-white/55">
+              <a href="#" aria-label="LinkedIn" className="hover:text-white transition-colors">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286z" />
                 </svg>
               </a>
-              <a
-                href="#"
-                aria-label="X (Twitter)"
-                className="hover:text-white transition-colors"
-              >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
+              <a href="#" aria-label="X (Twitter)" className="hover:text-white transition-colors">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
                 </svg>
               </a>
