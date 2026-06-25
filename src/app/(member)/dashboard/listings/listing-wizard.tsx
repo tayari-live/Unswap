@@ -9,14 +9,8 @@ import {
 import { useToast } from "@/components/ui/toast"
 
 const PROPERTY_TYPES = ["Apartment", "House", "Villa", "Studio", "Townhouse"]
-const WIFI = [
-  { v: "under_50", l: "Under 50 Mbps" },
-  { v: "50_200", l: "50–200 Mbps" },
-  { v: "200_plus", l: "200 Mbps+" },
-  { v: "gigabit", l: "Gigabit" },
-]
 const AMENITIES = [
-  { v: "home_office", l: "Home office / desk" }, { v: "parking", l: "Parking" },
+  { v: "wifi", l: "Wi-Fi" }, { v: "home_office", l: "Home office / desk" }, { v: "parking", l: "Parking" },
   { v: "garden", l: "Garden" }, { v: "pool", l: "Pool" }, { v: "dishwasher", l: "Dishwasher" },
   { v: "washing_machine", l: "Washing machine" }, { v: "air_conditioning", l: "Air conditioning" },
   { v: "lift", l: "Lift access" }, { v: "pet_friendly", l: "Pet-friendly" }, { v: "accessible", l: "Accessible" },
@@ -29,11 +23,17 @@ const DURATIONS = [
 ]
 const ACCEPT = ["image/png", "image/jpeg", "image/webp"]
 const MAX_BYTES = 10 * 1024 * 1024
+// Photos are stored inline as data URLs and sent in one request body, which the
+// platform caps at ~4.5 MB. Downscale to a sane long edge + re-encode as JPEG so
+// each photo is small, and keep the combined payload under a safe budget.
+const MAX_EDGE = 1600
+const JPEG_QUALITY = 0.82
+const TOTAL_BUDGET = 3_800_000 // combined data-URL chars across all photos
 
 export type WizardValues = {
   id?: string
   title: string; propertyType: string; fullAddress: string; city: string; neighbourhood: string; country: string
-  bedrooms: number; bathrooms: number; maxGuests: number; description: string; wifiSpeed: string; amenities: string[]
+  bedrooms: number; bathrooms: number; maxGuests: number; description: string; amenities: string[]
   photos: { url: string; caption?: string }[]
   swapDurations: string[]; exchangeType: string; blackouts: { startDate: string; endDate: string }[]
   houseRules: string; emergencyName: string; emergencyPhone: string; emergencyRelationship: string
@@ -41,7 +41,7 @@ export type WizardValues = {
 
 const EMPTY: WizardValues = {
   title: "", propertyType: "Apartment", fullAddress: "", city: "", neighbourhood: "", country: "",
-  bedrooms: 1, bathrooms: 1, maxGuests: 2, description: "", wifiSpeed: "", amenities: [],
+  bedrooms: 1, bathrooms: 1, maxGuests: 2, description: "", amenities: [],
   photos: [], swapDurations: [], exchangeType: "either", blackouts: [],
   houseRules: "", emergencyName: "", emergencyPhone: "", emergencyRelationship: "",
 }
@@ -59,8 +59,18 @@ function readImage(file: File): Promise<{ url?: string; error?: string }> {
       const img = new window.Image()
       img.onload = () => {
         if (Math.min(img.naturalWidth, img.naturalHeight) < 1080)
-          resolve({ error: "This photo is too small — please upload a higher resolution image." })
-        else resolve({ url: reader.result as string })
+          return resolve({ error: "This photo is too small — please upload a higher resolution image." })
+        // Downscale to MAX_EDGE and re-encode as JPEG to shrink the upload payload.
+        const scale = Math.min(1, MAX_EDGE / Math.max(img.naturalWidth, img.naturalHeight))
+        const w = Math.round(img.naturalWidth * scale)
+        const h = Math.round(img.naturalHeight * scale)
+        const canvas = document.createElement("canvas")
+        canvas.width = w
+        canvas.height = h
+        const ctx = canvas.getContext("2d")
+        if (!ctx) return resolve({ url: reader.result as string })
+        ctx.drawImage(img, 0, 0, w, h)
+        resolve({ url: canvas.toDataURL("image/jpeg", JPEG_QUALITY) })
       }
       img.onerror = () => resolve({ error: "Could not read that image." })
       img.src = reader.result as string
@@ -84,7 +94,6 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
   const toast = useToast()
   const [step, setStep] = useState(0)
   const [v, setV] = useState<WizardValues>(initial ?? EMPTY)
-  const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const [photoBusy, setPhotoBusy] = useState(false)
 
@@ -94,13 +103,18 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
 
   async function addPhotos(files: FileList | null) {
     if (!files) return
-    setError("")
     setPhotoBusy(true)
     const next = [...v.photos]
+    let total = next.reduce((sum, p) => sum + p.url.length, 0)
     for (const f of Array.from(files)) {
-      if (next.length >= 20) { setError("Maximum 20 photos."); break }
+      if (next.length >= 20) { toast("Maximum 20 photos.", "error"); break }
       const r = await readImage(f)
-      if (r.error) { setError(r.error); continue }
+      if (r.error) { toast(r.error, "error"); continue }
+      if (total + r.url!.length > TOTAL_BUDGET) {
+        toast("These photos exceed the total upload size. Remove some or use fewer images.", "error")
+        break
+      }
+      total += r.url!.length
       next.push({ url: r.url!, caption: "" })
     }
     set("photos", next)
@@ -124,7 +138,6 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
     }
     if (s === 1) {
       if (v.description.trim().length < 100) return "Description must be at least 100 characters."
-      if (!v.wifiSpeed) return "Select a Wi-Fi speed."
     }
     if (s === 2 && v.photos.length < 5) return "Upload at least 5 photos."
     if (s === 3 && v.swapDurations.length === 0) return "Select at least one swap duration type."
@@ -134,18 +147,16 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
 
   function next() {
     const err = stepValid(step)
-    if (err) { setError(err); return }
-    setError("")
+    if (err) { toast(err, "error"); return }
     setStep((s) => Math.min(STEPS.length - 1, s + 1))
   }
 
   async function submit() {
     for (let s = 0; s < 5; s++) {
       const err = stepValid(s)
-      if (err) { setError(err); setStep(s); return }
+      if (err) { toast(err, "error"); setStep(s); return }
     }
     setLoading(true)
-    setError("")
     try {
       const res = await fetch(mode === "create" ? "/api/listings" : `/api/listings/${initial?.id}`, {
         method: mode === "create" ? "POST" : "PATCH",
@@ -153,12 +164,12 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
         body: JSON.stringify(v),
       })
       const data = await res.json()
-      if (!res.ok) { setError(data.error || "Could not save the listing."); setLoading(false); return }
+      if (!res.ok) { toast(data.error || "Could not save the listing.", "error"); setLoading(false); return }
       toast(mode === "create" ? "Listing saved as draft" : "Listing updated", "success")
       router.push("/dashboard/listings")
       router.refresh()
     } catch {
-      setError("Something went wrong. Please try again.")
+      toast("Something went wrong. Please try again.", "error")
       setLoading(false)
     }
   }
@@ -175,7 +186,6 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
         ))}
       </div>
 
-      {error && <div className="bg-[var(--crimson)]/10 border-l-4 border-[var(--crimson)] p-3 rounded-lg mb-5"><p className="text-sm text-[var(--crimson)] font-medium">{error}</p></div>}
 
       {/* Step 0 — Basics */}
       {step === 0 && (
@@ -207,8 +217,6 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
           </div>
           <div><label className={label}>Description <span className="text-neutral normal-case font-normal">({v.description.trim().length}/100 min)</span></label>
             <textarea rows={5} className={input} value={v.description} onChange={(e) => set("description", e.target.value)} placeholder="Describe your home, the neighbourhood, and what makes it a great exchange." /></div>
-          <div><label className={label}>Wi-Fi speed</label>
-            <select className={input} value={v.wifiSpeed} onChange={(e) => set("wifiSpeed", e.target.value)}><option value="">Select…</option>{WIFI.map((w) => <option key={w.v} value={w.v}>{w.l}</option>)}</select></div>
           <div><label className={label}>Amenities</label>
             <div className="grid grid-cols-2 gap-2">{AMENITIES.map((a) => (
               <label key={a.v} className="flex items-center gap-2 text-sm text-neutral-dark cursor-pointer">
@@ -307,7 +315,7 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
             {[
               ["Title", v.title], ["Type", v.propertyType], ["Location", `${v.neighbourhood ? v.neighbourhood + ", " : ""}${v.city}, ${v.country}`],
               ["Capacity", `${v.bedrooms} bed · ${v.bathrooms} bath · ${v.maxGuests} guests`],
-              ["Wi-Fi", WIFI.find((w) => w.v === v.wifiSpeed)?.l ?? "—"],
+              ["Amenities", v.amenities.length ? `${v.amenities.length} selected` : "—"],
               ["Photos", `${v.photos.length}`], ["Durations", v.swapDurations.length ? v.swapDurations.join(", ") : "—"],
               ["Exchange", v.exchangeType], ["Emergency contact", v.emergencyName || "—"],
             ].map(([k, val]) => (
@@ -320,7 +328,7 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
       {/* Nav */}
       <div className="mt-8 flex items-center justify-between">
         {step > 0 ? (
-          <button type="button" onClick={() => { setError(""); setStep((s) => s - 1) }} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--navy)] px-4 py-2.5 rounded-xl border border-[var(--border)] hover:border-[var(--navy)]"><ChevronLeft size={16} /> Back</button>
+          <button type="button" onClick={() => setStep((s) => s - 1)} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--navy)] px-4 py-2.5 rounded-xl border border-[var(--border)] hover:border-[var(--navy)]"><ChevronLeft size={16} /> Back</button>
         ) : (
           <Link href="/dashboard/listings" className="text-sm font-semibold text-neutral hover:text-[var(--navy)] px-2">Cancel</Link>
         )}
