@@ -158,11 +158,23 @@ export default function LandingPage() {
       {/*  Hero — full navy, serif, left-aligned                        */}
       {/* ============================================================ */}
       <section className="relative bg-[var(--navy)] text-white overflow-hidden">
+        {/* Background photograph of a member home */}
+        <Image
+          src="/images/hero-sovereign.png"
+          alt="A bright, light-filled member home available for exchange on the UnSwap network"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
+        {/* Navy overlay over the image — darker on the text side, letting the
+            photo breathe on the right, for brand tone + legibility */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[var(--navy)]/95 via-[var(--navy)]/85 to-[var(--navy)]/60" />
         {/* Soft light from upper-right + faint gold wash, per the concept */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_72%_35%,rgba(255,255,255,0.10),transparent_55%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_0%_100%,rgba(201,168,76,0.08),transparent_50%)]" />
 
-        <div className="relative max-w-[1200px] mx-auto px-6 pt-24 pb-14 lg:pt-32 lg:pb-16">
+        <div className="relative max-w-[1200px] mx-auto px-6 pt-24 pb-28 lg:pt-32 lg:pb-36">
           <div className="max-w-[760px]">
             <Eyebrow tone="light">Verified Home Exchange</Eyebrow>
             <h1 className="mt-6 font-display font-bold leading-[1.05] tracking-tight text-[clamp(2.75rem,6.5vw,5rem)]">
@@ -199,20 +211,6 @@ export default function LandingPage() {
               </span>
             </div>
           </div>
-        </div>
-
-        {/* Full-width hero image, sitting directly under the hero copy */}
-        <div className="relative w-full h-[360px] sm:h-[480px] lg:h-[600px]">
-          <Image
-            src="/images/hero-sovereign.png"
-            alt="A bright, light-filled member home available for exchange on the UnSwap network"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-          />
-          {/* Soft blend from the navy copy above into the image */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[var(--navy)] via-transparent to-transparent" />
         </div>
       </section>
 
