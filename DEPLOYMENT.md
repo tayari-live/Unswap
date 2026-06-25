@@ -77,13 +77,16 @@ Subscribe to checkout / subscription / invoice events, then copy the endpoint's
 signing secret into `STRIPE_WEBHOOK_SECRET` and redeploy.
 
 ### Cron schedule
-`vercel.json` schedules `/api/cron/reminders` **hourly** (`0 * * * *`), which
-runs 48-hour swap reminders, 7-day renewal reminders, and the swap lifecycle
-(counter-offer expiry, in-progress / auto-complete transitions).
+`vercel.json` schedules `/api/cron/reminders` **daily at 09:00 UTC** (`0 9 * * *`),
+which runs 48-hour swap reminders, 7-day renewal reminders, and the swap
+lifecycle (counter-offer expiry, in-progress / auto-complete transitions).
 
-> **Plan note:** Vercel's Hobby plan allows only **one cron invocation per day**.
-> Hourly scheduling requires the **Pro** plan. On Hobby, change the schedule in
-> `vercel.json` to e.g. `0 9 * * *` (daily at 09:00 UTC).
+> **Plan note:** Vercel's Hobby plan allows only **one cron invocation per day**,
+> so the schedule is set to daily. All the reminder/lifecycle jobs query a date
+> *range* and are idempotent (guarded by `reminderSentAt` / `renewalReminderSentAt`
+> / status), so a once-daily run catches everything without double-sending. On the
+> **Pro** plan you can raise the cadence (e.g. `0 * * * *` for hourly) for tighter
+> timing on the "48 hours from now" reminder.
 
 ## Local development
 
