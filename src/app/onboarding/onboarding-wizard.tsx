@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { ShieldCheck, ArrowRight, Home, Compass, PartyPopper } from "lucide-react"
+import Image from "next/image"
+import { ArrowRight, ArrowLeft, Home, Compass, PartyPopper } from "lucide-react"
 import { Logo } from "@/components/brand/logo"
 import { ProfileForm, type ProfileValues } from "@/components/profile/profile-form"
 
@@ -59,9 +60,14 @@ export function OnboardingWizard({
         {/* Step 1 — Welcome + Mission */}
         {step === 1 && (
           <div className="text-center">
-            <div className="mx-auto w-14 h-14 rounded-2xl bg-[var(--navy)] text-[var(--gold)] flex items-center justify-center mb-5">
-              <ShieldCheck size={26} />
-            </div>
+            <Image
+              src="/unswap-logo.png"
+              alt="UnSwap"
+              width={64}
+              height={64}
+              priority
+              className="mx-auto mb-5 w-16 h-16 object-contain rounded-2xl"
+            />
             <h1 className="font-display text-3xl font-bold text-[var(--navy)]">Welcome to UnSwap, {firstName}</h1>
             <p className="mt-4 text-neutral leading-relaxed">
               You&apos;ve joined a closed, verified network built exclusively for UN and
@@ -148,6 +154,17 @@ export function OnboardingWizard({
           </div>
         )}
       </div>
+
+      {step > 1 && (
+        <button
+          type="button"
+          onClick={() => { setHint(""); setStep((s) => Math.max(1, s - 1)) }}
+          disabled={leaving}
+          className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-neutral hover:text-[var(--navy)] disabled:opacity-50 transition-colors"
+        >
+          <ArrowLeft size={16} /> Back
+        </button>
+      )}
     </div>
   )
 }
