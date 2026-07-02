@@ -10,6 +10,7 @@ import { listReviewsForListing } from "@/server/services/reviews"
 import { FavouriteButton } from "../favourite-button"
 import { ReportButton } from "@/components/report-button"
 import { SwapRequestForm } from "./swap-request-form"
+import { PhotoGallery } from "./photo-gallery"
 import { MessageButton } from "../../messages/message-button"
 
 export const dynamic = "force-dynamic"
@@ -56,16 +57,9 @@ export default async function ListingDetailPage({
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Main */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="relative rounded-2xl overflow-hidden border border-[var(--border)] bg-[var(--background)] h-72 sm:h-96">
-            {listing.primaryPhotoUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={listing.primaryPhotoUrl} alt={listing.title} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-neutral/30">
-                <MapPin size={40} />
-              </div>
-            )}
-            <div className="absolute top-4 right-4">
+          <div className="relative">
+            <PhotoGallery photos={listing.photos} title={listing.title} />
+            <div className="absolute top-4 right-4 z-10">
               <FavouriteButton listingId={listing.id} initial={listing.favourited} />
             </div>
           </div>
