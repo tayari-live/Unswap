@@ -32,6 +32,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [result, setResult] = useState<{ fastTrack: boolean; emailSent: boolean } | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
@@ -53,6 +54,7 @@ export default function RegisterPage() {
         setLoading(false)
         return
       }
+      setResult(data)
       setSubmitted(true)
     } catch {
       setError("Something went wrong. Please try again.")
@@ -105,34 +107,88 @@ export default function RegisterPage() {
           </div>
 
           {submitted ? (
-            <div className="text-center">
-              <div className="mx-auto w-14 h-14 rounded-2xl bg-[var(--teal-light)] text-[var(--teal)] flex items-center justify-center mb-5">
-                <MailCheck size={26} />
+            <div>
+              <div className="text-center">
+                <div className="mx-auto w-14 h-14 rounded-2xl bg-[var(--teal-light)] text-[var(--teal)] flex items-center justify-center mb-5">
+                  <MailCheck size={26} />
+                </div>
+                <h2 className="font-display text-3xl font-bold text-[var(--navy)]">
+                  {result?.emailSent === false ? "Account created" : "Check your inbox"}
+                </h2>
+                <p className="mt-3 text-neutral leading-relaxed">
+                  {result?.emailSent === false ? (
+                    <>
+                      Welcome, {firstName || "there"}. We&apos;ll email your verification
+                      link to{" "}
+                      <span className="font-semibold text-[var(--navy)]">{email}</span>{" "}
+                      shortly. Here&apos;s what happens next:
+                    </>
+                  ) : (
+                    <>
+                      We&apos;ve sent a verification link to{" "}
+                      <span className="font-semibold text-[var(--navy)]">{email}</span>.
+                      Here&apos;s what happens next:
+                    </>
+                  )}
+                </p>
               </div>
-              <h2 className="font-display text-3xl font-bold text-[var(--navy)]">
-                Check your inbox
-              </h2>
-              <p className="mt-3 text-neutral leading-relaxed">
-                {status === "fast" ? (
-                  <>
-                    We&apos;ve sent a verification link to{" "}
-                    <span className="font-semibold text-[var(--navy)]">{email}</span>.
-                    Confirm your institutional email to fast-track your access.
-                  </>
-                ) : (
-                  <>
-                    Thank you, {firstName || "there"}. Your application is in the
-                    review queue. Our verification team will confirm your
-                    institutional status by email shortly.
-                  </>
-                )}
-              </p>
+
+              {/* What happens next — the verification journey */}
+              <ol className="mt-7 space-y-4">
+                {[
+                  {
+                    n: 1,
+                    title: "Verify your email",
+                    body: `Open the link we sent to ${email}. It expires in 24 hours.`,
+                    current: true,
+                  },
+                  {
+                    n: 2,
+                    title: "Complete identity verification",
+                    body: result?.fastTrack
+                      ? "Upload your staff ID — recognised institutional emails are fast-tracked."
+                      : "Upload your staff ID and proof of employment for our team to review.",
+                  },
+                  {
+                    n: 3,
+                    title: "Get approved & explore",
+                    body: "Once you're verified, browse homes worldwide, list your own, and request your first swap.",
+                  },
+                ].map((s) => (
+                  <li key={s.n} className="flex gap-3.5">
+                    <span
+                      className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
+                        s.current
+                          ? "bg-[var(--gold-dark)] text-white"
+                          : "bg-[var(--border)] text-neutral-dark"
+                      }`}
+                    >
+                      {s.n}
+                    </span>
+                    <div>
+                      <div className="text-sm font-semibold text-[var(--navy)]">
+                        {s.title}
+                        {s.current && (
+                          <span className="ml-2 align-middle text-[10px] font-bold uppercase tracking-wide text-[var(--gold-dark)]">
+                            You&apos;re here
+                          </span>
+                        )}
+                      </div>
+                      <p className="mt-0.5 text-sm text-neutral leading-relaxed">{s.body}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+
               <Link
                 href="/login"
-                className="mt-8 inline-flex items-center justify-center py-3 px-6 rounded-xl text-sm font-semibold text-white bg-[var(--navy)] hover:bg-[var(--navy-light)] transition-colors"
+                className="mt-8 w-full inline-flex items-center justify-center py-3 px-6 rounded-xl text-sm font-semibold text-white bg-[var(--navy)] hover:bg-[var(--navy-light)] transition-colors"
               >
-                Back to sign in
+                Go to sign in
               </Link>
+              <p className="mt-3 text-center text-xs text-neutral">
+                Didn&apos;t get the email? Check your spam folder.
+              </p>
             </div>
           ) : (
             <>
