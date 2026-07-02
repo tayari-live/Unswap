@@ -13,13 +13,13 @@ export default async function NewListingPage() {
   const userId = (session?.user as any)?.id as string | undefined
   if (!userId) redirect("/login")
 
-  const user = await prisma.user.findUnique({ where: { id: userId }, include: { subscription: true } })
+  const user = await prisma.user.findUnique({ where: { id: userId } })
   if (!user) redirect("/login")
 
+  // Listing is open to any member with a confirmed email. Institutional
+  // verification and a subscription are only required later, to confirm a swap.
   const checks = [
-    { ok: user.verificationStatus === "FULLY_VERIFIED", label: "Be fully verified", href: "/verify-identity" },
-    { ok: user.profileCompletion >= 80, label: `Complete your profile (${user.profileCompletion}% of 80%)`, href: "/dashboard/profile" },
-    { ok: !!user.subscription && user.subscription.status === "active", label: "Hold an active subscription", href: "/dashboard/subscription" },
+    { ok: user.verificationStatus !== "PENDING_EMAIL", label: "Confirm your email address", href: "/login" },
   ]
   const canList = checks.every((c) => c.ok)
 

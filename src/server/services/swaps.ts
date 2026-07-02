@@ -100,6 +100,38 @@ async function assertWithinExchangeLimit(requesterId: string) {
 }
 
 /**
+ * Gate a swap from confirming. Both parties must be institutionally verified,
+ * and the requester must hold an active subscription within their exchange
+ * limit. `actor` tailors the message to whoever triggered the confirmation.
+ */
+async function assertConfirmable(
+  swap: { hostId: string; requesterId: string },
+  actor: "host" | "requester",
+) {
+  const [host, requester] = await Promise.all([
+    prisma.user.findUnique({ where: { id: swap.hostId }, select: { verificationStatus: true } }),
+    prisma.user.findUnique({ where: { id: swap.requesterId }, select: { verificationStatus: true } }),
+  ])
+  if (host?.verificationStatus !== "FULLY_VERIFIED") {
+    throw new ApiError(403, actor === "host"
+      ? "Verify your identity before you can accept a swap request."
+      : "The host must verify their identity before this swap can be confirmed.")
+  }
+  if (requester?.verificationStatus !== "FULLY_VERIFIED") {
+    throw new ApiError(403, actor === "requester"
+      ? "Verify your identity before you can confirm this swap."
+      : "The requester must be verified before this swap can be confirmed.")
+  }
+  const sub = await prisma.subscription.findUnique({ where: { userId: swap.requesterId } })
+  if (!sub || sub.status !== "active") {
+    throw new ApiError(402, actor === "requester"
+      ? "An active subscription is required to confirm a swap."
+      : "The requester needs an active subscription before this swap can be confirmed.")
+  }
+  await assertWithinExchangeLimit(swap.requesterId)
+}
+
+/**
  * Finalise a completed exchange: set status, post credits (host earns, requester
  * spends), and prompt both parties to review. Shared by manual completion and
  * the auto-complete cron. Idempotent — only acts on confirmed/in-progress swaps.
@@ -164,7 +196,8 @@ export async function createSwapRequest(input: {
     throw new ApiError(403, "You must be fully verified to request a swap.")
   }
 
-  await assertWithinExchangeLimit(input.requesterId)
+  // Requesting is free — no subscription needed. Subscription and the exchange
+  // limit are enforced when the swap is confirmed (see assertConfirmable).
 
   const listing = await prisma.listing.findUnique({
     where: { id: input.listingId },
@@ -280,6 +313,7 @@ export async function respondToSwap(input: {
     case "accept": // host accepts the original request
       if (!isHost) throw new ApiError(403, "Only the host can accept.")
       if (swap.status !== "REQUESTED") throw new ApiError(409, "This request can no longer be accepted.")
+      await assertConfirmable(swap, "host")
       data.status = "CONFIRMED"
       break
     case "decline":
@@ -303,6 +337,7 @@ export async function respondToSwap(input: {
     case "accept_counter": // requester accepts the host's counter
       if (!isRequester) throw new ApiError(403, "Only the requester can accept the counter-offer.")
       if (swap.status !== "COUNTER_OFFERED") throw new ApiError(409, "There is no counter-offer to accept.")
+      await assertConfirmable(swap, "requester")
       data.status = "CONFIRMED"
       break
     case "cancel": // either party may cancel

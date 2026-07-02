@@ -129,11 +129,13 @@ function validateFull(input: ListingInput) {
 
 /** The three upload gates: verified, 80% profile, active subscription. */
 async function assertCanList(ownerId: string) {
-  const owner = await prisma.user.findUnique({ where: { id: ownerId }, include: { subscription: true } })
+  const owner = await prisma.user.findUnique({ where: { id: ownerId } })
   if (!owner) throw new ApiError(404, "Account not found.")
-  if (owner.verificationStatus !== "FULLY_VERIFIED") throw new ApiError(403, "You must be fully verified to list a property.")
-  if (owner.profileCompletion < 80) throw new ApiError(403, "Complete your profile to at least 80% to list a property.")
-  if (!owner.subscription || owner.subscription.status !== "active") throw new ApiError(402, "An active subscription is required to list a property.")
+  // Listing is open to any member who has confirmed their email. Institutional
+  // verification and a subscription are only required later, when a swap confirms.
+  if (owner.verificationStatus === "PENDING_EMAIL") {
+    throw new ApiError(403, "Confirm your email address to list a property.")
+  }
   return owner
 }
 
