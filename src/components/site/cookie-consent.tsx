@@ -1,5 +1,16 @@
 "use client"
 
+/*
+ * DORMANT — not mounted anywhere right now (removed from app/layout.tsx).
+ * The app currently sets only the strictly-necessary NextAuth session cookie,
+ * which needs no consent, so a banner here would imply a choice it doesn't honor.
+ *
+ * Re-mount this in app/layout.tsx (and gate the tracker script on the stored
+ * choice via `localStorage.getItem("unswap-cookie-consent") === "accepted"`)
+ * the moment you introduce ANY cookie-based analytics / marketing tag.
+ * Prefer cookieless analytics (Plausible/Fathom) — then you can skip this entirely.
+ */
+
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Cookie } from "lucide-react"

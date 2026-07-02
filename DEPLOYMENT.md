@@ -100,3 +100,15 @@ npx prisma migrate deploy   # or: npx prisma db push
 npx prisma db seed
 npm run dev
 ```
+
+## Before adding analytics / tracking
+
+The app currently sets only the strictly-necessary NextAuth session cookie, so
+there is **no cookie-consent banner** (it would imply a choice it doesn't honor).
+
+- [ ] Before shipping **any** cookie-based analytics or marketing tag (GA4,
+      PostHog cookie mode, Meta pixel, etc.), re-mount `<CookieConsent />` in
+      `src/app/layout.tsx` and gate the script on the stored consent value.
+- [ ] Prefer **cookieless** analytics (Plausible / Fathom) — no cookies means no
+      banner required in most jurisdictions.
+- [ ] Update the Privacy Policy to list the actual tools, cookies, and purposes.

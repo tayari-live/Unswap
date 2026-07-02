@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
-import { CookieConsent } from "@/components/site/cookie-consent";
 import { ToastProvider } from "@/components/ui/toast";
 
 // Body / UI — DM Sans (300, 400, 500)
@@ -60,7 +59,14 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col font-sans bg-background text-foreground">
         <ToastProvider>
           {children}
-          <CookieConsent />
+          {/*
+            No cookie-consent banner is mounted: the app only sets the
+            strictly-necessary NextAuth session cookie, which requires no consent.
+            TODO: Before adding ANY cookie-based analytics or marketing script
+            (GA4, PostHog cookie mode, Meta pixel, etc.), re-mount <CookieConsent />
+            from src/components/site/cookie-consent.tsx and gate the script on the
+            stored choice. Cookieless analytics (Plausible/Fathom) need no banner.
+          */}
         </ToastProvider>
       </body>
     </html>
