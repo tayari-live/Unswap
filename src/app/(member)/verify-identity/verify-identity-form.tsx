@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { UploadCloud, FileCheck2, X, ShieldCheck } from "lucide-react"
+import { useToast } from "@/components/ui/toast"
 
 const MAX_BYTES = 5 * 1024 * 1024 // 5 MB (pre-compression source limit)
 const ACCEPT = "image/png,image/jpeg,image/webp"
@@ -90,18 +91,17 @@ function FileField({
 
 export function VerifyIdentityForm({ type }: { type: "fast_track" | "manual" }) {
   const router = useRouter()
+  const toast = useToast()
   const [idCard, setIdCard] = useState<string | null>(null)
   const [proof, setProof] = useState<string | null>(null)
-  const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
   const manual = type === "manual"
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError("")
-    if (!idCard) return setError("Please upload your staff ID.")
-    if (manual && !proof) return setError("Please upload your proof of employment.")
+    if (!idCard) return toast("Please upload your staff ID.", "error")
+    if (manual && !proof) return toast("Please upload your proof of employment.", "error")
 
     setLoading(true)
     try {
@@ -112,33 +112,27 @@ export function VerifyIdentityForm({ type }: { type: "fast_track" | "manual" }) 
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error || "Could not submit your documents.")
+        toast(data.error || "Could not submit your documents.", "error")
         setLoading(false)
         return
       }
       router.push("/dashboard")
       router.refresh()
     } catch {
-      setError("Something went wrong. Please try again.")
+      toast("Something went wrong. Please try again.", "error")
       setLoading(false)
     }
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {error && (
-        <div className="bg-[var(--crimson)]/10 border-l-4 border-[var(--crimson)] p-3 rounded-lg">
-          <p className="text-sm text-[var(--crimson)] font-medium">{error}</p>
-        </div>
-      )}
-
       <FileField
         label="Staff ID card (front)"
         hint="PNG, JPG or WebP · max 5 MB"
         value={idCard}
         onChange={(v, err) => {
           setIdCard(v)
-          if (err) setError(err)
+          if (err) toast(err, "error")
         }}
       />
 
@@ -149,7 +143,7 @@ export function VerifyIdentityForm({ type }: { type: "fast_track" | "manual" }) 
           value={proof}
           onChange={(v, err) => {
             setProof(v)
-            if (err) setError(err)
+            if (err) toast(err, "error")
           }}
         />
       )}

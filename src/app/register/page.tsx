@@ -5,6 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { Eye, EyeOff, Info, ShieldCheck, MailCheck } from "lucide-react"
 import { Logo, LogoMark } from "@/components/brand/logo"
+import { useToast } from "@/components/ui/toast"
 
 // Institutional domains that qualify for fast-track verification. Mirrors the
 // admin-editable allowlist; kept here for instant client-side feedback only —
@@ -34,8 +35,8 @@ export default function RegisterPage() {
   const [submitted, setSubmitted] = useState(false)
   const [result, setResult] = useState<{ fastTrack: boolean; emailSent: boolean } | null>(null)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
   const [resent, setResent] = useState<"idle" | "sending" | "sent">("idle")
+  const toast = useToast()
 
   const status = domainStatus(email)
 
@@ -55,7 +56,6 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError("")
     setLoading(true)
     try {
       const res = await fetch("/api/auth/register", {
@@ -65,14 +65,14 @@ export default function RegisterPage() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error || "Could not create your account.")
+        toast(data.error || "Could not create your account.", "error")
         setLoading(false)
         return
       }
       setResult(data)
       setSubmitted(true)
     } catch {
-      setError("Something went wrong. Please try again.")
+      toast("Something went wrong. Please try again.", "error")
       setLoading(false)
     }
   }
@@ -228,11 +228,6 @@ export default function RegisterPage() {
               </p>
 
               <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
-                {error && (
-                  <div className="bg-[var(--crimson)]/10 border-l-4 border-[var(--crimson)] p-3 rounded-lg">
-                    <p className="text-sm text-[var(--crimson)] font-medium">{error}</p>
-                  </div>
-                )}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label
