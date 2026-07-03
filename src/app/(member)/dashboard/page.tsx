@@ -7,6 +7,7 @@ import {
   Coins,
   ShieldCheck,
   ShieldAlert,
+  Check,
   Star,
   ChevronRight,
   PlusCircle,
@@ -79,6 +80,41 @@ export default async function MemberDashboardPage() {
   const isVerified = user.verificationStatus === "FULLY_VERIFIED"
   const profileIncomplete = user.profileCompletion < 80
 
+  // Getting-started checklist — consolidates the onboarding path; hidden once done.
+  const idReview = user.verificationStatus === "PENDING_ID_REVIEW"
+  const checklist = [
+    {
+      title: "Confirm your email",
+      sub: user.verificationStatus === "PENDING_EMAIL" ? "Check your inbox for the confirmation link." : null,
+      done: user.verificationStatus !== "PENDING_EMAIL",
+      href: undefined as string | undefined,
+      action: "",
+    },
+    {
+      title: "Complete your profile",
+      sub: profileIncomplete ? `${user.profileCompletion}% done — members exchange with people, not just listings.` : null,
+      done: !profileIncomplete,
+      href: "/dashboard/profile",
+      action: "Complete",
+    },
+    {
+      title: "List your first home",
+      sub: user.listings.length ? null : "Add a home you'd like to offer for exchange.",
+      done: user.listings.length > 0,
+      href: "/dashboard/listings/new",
+      action: "Add home",
+    },
+    {
+      title: "Verify your identity",
+      sub: isVerified ? null : idReview ? "Under review — usually within 2 business days." : "Required to request or accept a swap.",
+      done: isVerified,
+      href: isVerified || idReview ? undefined : "/verify-identity",
+      action: user.verificationStatus === "REJECTED" ? "Resubmit" : "Verify",
+    },
+  ]
+  const checklistDone = checklist.filter((s) => s.done).length
+  const showChecklist = checklistDone < checklist.length
+
   const cards = [
     { label: "Active Listings", value: activeListings, icon: Home, tone: "navy" },
     { label: "Incoming Requests", value: incoming.length, icon: ArrowLeftRight, tone: "gold" },
@@ -99,45 +135,40 @@ export default async function MemberDashboardPage() {
         subtitle="Your activity across the UnSwap exchange network."
       />
 
-      {/* Status alerts */}
-      {(!isVerified || profileIncomplete) && (
-        <div className="space-y-3 mb-6">
-          {!isVerified && (
-            <div className="flex items-center gap-3 rounded-2xl border border-[var(--gold)]/40 bg-[var(--parchment)] p-4">
-              <ShieldAlert size={20} className="text-[var(--gold-dark)] flex-shrink-0" />
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-[var(--navy)]">
-                  {VERIFICATION_LABELS[user.verificationStatus] ?? "Verification pending"}
-                </p>
-                <p className="text-xs text-neutral-dark mt-0.5">
-                  Verify your identity to request and accept exchanges. You can browse and list without it.
-                </p>
-              </div>
-              {(user.verificationStatus === "EMAIL_VERIFIED" ||
-                user.verificationStatus === "REJECTED") && (
-                <Link
-                  href="/verify-identity"
-                  className="flex-shrink-0 text-xs font-semibold px-3.5 py-2 rounded-lg bg-[var(--gold-dark)] text-white hover:bg-[var(--gold-hover)] transition-colors"
+      {/* Getting-started checklist — replaces the scattered status cards */}
+      {showChecklist && (
+        <div className="rounded-2xl border border-[var(--border)] bg-surface shadow-sm p-5 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-display text-lg font-bold text-[var(--navy)]">Getting started</h2>
+            <span className="text-xs font-semibold text-neutral">{checklistDone} of {checklist.length} done</span>
+          </div>
+          <ul className="space-y-3">
+            {checklist.map((s, i) => (
+              <li key={s.title} className="flex items-center gap-3">
+                <span
+                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                    s.done ? "bg-[var(--teal)]/15 text-[var(--teal)]" : "bg-[var(--navy)]/10 text-[var(--navy)]"
+                  }`}
                 >
-                  {user.verificationStatus === "REJECTED" ? "Resubmit" : "Upload staff ID"}
-                </Link>
-              )}
-            </div>
-          )}
-          {profileIncomplete && (
-            <div className="rounded-2xl border border-[var(--border)] bg-surface p-4">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-sm font-semibold text-[var(--navy)]">Complete your profile</p>
-                <span className="text-xs font-bold text-[var(--gold-dark)]">{user.profileCompletion}%</span>
-              </div>
-              <div className="h-2 rounded-full bg-neutral-light overflow-hidden">
-                <div className="h-full bg-[var(--gold)]" style={{ width: `${user.profileCompletion}%` }} />
-              </div>
-              <p className="text-xs text-neutral mt-2">
-                Reach 80% to go active and start exchanging.
-              </p>
-            </div>
-          )}
+                  {s.done ? <Check size={14} /> : i + 1}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <div className={`text-sm font-semibold ${s.done ? "text-neutral line-through" : "text-[var(--navy)]"}`}>
+                    {s.title}
+                  </div>
+                  {s.sub && <div className="text-xs text-neutral mt-0.5">{s.sub}</div>}
+                </div>
+                {!s.done && s.href && (
+                  <Link
+                    href={s.href}
+                    className="flex-shrink-0 inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg bg-[var(--gold-dark)] text-white hover:bg-[var(--gold-hover)] transition-colors"
+                  >
+                    {s.action} <ChevronRight size={13} />
+                  </Link>
+                )}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
 
