@@ -110,7 +110,7 @@ export default async function MemberDashboardPage() {
                   {VERIFICATION_LABELS[user.verificationStatus] ?? "Verification pending"}
                 </p>
                 <p className="text-xs text-neutral-dark mt-0.5">
-                  Complete verification to browse, list, and message other members.
+                  Verify your identity to request and accept exchanges. You can browse and list without it.
                 </p>
               </div>
               {(user.verificationStatus === "EMAIL_VERIFIED" ||

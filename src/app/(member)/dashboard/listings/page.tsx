@@ -18,7 +18,9 @@ export default async function MyListingsPage() {
     prisma.user.findUnique({ where: { id: userId } }),
     listMemberListings(userId),
   ])
-  const canPublish = user?.verificationStatus === "FULLY_VERIFIED"
+  // Publishing needs only a confirmed email — ID verification is required to
+  // request/accept swaps, not to list.
+  const canPublish = user?.verificationStatus !== "PENDING_EMAIL"
 
   return (
     <div className="max-w-6xl mx-auto pb-12">
@@ -36,8 +38,7 @@ export default async function MyListingsPage() {
         <div className="flex items-center gap-3 rounded-2xl border border-[var(--gold)]/40 bg-[var(--parchment)] p-4 mb-6">
           <ShieldAlert size={20} className="text-[var(--gold-dark)] flex-shrink-0" />
           <p className="text-sm text-neutral-dark">
-            You can create and edit listings now. Publishing to the network unlocks once you&apos;re{" "}
-            <Link href="/verify-identity" className="font-semibold text-[var(--gold-dark)] underline">fully verified</Link>.
+            Confirm your email address to publish your listings to the network. You can create and edit drafts in the meantime.
           </p>
         </div>
       )}

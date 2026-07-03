@@ -1,8 +1,7 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { MapPin, Star, BadgeCheck, ShieldAlert, SearchX } from "lucide-react"
+import { MapPin, Star, BadgeCheck, SearchX } from "lucide-react"
 import { auth } from "@/server/auth"
-import { prisma } from "@/server/prisma"
 import { searchListings } from "@/server/services/discovery"
 import { PageHeader } from "@/components/ui/page-header"
 import { BrowseControls } from "./browse-controls"
@@ -25,32 +24,8 @@ export default async function BrowsePage({
   const userId = (session?.user as any)?.id as string | undefined
   if (!userId) redirect("/login")
 
-  const user = await prisma.user.findUnique({ where: { id: userId } })
-
-  // Browsing is gated behind full verification (the walled garden).
-  if (user?.verificationStatus !== "FULLY_VERIFIED") {
-    return (
-      <div className="max-w-2xl mx-auto pb-12">
-        <PageHeader title="Discover Homes" subtitle="Browse verified homes across the network." />
-        <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-10 text-center">
-          <div className="mx-auto w-14 h-14 rounded-2xl bg-[var(--parchment)] text-[var(--gold-dark)] flex items-center justify-center mb-5">
-            <ShieldAlert size={26} />
-          </div>
-          <h2 className="font-display text-2xl font-bold text-[var(--navy)]">Verification required</h2>
-          <p className="mt-3 text-neutral leading-relaxed">
-            Browsing is reserved for verified members. Complete your verification to explore homes and arrange exchanges.
-          </p>
-          <Link
-            href="/verify-identity"
-            className="mt-7 inline-flex items-center justify-center py-3 px-6 rounded-xl text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] transition-colors"
-          >
-            Get verified
-          </Link>
-        </div>
-      </div>
-    )
-  }
-
+  // Discovery is open to any signed-in member — verification is only needed to
+  // request or accept a swap, not to browse.
   const sp = await searchParams
   const filters = {
     q: sp.q ?? "",

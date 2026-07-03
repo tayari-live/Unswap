@@ -139,7 +139,7 @@ export function ListingsClient({
                     <button
                       disabled={busy || !canPublish}
                       onClick={() => setStatus(l.id, "ACTIVE")}
-                      title={canPublish ? "Publish" : "Verify your account to publish"}
+                      title={canPublish ? "Publish" : "Confirm your email to publish"}
                       className={`${btn} text-white bg-[var(--teal)] hover:opacity-90`}
                     >
                       <PlayCircle size={13} /> Publish
