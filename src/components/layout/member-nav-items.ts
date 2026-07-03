@@ -9,6 +9,7 @@ import {
   UserCircle,
   CreditCard,
   Bell,
+  Settings,
   type LucideIcon,
 } from "lucide-react"
 
@@ -34,4 +35,13 @@ export const memberNavigation: MemberNavItem[] = [
   { name: "Profile", href: "/dashboard/profile", icon: UserCircle, live: true },
   { name: "Subscription", href: "/dashboard/subscription", icon: CreditCard, live: true },
   { name: "Notifications", href: "/dashboard/notifications", icon: Bell, live: true },
+  { name: "Settings", href: "/dashboard/settings", icon: Settings, live: true },
 ]
+
+// Same destinations reordered for the mobile bottom bar: the four most-used
+// actions on the go sit inline, everything else goes under "More".
+const MOBILE_INLINE = ["Home", "Discover", "Swap Requests", "Messages"]
+export const memberMobileNavigation: MemberNavItem[] = [
+  ...MOBILE_INLINE.map((n) => memberNavigation.find((i) => i.name === n)!),
+  ...memberNavigation.filter((i) => !MOBILE_INLINE.includes(i.name)),
+].filter((i) => i.live)
