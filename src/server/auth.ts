@@ -1,9 +1,7 @@
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
-import { PrismaClient } from "@prisma/client"
 import bcrypt from "bcryptjs"
-
-const prisma = new PrismaClient()
+import { prisma } from "@/server/prisma"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -72,20 +70,29 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     async session({ session, token }) {
       if (session.user) {
-        // Always fetch the freshest profile info from DB
-        const dbUser = await prisma.user.findUnique({
-          where: { id: token.id as string }
-        })
-        if (dbUser) {
-          session.user.name = dbUser.fullName
-          session.user.image = dbUser.imageUrl
-          ;(session.user as any).role = dbUser.role
-          ;(session.user as any).initials = dbUser.avatarInitials
-        } else {
+        ;(session.user as any).id = token.id as string
+        // Refresh the freshest profile info from the DB — but never let a
+        // transient DB blip (e.g. a serverless Postgres cold start / auto-suspend)
+        // throw here, or NextAuth surfaces it as JWTSessionError and 500s every
+        // authed page. On any failure, fall back to the values carried in the JWT.
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: token.id as string }
+          })
+          if (dbUser) {
+            session.user.name = dbUser.fullName
+            session.user.image = dbUser.imageUrl
+            ;(session.user as any).role = dbUser.role
+            ;(session.user as any).initials = dbUser.avatarInitials
+          } else {
+            ;(session.user as any).role = token.role as string
+            ;(session.user as any).initials = token.initials as string
+          }
+        } catch (err) {
+          console.error("session callback: DB refresh failed, using JWT values", err)
           ;(session.user as any).role = token.role as string
           ;(session.user as any).initials = token.initials as string
         }
-        ;(session.user as any).id = token.id as string
       }
       return session
     }
