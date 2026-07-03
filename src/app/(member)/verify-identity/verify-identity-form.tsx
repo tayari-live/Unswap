@@ -4,8 +4,9 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { UploadCloud, FileCheck2, X, ShieldCheck } from "lucide-react"
 
-const MAX_BYTES = 5 * 1024 * 1024 // 5 MB
+const MAX_BYTES = 5 * 1024 * 1024 // 5 MB (pre-compression source limit)
 const ACCEPT = "image/png,image/jpeg,image/webp"
+const MAX_EDGE = 2000 // keep IDs legible while shrinking the upload payload
 
 function FileField({
   label,
@@ -27,7 +28,25 @@ function FileField({
       return onChange(null, "That image is over 5 MB. Please upload a smaller file.")
     }
     const reader = new FileReader()
-    reader.onload = () => onChange(reader.result as string)
+    reader.onload = () => {
+      // Downscale + re-encode so a phone photo of an ID doesn't blow past the
+      // request-size limit (documents are sent inline as base64 data URLs).
+      const img = new window.Image()
+      img.onload = () => {
+        const scale = Math.min(1, MAX_EDGE / Math.max(img.naturalWidth, img.naturalHeight))
+        const w = Math.round(img.naturalWidth * scale)
+        const h = Math.round(img.naturalHeight * scale)
+        const canvas = document.createElement("canvas")
+        canvas.width = w
+        canvas.height = h
+        const ctx = canvas.getContext("2d")
+        if (!ctx) return onChange(reader.result as string) // fallback: original
+        ctx.drawImage(img, 0, 0, w, h)
+        onChange(canvas.toDataURL("image/jpeg", 0.85))
+      }
+      img.onerror = () => onChange(null, "Could not read that image.")
+      img.src = reader.result as string
+    }
     reader.readAsDataURL(file)
   }
 
