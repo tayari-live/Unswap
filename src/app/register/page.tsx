@@ -35,8 +35,23 @@ export default function RegisterPage() {
   const [result, setResult] = useState<{ fastTrack: boolean; emailSent: boolean } | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [resent, setResent] = useState<"idle" | "sending" | "sent">("idle")
 
   const status = domainStatus(email)
+
+  const handleResend = async () => {
+    setResent("sending")
+    try {
+      await fetch("/api/auth/resend-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      })
+    } catch {
+      /* ignore — we always show a neutral confirmation */
+    }
+    setResent("sent")
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -187,7 +202,20 @@ export default function RegisterPage() {
                 Go to sign in
               </Link>
               <p className="mt-3 text-center text-xs text-neutral">
-                Didn&apos;t get the email? Check your spam folder.
+                Didn&apos;t get the email? Check your spam folder, or{" "}
+                {resent === "sent" ? (
+                  <span className="font-semibold text-[var(--teal)]">link re-sent ✓</span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleResend}
+                    disabled={resent === "sending"}
+                    className="font-semibold text-[var(--gold-dark)] hover:text-[var(--gold-hover)] underline disabled:opacity-50"
+                  >
+                    {resent === "sending" ? "resending…" : "resend it"}
+                  </button>
+                )}
+                .
               </p>
             </div>
           ) : (

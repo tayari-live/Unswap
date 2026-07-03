@@ -2,6 +2,7 @@ import Link from "next/link"
 import { CheckCircle2, XCircle } from "lucide-react"
 import { Logo } from "@/components/brand/logo"
 import { verifyEmailToken } from "@/server/services/registration"
+import { ResendVerification } from "./resend-verification"
 
 export const dynamic = "force-dynamic"
 
@@ -45,9 +46,10 @@ export default async function VerifyPage({
                 Email confirmed
               </h1>
               <p className="mt-3 text-neutral leading-relaxed">
-                Thank you{firstName ? `, ${firstName}` : ""}. Your institutional
-                email is verified. The next step is to upload your staff ID so our
-                team can complete your verification.
+                Thank you{firstName ? `, ${firstName}` : ""}. Your email is confirmed.
+                Sign in to set up your profile and start exploring homes — you can
+                verify your identity later, when you&apos;re ready to request or accept
+                a swap.
               </p>
             </>
           ) : (
@@ -56,6 +58,10 @@ export default async function VerifyPage({
                 Verification failed
               </h1>
               <p className="mt-3 text-neutral leading-relaxed">{message}</p>
+              <p className="mt-4 text-sm text-neutral">
+                If your link expired, enter your email for a fresh one:
+              </p>
+              <ResendVerification />
             </>
           )}
 

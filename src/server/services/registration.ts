@@ -41,6 +41,37 @@ export type RegisterInput = {
   password: string
 }
 
+/** Create a fresh 24h verification token and email the confirm link. */
+async function issueVerificationLink(
+  user: { id: string; email: string; firstName: string },
+  fastTrack: boolean,
+) {
+  const vToken = token()
+  await prisma.emailVerificationToken.create({
+    data: {
+      token: vToken,
+      userId: user.id,
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    },
+  })
+  const verifyUrl = `${baseUrl()}/verify?token=${vToken}`
+  return sendEmail({
+    to: user.email,
+    subject: "Confirm your UnSwap email",
+    html: `
+      <h2>Welcome to UnSwap, ${user.firstName}.</h2>
+      <p>Confirm your institutional email to ${
+        fastTrack
+          ? "fast-track your verification"
+          : "continue — your application will then enter manual review"
+      }.</p>
+      <p><a href="${verifyUrl}">Confirm my email</a></p>
+      <p style="color:#6B7689;font-size:12px">This link expires in 24 hours. If you didn't request this, ignore this email.</p>
+    `,
+    text: `Welcome to UnSwap, ${user.firstName}. Confirm your email: ${verifyUrl}`,
+  })
+}
+
 /**
  * Register a new member: validate, create the User in PENDING_EMAIL state, and
  * email a verification link. Domain allowlist decides fast-track vs manual.
@@ -76,31 +107,7 @@ export async function registerMember(input: RegisterInput) {
     },
   })
 
-  const vToken = token()
-  await prisma.emailVerificationToken.create({
-    data: {
-      token: vToken,
-      userId: user.id,
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-    },
-  })
-
-  const verifyUrl = `${baseUrl()}/verify?token=${vToken}`
-  const emailSent = await sendEmail({
-    to: email,
-    subject: "Confirm your UnSwap email",
-    html: `
-      <h2>Welcome to UnSwap, ${firstName}.</h2>
-      <p>Confirm your institutional email to ${
-        fastTrack
-          ? "fast-track your verification"
-          : "continue — your application will then enter manual review"
-      }.</p>
-      <p><a href="${verifyUrl}">Confirm my email</a></p>
-      <p style="color:#6B7689;font-size:12px">This link expires in 24 hours. If you didn't request this, ignore this email.</p>
-    `,
-    text: `Welcome to UnSwap, ${firstName}. Confirm your email: ${verifyUrl}`,
-  })
+  const emailSent = await issueVerificationLink({ id: user.id, email, firstName }, fastTrack)
 
   await logAudit({
     action: "MEMBER_REGISTERED",
@@ -143,4 +150,26 @@ export async function verifyEmailToken(rawToken: string) {
   ])
 
   return { firstName: record.user.firstName }
+}
+
+/**
+ * Re-send the email verification link for an account still in PENDING_EMAIL.
+ * Silently no-ops for unknown or already-verified emails to avoid revealing
+ * whether an account exists.
+ */
+export async function resendVerificationEmail(rawEmail: string) {
+  const email = rawEmail?.trim().toLowerCase()
+  if (!email || !EMAIL_RE.test(email)) throw new ApiError(400, "Enter a valid email address.")
+
+  const user = await prisma.user.findUnique({ where: { email } })
+  if (!user || user.verificationStatus !== "PENDING_EMAIL") return { ok: true }
+
+  // Invalidate any outstanding links, then issue a fresh one.
+  await prisma.emailVerificationToken.updateMany({
+    where: { userId: user.id, usedAt: null },
+    data: { usedAt: new Date() },
+  })
+  const matched = await matchAllowedDomain(email)
+  await issueVerificationLink({ id: user.id, email, firstName: user.firstName }, matched?.fastTrack ?? false)
+  return { ok: true }
 }
