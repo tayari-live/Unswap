@@ -3,17 +3,19 @@
 import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
 import { signOut } from "next-auth/react"
-import { LogOut } from "lucide-react"
+import { LogOut, BadgeCheck, Clock, ShieldAlert } from "lucide-react"
 import { Logo } from "@/components/brand/logo"
 
 export function MemberTopbar({
   name,
   initials,
   image,
+  verificationStatus,
 }: {
   name: string
   initials: string
   image: string | null
+  verificationStatus: string
 }) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -33,6 +35,23 @@ export function MemberTopbar({
       </Link>
 
       <div className="flex items-center gap-3 relative" ref={ref}>
+        {/* Verification status chip — constant awareness + one-tap to verify */}
+        {verificationStatus === "FULLY_VERIFIED" ? (
+          <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-semibold text-[var(--teal)] bg-[var(--teal)]/15 px-2.5 py-1 rounded-full">
+            <BadgeCheck size={13} /> Verified
+          </span>
+        ) : verificationStatus === "PENDING_ID_REVIEW" ? (
+          <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-semibold text-[var(--gold)] bg-white/10 px-2.5 py-1 rounded-full">
+            <Clock size={13} /> In review
+          </span>
+        ) : (
+          <Link
+            href="/verify-identity"
+            className="hidden sm:inline-flex items-center gap-1 text-[11px] font-semibold text-[var(--navy)] bg-[var(--gold)] hover:bg-[var(--gold-hover)] px-2.5 py-1 rounded-full transition-colors"
+          >
+            <ShieldAlert size={13} /> Verify
+          </Link>
+        )}
         <div className="text-right hidden sm:block">
           <div className="text-sm font-semibold text-white leading-none">{name}</div>
           <div className="text-[10px] uppercase font-medium text-white/50 mt-1 tracking-wider">

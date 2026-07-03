@@ -3,6 +3,7 @@ import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
 import { MemberSidebar } from "@/components/layout/member-sidebar"
 import { MemberTopbar } from "@/components/layout/member-topbar"
+import { MobileNav } from "@/components/layout/mobile-nav"
 
 export default async function MemberLayout({
   children,
@@ -24,7 +25,7 @@ export default async function MemberLayout({
   // New members complete the onboarding wizard before reaching the dashboard.
   const dbUser = await prisma.user.findUnique({
     where: { id: u.id as string },
-    select: { onboardedAt: true },
+    select: { onboardedAt: true, verificationStatus: true },
   })
   if (!dbUser?.onboardedAt) {
     redirect("/onboarding")
@@ -39,7 +40,7 @@ export default async function MemberLayout({
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-[var(--background)]">
-      <MemberTopbar name={u.name || ""} initials={initials} image={u.image || null} />
+      <MemberTopbar name={u.name || ""} initials={initials} image={u.image || null} verificationStatus={dbUser.verificationStatus} />
       <div className="flex flex-1 overflow-hidden">
         <div className="hidden md:block">
           <MemberSidebar />
