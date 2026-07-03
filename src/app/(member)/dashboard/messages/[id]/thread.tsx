@@ -90,7 +90,8 @@ export function Thread({
   }
 
   return (
-    <div className="max-w-3xl mx-auto flex flex-col h-[calc(100vh-7rem)]">
+    // Mobile subtracts the bottom nav bar (main has pb-24); desktop only the topbar + padding.
+    <div className="max-w-3xl mx-auto flex flex-col h-[calc(100vh-11rem)] md:h-[calc(100vh-7rem)]">
       {/* Header */}
       <div className="flex items-center gap-3 pb-4 border-b border-[var(--border)]">
         <Link href="/dashboard/messages" className="text-neutral hover:text-[var(--navy)]">

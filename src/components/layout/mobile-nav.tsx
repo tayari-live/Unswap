@@ -6,14 +6,18 @@ import { useState, useRef, useEffect } from "react"
 import { MoreHorizontal } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { adminNavigation } from "./nav-items"
+import { memberMobileNavigation } from "./member-nav-items"
 
 // Keep the bottom bar uncramped: show this many tabs inline, the rest go under "More".
 const MAX_INLINE = 4
 
-export function MobileNav() {
+export function MobileNav({ variant = "admin" }: { variant?: "admin" | "member" }) {
   const pathname = usePathname()
   const [moreOpen, setMoreOpen] = useState(false)
+  const [unread, setUnread] = useState(0)
   const moreRef = useRef<HTMLDivElement>(null)
+
+  const navigation = variant === "member" ? memberMobileNavigation : adminNavigation
 
   useEffect(() => {
     function onClick(e: MouseEvent) {
@@ -23,17 +27,41 @@ export function MobileNav() {
     return () => document.removeEventListener("mousedown", onClick)
   }, [])
 
-  const isActive = (href: string) =>
-    pathname === href || pathname.startsWith(href + "/")
+  // Members: poll the unread-message count for the Messages tab badge (same
+  // endpoint and cadence as the desktop sidebar).
+  useEffect(() => {
+    if (variant !== "member") return
+    let active = true
+    const load = async () => {
+      try {
+        const res = await fetch("/api/conversations?count=1", { cache: "no-store" })
+        if (res.ok && active) setUnread((await res.json()).unread ?? 0)
+      } catch {
+        /* ignore */
+      }
+    }
+    load()
+    const t = setInterval(load, 10000)
+    return () => {
+      active = false
+      clearInterval(t)
+    }
+  }, [variant, pathname])
 
-  const hasOverflow = adminNavigation.length > MAX_INLINE
-  const inline = hasOverflow ? adminNavigation.slice(0, MAX_INLINE) : adminNavigation
-  const overflow = hasOverflow ? adminNavigation.slice(MAX_INLINE) : []
+  // The member Home tab matches exactly so it doesn't stay lit on /dashboard/*.
+  const isActive = (href: string) =>
+    href === "/dashboard"
+      ? pathname === "/dashboard"
+      : pathname === href || pathname.startsWith(href + "/")
+
+  const hasOverflow = navigation.length > MAX_INLINE
+  const inline = hasOverflow ? navigation.slice(0, MAX_INLINE) : navigation
+  const overflow = hasOverflow ? navigation.slice(MAX_INLINE) : []
   const overflowActive = overflow.some((i) => isActive(i.href))
 
   const itemClass = (active: boolean) =>
     cn(
-      "flex flex-col items-center justify-center gap-1 w-16 transition-colors",
+      "relative flex flex-col items-center justify-center gap-1 w-16 transition-colors",
       active ? "text-white" : "text-white/60 hover:text-white"
     )
 
@@ -46,6 +74,11 @@ export function MobileNav() {
             <Link key={item.name} href={item.href} className={itemClass(active)}>
               <item.icon size={20} className={cn(active ? "text-[var(--gold)]" : "text-white/50")} />
               <span className="text-[9px] font-bold uppercase tracking-wide text-center leading-tight">{item.name}</span>
+              {item.name === "Messages" && unread > 0 && (
+                <span className="absolute -top-1.5 right-2 min-w-4 h-4 px-1 rounded-full bg-[var(--gold-dark)] text-white text-[10px] font-bold flex items-center justify-center">
+                  {unread}
+                </span>
+              )}
             </Link>
           )
         })}
