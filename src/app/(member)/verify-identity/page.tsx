@@ -65,12 +65,30 @@ export default async function VerifyIdentityPage() {
   // EMAIL_VERIFIED or REJECTED → show the upload form.
   const type = await reviewTypeForEmail(user.email)
 
+  // On rejection, show the reviewer's note so the member knows what to fix.
+  const lastRejection =
+    status === "REJECTED"
+      ? await prisma.verificationSubmission.findFirst({
+          where: { memberId: userId, status: "REJECTED" },
+          orderBy: { reviewedAt: "desc" },
+          select: { reviewNote: true },
+        })
+      : null
+
   return (
     <Shell>
       {status === "REJECTED" && (
-        <div className="bg-[var(--crimson)]/10 border-l-4 border-[var(--crimson)] p-3 rounded-lg mb-6">
+        <div className="bg-[var(--crimson)]/10 border-l-4 border-[var(--crimson)] p-3.5 rounded-lg mb-6">
           <p className="text-sm text-[var(--crimson)] font-medium">
-            Your previous submission was not approved. You can resubmit with updated documents below.
+            Your previous submission was not approved.
+          </p>
+          {lastRejection?.reviewNote && (
+            <p className="mt-1.5 text-sm text-[var(--navy)]">
+              <span className="font-semibold">Reviewer&apos;s note:</span> {lastRejection.reviewNote}
+            </p>
+          )}
+          <p className="mt-1.5 text-sm text-neutral-dark">
+            You can resubmit with updated documents below.
           </p>
         </div>
       )}

@@ -5,7 +5,12 @@ import {
 } from "lucide-react"
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
-import { getMemberNotifications, type MemberNotification } from "@/server/services/member-notifications"
+import {
+  getMemberNotifications,
+  markNotificationsSeen,
+  ACTIVITY_KINDS,
+  type MemberNotification,
+} from "@/server/services/member-notifications"
 import { PageHeader } from "@/components/ui/page-header"
 import { NotificationPrefs } from "./notification-prefs"
 
@@ -38,9 +43,16 @@ export default async function NotificationsPage() {
     getMemberNotifications(userId),
     prisma.user.findUnique({
       where: { id: userId },
-      select: { notifySwaps: true, notifyMessages: true, notifyReviews: true, notifyReminders: true, notifyMarketing: true },
+      select: { notifySwaps: true, notifyMessages: true, notifyReviews: true, notifyReminders: true, notifyMarketing: true, notificationsSeenAt: true },
     }),
   ])
+
+  // Visiting this page clears the bell badge; anything newer than the previous
+  // visit is highlighted below.
+  const seenBefore = user?.notificationsSeenAt ?? new Date(0)
+  await markNotificationsSeen(userId)
+  const isNew = (n: MemberNotification) =>
+    ACTIVITY_KINDS.includes(n.kind) && n.date > seenBefore
 
   return (
     <div className="max-w-2xl mx-auto pb-12">
@@ -66,7 +78,14 @@ export default async function NotificationsPage() {
                   <k.icon size={18} />
                 </span>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-semibold text-[var(--navy)]">{n.title}</div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-[var(--navy)]">{n.title}</span>
+                    {isNew(n) && (
+                      <span className="text-[9px] font-bold uppercase tracking-wide bg-[var(--gold)]/20 text-[var(--gold-dark)] px-1.5 py-0.5 rounded-full">
+                        New
+                      </span>
+                    )}
+                  </div>
                   <div className="text-sm text-neutral truncate">{n.body}</div>
                 </div>
                 <span className="text-xs text-neutral flex-shrink-0">{timeAgo(n.date)}</span>

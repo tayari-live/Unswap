@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { MapPin, Star, BadgeCheck, SearchX } from "lucide-react"
+import { MapPin, Star, BadgeCheck, SearchX, ChevronLeft, ChevronRight } from "lucide-react"
 import { auth } from "@/server/auth"
 import { searchListings } from "@/server/services/discovery"
 import { PageHeader } from "@/components/ui/page-header"
@@ -36,7 +36,7 @@ export default async function BrowsePage({
     savedOnly: sp.saved === "1",
   }
 
-  const listings = await searchListings({
+  const { items: listings, total, page, pageCount } = await searchListings({
     viewerId: userId,
     q: filters.q,
     propertyType: filters.propertyType || undefined,
@@ -44,7 +44,21 @@ export default async function BrowsePage({
     guests: filters.guests ? Number(filters.guests) : undefined,
     exchangeType: filters.exchangeType || undefined,
     savedOnly: filters.savedOnly,
+    page: sp.page ? Number(sp.page) : 1,
   })
+
+  // Pagination links keep the active filters and swap only the page number.
+  const pageHref = (n: number) => {
+    const qs = new URLSearchParams()
+    if (filters.q) qs.set("q", filters.q)
+    if (filters.propertyType) qs.set("type", filters.propertyType)
+    if (filters.bedrooms) qs.set("beds", filters.bedrooms)
+    if (filters.guests) qs.set("guests", filters.guests)
+    if (filters.exchangeType) qs.set("exchange", filters.exchangeType)
+    if (filters.savedOnly) qs.set("saved", "1")
+    if (n > 1) qs.set("page", String(n))
+    return `/dashboard/browse${qs.toString() ? `?${qs}` : ""}`
+  }
 
   return (
     <div className="max-w-6xl mx-auto pb-12">
@@ -52,7 +66,7 @@ export default async function BrowsePage({
       <BrowseControls initial={filters} />
 
       <p className="text-sm text-neutral mb-4">
-        {listings.length} {listings.length === 1 ? "home" : "homes"}{filters.savedOnly ? " saved" : " available"}
+        {total} {total === 1 ? "home" : "homes"}{filters.savedOnly ? " saved" : " available"}
       </p>
 
       {listings.length === 0 ? (
@@ -72,9 +86,9 @@ export default async function BrowsePage({
               className="group bg-surface rounded-2xl border border-[var(--border)] shadow-sm overflow-hidden hover:shadow-md hover:border-[var(--gold)]/50 transition-all"
             >
               <div className="relative h-44 bg-[var(--background)]">
-                {l.primaryPhotoUrl ? (
+                {l.photoId ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={l.primaryPhotoUrl} alt={l.title} className="w-full h-full object-cover" />
+                  <img src={`/api/photos/${l.photoId}`} alt={l.title} loading="lazy" className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-neutral/30">
                     <MapPin size={30} />
@@ -108,6 +122,30 @@ export default async function BrowsePage({
             </Link>
           ))}
         </div>
+      )}
+
+      {pageCount > 1 && (
+        <nav className="mt-8 flex items-center justify-center gap-3" aria-label="Pagination">
+          {page > 1 ? (
+            <Link href={pageHref(page - 1)} className="inline-flex items-center gap-1 text-sm font-semibold text-[var(--navy)] px-4 py-2 rounded-xl border border-[var(--border)] hover:border-[var(--navy)] transition-colors">
+              <ChevronLeft size={15} /> Previous
+            </Link>
+          ) : (
+            <span className="inline-flex items-center gap-1 text-sm font-semibold text-neutral/40 px-4 py-2 rounded-xl border border-[var(--border)] cursor-not-allowed">
+              <ChevronLeft size={15} /> Previous
+            </span>
+          )}
+          <span className="text-sm text-neutral">Page {page} of {pageCount}</span>
+          {page < pageCount ? (
+            <Link href={pageHref(page + 1)} className="inline-flex items-center gap-1 text-sm font-semibold text-[var(--navy)] px-4 py-2 rounded-xl border border-[var(--border)] hover:border-[var(--navy)] transition-colors">
+              Next <ChevronRight size={15} />
+            </Link>
+          ) : (
+            <span className="inline-flex items-center gap-1 text-sm font-semibold text-neutral/40 px-4 py-2 rounded-xl border border-[var(--border)] cursor-not-allowed">
+              Next <ChevronRight size={15} />
+            </span>
+          )}
+        </nav>
       )}
     </div>
   )

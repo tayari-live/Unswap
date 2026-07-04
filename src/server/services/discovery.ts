@@ -20,11 +20,15 @@ export type SearchParams = {
   guests?: number
   exchangeType?: string
   savedOnly?: boolean
+  page?: number
 }
+
+export const BROWSE_PAGE_SIZE = 12
 
 /**
  * Browse ACTIVE listings owned by other members, with optional filters.
- * Each result is annotated with whether the viewer has favourited it.
+ * Paginated; each card carries only the fields it renders plus the primary
+ * photo's id (served via /api/photos/:id) — never the photo bytes themselves.
  */
 export async function searchListings(p: SearchParams) {
   const where: any = {
@@ -35,10 +39,10 @@ export async function searchListings(p: SearchParams) {
   if (p.q?.trim()) {
     const q = p.q.trim()
     where.OR = [
-      { city: { contains: q } },
-      { country: { contains: q } },
-      { title: { contains: q } },
-      { neighbourhood: { contains: q } },
+      { city: { contains: q, mode: "insensitive" } },
+      { country: { contains: q, mode: "insensitive" } },
+      { title: { contains: q, mode: "insensitive" } },
+      { neighbourhood: { contains: q, mode: "insensitive" } },
     ]
   }
   if (p.propertyType) where.propertyType = p.propertyType
@@ -55,13 +59,39 @@ export async function searchListings(p: SearchParams) {
 
   if (p.savedOnly) where.id = { in: [...favSet] }
 
-  const listings = await prisma.listing.findMany({
-    where,
-    orderBy: { createdAt: "desc" },
-    include: { owner: OWNER_CARD },
-  })
+  const page = Math.max(1, Math.floor(p.page ?? 1))
+  const [total, listings] = await Promise.all([
+    prisma.listing.count({ where }),
+    prisma.listing.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * BROWSE_PAGE_SIZE,
+      take: BROWSE_PAGE_SIZE,
+      select: {
+        id: true,
+        title: true,
+        propertyType: true,
+        city: true,
+        country: true,
+        bedrooms: true,
+        maxGuests: true,
+        exchangeType: true,
+        owner: OWNER_CARD,
+        photos: { select: { id: true }, orderBy: { position: "asc" }, take: 1 },
+      },
+    }),
+  ])
 
-  return listings.map((l) => ({ ...l, favourited: favSet.has(l.id) }))
+  return {
+    items: listings.map(({ photos, ...l }) => ({
+      ...l,
+      photoId: photos[0]?.id ?? null,
+      favourited: favSet.has(l.id),
+    })),
+    total,
+    page,
+    pageCount: Math.max(1, Math.ceil(total / BROWSE_PAGE_SIZE)),
+  }
 }
 
 /** A single listing for the detail view. Only ACTIVE listings are browsable. */
@@ -82,7 +112,7 @@ export async function getListingDetail(viewerId: string, id: string) {
           verificationStatus: true,
         },
       },
-      photos: { orderBy: { position: "asc" } },
+      photos: { select: { id: true, caption: true }, orderBy: { position: "asc" } },
       blackouts: { orderBy: { startDate: "asc" } },
     },
   })

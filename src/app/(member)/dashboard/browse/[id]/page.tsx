@@ -58,7 +58,10 @@ export default async function ListingDetailPage({
         {/* Main */}
         <div className="lg:col-span-2 space-y-6">
           <div className="relative">
-            <PhotoGallery photos={listing.photos} title={listing.title} />
+            <PhotoGallery
+              photos={listing.photos.map((p) => ({ url: `/api/photos/${p.id}`, caption: p.caption }))}
+              title={listing.title}
+            />
             <div className="absolute top-4 right-4 z-10">
               <FavouriteButton listingId={listing.id} initial={listing.favourited} />
             </div>

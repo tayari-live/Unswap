@@ -65,3 +65,36 @@ export async function getMemberNotifications(userId: string): Promise<MemberNoti
   items.sort((a, b) => b.date.getTime() - a.date.getTime())
   return items
 }
+
+// Kinds that count as "unread" for the bell badge. Standing nags (verification,
+// profile, unread messages) are excluded — they carry `date: new Date()` and
+// would otherwise keep the badge lit forever.
+export const ACTIVITY_KINDS: MemberNotification["kind"][] = ["swap", "counter", "confirmed"]
+
+/** Activity items newer than the member's last visit to the notifications page. */
+export async function countNewMemberNotifications(userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { notificationsSeenAt: true },
+  })
+  const since = user?.notificationsSeenAt ?? new Date(0)
+  return prisma.swapRequest.count({
+    where: {
+      createdAt: { gt: since },
+      OR: [
+        { hostId: userId, status: "REQUESTED" },
+        { requesterId: userId, status: "COUNTER_OFFERED" },
+        { hostId: userId, status: "CONFIRMED" },
+        { requesterId: userId, status: "CONFIRMED" },
+      ],
+    },
+  })
+}
+
+/** Clear the bell badge: everything up to now has been seen. */
+export function markNotificationsSeen(userId: string) {
+  return prisma.user.update({
+    where: { id: userId },
+    data: { notificationsSeenAt: new Date() },
+  })
+}

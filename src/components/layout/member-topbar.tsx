@@ -2,9 +2,49 @@
 
 import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { signOut } from "next-auth/react"
-import { LogOut, BadgeCheck, Clock, ShieldAlert } from "lucide-react"
+import { LogOut, BadgeCheck, Clock, ShieldAlert, Bell } from "lucide-react"
 import { Logo } from "@/components/brand/logo"
+
+/** Bell linking to the notifications page, with a polled unread-activity badge. */
+function NotificationBell() {
+  const pathname = usePathname()
+  const [unread, setUnread] = useState(0)
+
+  useEffect(() => {
+    let active = true
+    const load = async () => {
+      try {
+        const res = await fetch("/api/member-notifications", { cache: "no-store" })
+        if (res.ok && active) setUnread((await res.json()).unread ?? 0)
+      } catch {
+        /* ignore */
+      }
+    }
+    load()
+    const t = setInterval(load, 30000)
+    return () => {
+      active = false
+      clearInterval(t)
+    }
+  }, [pathname]) // re-check on navigation so the badge clears after visiting the page
+
+  return (
+    <Link
+      href="/dashboard/notifications"
+      aria-label={unread > 0 ? `Notifications (${unread} new)` : "Notifications"}
+      className="relative w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white flex items-center justify-center transition-colors"
+    >
+      <Bell size={17} />
+      {unread > 0 && (
+        <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-[var(--gold-dark)] text-white text-[10px] font-bold flex items-center justify-center">
+          {unread > 9 ? "9+" : unread}
+        </span>
+      )}
+    </Link>
+  )
+}
 
 export function MemberTopbar({
   name,
@@ -35,6 +75,7 @@ export function MemberTopbar({
       </Link>
 
       <div className="flex items-center gap-3 relative" ref={ref}>
+        <NotificationBell />
         {/* Verification status chip — constant awareness + one-tap to verify */}
         {verificationStatus === "FULLY_VERIFIED" ? (
           <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-semibold text-[var(--teal)] bg-[var(--teal)]/15 px-2.5 py-1 rounded-full">

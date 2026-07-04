@@ -28,7 +28,13 @@ const STATUSES = ["REQUESTED", "COUNTER_OFFERED", "ACCEPTED", "CONFIRMED", "IN_P
 const SWAP_INCLUDE = {
   requester: { select: { id: true, fullName: true, avatarInitials: true, organisation: true } },
   host: { select: { id: true, fullName: true, avatarInitials: true, organisation: true } },
-  listing: { select: { id: true, title: true, city: true, country: true, neighbourhood: true, primaryPhotoUrl: true } },
+  // Card images are served via /api/photos/:id — never inline photo bytes.
+  listing: {
+    select: {
+      id: true, title: true, city: true, country: true, neighbourhood: true,
+      photos: { select: { id: true }, orderBy: { position: "asc" as const }, take: 1 },
+    },
+  },
 } as const
 
 const EXCHANGE_STATUSES = ["CONFIRMED", "IN_PROGRESS", "COMPLETED"]

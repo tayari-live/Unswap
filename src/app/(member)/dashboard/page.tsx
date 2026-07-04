@@ -82,6 +82,16 @@ export default async function MemberDashboardPage() {
 
   // Getting-started checklist — consolidates the onboarding path; hidden once done.
   const idReview = user.verificationStatus === "PENDING_ID_REVIEW"
+
+  // On rejection, surface the reviewer's note so the member knows what to fix.
+  const lastRejection =
+    user.verificationStatus === "REJECTED"
+      ? await prisma.verificationSubmission.findFirst({
+          where: { memberId: userId, status: "REJECTED" },
+          orderBy: { reviewedAt: "desc" },
+          select: { reviewNote: true },
+        })
+      : null
   const checklist = [
     {
       title: "Confirm your email",
@@ -106,7 +116,13 @@ export default async function MemberDashboardPage() {
     },
     {
       title: "Verify your identity",
-      sub: isVerified ? null : idReview ? "Under review — usually within 2 business days." : "Required to request or accept a swap.",
+      sub: isVerified
+        ? null
+        : idReview
+        ? "Under review — usually within 2 business days."
+        : user.verificationStatus === "REJECTED"
+        ? `Not approved${lastRejection?.reviewNote ? ` — “${lastRejection.reviewNote}”` : ""}. Resubmit with updated documents.`
+        : "Required to request or accept a swap.",
       done: isVerified,
       href: isVerified || idReview ? undefined : "/verify-identity",
       action: user.verificationStatus === "REJECTED" ? "Resubmit" : "Verify",

@@ -18,7 +18,7 @@ type Listing = {
   status: string
   flagged: boolean
   rating: number | null
-  primaryPhotoUrl: string | null
+  photos: { id: string }[]
   exchangeType: string
   owner: { fullName: string; avatarInitials: string; organisation: string | null }
 }
@@ -75,9 +75,9 @@ export default function ListingsClient({ initialListings }: { initialListings: L
         {filtered.map((l) => (
           <div key={l.id} className={`bg-surface rounded-2xl border shadow-sm overflow-hidden ${l.flagged ? "border-[var(--crimson)]" : "border-[var(--border)]"}`}>
             <div className="relative h-36 bg-neutral-light">
-              {l.primaryPhotoUrl && (
+              {l.photos[0] && (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={l.primaryPhotoUrl} alt={l.title} className="h-full w-full object-cover" />
+                <img src={`/api/photos/${l.photos[0].id}`} alt={l.title} loading="lazy" className="h-full w-full object-cover" />
               )}
               <div className="absolute top-2 left-2"><StatusBadge status={l.status} /></div>
               {l.flagged && <div className="absolute top-2 right-2"><Badge tone="crimson"><Flag size={11} /> Flagged</Badge></div>}

@@ -48,6 +48,10 @@ model User {
 
   // Email notification preferences (opt-out per category; transactional emails
   // such as verification, password reset, and billing are always sent).
+  // Bell badge: activity items newer than this count as unread. Set when the
+  // member opens their notifications page.
+  notificationsSeenAt DateTime?
+
   notifySwaps        Boolean   @default(true)
   notifyMessages     Boolean   @default(true)
   notifyReviews      Boolean   @default(true)

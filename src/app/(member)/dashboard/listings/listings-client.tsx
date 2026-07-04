@@ -29,7 +29,7 @@ type Listing = {
   country: string
   bedrooms: number
   status: string
-  primaryPhotoUrl: string | null
+  photos: { id: string }[]
 }
 
 const STATUS_STYLE: Record<string, string> = {
@@ -108,9 +108,9 @@ export function ListingsClient({
           return (
             <div key={l.id} className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm overflow-hidden flex flex-col">
               <div className="relative h-40 bg-[var(--background)]">
-                {l.primaryPhotoUrl ? (
+                {l.photos[0] ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={l.primaryPhotoUrl} alt={l.title} className="w-full h-full object-cover" />
+                  <img src={`/api/photos/${l.photos[0].id}`} alt={l.title} loading="lazy" className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-neutral/40">
                     <Home size={32} />

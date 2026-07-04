@@ -3,10 +3,27 @@ import { ApiError } from "@/server/http"
 import { logAudit } from "@/server/services/audit"
 import { encryptField, decryptField } from "@/server/crypto"
 
+// Admin moderation grid. Card fields only — photos are served via
+// /api/photos/:id, so photo bytes never travel with the listing rows.
 export function listListings() {
   return prisma.listing.findMany({
     orderBy: { createdAt: "desc" },
-    include: { owner: { select: { fullName: true, avatarInitials: true, organisation: true } } },
+    select: {
+      id: true,
+      title: true,
+      propertyType: true,
+      city: true,
+      country: true,
+      bedrooms: true,
+      bathrooms: true,
+      maxGuests: true,
+      status: true,
+      flagged: true,
+      rating: true,
+      exchangeType: true,
+      owner: { select: { fullName: true, avatarInitials: true, organisation: true } },
+      photos: { select: { id: true }, orderBy: { position: "asc" }, take: 1 },
+    },
   })
 }
 
@@ -50,12 +67,21 @@ export type ListingInput = {
   status?: string
 }
 
-/** All listings owned by a member, newest first (with photo count). */
+/** All listings owned by a member, newest first. Card fields + primary photo id. */
 export function listMemberListings(ownerId: string) {
   return prisma.listing.findMany({
     where: { ownerId },
     orderBy: { createdAt: "desc" },
-    include: { _count: { select: { photos: true } } },
+    select: {
+      id: true,
+      title: true,
+      propertyType: true,
+      city: true,
+      country: true,
+      bedrooms: true,
+      status: true,
+      photos: { select: { id: true }, orderBy: { position: "asc" }, take: 1 },
+    },
   })
 }
 

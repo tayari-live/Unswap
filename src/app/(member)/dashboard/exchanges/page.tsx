@@ -29,9 +29,9 @@ function ExchangeCard({ r, review }: { r: Row; review?: { aboutHost: boolean } }
   return (
     <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm overflow-hidden flex flex-col sm:flex-row">
       <div className="relative sm:w-48 h-40 sm:h-auto flex-shrink-0 bg-[var(--background)]">
-        {r.listing.primaryPhotoUrl ? (
+        {r.listing.photos[0] ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={r.listing.primaryPhotoUrl} alt={r.listing.title} className="w-full h-full object-cover" />
+          <img src={`/api/photos/${r.listing.photos[0].id}`} alt={r.listing.title} loading="lazy" className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-neutral/30"><HomeIcon size={28} /></div>
         )}

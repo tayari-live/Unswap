@@ -7,7 +7,7 @@ type Photo = { url: string; caption?: string | null }
 
 /**
  * Listing photo gallery: a large active image with a clickable thumbnail strip
- * below. Photos are stored inline as base64 data URLs, so they render directly.
+ * below. Photos are cacheable /api/photos/:id URLs.
  */
 export function PhotoGallery({ photos, title }: { photos: Photo[]; title: string }) {
   const [active, setActive] = useState(0)
