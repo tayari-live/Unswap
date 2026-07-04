@@ -105,7 +105,9 @@ export function Thread({
             <span className="font-display font-bold text-[var(--navy)]">{other?.fullName ?? "Member"}</span>
             {other?.verificationStatus === "FULLY_VERIFIED" && <BadgeCheck size={15} className="text-[var(--teal)]" />}
           </div>
-          <span className="text-xs text-neutral">Verified member</span>
+          <span className="text-xs text-neutral">
+            {other?.verificationStatus === "FULLY_VERIFIED" ? "Verified member" : "Member"}
+          </span>
         </div>
       </div>
 

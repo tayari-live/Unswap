@@ -8,6 +8,7 @@ const OWNER_CARD = {
     avatarInitials: true,
     organisation: true,
     trustScore: true,
+    verificationStatus: true,
   },
 } as const
 

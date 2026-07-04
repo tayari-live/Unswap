@@ -83,9 +83,11 @@ export default async function BrowsePage({
                 <div className="absolute top-3 right-3">
                   <FavouriteButton listingId={l.id} initial={l.favourited} />
                 </div>
-                <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide bg-white/90 text-[var(--navy)] px-2.5 py-1 rounded-full">
-                  <BadgeCheck size={12} className="text-[var(--teal)]" /> Verified host
-                </span>
+                {l.owner.verificationStatus === "FULLY_VERIFIED" && (
+                  <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide bg-white/90 text-[var(--navy)] px-2.5 py-1 rounded-full">
+                    <BadgeCheck size={12} className="text-[var(--teal)]" /> Verified host
+                  </span>
+                )}
               </div>
               <div className="p-4">
                 <div className="flex items-center gap-1.5 text-xs text-neutral">
