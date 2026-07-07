@@ -6,14 +6,18 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { adminNavigation } from "./nav-items"
-import { ChevronLeft, ChevronRight, Settings } from "lucide-react"
+import { Settings } from "lucide-react"
 
 export function Sidebar() {
   const pathname = usePathname()
-  const [collapsed, setCollapsed] = useState(false)
+  const [collapsed, setCollapsed] = useState(true)
 
   return (
-    <div className={cn("flex flex-col bg-[var(--navy)] border-r border-white/10 h-full transition-all duration-300", collapsed ? "w-20" : "w-64")}>
+    <div 
+      onMouseEnter={() => setCollapsed(false)}
+      onMouseLeave={() => setCollapsed(true)}
+      className={cn("flex flex-col bg-[var(--navy)] border-r border-white/10 h-full transition-all duration-300", collapsed ? "w-20" : "w-64")}
+    >
       <div className="pt-6 pb-2" />
 
       <nav className="flex-1 px-4 pb-6 space-y-1 overflow-y-auto">
@@ -66,14 +70,6 @@ export function Sidebar() {
           </div>
         </div>
       )}
-      
-      <button
-        onClick={() => setCollapsed(!collapsed)}
-        className="mx-auto mb-6 p-2 rounded-xl text-white/50 hover:text-white hover:bg-white/10 transition-colors"
-        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-      >
-        {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-      </button>
     </div>
   )
 }

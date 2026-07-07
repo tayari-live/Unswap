@@ -5,12 +5,11 @@ import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
 import { memberNavigation } from "./member-nav-items"
-import { ChevronLeft, ChevronRight } from "lucide-react"
 
 export function MemberSidebar() {
   const pathname = usePathname()
   const [unread, setUnread] = useState(0)
-  const [collapsed, setCollapsed] = useState(false)
+  const [collapsed, setCollapsed] = useState(true)
 
   // Poll the unread-message count for the Messages badge.
   useEffect(() => {
@@ -32,7 +31,11 @@ export function MemberSidebar() {
   }, [pathname])
 
   return (
-    <div className={cn("flex flex-col bg-[var(--navy)] border-r border-white/10 h-full transition-all duration-300", collapsed ? "w-20" : "w-64")}>
+    <div 
+      onMouseEnter={() => setCollapsed(false)}
+      onMouseLeave={() => setCollapsed(true)}
+      className={cn("flex flex-col bg-[var(--navy)] border-r border-white/10 h-full transition-all duration-300", collapsed ? "w-20" : "w-64")}
+    >
       <div className="pt-6 pb-2" />
 
       <nav className="flex-1 px-4 pb-6 space-y-1 overflow-y-auto">
@@ -107,14 +110,6 @@ export function MemberSidebar() {
           </div>
         </div>
       )}
-      
-      <button
-        onClick={() => setCollapsed(!collapsed)}
-        className="mx-auto mb-6 p-2 rounded-xl text-white/50 hover:text-white hover:bg-white/10 transition-colors"
-        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-      >
-        {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-      </button>
     </div>
   )
 }
