@@ -10,6 +10,10 @@ import {
   Globe2,
   CreditCard,
   Home,
+  Facebook,
+  Instagram,
+  Twitter,
+  Linkedin,
 } from "lucide-react"
 import { Logo } from "@/components/brand/logo"
 
@@ -117,46 +121,48 @@ export default function LandingPage() {
   return (
     <div className="bg-white text-navy">
       {/* ============================================================ */}
-      {/*  Navigation — navy chrome over the hero                       */}
+      {/*  Navigation — floating glass pill                             */}
       {/* ============================================================ */}
-      <header className="sticky top-0 z-50 bg-[var(--navy)]/95 backdrop-blur-md border-b border-white/10">
-        <div className="max-w-[1200px] mx-auto flex items-center justify-between px-6 h-20">
-          <Logo wordClassName="text-white" />
+      <header className="fixed top-4 sm:top-6 left-0 right-0 z-50 px-4 sm:px-6">
+        <div className="max-w-[1200px] mx-auto">
+          <div className="bg-[var(--navy)]/85 backdrop-blur-xl border border-white/10 rounded-full h-20 px-5 sm:px-8 flex items-center justify-between shadow-2xl">
+            <Logo wordClassName="text-white" />
 
-          <nav className="hidden md:flex items-center gap-10 text-[13px] font-semibold tracking-wide uppercase text-white/65">
-            <a href="#network" className="hover:text-white transition-colors duration-200">
-              The Network
-            </a>
-            <a href="#homes" className="hover:text-white transition-colors duration-200">
-              Homes
-            </a>
-            <a href="#how" className="hover:text-white transition-colors duration-200">
-              How It Works
-            </a>
-            <a href="#pricing" className="hover:text-white transition-colors duration-200">
-              Membership
-            </a>
-          </nav>
+            <nav className="hidden md:flex items-center gap-10 text-[12px] font-bold tracking-[0.15em] uppercase text-white/70">
+              <a href="#network" className="hover:text-white transition-colors duration-200">
+                The Network
+              </a>
+              <a href="#homes" className="hover:text-white transition-colors duration-200">
+                Homes
+              </a>
+              <a href="#how" className="hover:text-white transition-colors duration-200">
+                How It Works
+              </a>
+              <a href="#pricing" className="hover:text-white transition-colors duration-200">
+                Membership
+              </a>
+            </nav>
 
-          <div className="flex items-center gap-3">
-            <Link
-              href="/login"
-              className="hidden sm:inline-block text-[13px] font-semibold text-white/80 hover:text-white transition-colors duration-200 px-2"
-            >
-              Log In
-            </Link>
-            <Link
-              href="/register"
-              className="hidden sm:inline-flex text-[13px] font-bold uppercase tracking-wider text-[var(--navy)] bg-[var(--gold)] hover:bg-[var(--gold-hover)] px-5 py-2.5 rounded-lg transition-colors duration-200"
-            >
-              Request Access
-            </Link>
-            <Link
-              href="/login"
-              className="sm:hidden text-[13px] font-bold uppercase tracking-wider text-[var(--navy)] bg-[var(--gold)] hover:bg-[var(--gold-hover)] px-4 py-2.5 rounded-lg transition-colors duration-200"
-            >
-              Log In
-            </Link>
+            <div className="flex items-center gap-4 sm:gap-6">
+              <Link
+                href="/login"
+                className="hidden sm:inline-block text-[12px] font-bold uppercase tracking-wider text-white/80 hover:text-white transition-colors duration-200"
+              >
+                Log In
+              </Link>
+              <Link
+                href="/register"
+                className="hidden sm:inline-flex text-[12px] font-bold uppercase tracking-wider text-[var(--navy)] bg-[var(--gold)] hover:bg-[var(--gold-hover)] px-6 py-3 rounded-full transition-colors duration-200"
+              >
+                Request Access
+              </Link>
+              <Link
+                href="/login"
+                className="sm:hidden text-[12px] font-bold uppercase tracking-wider text-[var(--navy)] bg-[var(--gold)] hover:bg-[var(--gold-hover)] px-5 py-2.5 rounded-full transition-colors duration-200"
+              >
+                Log In
+              </Link>
+            </div>
           </div>
         </div>
       </header>
@@ -653,40 +659,42 @@ export default function LandingPage() {
       {/* ============================================================ */}
       {/*  Non-affiliation disclaimer                                   */}
       {/* ============================================================ */}
-      <div className="bg-white border-t border-border">
-        <div className="max-w-[1200px] mx-auto px-6 py-5">
-          <p className="text-[11px] text-neutral text-center leading-relaxed">
-            UnSwap is an independent, staff-led platform. It is not affiliated
-            with, endorsed by, or formally connected to the United Nations, the
-            World Bank Group, the International Monetary Fund, or any
-            international organisation. All trademarks and organisation names
-            are the property of their respective owners.
-          </p>
+      <section className="bg-parchment pb-32">
+        <div className="max-w-[1000px] mx-auto px-6">
+          <div className="bg-white border border-[var(--border)] rounded-[24px] p-8 md:p-10 text-center shadow-sm">
+            <p className="text-[13px] md:text-[14px] text-neutral leading-[1.8]">
+              UnSwap is an independent, staff-led platform. It is not affiliated
+              with, endorsed by, or formally connected to the United Nations, the
+              World Bank Group, the International Monetary Fund, or any
+              international organisation. All trademarks and organisation names
+              are the property of their respective owners.
+            </p>
+          </div>
         </div>
-      </div>
+      </section>
 
       {/* ============================================================ */}
       {/*  Footer — navy, multi-column                                  */}
       {/* ============================================================ */}
-      <footer className="bg-[var(--navy)] text-white">
-        <div className="max-w-[1200px] mx-auto px-6 py-16">
-          <div className="grid gap-10 md:grid-cols-12">
+      <footer className="bg-[var(--navy)] text-white rounded-t-[48px] -mt-12 relative z-10 shadow-[0_-10px_40px_rgba(0,0,0,0.1)]">
+        <div className="max-w-[1200px] mx-auto px-6 pt-24 pb-12">
+          <div className="grid gap-12 md:grid-cols-12 lg:gap-8 border-b border-white/10 pb-16">
             {/* Brand */}
-            <div className="md:col-span-5">
+            <div className="md:col-span-5 lg:col-span-4 flex flex-col">
               <Logo wordClassName="text-white" />
-              <p className="mt-4 text-[13px] text-white/50 max-w-[320px] leading-relaxed">
+              <p className="mt-6 text-[14px] text-white/50 max-w-[320px] leading-[1.8]">
                 Enabling mobility. Empowering community. The verified home
                 exchange network for international organisation professionals.
               </p>
             </div>
 
             {/* Link columns */}
-            <div className="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8">
+            <div className="md:col-span-7 lg:col-span-8 grid grid-cols-2 sm:grid-cols-3 gap-10">
               <div>
-                <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-gold mb-4">
+                <h4 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--gold)] mb-6">
                   Network
                 </h4>
-                <ul className="space-y-2.5 text-[13px] text-white/60">
+                <ul className="space-y-4 text-[14px] text-white/60">
                   <li><a href="#network" className="hover:text-white transition-colors">The Network</a></li>
                   <li><a href="#homes" className="hover:text-white transition-colors">Homes</a></li>
                   <li><a href="#how" className="hover:text-white transition-colors">How It Works</a></li>
@@ -694,10 +702,10 @@ export default function LandingPage() {
                 </ul>
               </div>
               <div>
-                <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-gold mb-4">
+                <h4 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--gold)] mb-6">
                   Company
                 </h4>
-                <ul className="space-y-2.5 text-[13px] text-white/60">
+                <ul className="space-y-4 text-[14px] text-white/60">
                   <li><Link href="/about" className="hover:text-white transition-colors">About</Link></li>
                   <li><Link href="/early-access" className="hover:text-white transition-colors">Early Access</Link></li>
                   <li><Link href="/register" className="hover:text-white transition-colors">Request Access</Link></li>
@@ -705,10 +713,10 @@ export default function LandingPage() {
                 </ul>
               </div>
               <div>
-                <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-gold mb-4">
+                <h4 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[var(--gold)] mb-6">
                   Legal
                 </h4>
-                <ul className="space-y-2.5 text-[13px] text-white/60">
+                <ul className="space-y-4 text-[14px] text-white/60">
                   <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
                   <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
                 </ul>
@@ -716,20 +724,22 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="mt-12 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-[12px] text-white/45">
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+            <p className="text-[13px] text-white/45">
               © {new Date().getFullYear()} UnSwap. All rights reserved.
             </p>
-            <div className="flex items-center gap-4 text-white/55">
-              <a href="#" aria-label="LinkedIn" className="hover:text-white transition-colors">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286z" />
-                </svg>
+            <div className="flex items-center gap-5 text-white/50">
+              <a href="#" aria-label="X (Twitter)" className="p-2 hover:text-white hover:bg-white/10 rounded-full transition-colors">
+                <Twitter size={18} strokeWidth={1.5} />
               </a>
-              <a href="#" aria-label="X (Twitter)" className="hover:text-white transition-colors">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                </svg>
+              <a href="#" aria-label="Facebook" className="p-2 hover:text-white hover:bg-white/10 rounded-full transition-colors">
+                <Facebook size={18} strokeWidth={1.5} />
+              </a>
+              <a href="#" aria-label="Instagram" className="p-2 hover:text-white hover:bg-white/10 rounded-full transition-colors">
+                <Instagram size={18} strokeWidth={1.5} />
+              </a>
+              <a href="#" aria-label="LinkedIn" className="p-2 hover:text-white hover:bg-white/10 rounded-full transition-colors">
+                <Linkedin size={18} strokeWidth={1.5} />
               </a>
             </div>
           </div>
