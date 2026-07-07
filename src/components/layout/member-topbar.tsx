@@ -69,10 +69,12 @@ export function MemberTopbar({
   }, [])
 
   return (
-    <header className="flex items-center justify-between px-4 sm:px-6 py-3 bg-navy border-b border-white/10 h-20 relative shadow-sm z-30">
-      <Logo wordClassName="text-white" href="/dashboard" />
+    <header className="flex items-stretch justify-between bg-white border-b border-border h-20 relative shadow-[0_2px_15px_rgba(0,0,0,0.03)] z-30">
+      <div className="flex items-center bg-navy pl-4 pr-8 sm:pl-6 sm:pr-10 rounded-br-3xl shadow-[4px_0_15px_rgba(11,31,58,0.1)] relative z-10">
+        <Logo wordClassName="text-white" href="/dashboard" />
+      </div>
 
-      <div className="flex items-center gap-3 sm:gap-4 relative" ref={ref}>
+      <div className="flex flex-1 items-center justify-end px-4 sm:px-6 gap-3 sm:gap-4 relative" ref={ref}>
         <NotificationBell />
         {/* Verification status chip — constant awareness + one-tap to verify */}
         {verificationStatus === "FULLY_VERIFIED" ? (
@@ -91,20 +93,20 @@ export function MemberTopbar({
             <ShieldAlert size={14} /> Verify
           </Link>
         )}
-        <div className="text-right hidden sm:block pl-4 border-l border-white/20">
-          <div className="text-sm font-bold text-white leading-none">{name}</div>
-          <div className="text-[10px] uppercase font-bold text-white/50 mt-1.5 tracking-wider">
+        <div className="text-right hidden sm:block pl-4 border-l border-border">
+          <div className="text-sm font-bold text-navy leading-none">{name}</div>
+          <div className="text-[10px] uppercase font-bold text-navy/50 mt-1.5 tracking-wider">
             Member
           </div>
         </div>
         <button
           onClick={() => setOpen((v) => !v)}
-          className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center overflow-hidden border-2 border-gold/40 hover:border-gold hover:shadow-md transition-all ml-1"
+          className="h-10 w-10 rounded-full bg-parchment flex items-center justify-center overflow-hidden border-2 border-border hover:border-gold hover:shadow-md transition-all ml-1"
         >
           {image ? (
             <img src={image} alt="Avatar" className="h-full w-full object-cover" />
           ) : (
-            <span className="text-xs font-bold text-white">{initials || "M"}</span>
+            <span className="text-xs font-bold text-navy">{initials || "M"}</span>
           )}
         </button>
 
