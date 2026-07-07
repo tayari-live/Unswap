@@ -34,7 +34,7 @@ export function MemberSidebar() {
     <div 
       onMouseEnter={() => setCollapsed(false)}
       onMouseLeave={() => setCollapsed(true)}
-      className={cn("flex flex-col bg-white border-r border-[var(--border)] h-full transition-all duration-300 shadow-[2px_0_15px_rgba(0,0,0,0.03)] z-20 relative", collapsed ? "w-20" : "w-64")}
+      className={cn("flex flex-col bg-[var(--navy)] border-r border-white/10 h-full transition-all duration-300 shadow-[2px_0_15px_rgba(0,0,0,0.1)] z-20 relative", collapsed ? "w-20" : "w-64")}
     >
       <div className="pt-6 pb-2" />
 
@@ -52,17 +52,17 @@ export function MemberSidebar() {
                 key={item.name}
                 title={collapsed ? "Coming soon" : undefined}
                 className={cn(
-                  "flex items-center gap-3 py-3 px-3 mx-1 rounded-xl text-[13px] font-bold text-neutral-dark/30 cursor-not-allowed select-none overflow-hidden"
+                  "flex items-center gap-3 py-3 px-3 mx-1 rounded-xl text-[13px] font-bold text-white/30 cursor-not-allowed select-none overflow-hidden"
                 )}
                 aria-disabled="true"
               >
                 <span className="flex items-center gap-3 flex-1 min-w-0">
-                  <item.icon size={20} className="text-neutral-dark/20 flex-shrink-0" />
+                  <item.icon size={20} className="text-white/20 flex-shrink-0" />
                   <span className={cn("overflow-hidden whitespace-nowrap transition-all duration-300", collapsed ? "max-w-0 opacity-0" : "max-w-[150px] opacity-100")}>
                     {item.name}
                   </span>
                 </span>
-                <span className={cn("text-[9px] font-bold uppercase tracking-wide text-neutral-dark/30 transition-all duration-300 overflow-hidden", collapsed ? "max-w-0 opacity-0 ml-0" : "max-w-[40px] opacity-100 ml-2")}>
+                <span className={cn("text-[9px] font-bold uppercase tracking-wide text-white/30 transition-all duration-300 overflow-hidden", collapsed ? "max-w-0 opacity-0 ml-0" : "max-w-[40px] opacity-100 ml-2")}>
                   Soon
                 </span>
               </div>
@@ -77,11 +77,11 @@ export function MemberSidebar() {
               className={cn(
                 "flex items-center gap-3 py-3 px-3 mx-1 rounded-xl text-[13px] font-bold transition-all duration-200 overflow-hidden",
                 isActive
-                  ? "bg-[var(--navy)] text-white shadow-md"
-                  : "text-neutral-dark hover:bg-neutral-light/50 hover:text-[var(--navy)]"
+                  ? "bg-white/10 text-white shadow-md border border-white/5"
+                  : "text-white/60 hover:bg-white/5 hover:text-white"
               )}
             >
-              <item.icon size={20} className={cn("flex-shrink-0 transition-colors", isActive ? "text-[var(--gold)]" : "text-neutral")} />
+              <item.icon size={20} className={cn("flex-shrink-0 transition-colors", isActive ? "text-[var(--gold)]" : "text-white/50")} />
               <span className={cn("overflow-hidden whitespace-nowrap transition-all duration-300 flex-1", collapsed ? "max-w-0 opacity-0" : "max-w-[150px] opacity-100")}>
                 {item.name}
               </span>
@@ -108,18 +108,18 @@ export function MemberSidebar() {
         const isSettingsActive = pathname === settingsItem.href || pathname.startsWith(settingsItem.href + "/");
         
         return (
-          <div className="mt-auto border-t border-[var(--border)] p-3 bg-white">
+          <div className="mt-auto border-t border-white/10 p-3 bg-[var(--navy-dark)]">
             <Link
               href={settingsItem.href}
               title={collapsed ? "Settings" : undefined}
               className={cn(
                 "flex items-center gap-3 py-3 px-3 mx-1 rounded-xl text-[13px] font-bold transition-all duration-200 overflow-hidden",
                 isSettingsActive
-                  ? "bg-[var(--navy)] text-white shadow-md"
-                  : "text-neutral-dark hover:bg-neutral-light/50 hover:text-[var(--navy)]"
+                  ? "bg-white/10 text-white shadow-md border border-white/5"
+                  : "text-white/60 hover:bg-white/5 hover:text-white"
               )}
             >
-              <settingsItem.icon size={20} className={cn("flex-shrink-0 transition-colors", isSettingsActive ? "text-[var(--gold)]" : "text-neutral")} />
+              <settingsItem.icon size={20} className={cn("flex-shrink-0 transition-colors", isSettingsActive ? "text-[var(--gold)]" : "text-white/50")} />
               <span className={cn("overflow-hidden whitespace-nowrap transition-all duration-300", collapsed ? "max-w-0 opacity-0" : "max-w-[200px] opacity-100")}>
                 Settings
               </span>

@@ -16,7 +16,7 @@ export function Sidebar() {
     <div 
       onMouseEnter={() => setCollapsed(false)}
       onMouseLeave={() => setCollapsed(true)}
-      className={cn("flex flex-col bg-white border-r border-[var(--border)] h-full transition-all duration-300 shadow-[2px_0_15px_rgba(0,0,0,0.03)] z-20 relative", collapsed ? "w-20" : "w-64")}
+      className={cn("flex flex-col bg-[var(--navy)] border-r border-white/10 h-full transition-all duration-300 shadow-[2px_0_15px_rgba(0,0,0,0.1)] z-20 relative", collapsed ? "w-20" : "w-64")}
     >
       <div className="pt-6 pb-2" />
 
@@ -32,11 +32,11 @@ export function Sidebar() {
               className={cn(
                 "flex items-center gap-3 py-3 px-3 mx-1 rounded-xl text-[13px] font-bold transition-all duration-200 overflow-hidden",
                 isActive
-                  ? "bg-[var(--navy)] text-white shadow-md"
-                  : "text-neutral-dark hover:bg-neutral-light/50 hover:text-[var(--navy)]"
+                  ? "bg-white/10 text-white shadow-md border border-white/5"
+                  : "text-white/60 hover:bg-white/5 hover:text-white"
               )}
             >
-              <item.icon size={20} className={cn("flex-shrink-0 transition-colors", isActive ? "text-[var(--gold)]" : "text-neutral")} />
+              <item.icon size={20} className={cn("flex-shrink-0 transition-colors", isActive ? "text-[var(--gold)]" : "text-white/50")} />
               <span className={cn("overflow-hidden whitespace-nowrap transition-all duration-300", collapsed ? "max-w-0 opacity-0" : "max-w-[200px] opacity-100")}>
                 {item.name}
               </span>
@@ -45,18 +45,18 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="mt-auto border-t border-[var(--border)] p-3 bg-white">
+      <div className="mt-auto border-t border-white/10 p-3 bg-[var(--navy-dark)]">
         <Link
           href="/settings"
           title={collapsed ? "Settings" : undefined}
           className={cn(
             "flex items-center gap-3 py-3 px-3 mx-1 rounded-xl text-[13px] font-bold transition-all duration-200 overflow-hidden",
             pathname === "/settings" || pathname.startsWith("/settings/")
-              ? "bg-[var(--navy)] text-white shadow-md"
-              : "text-neutral-dark hover:bg-neutral-light/50 hover:text-[var(--navy)]"
+              ? "bg-white/10 text-white shadow-md border border-white/5"
+              : "text-white/60 hover:bg-white/5 hover:text-white"
           )}
         >
-          <Settings size={20} className={cn("flex-shrink-0 transition-colors", pathname === "/settings" || pathname.startsWith("/settings/") ? "text-[var(--gold)]" : "text-neutral")} />
+          <Settings size={20} className={cn("flex-shrink-0 transition-colors", pathname === "/settings" || pathname.startsWith("/settings/") ? "text-[var(--gold)]" : "text-white/50")} />
           <span className={cn("overflow-hidden whitespace-nowrap transition-all duration-300", collapsed ? "max-w-0 opacity-0" : "max-w-[200px] opacity-100")}>
             Settings
           </span>

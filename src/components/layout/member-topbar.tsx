@@ -34,7 +34,7 @@ function NotificationBell() {
     <Link
       href="/dashboard/notifications"
       aria-label={unread > 0 ? `Notifications (${unread} new)` : "Notifications"}
-      className="relative w-10 h-10 rounded-full bg-[var(--parchment)] hover:bg-[var(--gold)]/10 text-[var(--navy)] flex items-center justify-center transition-colors border border-[var(--border)]"
+      className="relative w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white flex items-center justify-center transition-colors border border-white/5"
     >
       <Bell size={18} />
       {unread > 0 && (
@@ -69,8 +69,8 @@ export function MemberTopbar({
   }, [])
 
   return (
-    <header className="flex items-center justify-between px-4 sm:px-6 py-3 bg-white border-b border-[var(--border)] h-20 relative shadow-sm z-30">
-      <Logo wordClassName="text-[var(--navy)]" href="/dashboard" />
+    <header className="flex items-center justify-between px-4 sm:px-6 py-3 bg-[var(--navy)] border-b border-white/10 h-20 relative shadow-sm z-30">
+      <Logo wordClassName="text-white" href="/dashboard" />
 
       <div className="flex items-center gap-3 sm:gap-4 relative" ref={ref}>
         <NotificationBell />
@@ -91,20 +91,20 @@ export function MemberTopbar({
             <ShieldAlert size={14} /> Verify
           </Link>
         )}
-        <div className="text-right hidden sm:block pl-4 border-l border-[var(--border)]">
-          <div className="text-sm font-bold text-[var(--navy)] leading-none">{name}</div>
-          <div className="text-[10px] uppercase font-bold text-neutral mt-1.5 tracking-wider">
+        <div className="text-right hidden sm:block pl-4 border-l border-white/20">
+          <div className="text-sm font-bold text-white leading-none">{name}</div>
+          <div className="text-[10px] uppercase font-bold text-white/50 mt-1.5 tracking-wider">
             Member
           </div>
         </div>
         <button
           onClick={() => setOpen((v) => !v)}
-          className="h-10 w-10 rounded-full bg-[var(--parchment)] flex items-center justify-center overflow-hidden border-2 border-[var(--border)] hover:border-[var(--gold)] hover:shadow-md transition-all ml-1"
+          className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center overflow-hidden border-2 border-[var(--gold)]/40 hover:border-[var(--gold)] hover:shadow-md transition-all ml-1"
         >
           {image ? (
             <img src={image} alt="Avatar" className="h-full w-full object-cover" />
           ) : (
-            <span className="text-xs font-bold text-[var(--navy)]">{initials || "M"}</span>
+            <span className="text-xs font-bold text-white">{initials || "M"}</span>
           )}
         </button>
 
