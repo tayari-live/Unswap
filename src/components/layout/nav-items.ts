@@ -8,6 +8,7 @@ import {
   Globe,
   LineChart,
   Flag,
+  Settings,
   type LucideIcon,
 } from "lucide-react"
 

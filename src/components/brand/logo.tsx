@@ -26,7 +26,7 @@ export function Logo({
         alt="UnSwap Logo"
         width={36}
         height={36}
-        className={cn("w-9 h-9 object-contain rounded-md", markClassName)}
+        className={cn("w-9 h-9 object-contain rounded-lg bg-[var(--navy)] p-1.5 shadow-sm ring-1 ring-white/10", markClassName)}
         priority
       />
       {showWord && (
