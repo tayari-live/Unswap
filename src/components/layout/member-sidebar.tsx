@@ -52,20 +52,20 @@ export function MemberSidebar() {
                 key={item.name}
                 title={collapsed ? "Coming soon" : undefined}
                 className={cn(
-                  "flex items-center gap-3 py-2.5 rounded-xl text-sm font-medium text-white/30 cursor-not-allowed select-none",
-                  collapsed ? "justify-center px-0" : "justify-between px-3"
+                  "flex items-center gap-3 py-2.5 rounded-xl text-sm font-medium text-white/30 cursor-not-allowed select-none overflow-hidden",
+                  "px-3"
                 )}
                 aria-disabled="true"
               >
-                <span className={cn("flex items-center gap-3", collapsed && "justify-center")}>
-                  <item.icon size={20} className="text-white/25" />
-                  {!collapsed && item.name}
-                </span>
-                {!collapsed && (
-                  <span className="text-[9px] font-bold uppercase tracking-wide text-white/30">
-                    Soon
+                <span className="flex items-center gap-3 flex-1 min-w-0">
+                  <item.icon size={20} className="text-white/25 flex-shrink-0" />
+                  <span className={cn("overflow-hidden whitespace-nowrap transition-all duration-300", collapsed ? "max-w-0 opacity-0" : "max-w-[150px] opacity-100")}>
+                    {item.name}
                   </span>
-                )}
+                </span>
+                <span className={cn("text-[9px] font-bold uppercase tracking-wide text-white/30 transition-all duration-300 overflow-hidden", collapsed ? "max-w-0 opacity-0 ml-0" : "max-w-[40px] opacity-100 ml-2")}>
+                  Soon
+                </span>
               </div>
             )
           }
@@ -76,21 +76,23 @@ export function MemberSidebar() {
               href={item.href}
               title={collapsed ? item.name : undefined}
               className={cn(
-                "flex items-center gap-3 py-2.5 rounded-xl text-sm font-medium transition-colors",
-                collapsed ? "justify-center px-0 relative" : "px-3",
+                "flex items-center gap-3 py-2.5 rounded-xl text-sm font-medium transition-colors overflow-hidden",
+                "px-3",
                 isActive
                   ? "bg-white/10 text-white"
                   : "text-white/60 hover:bg-white/10 hover:text-white"
               )}
             >
-              <item.icon size={20} className={cn(isActive ? "text-[var(--gold)]" : "text-white/50")} />
-              {!collapsed && item.name}
+              <item.icon size={20} className={cn("flex-shrink-0", isActive ? "text-[var(--gold)]" : "text-white/50")} />
+              <span className={cn("overflow-hidden whitespace-nowrap transition-all duration-300 flex-1", collapsed ? "max-w-0 opacity-0" : "max-w-[150px] opacity-100")}>
+                {item.name}
+              </span>
               
               {item.name === "Messages" && unread > 0 && (
                 <span
                   className={cn(
-                    "min-w-5 h-5 px-1.5 rounded-full bg-[var(--gold-dark)] text-white text-[11px] font-bold flex items-center justify-center",
-                    collapsed ? "absolute top-1 right-1 w-3 h-3 min-w-3 p-0 text-[0px]" : "ml-auto"
+                    "rounded-full bg-[var(--gold-dark)] text-white font-bold flex items-center justify-center transition-all duration-300 overflow-hidden",
+                    collapsed ? "absolute top-1 left-7 w-3 h-3 min-w-3 p-0 text-[0px]" : "ml-auto min-w-5 h-5 px-1.5 text-[11px]"
                   )}
                 >
                   {collapsed ? "" : unread}

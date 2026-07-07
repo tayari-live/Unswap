@@ -30,15 +30,17 @@ export function Sidebar() {
               href={item.href}
               title={collapsed ? item.name : undefined}
               className={cn(
-                "flex items-center gap-3 py-2.5 rounded-xl text-sm font-medium transition-colors",
-                collapsed ? "justify-center px-0" : "px-3",
+                "flex items-center gap-3 py-2.5 rounded-xl text-sm font-medium transition-colors overflow-hidden",
+                "px-3",
                 isActive
                   ? "bg-white/10 text-white"
                   : "text-white/60 hover:bg-white/10 hover:text-white"
               )}
             >
-              <item.icon size={20} className={cn(isActive ? "text-[var(--gold)]" : "text-white/50")} />
-              {!collapsed && <span>{item.name}</span>}
+              <item.icon size={20} className={cn("flex-shrink-0", isActive ? "text-[var(--gold)]" : "text-white/50")} />
+              <span className={cn("overflow-hidden whitespace-nowrap transition-all duration-300", collapsed ? "max-w-0 opacity-0" : "max-w-[200px] opacity-100")}>
+                {item.name}
+              </span>
             </Link>
           )
         })}
@@ -49,15 +51,17 @@ export function Sidebar() {
           href="/settings"
           title={collapsed ? "Settings" : undefined}
           className={cn(
-            "flex items-center gap-3 py-4 w-full text-sm font-medium transition-colors",
-            collapsed ? "justify-center px-0" : "px-6",
+            "flex items-center gap-3 py-4 w-full text-sm font-medium transition-colors overflow-hidden",
+            "px-7",
             pathname === "/settings" || pathname.startsWith("/settings/")
               ? "bg-white/10 text-white"
               : "text-white/60 hover:bg-white/10 hover:text-white"
           )}
         >
-          <Settings size={20} className={cn(pathname === "/settings" || pathname.startsWith("/settings/") ? "text-[var(--gold)]" : "text-white/50")} />
-          {!collapsed && <span>Settings</span>}
+          <Settings size={20} className={cn("flex-shrink-0", pathname === "/settings" || pathname.startsWith("/settings/") ? "text-[var(--gold)]" : "text-white/50")} />
+          <span className={cn("overflow-hidden whitespace-nowrap transition-all duration-300", collapsed ? "max-w-0 opacity-0" : "max-w-[200px] opacity-100")}>
+            Settings
+          </span>
         </Link>
       </div>
     </div>
