@@ -10,7 +10,7 @@ export default function WaitlistPage() {
     <div className="min-h-screen flex items-center justify-center p-6 bg-[var(--background)]">
       <div className="w-full max-w-md">
         <div className="flex justify-center mb-8">
-          <Link href="/"><Logo underline wordClassName="text-[var(--navy)]" /></Link>
+          <Logo underline wordClassName="text-[var(--navy)]" />
         </div>
         <div className="bg-white rounded-3xl shadow-xl border border-[var(--border)] p-8 sm:p-10">
           <Suspense fallback={<p className="text-center text-sm text-neutral">Loading…</p>}>
