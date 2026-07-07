@@ -15,6 +15,7 @@ import {
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
 import { PageHeader } from "@/components/ui/page-header"
+import { ResendEmailButton } from "@/components/ui/resend-email-button"
 
 export const dynamic = "force-dynamic"
 
@@ -99,6 +100,7 @@ export default async function MemberDashboardPage() {
       done: user.verificationStatus !== "PENDING_EMAIL",
       href: undefined as string | undefined,
       action: "",
+      resendEmail: user.verificationStatus === "PENDING_EMAIL" ? user.email : undefined,
     },
     {
       title: "Complete your profile",
@@ -181,6 +183,9 @@ export default async function MemberDashboardPage() {
                   >
                     {s.action} <ChevronRight size={13} />
                   </Link>
+                )}
+                {!s.done && s.resendEmail && (
+                  <ResendEmailButton email={s.resendEmail} />
                 )}
               </li>
             ))}

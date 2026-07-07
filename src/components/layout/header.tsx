@@ -6,7 +6,7 @@ import { signOut } from "next-auth/react"
 import Link from "next/link"
 import { useProfile } from "@/context/profile-context"
 import { NotificationBell } from "@/components/layout/notification-bell"
-import { LogoMark } from "@/components/brand/logo"
+import Image from "next/image"
 
 export function Header() {
   const { profile } = useProfile()
@@ -26,9 +26,14 @@ export function Header() {
   return (
     <header className="flex items-center justify-between px-6 py-4 bg-[var(--navy)] border-b border-white/10 h-16 relative">
       <Link href="/overview" className="flex items-center gap-2.5">
-        <div className="w-9 h-9 rounded-lg bg-white/10 text-[var(--gold)] flex items-center justify-center shadow-sm flex-shrink-0">
-          <LogoMark className="w-6 h-6" />
-        </div>
+        <Image
+          src="/unswap-logo.png"
+          alt="UnSwap Logo"
+          width={36}
+          height={36}
+          className="w-9 h-9 object-contain rounded-lg flex-shrink-0"
+          priority
+        />
         <div className="flex flex-col leading-none">
           <span className="font-display font-bold text-white text-lg tracking-tight">UnSwap</span>
           <span className="text-[9px] uppercase tracking-widest text-white/50 font-semibold">Admin Console</span>

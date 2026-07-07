@@ -4,7 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Eye, EyeOff, Info, ShieldCheck, MailCheck } from "lucide-react"
-import { Logo, LogoMark } from "@/components/brand/logo"
+import { Logo } from "@/components/brand/logo"
 import { useToast } from "@/components/ui/toast"
 
 // Institutional domains that qualify for fast-track verification. Mirrors the
@@ -353,7 +353,13 @@ export default function RegisterPage() {
               </div>
 
               <div className="mt-6 flex items-center justify-center gap-2 text-xs text-neutral text-center">
-                <LogoMark className="w-4 h-4 text-neutral flex-shrink-0" />
+                <Image
+                  src="/unswap-logo.png"
+                  alt="UnSwap"
+                  width={16}
+                  height={16}
+                  className="w-4 h-4 object-contain rounded-sm opacity-60 flex-shrink-0"
+                />
                 UnSwap is an independent, staff-led platform, not affiliated with
                 the United Nations.
               </div>

@@ -120,7 +120,7 @@ export default function LandingPage() {
       {/* ============================================================ */}
       <header className="sticky top-0 z-50 bg-[var(--navy)]/95 backdrop-blur-md border-b border-white/10">
         <div className="max-w-[1200px] mx-auto flex items-center justify-between px-6 h-[72px]">
-          <Logo wordClassName="text-white text-xl" />
+          <Logo markClassName="w-11 h-11" wordClassName="text-white text-2xl" />
 
           <nav className="hidden md:flex items-center gap-10 text-[13px] font-semibold tracking-wide uppercase text-white/65">
             <a href="#network" className="hover:text-white transition-colors duration-200">

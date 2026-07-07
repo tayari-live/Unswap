@@ -6,7 +6,7 @@ import Image from "next/image"
 import { signIn, getSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Mail, Eye, EyeOff, ShieldCheck } from "lucide-react"
-import { Logo, LogoMark } from "@/components/brand/logo"
+import { Logo } from "@/components/brand/logo"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -209,7 +209,13 @@ export default function LoginPage() {
           </div>
 
           <div className="mt-6 flex items-center justify-center gap-2 text-xs text-neutral">
-            <LogoMark className="w-4 h-4 text-neutral" />
+            <Image
+              src="/unswap-logo.png"
+              alt="UnSwap"
+              width={16}
+              height={16}
+              className="w-4 h-4 object-contain rounded-sm opacity-60"
+            />
             UnSwap is an independent, staff-led platform, not affiliated with the
             United Nations.
           </div>
