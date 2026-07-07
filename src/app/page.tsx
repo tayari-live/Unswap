@@ -119,8 +119,8 @@ export default function LandingPage() {
       {/*  Navigation — navy chrome over the hero                       */}
       {/* ============================================================ */}
       <header className="sticky top-0 z-50 bg-[var(--navy)]/95 backdrop-blur-md border-b border-white/10">
-        <div className="max-w-[1200px] mx-auto flex items-center justify-between px-6 h-[72px]">
-          <Logo markClassName="w-11 h-11" wordClassName="text-white text-2xl" />
+        <div className="max-w-[1200px] mx-auto flex items-center justify-between px-6 h-20">
+          <Logo wordClassName="text-white" />
 
           <nav className="hidden md:flex items-center gap-10 text-[13px] font-semibold tracking-wide uppercase text-white/65">
             <a href="#network" className="hover:text-white transition-colors duration-200">
@@ -632,7 +632,7 @@ export default function LandingPage() {
           <div className="grid gap-10 md:grid-cols-12">
             {/* Brand */}
             <div className="md:col-span-5">
-              <Logo wordClassName="text-white text-lg" />
+              <Logo wordClassName="text-white" />
               <p className="mt-4 text-[13px] text-white/50 max-w-[320px] leading-relaxed">
                 Enabling mobility. Empowering community. The verified home
                 exchange network for international organisation professionals.

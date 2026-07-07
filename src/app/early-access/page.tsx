@@ -15,8 +15,8 @@ export default async function EarlyAccessPage() {
     <div className="min-h-screen bg-[var(--background)]">
       {/* Header */}
       <header className="bg-white border-b border-[var(--border)]">
-        <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/"><Logo wordClassName="text-[var(--navy)] text-lg" /></Link>
+        <div className="max-w-4xl mx-auto px-6 h-20 flex items-center justify-between">
+          <Link href="/"><Logo wordClassName="text-[var(--navy)]" /></Link>
           <Link href="/join" className="text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] px-4 py-2.5 rounded-xl transition-colors">
             Join the waitlist
           </Link>

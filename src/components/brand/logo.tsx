@@ -24,23 +24,23 @@ export function Logo({
       <Image
         src="/unswap-logo.png"
         alt="UnSwap Logo"
-        width={48}
-        height={48}
-        className={cn("w-12 h-12 object-contain", markClassName)}
+        width={56}
+        height={56}
+        className={cn("w-14 h-14 object-contain", markClassName)}
         priority
       />
       {showWord && (
         <span className="inline-flex flex-col">
           <span
             className={cn(
-              "font-display text-2xl font-bold tracking-tight leading-none",
+              "font-display text-3xl font-bold tracking-tight leading-none",
               wordClassName,
             )}
           >
             UnSwap
           </span>
           {underline && (
-            <span className="mt-1.5 h-0.5 w-10 rounded-full bg-gold" />
+            <span className="mt-1.5 h-0.5 w-10 rounded-full bg-[var(--gold)]" />
           )}
         </span>
       )}

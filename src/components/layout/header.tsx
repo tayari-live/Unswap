@@ -24,18 +24,18 @@ export function Header() {
   }, [])
 
   return (
-    <header className="flex items-center justify-between px-6 py-4 bg-[var(--navy)] border-b border-white/10 h-16 relative">
+    <header className="flex items-center justify-between px-4 sm:px-6 py-3 bg-[var(--navy)] border-b border-white/10 h-20 relative">
       <Link href="/overview" className="flex items-center gap-2.5">
         <Image
           src="/unswap-logo.png"
           alt="UnSwap Logo"
-          width={36}
-          height={36}
-          className="w-9 h-9 object-contain rounded-lg flex-shrink-0"
+          width={56}
+          height={56}
+          className="w-14 h-14 object-contain rounded-lg flex-shrink-0"
           priority
         />
         <div className="flex flex-col leading-none">
-          <span className="font-display font-bold text-white text-lg tracking-tight">UnSwap</span>
+          <span className="font-display font-bold text-white text-3xl tracking-tight">UnSwap</span>
           <span className="text-[9px] uppercase tracking-widest text-white/50 font-semibold">Admin Console</span>
         </div>
       </Link>

@@ -93,8 +93,7 @@ export default function RegisterPage() {
 
         <Logo
           className="relative z-10 text-white"
-          markClassName="w-10 h-10 text-[var(--gold)]"
-          wordClassName="text-white text-2xl"
+          wordClassName="text-white"
         />
 
         <div className="relative z-10 max-w-md">

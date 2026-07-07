@@ -69,9 +69,9 @@ export function MemberTopbar({
   }, [])
 
   return (
-    <header className="flex items-center justify-between px-6 py-4 bg-[var(--navy)] border-b border-white/10 h-16 relative">
+    <header className="flex items-center justify-between px-4 sm:px-6 py-3 bg-[var(--navy)] border-b border-white/10 h-20 relative">
       <Link href="/dashboard" className="flex items-center">
-        <Logo wordClassName="text-white text-lg" />
+        <Logo wordClassName="text-white" />
       </Link>
 
       <div className="flex items-center gap-3 relative" ref={ref}>
