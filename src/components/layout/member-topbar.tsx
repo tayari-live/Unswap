@@ -70,8 +70,8 @@ export function MemberTopbar({
 
   return (
     <header className="flex items-stretch justify-between bg-white border-b border-border h-20 relative shadow-[0_2px_15px_rgba(0,0,0,0.03)] z-30">
-      <div className="flex items-center bg-navy pl-4 pr-8 sm:pl-6 sm:pr-10 rounded-br-3xl shadow-[4px_0_15px_rgba(11,31,58,0.1)] relative z-10">
-        <Logo wordClassName="text-white" href="/dashboard" />
+      <div className="flex items-center bg-gold pl-4 pr-8 sm:pl-6 sm:pr-10 rounded-br-3xl shadow-[4px_0_15px_rgba(201,168,76,0.2)] relative z-10">
+        <Logo wordClassName="text-navy" href="/dashboard" />
       </div>
 
       <div className="flex flex-1 items-center justify-end px-4 sm:px-6 gap-3 sm:gap-4 relative" ref={ref}>
