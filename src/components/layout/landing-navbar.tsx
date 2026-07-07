@@ -8,10 +8,21 @@ export function LandingNavbar() {
   const [isScrolled, setIsScrolled] = useState(false)
 
   useEffect(() => {
+    // Disable browser's default scroll restoration
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual"
+    }
+    // Force scroll to top on mount
+    window.scrollTo(0, 0)
+
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10)
     }
     window.addEventListener("scroll", handleScroll)
+    
+    // Initial check
+    handleScroll()
+
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
