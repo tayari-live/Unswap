@@ -12,6 +12,7 @@ import {
   Home,
 } from "lucide-react"
 import { Logo } from "@/components/brand/logo"
+import { LandingNavbar } from "@/components/layout/landing-navbar"
 
 export const metadata = {
   title: "UnSwap | Exchange Homes. Not Money.",
@@ -117,51 +118,9 @@ export default function LandingPage() {
   return (
     <div className="bg-white text-navy">
       {/* ============================================================ */}
-      {/*  Navigation — floating glass pill                             */}
+      {/*  Navigation — dynamic fixed top                               */}
       {/* ============================================================ */}
-      <header className="fixed top-4 sm:top-6 left-0 right-0 z-50 px-4 sm:px-6">
-        <div className="max-w-[1200px] mx-auto">
-          <div className="bg-[var(--navy)]/85 backdrop-blur-xl border border-white/10 rounded-full h-20 px-5 sm:px-8 flex items-center justify-between shadow-2xl">
-            <Logo wordClassName="text-white" />
-
-            <nav className="hidden md:flex items-center gap-10 text-[12px] font-bold tracking-[0.15em] uppercase text-white/70">
-              <a href="#network" className="hover:text-white transition-colors duration-200">
-                The Network
-              </a>
-              <a href="#homes" className="hover:text-white transition-colors duration-200">
-                Homes
-              </a>
-              <a href="#how" className="hover:text-white transition-colors duration-200">
-                How It Works
-              </a>
-              <a href="#pricing" className="hover:text-white transition-colors duration-200">
-                Membership
-              </a>
-            </nav>
-
-            <div className="flex items-center gap-4 sm:gap-6">
-              <Link
-                href="/login"
-                className="hidden sm:inline-block text-[12px] font-bold uppercase tracking-wider text-white/80 hover:text-white transition-colors duration-200"
-              >
-                Log In
-              </Link>
-              <Link
-                href="/register"
-                className="hidden sm:inline-flex text-[12px] font-bold uppercase tracking-wider text-[var(--navy)] bg-[var(--gold)] hover:bg-[var(--gold-hover)] px-6 py-3 rounded-full transition-colors duration-200"
-              >
-                Request Access
-              </Link>
-              <Link
-                href="/login"
-                className="sm:hidden text-[12px] font-bold uppercase tracking-wider text-[var(--navy)] bg-[var(--gold)] hover:bg-[var(--gold-hover)] px-5 py-2.5 rounded-full transition-colors duration-200"
-              >
-                Log In
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
+      <LandingNavbar />
 
       {/* ============================================================ */}
       {/*  Hero — full navy, serif, centered                           */}
