@@ -9,6 +9,7 @@ import {
   FileCheck,
   Globe2,
   CreditCard,
+  Home,
 } from "lucide-react"
 import { Logo } from "@/components/brand/logo"
 
@@ -161,61 +162,66 @@ export default function LandingPage() {
       </header>
 
       {/* ============================================================ */}
-      {/*  Hero — full navy, serif, left-aligned                        */}
+      {/*  Hero — full navy, serif, centered                           */}
       {/* ============================================================ */}
-      <section className="relative bg-[var(--navy)] text-white overflow-hidden">
-        {/* Background photograph of a member home */}
-        <Image
-          src="/images/hero-sovereign.png"
-          alt="A bright, light-filled member home available for exchange on the UnSwap network"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
-        />
-        {/* Navy overlay over the image — darker on the text side, letting the
-            photo breathe on the right, for brand tone + legibility */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[var(--navy)]/95 via-[var(--navy)]/85 to-[var(--navy)]/60" />
-        {/* Soft light from upper-right + faint gold wash, per the concept */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_72%_35%,rgba(255,255,255,0.10),transparent_55%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_0%_100%,rgba(201,168,76,0.08),transparent_50%)]" />
+      <section className="relative bg-[var(--navy)] text-white overflow-hidden min-h-[90vh] flex items-center">
+        {/* Background video */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover opacity-80"
+        >
+          {/* High-quality placeholder video of a beautiful home */}
+          <source src="https://cdn.pixabay.com/video/2021/08/21/85848-592661001_large.mp4" type="video/mp4" />
+        </video>
+        
+        {/* Overlay to ensure text legibility while maintaining brand color */}
+        <div className="absolute inset-0 bg-[var(--navy)]/60 backdrop-blur-[2px]" />
+        
+        {/* Soft light from upper-right + faint gold wash */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(255,255,255,0.15),transparent_60%)]" />
 
-        <div className="relative max-w-[1200px] mx-auto px-6 pt-24 pb-28 lg:pt-32 lg:pb-36">
-          <div className="max-w-[760px]">
-            <Eyebrow tone="light">Verified Home Exchange</Eyebrow>
-            <h1 className="mt-6 font-display font-bold leading-[1.05] tracking-tight text-[clamp(2.75rem,6.5vw,5rem)]">
-              Exchange Homes.
-              <br />
-              Not Money.
-            </h1>
-            <p className="mt-7 text-[17px] text-white/65 leading-[1.7] max-w-[520px]">
-              The home exchange network built exclusively for UN, World Bank,
-              IMF, and international organisation professionals. Eliminate
-              $40,000–$80,000 a year in accommodation costs on rotation.
-            </p>
+        <div className="relative w-full max-w-[1200px] mx-auto px-6 py-20 flex flex-col items-center text-center mt-10">
+          <Eyebrow tone="light">Verified Home Exchange</Eyebrow>
+          
+          <h1 className="mt-6 font-display font-bold leading-[1.05] tracking-tight text-[clamp(3rem,7vw,5.5rem)] text-balance">
+            Exchange Homes.<br />Not Money.
+          </h1>
+          
+          <p className="mt-8 text-[17px] md:text-[19px] text-white/90 leading-[1.6] max-w-[640px]">
+            The home exchange network built exclusively for UN, World Bank,
+            IMF, and international organisation professionals. Eliminate
+            $40,000–$80,000 a year in accommodation costs on rotation.
+          </p>
 
-            <div className="mt-10 flex flex-wrap gap-3">
-              <Link
-                href="/register"
-                className="inline-flex items-center gap-2 text-[13px] font-bold uppercase tracking-wider text-navy bg-gold hover:bg-gold-hover px-8 py-4 rounded-lg transition-colors duration-200"
-              >
-                Request Access
-              </Link>
-              <a
-                href="#network"
-                className="inline-flex items-center gap-2 text-[13px] font-bold uppercase tracking-wider text-white border border-white/25 hover:border-white/60 px-8 py-4 rounded-lg transition-colors duration-200"
-              >
-                Learn More
-              </a>
-            </div>
+          <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
+            <Link
+              href="/register"
+              className="w-full sm:w-auto inline-flex justify-center items-center gap-2 text-[14px] font-bold uppercase tracking-wider text-[var(--navy)] bg-[var(--gold)] hover:bg-[var(--gold-hover)] px-10 py-4 rounded-full transition-colors duration-200"
+            >
+              Request Access
+            </Link>
+            <a
+              href="#network"
+              className="w-full sm:w-auto inline-flex justify-center items-center gap-2 text-[14px] font-bold uppercase tracking-wider text-white border border-white/40 hover:border-white hover:bg-white/10 px-10 py-4 rounded-full transition-colors duration-200 backdrop-blur-md bg-white/5"
+            >
+              Learn More
+            </a>
+          </div>
 
-            <div className="mt-10 inline-flex items-center gap-3 text-white/55">
-              <ShieldCheck size={18} className="text-gold" />
-              <span className="text-[13px]">
-                Up to <span className="text-white font-semibold">$2,000,000</span> property
-                protection per exchange
-              </span>
-            </div>
+          {/* Trust Banner inline */}
+          <div className="mt-16 sm:mt-24 inline-flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-white/80 text-[13px] md:text-[14px] font-medium backdrop-blur-md bg-[var(--navy-dark)]/40 px-6 py-3.5 rounded-2xl sm:rounded-full border border-white/10 shadow-xl">
+            <span className="flex items-center gap-2.5">
+              <Globe2 size={18} className="text-[var(--gold)]" />
+              100,000+ eligible professionals globally
+            </span>
+            <span className="w-px h-5 bg-white/20 hidden sm:block" />
+            <span className="flex items-center gap-2.5">
+              <ShieldCheck size={18} className="text-[var(--teal)]" />
+              Up to $2,000,000 property protection
+            </span>
           </div>
         </div>
       </section>
@@ -322,39 +328,64 @@ export default function LandingPage() {
       {/* ============================================================ */}
       <section id="how" className="bg-parchment">
         <div className="max-w-[1200px] mx-auto px-6 py-20 lg:py-28">
-          <div className="max-w-[620px] mb-14">
-            <Eyebrow>Three Steps</Eyebrow>
-            <h2 className="mt-4 font-display text-3xl lg:text-[2.75rem] font-bold leading-tight">
-              How It Works
+          <div className="text-center mb-16">
+            <h2 className="font-display text-4xl lg:text-[3.25rem] font-bold text-[var(--navy)] leading-tight">
+              How does it work?
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-5 lg:gap-6">
+          <div className="grid md:grid-cols-3 gap-6 lg:gap-10">
             {[
               {
-                n: "01",
+                n: "1",
+                icon: BadgeCheck,
+                color: "text-blue-500",
+                bg: "bg-blue-500/10",
                 title: "Verify your status",
                 body: "Sign up with your institutional email. Recognised domains like @un.org and @worldbank.org are fast-tracked. Upload your staff ID for full verification.",
               },
               {
-                n: "02",
+                n: "2",
+                icon: Home,
+                color: "text-[var(--gold-dark)]",
+                bg: "bg-[var(--gold)]/15",
                 title: "List your home",
                 body: "Publish your property with photos, swap duration preferences, and house rules. Your home becomes a living asset instead of an empty liability on rotation.",
               },
               {
-                n: "03",
+                n: "3",
+                icon: Globe2,
+                color: "text-[var(--teal)]",
+                bg: "bg-[var(--teal)]/15",
                 title: "Exchange and save",
                 body: "Swap simultaneously with a peer, or host now and earn UnSwap Credits for later. Sign the exchange agreement and travel protected — up to $2,000,000.",
               },
             ].map((s) => (
-              <div key={s.n} className="bg-white rounded-2xl border border-border p-7">
-                <span className="font-display text-5xl font-bold text-gold/30 leading-none">
-                  {s.n}
-                </span>
-                <h3 className="mt-4 font-display text-xl font-bold">{s.title}</h3>
-                <p className="mt-3 text-[14px] text-neutral leading-relaxed">
-                  {s.body}
-                </p>
+              <div key={s.n} className="bg-white rounded-[24px] border border-[var(--border)] p-8 shadow-sm flex flex-col h-full hover:shadow-md transition-shadow duration-300">
+                {/* Header: Circle number and line */}
+                <div className="flex items-center gap-4 w-full">
+                  <div className="w-10 h-10 rounded-full border border-[var(--border)] flex items-center justify-center font-display text-lg font-medium text-[var(--navy)] shrink-0">
+                    {s.n}
+                  </div>
+                  <div className="h-px bg-[var(--border)] flex-1" />
+                </div>
+                
+                {/* Illustration (Icon lockup) */}
+                <div className="flex items-center justify-center py-14">
+                  <div className={`w-32 h-32 rounded-full ${s.bg} flex items-center justify-center`}>
+                    <s.icon size={64} strokeWidth={1.5} className={s.color} />
+                  </div>
+                </div>
+
+                {/* Text Content */}
+                <div className="mt-auto">
+                  <h3 className="font-display text-2xl font-bold text-[var(--navy)] leading-snug">
+                    {s.title}
+                  </h3>
+                  <p className="mt-4 text-[15px] text-neutral leading-[1.6]">
+                    {s.body}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
