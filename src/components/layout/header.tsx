@@ -24,7 +24,7 @@ export function Header() {
   }, [])
 
   return (
-    <header className="flex items-center justify-between px-4 sm:px-6 py-3 bg-[var(--navy)] border-b border-white/10 h-20 relative z-30 shadow-sm">
+    <header className="flex items-center justify-between px-4 sm:px-6 py-3 bg-navy border-b border-white/10 h-20 relative z-30 shadow-sm">
       <Link href="/overview" className="flex items-center gap-2.5">
         <Image
           src="/unswap-logo.png"
@@ -55,7 +55,7 @@ export function Header() {
 
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center overflow-hidden border-2 border-[var(--gold)]/40 hover:border-[var(--gold)] hover:shadow-md transition-all ml-2"
+            className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center overflow-hidden border-2 border-gold/40 hover:border-gold hover:shadow-md transition-all ml-2"
           >
             {profile.image ? (
               <img src={profile.image} alt="User Avatar" className="h-full w-full object-cover" />

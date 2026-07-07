@@ -38,7 +38,7 @@ function NotificationBell() {
     >
       <Bell size={18} />
       {unread > 0 && (
-        <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-[var(--gold)] text-[var(--navy)] text-[10px] font-bold flex items-center justify-center shadow-sm">
+        <span className="absolute -top-1 -right-1 min-w-4 h-4 px-1 rounded-full bg-gold text-navy text-[10px] font-bold flex items-center justify-center shadow-sm">
           {unread > 9 ? "9+" : unread}
         </span>
       )}
@@ -69,24 +69,24 @@ export function MemberTopbar({
   }, [])
 
   return (
-    <header className="flex items-center justify-between px-4 sm:px-6 py-3 bg-[var(--navy)] border-b border-white/10 h-20 relative shadow-sm z-30">
+    <header className="flex items-center justify-between px-4 sm:px-6 py-3 bg-navy border-b border-white/10 h-20 relative shadow-sm z-30">
       <Logo wordClassName="text-white" href="/dashboard" />
 
       <div className="flex items-center gap-3 sm:gap-4 relative" ref={ref}>
         <NotificationBell />
         {/* Verification status chip — constant awareness + one-tap to verify */}
         {verificationStatus === "FULLY_VERIFIED" ? (
-          <span className="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-bold tracking-wide uppercase text-[var(--teal)] bg-[var(--teal)]/10 px-3 py-1.5 rounded-full border border-[var(--teal)]/20">
+          <span className="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-bold tracking-wide uppercase text-teal bg-teal/10 px-3 py-1.5 rounded-full border border-teal/20">
             <BadgeCheck size={14} /> Verified
           </span>
         ) : verificationStatus === "PENDING_ID_REVIEW" ? (
-          <span className="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-bold tracking-wide uppercase text-[var(--gold)] bg-[var(--gold)]/10 px-3 py-1.5 rounded-full border border-[var(--gold)]/20">
+          <span className="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-bold tracking-wide uppercase text-gold bg-gold/10 px-3 py-1.5 rounded-full border border-gold/20">
             <Clock size={14} /> In review
           </span>
         ) : (
           <Link
             href="/verify-identity"
-            className="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-bold tracking-wide uppercase text-[var(--navy)] bg-[var(--gold)] hover:bg-[var(--gold-hover)] px-3 py-1.5 rounded-full transition-colors shadow-sm"
+            className="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-bold tracking-wide uppercase text-navy bg-gold hover:bg-gold-hover px-3 py-1.5 rounded-full transition-colors shadow-sm"
           >
             <ShieldAlert size={14} /> Verify
           </Link>
@@ -99,7 +99,7 @@ export function MemberTopbar({
         </div>
         <button
           onClick={() => setOpen((v) => !v)}
-          className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center overflow-hidden border-2 border-[var(--gold)]/40 hover:border-[var(--gold)] hover:shadow-md transition-all ml-1"
+          className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center overflow-hidden border-2 border-gold/40 hover:border-gold hover:shadow-md transition-all ml-1"
         >
           {image ? (
             <img src={image} alt="Avatar" className="h-full w-full object-cover" />

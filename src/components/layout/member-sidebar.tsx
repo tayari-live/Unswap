@@ -34,7 +34,7 @@ export function MemberSidebar() {
     <div 
       onMouseEnter={() => setCollapsed(false)}
       onMouseLeave={() => setCollapsed(true)}
-      className={cn("flex flex-col bg-[var(--navy)] border-r border-white/10 h-full transition-all duration-300 shadow-[2px_0_15px_rgba(0,0,0,0.1)] z-20 relative", collapsed ? "w-20" : "w-64")}
+      className={cn("flex flex-col bg-navy border-r border-white/10 h-full transition-all duration-300 shadow-2xl z-20 relative", collapsed ? "w-20" : "w-64")}
     >
       <div className="pt-6 pb-2" />
 
@@ -81,7 +81,7 @@ export function MemberSidebar() {
                   : "text-white/60 hover:bg-white/5 hover:text-white"
               )}
             >
-              <item.icon size={20} className={cn("flex-shrink-0 transition-colors", isActive ? "text-[var(--gold)]" : "text-white/50")} />
+              <item.icon size={20} className={cn("flex-shrink-0 transition-colors", isActive ? "text-gold" : "text-white/50")} />
               <span className={cn("overflow-hidden whitespace-nowrap transition-all duration-300 flex-1", collapsed ? "max-w-0 opacity-0" : "max-w-[150px] opacity-100")}>
                 {item.name}
               </span>
@@ -89,7 +89,7 @@ export function MemberSidebar() {
               {item.name === "Messages" && unread > 0 && (
                 <span
                   className={cn(
-                    "rounded-full bg-[var(--gold)] text-[var(--navy)] font-bold flex items-center justify-center transition-all duration-300 overflow-hidden shadow-sm",
+                    "rounded-full bg-gold text-navy font-bold flex items-center justify-center transition-all duration-300 overflow-hidden shadow-sm",
                     collapsed ? "absolute top-1 left-7 w-3 h-3 min-w-3 p-0 text-[0px]" : "ml-auto min-w-5 h-5 px-1.5 text-[11px]"
                   )}
                 >
@@ -108,7 +108,7 @@ export function MemberSidebar() {
         const isSettingsActive = pathname === settingsItem.href || pathname.startsWith(settingsItem.href + "/");
         
         return (
-          <div className="mt-auto border-t border-white/10 p-3 bg-[var(--navy-dark)]">
+          <div className="mt-auto border-t border-white/10 p-3 bg-navy-dark">
             <Link
               href={settingsItem.href}
               title={collapsed ? "Settings" : undefined}
@@ -119,7 +119,7 @@ export function MemberSidebar() {
                   : "text-white/60 hover:bg-white/5 hover:text-white"
               )}
             >
-              <settingsItem.icon size={20} className={cn("flex-shrink-0 transition-colors", isSettingsActive ? "text-[var(--gold)]" : "text-white/50")} />
+              <settingsItem.icon size={20} className={cn("flex-shrink-0 transition-colors", isSettingsActive ? "text-gold" : "text-white/50")} />
               <span className={cn("overflow-hidden whitespace-nowrap transition-all duration-300", collapsed ? "max-w-0 opacity-0" : "max-w-[200px] opacity-100")}>
                 Settings
               </span>

@@ -16,7 +16,7 @@ export function Sidebar() {
     <div 
       onMouseEnter={() => setCollapsed(false)}
       onMouseLeave={() => setCollapsed(true)}
-      className={cn("flex flex-col bg-[var(--navy)] border-r border-white/10 h-full transition-all duration-300 shadow-[2px_0_15px_rgba(0,0,0,0.1)] z-20 relative", collapsed ? "w-20" : "w-64")}
+      className={cn("flex flex-col bg-navy border-r border-white/10 h-full transition-all duration-300 shadow-2xl z-20 relative", collapsed ? "w-20" : "w-64")}
     >
       <div className="pt-6 pb-2" />
 
@@ -36,7 +36,7 @@ export function Sidebar() {
                   : "text-white/60 hover:bg-white/5 hover:text-white"
               )}
             >
-              <item.icon size={20} className={cn("flex-shrink-0 transition-colors", isActive ? "text-[var(--gold)]" : "text-white/50")} />
+              <item.icon size={20} className={cn("flex-shrink-0 transition-colors", isActive ? "text-gold" : "text-white/50")} />
               <span className={cn("overflow-hidden whitespace-nowrap transition-all duration-300", collapsed ? "max-w-0 opacity-0" : "max-w-[200px] opacity-100")}>
                 {item.name}
               </span>
@@ -45,7 +45,7 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="mt-auto border-t border-white/10 p-3 bg-[var(--navy-dark)]">
+      <div className="mt-auto border-t border-white/10 p-3 bg-navy-dark">
         <Link
           href="/settings"
           title={collapsed ? "Settings" : undefined}
@@ -56,7 +56,7 @@ export function Sidebar() {
               : "text-white/60 hover:bg-white/5 hover:text-white"
           )}
         >
-          <Settings size={20} className={cn("flex-shrink-0 transition-colors", pathname === "/settings" || pathname.startsWith("/settings/") ? "text-[var(--gold)]" : "text-white/50")} />
+          <Settings size={20} className={cn("flex-shrink-0 transition-colors", pathname === "/settings" || pathname.startsWith("/settings/") ? "text-gold" : "text-white/50")} />
           <span className={cn("overflow-hidden whitespace-nowrap transition-all duration-300", collapsed ? "max-w-0 opacity-0" : "max-w-[200px] opacity-100")}>
             Settings
           </span>
