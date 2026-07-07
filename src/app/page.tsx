@@ -173,8 +173,8 @@ export default function LandingPage() {
           playsInline
           className="absolute inset-0 w-full h-full object-cover opacity-80"
         >
-          {/* High-quality placeholder video of a beautiful home */}
-          <source src="https://cdn.pixabay.com/video/2021/08/21/85848-592661001_large.mp4" type="video/mp4" />
+          {/* Reliable CDN video to avoid hotlinking protection */}
+          <source src="https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4" type="video/mp4" />
         </video>
         
         {/* Overlay to ensure text legibility while maintaining brand color */}
@@ -184,9 +184,7 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(255,255,255,0.15),transparent_60%)]" />
 
         <div className="relative w-full max-w-[1200px] mx-auto px-6 py-20 flex flex-col items-center text-center mt-10">
-          <Eyebrow tone="light">Verified Home Exchange</Eyebrow>
-          
-          <h1 className="mt-6 font-display font-bold leading-[1.05] tracking-tight text-[clamp(3rem,7vw,5.5rem)] text-balance">
+          <h1 className="font-display font-bold leading-[1.05] tracking-tight text-[clamp(3rem,7vw,5.5rem)] text-balance">
             Exchange Homes.<br />Not Money.
           </h1>
           
@@ -232,8 +230,7 @@ export default function LandingPage() {
       <section id="network" className="bg-parchment">
         <div className="max-w-[1200px] mx-auto px-6 py-20 lg:py-28">
           <div className="max-w-[620px] mb-14">
-            <Eyebrow>The Closed Loop</Eyebrow>
-            <h2 className="mt-4 font-display text-3xl lg:text-[2.75rem] font-bold leading-tight">
+            <h2 className="font-display text-4xl lg:text-[3.25rem] font-bold text-[var(--navy)] leading-tight">
               The Exclusive Network
             </h2>
             <p className="mt-4 text-[15px] text-neutral leading-relaxed">
@@ -243,21 +240,25 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-5 lg:gap-6">
-            {pillars.map((p) => (
-              <div
-                key={p.title}
-                className="bg-white border border-border rounded-2xl p-7 hover:border-gold/50 transition-colors duration-300"
-              >
-                <div className="w-12 h-12 rounded-lg border border-gold/40 flex items-center justify-center mb-6">
-                  <p.icon size={22} strokeWidth={1.5} className="text-gold-dark" />
+          <div className="grid md:grid-cols-3 gap-6 lg:gap-10">
+            {pillars.map((p, i) => {
+              const bgColors = ["bg-blue-500/10", "bg-[var(--gold)]/15", "bg-[var(--teal)]/15"];
+              const iconColors = ["text-blue-500", "text-[var(--gold-dark)]", "text-[var(--teal)]"];
+              return (
+                <div
+                  key={p.title}
+                  className="bg-white border border-[var(--border)] rounded-[24px] p-8 shadow-sm flex flex-col h-full hover:shadow-md transition-shadow duration-300"
+                >
+                  <div className={`w-20 h-20 rounded-full ${bgColors[i]} flex items-center justify-center mb-8`}>
+                    <p.icon size={36} strokeWidth={1.5} className={iconColors[i]} />
+                  </div>
+                  <h3 className="font-display text-2xl font-bold text-[var(--navy)] leading-snug">{p.title}</h3>
+                  <p className="mt-4 text-[15px] text-neutral leading-[1.6]">
+                    {p.body}
+                  </p>
                 </div>
-                <h3 className="font-display text-xl font-bold">{p.title}</h3>
-                <p className="mt-3 text-[14px] text-neutral leading-relaxed">
-                  {p.body}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -267,10 +268,10 @@ export default function LandingPage() {
       {/* ============================================================ */}
       <section id="homes" className="bg-white">
         <div className="max-w-[1200px] mx-auto px-6 py-20 lg:py-28">
-          <div className="flex items-center justify-center gap-5 mb-12">
-            <span className="hidden sm:block h-px w-16 bg-border" />
-            <Eyebrow>Curated Portfolio</Eyebrow>
-            <span className="hidden sm:block h-px w-16 bg-border" />
+          <div className="text-center mb-16">
+            <h2 className="font-display text-4xl lg:text-[3.25rem] font-bold text-[var(--navy)] leading-tight">
+              Curated Portfolio
+            </h2>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
@@ -278,7 +279,7 @@ export default function LandingPage() {
               <Link
                 key={r.name}
                 href="/register"
-                className="group relative h-80 rounded-2xl overflow-hidden border border-border"
+                className="group relative h-[380px] rounded-[24px] overflow-hidden border border-[var(--border)] shadow-sm hover:shadow-lg transition-shadow duration-300"
               >
                 <Image
                   src={r.img}
@@ -288,24 +289,24 @@ export default function LandingPage() {
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
                 {/* Bottom-up navy gradient for legible serif title */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[var(--navy-dark)]/90 via-[var(--navy-dark)]/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[var(--navy-dark)]/90 via-[var(--navy-dark)]/30 to-transparent" />
 
-                <span className="absolute top-4 left-4 inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest bg-white/95 text-navy px-3 py-1.5 rounded-md backdrop-blur-sm">
-                  <BadgeCheck size={12} className="text-teal" />
+                <span className="absolute top-5 left-5 inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest bg-white/95 text-[var(--navy)] px-3.5 py-2 rounded-lg backdrop-blur-md shadow-sm">
+                  <BadgeCheck size={14} className="text-[var(--teal)]" />
                   Verified
                 </span>
 
-                <div className="absolute inset-x-0 bottom-0 p-6">
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gold">
+                <div className="absolute inset-x-0 bottom-0 p-8">
+                  <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--gold)]">
                     {r.location}
                   </span>
                   <h3 className="mt-1.5 font-display text-2xl font-bold text-white leading-snug">
                     {r.name}
                   </h3>
-                  <div className="mt-3 flex items-center gap-3 text-[12px] text-white/70">
+                  <div className="mt-4 flex items-center gap-3 text-[13px] text-white/70">
                     <span>{r.beds}</span>
                     <span className="w-1 h-1 rounded-full bg-white/40" />
-                    <span className="text-teal font-semibold">{r.duration}</span>
+                    <span className="text-[var(--teal)] font-semibold">{r.duration}</span>
                   </div>
                 </div>
               </Link>
@@ -393,88 +394,88 @@ export default function LandingPage() {
       </section>
 
       {/* ============================================================ */}
-      {/*  Trust & Protection — Dark Section                            */}
+      {/*  Trust & Protection — Floating Dark Card                      */}
       {/* ============================================================ */}
-      <section className="relative bg-navy text-white overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(201,168,76,0.08),transparent_60%)]" />
+      <section className="bg-parchment py-10 lg:py-20">
+        <div className="max-w-[1200px] mx-auto px-6">
+          <div className="relative bg-[var(--navy)] text-white rounded-[32px] overflow-hidden shadow-2xl border border-[var(--navy-dark)]">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(201,168,76,0.12),transparent_70%)]" />
 
-        <div className="relative max-w-[1200px] mx-auto px-6 py-20 lg:py-28">
-          <div className="grid lg:grid-cols-2 gap-14 lg:gap-20 items-start">
-            {/* Left — copy + features */}
-            <div>
-              <Eyebrow tone="light">Trust, by Design</Eyebrow>
-              <h2 className="mt-4 font-display text-3xl lg:text-[2.75rem] font-bold leading-tight">
-                Built on Institutional
-                <br />
-                Trust. Protected by Design.
-              </h2>
-              <p className="mt-5 text-[15px] text-white/55 leading-[1.7] max-w-[440px]">
-                The person staying in your home is not a stranger with a
-                five-star review. They are a vetted diplomatic professional with
-                as much to lose from a poor exchange as you do. That is the
-                closed loop.
-              </p>
+            <div className="relative px-8 py-20 lg:p-24">
+              <div className="grid lg:grid-cols-2 gap-16 lg:gap-20 items-center">
+                {/* Left — copy + features */}
+                <div>
+                  <h2 className="font-display text-4xl lg:text-[3.25rem] font-bold leading-tight">
+                    Built on Institutional
+                    <br />
+                    Trust. Protected by Design.
+                  </h2>
+                  <p className="mt-6 text-[17px] text-white/60 leading-[1.7] max-w-[480px]">
+                    The person staying in your home is not a stranger with a
+                    five-star review. They are a vetted diplomatic professional with
+                    as much to lose from a poor exchange as you do. That is the
+                    closed loop.
+                  </p>
 
-              <div className="mt-10 space-y-5">
-                {trustFeatures.map((f) => (
-                  <div key={f.title} className="flex gap-4">
-                    <div className="w-10 h-10 flex-shrink-0 rounded-xl bg-gold/15 text-gold flex items-center justify-center">
-                      <f.icon size={20} strokeWidth={1.5} />
-                    </div>
-                    <div>
-                      <h3 className="font-display font-bold text-[17px]">{f.title}</h3>
-                      <p className="text-[13px] text-white/50 mt-1 leading-relaxed">
-                        {f.body}
-                      </p>
-                    </div>
+                  <div className="mt-12 space-y-6">
+                    {trustFeatures.map((f) => (
+                      <div key={f.title} className="flex gap-5 items-start">
+                        <div className="w-12 h-12 flex-shrink-0 rounded-2xl bg-white/5 text-[var(--gold)] flex items-center justify-center backdrop-blur-sm border border-white/10 shadow-inner">
+                          <f.icon size={24} strokeWidth={1.5} />
+                        </div>
+                        <div>
+                          <h3 className="font-display font-bold text-[20px] text-white">{f.title}</h3>
+                          <p className="text-[15px] text-white/50 mt-1.5 leading-[1.6]">
+                            {f.body}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Right — protection cards */}
-            <div className="space-y-4 lg:pt-12">
-              {protectionCards.map((card) => (
-                <div
-                  key={card.label}
-                  className="flex items-center justify-between bg-white/[0.04] border border-white/[0.08] rounded-xl px-6 py-5"
-                >
-                  <div>
-                    <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">
-                      {card.label}
-                    </div>
-                    <div className="text-[16px] font-bold mt-1">{card.value}</div>
-                  </div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-teal bg-teal/10 px-3 py-1.5 rounded-md">
-                    {card.status}
-                  </span>
                 </div>
-              ))}
+
+                {/* Right — protection cards */}
+                <div className="space-y-4 lg:pl-10">
+                  {protectionCards.map((card) => (
+                    <div
+                      key={card.label}
+                      className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white/[0.03] border border-white/10 rounded-[24px] p-7 backdrop-blur-md shadow-lg"
+                    >
+                      <div>
+                        <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-[var(--gold)]/80">
+                          {card.label}
+                        </div>
+                        <div className="text-[20px] font-display font-bold mt-1 text-white">{card.value}</div>
+                      </div>
+                      <span className="inline-flex text-[11px] font-bold uppercase tracking-wider text-[var(--teal)] bg-[var(--teal)]/10 px-4 py-2 rounded-lg self-start sm:self-auto border border-[var(--teal)]/20">
+                        {card.status}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* ============================================================ */}
-      {/*  By the Numbers — navy stat band                              */}
+      {/*  By the Numbers — clean grid                                  */}
       {/* ============================================================ */}
-      <section className="relative bg-[var(--navy-dark)] text-white overflow-hidden">
-        <Globe2
-          size={300}
-          strokeWidth={0.5}
-          className="absolute -right-12 top-1/2 -translate-y-1/2 text-white/[0.04] hidden lg:block"
-        />
-        <div className="relative max-w-[1200px] mx-auto px-6 py-16 grid grid-cols-1 sm:grid-cols-3 gap-10 sm:gap-8 divide-y sm:divide-y-0 sm:divide-x divide-white/10">
-          {stats.map((s) => (
-            <div key={s.label} className="text-center sm:px-6 pt-8 sm:pt-0 first:pt-0">
-              <div className="font-display text-4xl lg:text-5xl font-bold text-gold">
-                {s.stat}
+      <section className="bg-white">
+        <div className="max-w-[1200px] mx-auto px-6 py-20 lg:py-28">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {stats.map((s) => (
+              <div key={s.label} className="bg-parchment rounded-[24px] p-10 text-center border border-[var(--border)] shadow-sm hover:shadow-md transition-shadow duration-300">
+                <div className="font-display text-5xl lg:text-6xl font-bold text-[var(--navy)]">
+                  {s.stat}
+                </div>
+                <div className="text-[12px] font-bold uppercase tracking-[0.2em] text-neutral mt-4">
+                  {s.label}
+                </div>
               </div>
-              <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/50 mt-3">
-                {s.label}
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
@@ -484,8 +485,7 @@ export default function LandingPage() {
       <section id="pricing" className="bg-white">
         <div className="max-w-[1200px] mx-auto px-6 py-20 lg:py-28">
           <div className="text-center max-w-[560px] mx-auto mb-14">
-            <Eyebrow>Membership</Eyebrow>
-            <h2 className="mt-4 font-display text-3xl lg:text-[2.75rem] font-bold leading-tight">
+            <h2 className="font-display text-4xl lg:text-[3.25rem] font-bold text-[var(--navy)] leading-tight">
               Choose Your Tier
             </h2>
             <p className="mt-4 text-[15px] text-neutral">
@@ -542,42 +542,42 @@ export default function LandingPage() {
             ].map((t) => (
               <div
                 key={t.name}
-                className={`relative rounded-2xl border p-6 flex flex-col ${
-                  t.popular ? "border-gold shadow-lg ring-1 ring-gold" : "border-border shadow-sm"
+                className={`relative rounded-[24px] border p-8 flex flex-col transition-all duration-300 ${
+                  t.popular ? "border-[var(--gold)] shadow-[0_8px_30px_rgb(201,168,76,0.15)] ring-1 ring-[var(--gold)] scale-[1.02] bg-white z-10" : "border-[var(--border)] shadow-sm hover:shadow-md bg-white"
                 }`}
               >
                 {t.popular && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase tracking-wide bg-gold text-navy px-3 py-1 rounded-full whitespace-nowrap">
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[11px] font-bold uppercase tracking-wide bg-[var(--gold)] text-[var(--navy)] px-4 py-1.5 rounded-full whitespace-nowrap shadow-sm">
                     Most Popular
                   </span>
                 )}
-                <h3 className="font-display text-lg font-bold">{t.name}</h3>
-                <div className="mt-3 flex items-baseline gap-1">
-                  <span className="font-display text-3xl font-bold">{t.price}</span>
+                <h3 className="font-display text-xl font-bold text-[var(--navy)]">{t.name}</h3>
+                <div className="mt-4 flex items-baseline gap-1">
+                  <span className="font-display text-4xl font-bold text-[var(--navy)]">{t.price}</span>
                   <span className="text-sm text-neutral">{t.per}</span>
                 </div>
-                <ul className="mt-5 space-y-2.5 text-[13px] text-neutral-dark flex-1">
-                  <li className="flex gap-2 font-semibold text-navy">
-                    <ShieldCheck size={15} className="text-teal flex-shrink-0 mt-0.5" />
+                <ul className="mt-6 space-y-3 text-[14px] text-neutral-dark flex-1">
+                  <li className="flex gap-3 font-semibold text-[var(--navy)] items-start">
+                    <ShieldCheck size={18} className="text-[var(--teal)] flex-shrink-0 mt-0.5" />
                     {t.exchanges}
                   </li>
-                  <li className="flex gap-2 font-semibold text-navy">
-                    <ShieldCheck size={15} className="text-teal flex-shrink-0 mt-0.5" />
+                  <li className="flex gap-3 font-semibold text-[var(--navy)] items-start">
+                    <ShieldCheck size={18} className="text-[var(--teal)] flex-shrink-0 mt-0.5" />
                     {t.guarantee}
                   </li>
                   {t.features.map((f) => (
-                    <li key={f} className="flex gap-2">
-                      <ShieldCheck size={15} className="text-teal flex-shrink-0 mt-0.5" />
+                    <li key={f} className="flex gap-3 items-start">
+                      <ShieldCheck size={18} className="text-[var(--teal)] flex-shrink-0 mt-0.5" />
                       {f}
                     </li>
                   ))}
                 </ul>
                 <Link
                   href="/register"
-                  className={`mt-6 text-center text-[13px] font-bold uppercase tracking-wider py-3 rounded-lg transition-colors duration-200 ${
+                  className={`mt-8 text-center text-[14px] font-bold uppercase tracking-wider py-4 rounded-xl transition-colors duration-200 ${
                     t.popular
-                      ? "bg-gold-dark text-white hover:bg-gold-hover"
-                      : "border border-border text-navy hover:border-navy"
+                      ? "bg-[var(--gold)] text-[var(--navy)] hover:bg-[var(--gold-hover)]"
+                      : "border border-[var(--border)] text-[var(--navy)] hover:border-[var(--navy)]"
                   }`}
                 >
                   Request Access
@@ -587,10 +587,10 @@ export default function LandingPage() {
           </div>
 
           {/* Lifetime banner */}
-          <div className="mt-6 rounded-2xl bg-navy text-white p-7 flex flex-col sm:flex-row items-center justify-between gap-5">
-            <div className="flex items-center gap-4">
-              <span className="w-12 h-12 rounded-xl bg-gold/15 text-gold flex items-center justify-center">
-                <BadgeCheck size={24} />
+          <div className="mt-10 rounded-[32px] bg-[var(--navy)] text-white p-8 lg:p-12 flex flex-col sm:flex-row items-center justify-between gap-8 shadow-xl border border-[var(--navy-dark)]">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+              <span className="w-16 h-16 rounded-2xl bg-white/5 text-[var(--gold)] flex items-center justify-center border border-white/10 shrink-0">
+                <BadgeCheck size={32} />
               </span>
               <div>
                 <div className="flex items-center gap-2">
@@ -622,26 +622,30 @@ export default function LandingPage() {
       </section>
 
       {/* ============================================================ */}
-      {/*  Final CTA — Join the Network (parchment)                    */}
+      {/*  Final CTA — Join the Network                               */}
       {/* ============================================================ */}
       <section className="bg-parchment">
-        <div className="max-w-[680px] mx-auto px-6 py-24 text-center">
-          <Eyebrow>By Invitation Only</Eyebrow>
-          <h2 className="mt-4 font-display text-3xl lg:text-[2.75rem] font-bold leading-tight">
-            Join the Network
-          </h2>
-          <p className="mt-5 text-[15px] text-neutral leading-[1.7] max-w-[520px] mx-auto">
-            Begin your verification today. Turn an empty home into your most
-            valuable asset on rotation. Stop paying $110 a day for accommodation
-            your peers could provide for free.
-          </p>
-          <div className="mt-10">
-            <Link
-              href="/register"
-              className="inline-flex items-center gap-2 text-[13px] font-bold uppercase tracking-wider text-navy bg-gold hover:bg-gold-hover px-9 py-4 rounded-lg transition-colors duration-200"
-            >
-              Access the Network
-            </Link>
+        <div className="max-w-[1200px] mx-auto px-6 py-24">
+          <div className="bg-white rounded-[32px] border border-[var(--border)] p-12 md:p-20 text-center shadow-sm max-w-[800px] mx-auto flex flex-col items-center">
+            <div className="w-20 h-20 rounded-full bg-[var(--gold)]/15 flex items-center justify-center mb-8">
+               <ShieldCheck size={40} className="text-[var(--gold-dark)]" />
+            </div>
+            <h2 className="font-display text-4xl lg:text-[3.25rem] font-bold text-[var(--navy)] leading-tight">
+              Join the Network
+            </h2>
+            <p className="mt-6 text-[17px] text-neutral leading-[1.6] max-w-[520px]">
+              Begin your verification today. Turn an empty home into your most
+              valuable asset on rotation. Stop paying $110 a day for accommodation
+              your peers could provide for free.
+            </p>
+            <div className="mt-12">
+              <Link
+                href="/register"
+                className="inline-flex items-center gap-2 text-[15px] font-bold uppercase tracking-wider text-[var(--navy)] bg-[var(--gold)] hover:bg-[var(--gold-hover)] px-10 py-4 rounded-full transition-colors duration-200"
+              >
+                Access the Network
+              </Link>
+            </div>
           </div>
         </div>
       </section>
