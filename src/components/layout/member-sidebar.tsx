@@ -101,15 +101,7 @@ export function MemberSidebar() {
         })}
       </nav>
 
-      {!collapsed && (
-        <div className="px-4 pb-4">
-          <div className="rounded-xl border border-white/10 bg-white/5 p-3">
-            <p className="text-[10px] leading-snug text-white/60">
-              Independent, staff-led platform. Not affiliated with the United Nations.
-            </p>
-          </div>
-        </div>
-      )}
+
     </div>
   )
 }

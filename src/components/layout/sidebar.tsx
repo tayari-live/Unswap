@@ -44,13 +44,13 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="px-4 pb-4">
+      <div className="mt-auto border-t border-white/10">
         <Link
           href="/settings"
           title={collapsed ? "Settings" : undefined}
           className={cn(
-            "flex items-center gap-3 py-2.5 rounded-xl text-sm font-medium transition-colors",
-            collapsed ? "justify-center px-0" : "px-3",
+            "flex items-center gap-3 py-4 w-full text-sm font-medium transition-colors",
+            collapsed ? "justify-center px-0" : "px-6",
             pathname === "/settings" || pathname.startsWith("/settings/")
               ? "bg-white/10 text-white"
               : "text-white/60 hover:bg-white/10 hover:text-white"
@@ -60,16 +60,6 @@ export function Sidebar() {
           {!collapsed && <span>Settings</span>}
         </Link>
       </div>
-
-      {!collapsed && (
-        <div className="px-4 pb-4">
-          <div className="rounded-xl border border-white/10 bg-white/5 p-3">
-            <p className="text-[10px] leading-snug text-white/60">
-              Independent, staff-led platform. Not affiliated with the United Nations.
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
