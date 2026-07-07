@@ -31,11 +31,11 @@ export function Header() {
           alt="UnSwap Logo"
           width={56}
           height={56}
-          className="w-14 h-14 object-contain rounded-lg flex-shrink-0"
+          className="w-10 h-10 sm:w-14 sm:h-14 object-contain rounded-lg flex-shrink-0"
           priority
         />
         <div className="flex flex-col leading-none">
-          <span className="font-display font-bold text-white text-3xl tracking-tight">UnSwap</span>
+          <span className="font-display font-bold text-white text-2xl sm:text-3xl tracking-tight">UnSwap</span>
           <span className="text-[9px] uppercase tracking-widest text-white/50 font-semibold">Admin Console</span>
         </div>
       </Link>

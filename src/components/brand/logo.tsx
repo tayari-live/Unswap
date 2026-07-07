@@ -30,14 +30,14 @@ export function Logo({
         alt="UnSwap Logo"
         width={56}
         height={56}
-        className={cn("w-14 h-14 object-contain", markClassName)}
+        className={cn("w-10 h-10 sm:w-14 sm:h-14 object-contain", markClassName)}
         priority
       />
       {showWord && (
         <span className="inline-flex flex-col">
           <span
             className={cn(
-              "font-display text-3xl font-bold tracking-tight leading-none",
+              "font-display text-2xl sm:text-3xl font-bold tracking-tight leading-none",
               wordClassName,
             )}
           >

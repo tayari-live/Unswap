@@ -146,9 +146,15 @@ export default function LandingPage() {
             </Link>
             <Link
               href="/register"
-              className="text-[13px] font-bold uppercase tracking-wider text-navy bg-gold hover:bg-gold-hover px-5 py-2.5 rounded-lg transition-colors duration-200"
+              className="hidden sm:inline-flex text-[13px] font-bold uppercase tracking-wider text-[var(--navy)] bg-[var(--gold)] hover:bg-[var(--gold-hover)] px-5 py-2.5 rounded-lg transition-colors duration-200"
             >
               Request Access
+            </Link>
+            <Link
+              href="/login"
+              className="sm:hidden text-[13px] font-bold uppercase tracking-wider text-[var(--navy)] bg-[var(--gold)] hover:bg-[var(--gold-hover)] px-4 py-2.5 rounded-lg transition-colors duration-200"
+            >
+              Log In
             </Link>
           </div>
         </div>
