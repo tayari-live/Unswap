@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Logo } from "@/components/brand/logo"
+import { LandingNavbar } from "@/components/layout/landing-navbar"
 
 /** Public content shell for legal/marketing pages (header + prose + footer). */
 export function LegalShell({
@@ -12,18 +12,11 @@ export function LegalShell({
   children: React.ReactNode
 }) {
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--background)]">
-      <header className="bg-white border-b border-[var(--border)]">
-        <div className="max-w-3xl mx-auto px-6 h-20 flex items-center justify-between">
-          <Logo wordClassName="text-[var(--navy)]" />
-          <Link href="/join" className="text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] px-4 py-2.5 rounded-xl transition-colors">
-            Join the waitlist
-          </Link>
-        </div>
-      </header>
+    <div className="min-h-screen flex flex-col bg-[var(--background)] relative">
+      <LandingNavbar forceLight />
 
       <main className="flex-1">
-        <div className="max-w-3xl mx-auto px-6 py-12">
+        <div className="max-w-3xl mx-auto px-6 pt-32 pb-12">
           <h1 className="font-display text-4xl font-bold text-[var(--navy)]">{title}</h1>
           {updated && <p className="mt-2 text-sm text-neutral">Last updated {updated}</p>}
           <div className="legal-prose mt-8 text-[15px] text-neutral-dark leading-relaxed space-y-6">

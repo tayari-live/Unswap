@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { Trophy, Sparkles, Gift, ArrowRight } from "lucide-react"
-import { Logo } from "@/components/brand/logo"
+import { LandingNavbar } from "@/components/layout/landing-navbar"
 import { getLeaderboard, getWaitlistCount } from "@/server/services/waitlist"
 
 export const dynamic = "force-dynamic"
@@ -13,17 +13,9 @@ export default async function EarlyAccessPage() {
 
   return (
     <div className="min-h-screen bg-[var(--background)]">
-      {/* Header */}
-      <header className="bg-white border-b border-[var(--border)]">
-        <div className="max-w-4xl mx-auto px-6 h-20 flex items-center justify-between">
-          <Logo wordClassName="text-[var(--navy)]" />
-          <Link href="/join" className="text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] px-4 py-2.5 rounded-xl transition-colors">
-            Join the waitlist
-          </Link>
-        </div>
-      </header>
+      <LandingNavbar forceLight />
 
-      <div className="max-w-3xl mx-auto px-6 py-12">
+      <div className="max-w-3xl mx-auto px-6 pt-32 pb-12">
         <div className="text-center">
           <span className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--gold-dark)]">Pre-launch</span>
           <h1 className="mt-3 font-display text-4xl font-bold text-[var(--navy)]">Early Access</h1>

@@ -24,7 +24,7 @@ export function Header() {
   }, [])
 
   return (
-    <header className="flex items-center justify-between px-4 sm:px-6 py-3 bg-[var(--navy)] border-b border-white/10 h-20 relative">
+    <header className="flex items-center justify-between px-4 sm:px-6 py-3 bg-white border-b border-[var(--border)] h-20 relative z-30 shadow-sm">
       <Link href="/overview" className="flex items-center gap-2.5">
         <Image
           src="/unswap-logo.png"
@@ -35,32 +35,32 @@ export function Header() {
           priority
         />
         <div className="flex flex-col leading-none">
-          <span className="font-display font-bold text-white text-2xl sm:text-3xl tracking-tight">UnSwap</span>
-          <span className="text-[9px] uppercase tracking-widest text-white/50 font-semibold">Admin Console</span>
+          <span className="font-display font-bold text-[var(--navy)] text-2xl sm:text-3xl tracking-tight">UnSwap</span>
+          <span className="text-[9px] uppercase tracking-widest text-[var(--gold)] font-bold mt-1">Admin Console</span>
         </div>
       </Link>
 
       <div className="flex items-center gap-6">
-        <div className="flex items-center gap-4 text-white/80">
+        <div className="flex items-center gap-4 text-neutral-dark">
           <NotificationBell />
         </div>
 
-        <div className="flex items-center gap-3 pl-6 border-l border-white/20 relative" ref={dropdownRef}>
+        <div className="flex items-center gap-3 pl-6 border-l border-[var(--border)] relative" ref={dropdownRef}>
           <div className="text-right hidden sm:block">
-            <div className="text-sm font-semibold text-white leading-none">{profile.name}</div>
-            <div className="text-[10px] uppercase font-medium text-white/50 mt-1 tracking-wider">
+            <div className="text-sm font-bold text-[var(--navy)] leading-none">{profile.name}</div>
+            <div className="text-[10px] uppercase font-bold text-neutral mt-1.5 tracking-wider">
               Verification Officer
             </div>
           </div>
 
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="h-9 w-9 rounded-full bg-white/10 flex items-center justify-center overflow-hidden border-2 border-[var(--gold)]/40 hover:ring-2 hover:ring-[var(--gold)] hover:ring-offset-1 hover:ring-offset-[var(--navy)] transition-all"
+            className="h-10 w-10 rounded-full bg-[var(--parchment)] flex items-center justify-center overflow-hidden border-2 border-[var(--border)] hover:border-[var(--gold)] hover:shadow-md transition-all ml-2"
           >
             {profile.image ? (
               <img src={profile.image} alt="User Avatar" className="h-full w-full object-cover" />
             ) : (
-              <span className="text-xs font-bold text-white">{profile.initials || "UA"}</span>
+              <span className="text-xs font-bold text-[var(--navy)]">{profile.initials || "UA"}</span>
             )}
           </button>
 
