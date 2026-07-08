@@ -134,8 +134,7 @@ export default function LandingPage() {
           playsInline
           className="absolute inset-0 w-full h-full object-cover opacity-80"
         >
-          {/* Reliable CDN video to avoid hotlinking protection */}
-          <source src="https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4" type="video/mp4" />
+          <source src="https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-a-beautiful-beach-and-the-ocean-1563-large.mp4" type="video/mp4" />
         </video>
         
         {/* Overlay to ensure text legibility while maintaining brand color */}

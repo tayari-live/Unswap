@@ -22,7 +22,7 @@ export default async function ConversationPage({
     redirect("/dashboard/messages")
   }
 
-  const initialMessages = convo.messages.map((m) => ({
+  const initialMessages = convo.messages.map((m: any) => ({
     id: m.id,
     senderId: m.senderId,
     body: m.body,
@@ -36,6 +36,7 @@ export default async function ConversationPage({
       currentUserId={userId}
       other={convo.other ?? null}
       initialMessages={initialMessages}
+      swapRequest={convo.swapRequest}
     />
   )
 }

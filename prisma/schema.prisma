@@ -110,6 +110,7 @@ model Conversation {
 
   participants  ConversationParticipant[]
   messages      Message[]
+  swapRequest   SwapRequest? @relation(fields: [swapRequestId], references: [id], onDelete: SetNull)
 
   @@index([lastMessageAt])
 }
@@ -339,6 +340,7 @@ model SwapRequest {
   host        User     @relation("Host", fields: [hostId], references: [id], onDelete: Cascade)
   listing     Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
   reviews     Review[]
+  conversation Conversation?
 
   @@index([status, createdAt])
 }

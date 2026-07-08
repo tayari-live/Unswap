@@ -112,6 +112,11 @@ export async function getConversationForUser(userId: string, conversationId: str
     include: {
       participants: { include: { user: PARTICIPANT_USER } },
       messages: { orderBy: { createdAt: "asc" } },
+      swapRequest: {
+        include: {
+          listing: { select: { id: true, title: true, city: true, country: true, primaryPhotoUrl: true } },
+        },
+      },
     },
   })
   if (!convo) throw new ApiError(404, "Conversation not found.")
@@ -123,7 +128,12 @@ export async function getConversationForUser(userId: string, conversationId: str
   })
 
   const other = convo.participants.find((p) => p.userId !== userId)?.user
-  return { id: convo.id, other, messages: convo.messages }
+  return { 
+    id: convo.id, 
+    other, 
+    messages: convo.messages,
+    swapRequest: convo.swapRequest 
+  }
 }
 
 /** Send a message in a conversation the member belongs to. */
