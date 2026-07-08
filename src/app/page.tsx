@@ -132,11 +132,10 @@ export default function LandingPage() {
           loop
           muted
           playsInline
-          poster="/images/auth-institution.jpg"
           className="absolute inset-0 w-full h-full object-cover opacity-80"
         >
-          {/* We use a static poster image as a bulletproof fallback if the video is blocked by browsers or CDNs */}
-          <source src="/videos/hero.mp4" type="video/mp4" />
+          {/* We use a reliable CDN hosted video */}
+          <source src="https://cdn.coverr.co/videos/coverr-a-beautiful-sunrise-over-the-ocean-5246/1080p.mp4" type="video/mp4" />
         </video>
         
         {/* Overlay to ensure text legibility while maintaining brand color */}
