@@ -132,9 +132,10 @@ export default function LandingPage() {
           loop
           muted
           playsInline
+          poster="/images/auth-institution.jpg"
           className="absolute inset-0 w-full h-full object-cover opacity-80"
         >
-          {/* Using a self-hosted video to bypass any browser or ad-blocker restrictions */}
+          {/* We use a static poster image as a bulletproof fallback if the video is blocked by browsers or CDNs */}
           <source src="/videos/hero.mp4" type="video/mp4" />
         </video>
         
