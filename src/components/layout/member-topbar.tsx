@@ -34,7 +34,7 @@ function NotificationBell() {
     <Link
       href="/dashboard/notifications"
       aria-label={unread > 0 ? `Notifications (${unread} new)` : "Notifications"}
-      className="relative w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white/80 hover:text-white flex items-center justify-center transition-colors border border-white/5"
+      className="relative w-10 h-10 rounded-full bg-parchment hover:bg-gold/10 text-navy/70 hover:text-navy flex items-center justify-center transition-colors border border-border"
     >
       <Bell size={18} />
       {unread > 0 && (
@@ -70,8 +70,8 @@ export function MemberTopbar({
 
   return (
     <header className="flex items-stretch justify-between bg-white border-b border-border h-20 relative shadow-[0_2px_15px_rgba(0,0,0,0.03)] z-30">
-      <div className="flex items-center bg-navy pl-4 pr-8 sm:pl-6 sm:pr-10 rounded-br-3xl shadow-[4px_0_15px_rgba(11,31,58,0.1)] relative z-10">
-        <Logo wordClassName="text-white" href="/dashboard" />
+      <div className="flex items-center pl-4 sm:pl-6">
+        <Logo href="/dashboard" />
       </div>
 
       <div className="flex flex-1 items-center justify-end px-4 sm:px-6 gap-3 sm:gap-4 relative" ref={ref}>
@@ -93,22 +93,25 @@ export function MemberTopbar({
             <ShieldAlert size={14} /> Verify
           </Link>
         )}
-        <div className="text-right hidden sm:block pl-4 border-l border-border">
-          <div className="text-sm font-bold text-navy leading-none">{name}</div>
-          <div className="text-[10px] uppercase font-bold text-navy/50 mt-1.5 tracking-wider">
-            Member
+
+        <div className="flex items-center bg-navy pl-5 pr-4 sm:pr-5 -mr-4 sm:-mr-6 self-stretch gap-3 shadow-[-4px_0_15px_rgba(11,31,58,0.08)]">
+          <div className="text-right hidden sm:block">
+            <div className="text-sm font-bold text-white leading-none">{name}</div>
+            <div className="text-[10px] uppercase font-bold text-white/50 mt-1.5 tracking-wider">
+              Member
+            </div>
           </div>
+          <button
+            onClick={() => setOpen((v) => !v)}
+            className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center overflow-hidden border-2 border-gold/40 hover:border-gold hover:shadow-md transition-all"
+          >
+            {image ? (
+              <img src={image} alt="Avatar" className="h-full w-full object-cover" />
+            ) : (
+              <span className="text-xs font-bold text-white">{initials || "M"}</span>
+            )}
+          </button>
         </div>
-        <button
-          onClick={() => setOpen((v) => !v)}
-          className="h-10 w-10 rounded-full bg-parchment flex items-center justify-center overflow-hidden border-2 border-border hover:border-gold hover:shadow-md transition-all ml-1"
-        >
-          {image ? (
-            <img src={image} alt="Avatar" className="h-full w-full object-cover" />
-          ) : (
-            <span className="text-xs font-bold text-navy">{initials || "M"}</span>
-          )}
-        </button>
 
         {open && (
           <div className="absolute top-full right-0 mt-2 w-48 bg-surface rounded-xl shadow-lg border border-[var(--border)] py-1 z-50">

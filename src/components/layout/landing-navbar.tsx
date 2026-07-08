@@ -39,7 +39,7 @@ export function LandingNavbar({ forceLight = false }: { forceLight?: boolean }) 
       }`}
     >
       <div className="max-w-[1200px] mx-auto flex items-center justify-between px-6 h-20">
-        <Logo wordClassName={isLight ? "text-[var(--navy)]" : "text-white"} />
+        <Logo />
 
         <nav className={`hidden md:flex items-center gap-10 text-[12px] font-bold tracking-[0.15em] uppercase transition-colors duration-300 ${isLight ? "text-[var(--navy)]/60" : "text-white/70"}`}>
           <a href="/#network" className={`transition-colors duration-200 ${isLight ? "hover:text-[var(--navy)]" : "hover:text-white"}`}>

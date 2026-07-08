@@ -25,19 +25,15 @@ export function Header() {
 
   return (
     <header className="flex items-stretch justify-between bg-white border-b border-border h-20 relative z-30 shadow-[0_2px_15px_rgba(0,0,0,0.03)]">
-      <Link href="/overview" className="flex items-center bg-navy pl-4 pr-8 sm:pl-6 sm:pr-10 rounded-br-3xl shadow-[4px_0_15px_rgba(11,31,58,0.1)] relative z-10 gap-2.5">
+      <Link href="/overview" className="flex items-center pl-4 sm:pl-6 gap-2.5">
         <Image
           src="/unswap-logo.png"
           alt="UnSwap Logo"
-          width={56}
-          height={56}
-          className="w-10 h-10 sm:w-14 sm:h-14 object-contain rounded-lg flex-shrink-0"
+          width={64}
+          height={64}
+          className="w-12 h-12 sm:w-16 sm:h-16 object-contain flex-shrink-0"
           priority
         />
-        <div className="flex flex-col leading-none">
-          <span className="font-display font-bold text-white text-2xl sm:text-3xl tracking-tight">UnSwap</span>
-          <span className="text-[9px] uppercase tracking-widest text-gold font-bold mt-1">Admin Console</span>
-        </div>
       </Link>
 
       <div className="flex flex-1 items-center justify-end px-4 sm:px-6 gap-6 relative">
@@ -45,22 +41,22 @@ export function Header() {
           <NotificationBell />
         </div>
 
-        <div className="flex items-center gap-3 pl-6 border-l border-border relative" ref={dropdownRef}>
+        <div className="flex items-center bg-navy pl-5 pr-4 sm:pr-5 -mr-4 sm:-mr-6 self-stretch gap-3 shadow-[-4px_0_15px_rgba(11,31,58,0.08)]" ref={dropdownRef}>
           <div className="text-right hidden sm:block">
-            <div className="text-sm font-bold text-navy leading-none">{profile.name}</div>
-            <div className="text-[10px] uppercase font-bold text-navy/50 mt-1.5 tracking-wider">
+            <div className="text-sm font-bold text-white leading-none">{profile.name}</div>
+            <div className="text-[10px] uppercase font-bold text-white/50 mt-1.5 tracking-wider">
               Verification Officer
             </div>
           </div>
 
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="h-10 w-10 rounded-full bg-parchment flex items-center justify-center overflow-hidden border-2 border-border hover:border-gold hover:shadow-md transition-all ml-2"
+            className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center overflow-hidden border-2 border-gold/40 hover:border-gold hover:shadow-md transition-all"
           >
             {profile.image ? (
               <img src={profile.image} alt="User Avatar" className="h-full w-full object-cover" />
             ) : (
-              <span className="text-xs font-bold text-navy">{profile.initials || "UA"}</span>
+              <span className="text-xs font-bold text-white">{profile.initials || "UA"}</span>
             )}
           </button>
 

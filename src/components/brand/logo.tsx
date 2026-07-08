@@ -12,7 +12,7 @@ export function Logo({
   className,
   markClassName,
   wordClassName,
-  showWord = true,
+  showWord = false,
   underline = false,
   href = "/",
 }: {
@@ -28,9 +28,9 @@ export function Logo({
       <Image
         src="/unswap-logo.png"
         alt="UnSwap Logo"
-        width={56}
-        height={56}
-        className={cn("w-10 h-10 sm:w-14 sm:h-14 object-contain", markClassName)}
+        width={64}
+        height={64}
+        className={cn("w-12 h-12 sm:w-16 sm:h-16 object-contain", markClassName)}
         priority
       />
       {showWord && (

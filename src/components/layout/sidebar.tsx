@@ -45,7 +45,7 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="mt-auto p-3 bg-navy-dark shadow-[0_-4px_20px_rgba(11,31,58,0.1)] rounded-tr-3xl relative">
+      <div className="mt-auto p-3 bg-navy-dark shadow-[0_-4px_20px_rgba(11,31,58,0.1)] relative">
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-white/10" />
         <Link
           href="/settings"
