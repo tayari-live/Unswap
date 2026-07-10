@@ -5,21 +5,43 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import {
   UploadCloud, X, ArrowUp, ArrowDown, Plus, Minus, Check, ChevronRight, ChevronLeft,
+  Building2, Home, Castle, DoorOpen, Building,
+  Wifi, Laptop, Car, Flower2, Waves, Utensils, WashingMachine, AirVent, ArrowUpDown, PawPrint, Accessibility,
+  CalendarDays, CalendarRange, CalendarClock, Calendar, Shuffle, Repeat, Coins,
+  type LucideIcon,
 } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
 
-const PROPERTY_TYPES = ["Apartment", "House", "Villa", "Studio", "Townhouse"]
-const AMENITIES = [
-  { v: "wifi", l: "Wi-Fi" }, { v: "home_office", l: "Home office / desk" }, { v: "parking", l: "Parking" },
-  { v: "garden", l: "Garden" }, { v: "pool", l: "Pool" }, { v: "dishwasher", l: "Dishwasher" },
-  { v: "washing_machine", l: "Washing machine" }, { v: "air_conditioning", l: "Air conditioning" },
-  { v: "lift", l: "Lift access" }, { v: "pet_friendly", l: "Pet-friendly" }, { v: "accessible", l: "Accessible" },
+const PROPERTY_TYPES: { v: string; icon: LucideIcon }[] = [
+  { v: "Apartment", icon: Building2 },
+  { v: "House", icon: Home },
+  { v: "Villa", icon: Castle },
+  { v: "Studio", icon: DoorOpen },
+  { v: "Townhouse", icon: Building },
 ]
-const DURATIONS = [
-  { v: "short_term", l: "Short-term", d: "7–14 days · vacation, annual leave" },
-  { v: "medium_term", l: "Medium-term", d: "15–90 days · temporary assignment, TDY" },
-  { v: "long_term", l: "Long-term", d: "91–180 days · rotation, initial arrival" },
-  { v: "extended", l: "Extended rotation", d: "181–548 days · full duty-station rotation" },
+const AMENITIES: { v: string; l: string; icon: LucideIcon }[] = [
+  { v: "wifi", l: "Wi-Fi", icon: Wifi },
+  { v: "home_office", l: "Home office", icon: Laptop },
+  { v: "parking", l: "Parking", icon: Car },
+  { v: "garden", l: "Garden", icon: Flower2 },
+  { v: "pool", l: "Pool", icon: Waves },
+  { v: "dishwasher", l: "Dishwasher", icon: Utensils },
+  { v: "washing_machine", l: "Washing machine", icon: WashingMachine },
+  { v: "air_conditioning", l: "Air conditioning", icon: AirVent },
+  { v: "lift", l: "Lift access", icon: ArrowUpDown },
+  { v: "pet_friendly", l: "Pet-friendly", icon: PawPrint },
+  { v: "accessible", l: "Accessible", icon: Accessibility },
+]
+const DURATIONS: { v: string; l: string; d: string; icon: LucideIcon }[] = [
+  { v: "short_term", l: "Short-term", d: "7–14 days · vacation, annual leave", icon: CalendarDays },
+  { v: "medium_term", l: "Medium-term", d: "15–90 days · temporary assignment, TDY", icon: CalendarRange },
+  { v: "long_term", l: "Long-term", d: "91–180 days · rotation, initial arrival", icon: CalendarClock },
+  { v: "extended", l: "Extended rotation", d: "181–548 days · full duty-station rotation", icon: Calendar },
+]
+const EXCHANGE_TYPES: { v: string; l: string; d: string; icon: LucideIcon }[] = [
+  { v: "either", l: "Either", d: "Appears in all searches — simultaneous or credits", icon: Shuffle },
+  { v: "simultaneous", l: "Simultaneous", d: "We swap homes at the same time", icon: Repeat },
+  { v: "credits", l: "Credits", d: "Host now, earn credits to stay later", icon: Coins },
 ]
 const ACCEPT = ["image/png", "image/jpeg", "image/webp"]
 const MAX_BYTES = 10 * 1024 * 1024
@@ -48,7 +70,24 @@ const EMPTY: WizardValues = {
 
 const input = "block w-full px-4 py-3 border border-[var(--border)] rounded-xl bg-white placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] text-sm text-[var(--navy)]"
 const label = "block text-xs font-semibold uppercase tracking-wider text-[var(--navy)] mb-2"
-const STEPS = ["Basics", "Details", "Photos", "Exchange", "Rules", "Review"]
+
+// One question per screen, HomeExchange-style. Screens are grouped into
+// sections for the segmented progress bar; `optional` screens get a Skip.
+const SECTIONS = ["Your home", "Amenities", "Photos", "Exchange", "Final details"]
+const SCREENS: { section: number; optional?: boolean }[] = [
+  { section: 0 },                  // 0 title + type
+  { section: 0 },                  // 1 location
+  { section: 0 },                  // 2 space
+  { section: 0 },                  // 3 description
+  { section: 1, optional: true },  // 4 amenities
+  { section: 2 },                  // 5 photos
+  { section: 3 },                  // 6 durations
+  { section: 3 },                  // 7 exchange type
+  { section: 3, optional: true },  // 8 blackouts
+  { section: 4, optional: true },  // 9 house rules
+  { section: 4 },                  // 10 emergency contact
+  { section: 4 },                  // 11 review
+]
 
 function readImage(file: File): Promise<{ url?: string; error?: string }> {
   return new Promise((resolve) => {
@@ -89,15 +128,55 @@ function Stepper({ value, set, min, max }: { value: number; set: (n: number) => 
   )
 }
 
+/** Selectable icon tile — the HomeExchange-style card checkbox/radio. */
+function IconCard({
+  icon: Icon, title, desc, selected, onClick,
+}: {
+  icon: LucideIcon; title: string; desc?: string; selected: boolean; onClick: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={selected}
+      className={`relative flex flex-col items-center justify-center gap-2 rounded-xl border p-4 text-center transition-colors ${
+        selected ? "border-[var(--gold)] bg-[var(--parchment)]" : "border-[var(--border)] bg-white hover:border-[var(--navy)]"
+      }`}
+    >
+      {selected && (
+        <span className="absolute top-2 right-2 w-5 h-5 rounded-full bg-[var(--gold-dark)] text-white flex items-center justify-center">
+          <Check size={12} />
+        </span>
+      )}
+      <Icon size={22} strokeWidth={1.5} className={selected ? "text-[var(--gold-dark)]" : "text-[var(--navy)]"} />
+      <span className="text-sm font-semibold text-[var(--navy)] leading-tight">{title}</span>
+      {desc && <span className="text-xs text-neutral leading-snug">{desc}</span>}
+    </button>
+  )
+}
+
+function Heading({ title, sub }: { title: string; sub?: string }) {
+  return (
+    <div className="mb-8">
+      <h2 className="font-display text-2xl sm:text-3xl font-bold text-[var(--navy)] leading-tight">{title}</h2>
+      {sub && <p className="mt-2 text-sm text-neutral leading-relaxed">{sub}</p>}
+    </div>
+  )
+}
+
 export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; initial?: WizardValues }) {
   const router = useRouter()
   const toast = useToast()
   const [step, setStep] = useState(0)
   const [v, setV] = useState<WizardValues>(initial ?? EMPTY)
+  const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const [photoBusy, setPhotoBusy] = useState(false)
 
-  const set = <K extends keyof WizardValues>(k: K, val: WizardValues[K]) => setV((p) => ({ ...p, [k]: val }))
+  const set = <K extends keyof WizardValues>(k: K, val: WizardValues[K]) => {
+    setError("")
+    setV((p) => ({ ...p, [k]: val }))
+  }
   const toggle = (k: "amenities" | "swapDurations", val: string) =>
     setV((p) => ({ ...p, [k]: p[k].includes(val) ? p[k].filter((x) => x !== val) : [...p[k], val] }))
 
@@ -128,33 +207,36 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
     set("photos", next)
   }
 
-  // Per-step gate before advancing.
-  function stepValid(s: number): string | null {
+  // Per-screen gate before advancing.
+  function screenValid(s: number): string | null {
     if (s === 0) {
       if (!v.title.trim()) return "Add a property title."
       if (v.title.length > 80) return "Title must be 80 characters or fewer."
+    }
+    if (s === 1) {
       if (!v.city.trim()) return "City is required."
       if (!v.country.trim()) return "Country is required."
     }
-    if (s === 1) {
-      if (v.description.trim().length < 100) return "Description must be at least 100 characters."
-    }
-    if (s === 2 && v.photos.length < 5) return "Upload at least 5 photos."
-    if (s === 3 && v.swapDurations.length === 0) return "Select at least one swap duration type."
-    if (s === 4 && (!v.emergencyName.trim() || !v.emergencyPhone.trim())) return "Emergency contact name and phone are required."
+    if (s === 3 && v.description.trim().length < 100) return "Description must be at least 100 characters."
+    if (s === 5 && v.photos.length < 5) return "Upload at least 5 photos."
+    if (s === 6 && v.swapDurations.length === 0) return "Select at least one swap duration type."
+    if (s === 10 && (!v.emergencyName.trim() || !v.emergencyPhone.trim())) return "Emergency contact name and phone are required."
     return null
   }
 
-  function next() {
-    const err = stepValid(step)
-    if (err) { toast(err, "error"); return }
-    setStep((s) => Math.min(STEPS.length - 1, s + 1))
+  function next(skip = false) {
+    if (!skip) {
+      const err = screenValid(step)
+      if (err) { setError(err); return }
+    }
+    setError("")
+    setStep((s) => Math.min(SCREENS.length - 1, s + 1))
   }
 
   async function submit() {
-    for (let s = 0; s < 5; s++) {
-      const err = stepValid(s)
-      if (err) { toast(err, "error"); setStep(s); return }
+    for (let s = 0; s < SCREENS.length - 1; s++) {
+      const err = screenValid(s)
+      if (err) { setError(err); setStep(s); return }
     }
     setLoading(true)
     try {
@@ -174,108 +256,167 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
     }
   }
 
+  const section = SCREENS[step].section
+  // Per-section fill: fraction of that section's screens already passed.
+  const fillFor = (i: number) => {
+    const screens = SCREENS.filter((sc) => sc.section === i).length
+    const done = SCREENS.filter((sc, idx) => sc.section === i && idx < step).length
+    if (i < section) return 1
+    if (i > section) return 0
+    return (done + 0.5) / screens
+  }
+
   return (
-    <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6 sm:p-8">
-      {/* Progress */}
-      <div className="flex items-center gap-2 mb-6">
-        {STEPS.map((s, i) => (
-          <div key={s} className="flex-1">
-            <div className={`h-1.5 rounded-full ${i <= step ? "bg-[var(--gold)]" : "bg-[var(--border)]"}`} />
-            <div className={`mt-1.5 text-[10px] font-semibold uppercase tracking-wide ${i === step ? "text-[var(--navy)]" : "text-neutral"}`}>{s}</div>
-          </div>
-        ))}
+    <div className="max-w-2xl mx-auto">
+      {/* Progress — section name, step count, segmented bar */}
+      <div className="mb-8">
+        <div className="flex items-baseline justify-between mb-2">
+          <span className="text-sm font-bold text-[var(--navy)]">{SECTIONS[section]}</span>
+          <span className="text-xs text-neutral font-semibold">{step + 1}/{SCREENS.length}</span>
+        </div>
+        <div className="flex gap-1.5">
+          {SECTIONS.map((s, i) => (
+            <div key={s} className="flex-1 h-1.5 rounded-full bg-[var(--border)] overflow-hidden">
+              <div className="h-full bg-[var(--gold)] transition-all" style={{ width: `${fillFor(i) * 100}%` }} />
+            </div>
+          ))}
+        </div>
       </div>
 
-
-      {/* Step 0 — Basics */}
-      {step === 0 && (
-        <div className="space-y-5">
-          <h2 className="font-display text-xl font-bold text-[var(--navy)]">Property basics</h2>
-          <div><label className={label}>Property title <span className="text-neutral normal-case font-normal">({v.title.length}/80)</span></label>
-            <input className={input} maxLength={80} value={v.title} onChange={(e) => set("title", e.target.value)} placeholder="Sunlit apartment near the lake" /></div>
-          <div><label className={label}>Property type</label>
-            <select className={input} value={v.propertyType} onChange={(e) => set("propertyType", e.target.value)}>{PROPERTY_TYPES.map((t) => <option key={t}>{t}</option>)}</select></div>
-          <div><label className={label}>Full address <span className="text-neutral normal-case font-normal">(private — never shown publicly)</span></label>
-            <input className={input} value={v.fullAddress} onChange={(e) => set("fullAddress", e.target.value)} placeholder="12 Rue du Lac, Apt 4B" /></div>
-          <div className="grid grid-cols-2 gap-4">
-            <div><label className={label}>City</label><input className={input} value={v.city} onChange={(e) => set("city", e.target.value)} placeholder="Geneva" /></div>
-            <div><label className={label}>Country</label><input className={input} value={v.country} onChange={(e) => set("country", e.target.value)} placeholder="Switzerland" /></div>
-          </div>
-          <div><label className={label}>Neighbourhood <span className="text-neutral normal-case font-normal">(shown publicly)</span></label>
-            <input className={input} value={v.neighbourhood} onChange={(e) => set("neighbourhood", e.target.value)} placeholder="Eaux-Vives" /></div>
-        </div>
-      )}
-
-      {/* Step 1 — Details */}
-      {step === 1 && (
-        <div className="space-y-5">
-          <h2 className="font-display text-xl font-bold text-[var(--navy)]">Property details</h2>
-          <div className="flex flex-wrap gap-8">
-            <div><label className={label}>Bedrooms</label><Stepper value={v.bedrooms} set={(n) => set("bedrooms", n)} min={1} max={10} /></div>
-            <div><label className={label}>Bathrooms</label><Stepper value={v.bathrooms} set={(n) => set("bathrooms", n)} min={1} max={6} /></div>
-            <div><label className={label}>Max guests</label><Stepper value={v.maxGuests} set={(n) => set("maxGuests", n)} min={1} max={12} /></div>
-          </div>
-          <div><label className={label}>Description <span className="text-neutral normal-case font-normal">({v.description.trim().length}/100 min)</span></label>
-            <textarea rows={5} className={input} value={v.description} onChange={(e) => set("description", e.target.value)} placeholder="Describe your home, the neighbourhood, and what makes it a great exchange." /></div>
-          <div><label className={label}>Amenities</label>
-            <div className="grid grid-cols-2 gap-2">{AMENITIES.map((a) => (
-              <label key={a.v} className="flex items-center gap-2 text-sm text-neutral-dark cursor-pointer">
-                <input type="checkbox" checked={v.amenities.includes(a.v)} onChange={() => toggle("amenities", a.v)} className="accent-[var(--navy)]" /> {a.l}
-              </label>))}</div></div>
-        </div>
-      )}
-
-      {/* Step 2 — Photos */}
-      {step === 2 && (
-        <div className="space-y-4">
-          <h2 className="font-display text-xl font-bold text-[var(--navy)]">Photos <span className="text-sm font-normal text-neutral">({v.photos.length}/20 · min 5)</span></h2>
-          <label className="flex flex-col items-center justify-center h-32 rounded-xl border-2 border-dashed border-[var(--border)] bg-[var(--background)] cursor-pointer hover:border-[var(--gold)] transition-colors text-center">
-            <UploadCloud size={26} className="text-neutral mb-2" />
-            <span className="text-sm font-semibold text-[var(--navy)]">{photoBusy ? "Processing…" : "Click or drop images to upload"}</span>
-            <span className="text-xs text-neutral mt-1">JPG, PNG, WebP · max 10 MB · min 1080px shortest edge</span>
-            <input type="file" accept={ACCEPT.join(",")} multiple className="hidden" onChange={(e) => addPhotos(e.target.files)} />
-          </label>
-          <div className="space-y-2">
-            {v.photos.map((p, i) => (
-              <div key={i} className="flex items-center gap-3 bg-[var(--background)] border border-[var(--border)] rounded-xl p-2">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.url} alt="" className="w-16 h-16 rounded-lg object-cover flex-shrink-0" />
-                <div className="flex-1">
-                  {i === 0 && <span className="text-[10px] font-bold uppercase tracking-wide text-[var(--gold-dark)]">Primary</span>}
-                  <input className="block w-full mt-0.5 px-2 py-1.5 border border-[var(--border)] rounded-lg bg-white text-xs text-[var(--navy)]" maxLength={60} placeholder="Caption (optional)" value={p.caption ?? ""} onChange={(e) => { const n = [...v.photos]; n[i] = { ...n[i], caption: e.target.value }; set("photos", n) }} />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <button type="button" onClick={() => movePhoto(i, -1)} disabled={i === 0} className="text-neutral hover:text-[var(--navy)] disabled:opacity-30"><ArrowUp size={15} /></button>
-                  <button type="button" onClick={() => movePhoto(i, 1)} disabled={i === v.photos.length - 1} className="text-neutral hover:text-[var(--navy)] disabled:opacity-30"><ArrowDown size={15} /></button>
-                </div>
-                <button type="button" onClick={() => set("photos", v.photos.filter((_, x) => x !== i))} className="text-neutral hover:text-[var(--crimson)]"><X size={16} /></button>
+      <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6 sm:p-10 min-h-[24rem]">
+        {/* 0 — Title + type */}
+        {step === 0 && (
+          <div>
+            <Heading title="What are you listing?" sub="Give your home a short, inviting title and pick its type." />
+            <div className="space-y-6">
+              <div>
+                <label className={label}>Property title <span className="text-neutral normal-case font-normal">({v.title.length}/80)</span></label>
+                <input className={input} maxLength={80} value={v.title} onChange={(e) => set("title", e.target.value)} placeholder="Sunlit apartment near the lake" />
               </div>
-            ))}
+              <div>
+                <label className={label}>Property type</label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {PROPERTY_TYPES.map((t) => (
+                    <IconCard key={t.v} icon={t.icon} title={t.v} selected={v.propertyType === t.v} onClick={() => set("propertyType", t.v)} />
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Step 3 — Exchange */}
-      {step === 3 && (
-        <div className="space-y-6">
-          <h2 className="font-display text-xl font-bold text-[var(--navy)]">Exchange preferences</h2>
+        {/* 1 — Location */}
+        {step === 1 && (
           <div>
-            <label className={label}>Swap duration types <span className="text-neutral normal-case font-normal">(select at least one)</span></label>
-            <div className="space-y-2">{DURATIONS.map((d) => (
-              <label key={d.v} className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer ${v.swapDurations.includes(d.v) ? "border-[var(--gold)] bg-[var(--parchment)]" : "border-[var(--border)]"}`}>
-                <input type="checkbox" checked={v.swapDurations.includes(d.v)} onChange={() => toggle("swapDurations", d.v)} className="mt-0.5 accent-[var(--navy)]" />
-                <span><span className="text-sm font-semibold text-[var(--navy)]">{d.l}</span><br /><span className="text-xs text-neutral">{d.d}</span></span>
-              </label>))}</div>
+            <Heading title="Where is your home?" sub="Only the city, country, and neighbourhood are shown publicly. The full address stays encrypted until a swap is confirmed." />
+            <div className="space-y-5">
+              <div>
+                <label className={label}>Full address <span className="text-neutral normal-case font-normal">(private)</span></label>
+                <input className={input} value={v.fullAddress} onChange={(e) => set("fullAddress", e.target.value)} placeholder="12 Rue du Lac, Apt 4B" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div><label className={label}>City</label><input className={input} value={v.city} onChange={(e) => set("city", e.target.value)} placeholder="Geneva" /></div>
+                <div><label className={label}>Country</label><input className={input} value={v.country} onChange={(e) => set("country", e.target.value)} placeholder="Switzerland" /></div>
+              </div>
+              <div>
+                <label className={label}>Neighbourhood <span className="text-neutral normal-case font-normal">(shown publicly)</span></label>
+                <input className={input} value={v.neighbourhood} onChange={(e) => set("neighbourhood", e.target.value)} placeholder="Eaux-Vives" />
+              </div>
+            </div>
           </div>
+        )}
+
+        {/* 2 — Space */}
+        {step === 2 && (
           <div>
-            <label className={label}>Preferred exchange type</label>
-            {[["either", "Either (appears in all searches)"], ["simultaneous", "Simultaneous only"], ["credits", "Non-simultaneous (Credits) only"]].map(([val, lab]) => (
-              <label key={val} className="flex items-center gap-2 text-sm text-neutral-dark py-1 cursor-pointer">
-                <input type="radio" name="exchangeType" checked={v.exchangeType === val} onChange={() => set("exchangeType", val)} className="accent-[var(--navy)]" /> {lab}
-              </label>))}
+            <Heading title="How much space is there?" sub="Bedrooms, bathrooms, and the most guests your home comfortably sleeps." />
+            <div className="flex flex-wrap gap-10">
+              <div><label className={label}>Bedrooms</label><Stepper value={v.bedrooms} set={(n) => set("bedrooms", n)} min={1} max={10} /></div>
+              <div><label className={label}>Bathrooms</label><Stepper value={v.bathrooms} set={(n) => set("bathrooms", n)} min={1} max={6} /></div>
+              <div><label className={label}>Max guests</label><Stepper value={v.maxGuests} set={(n) => set("maxGuests", n)} min={1} max={12} /></div>
+            </div>
           </div>
+        )}
+
+        {/* 3 — Description */}
+        {step === 3 && (
           <div>
-            <label className={label}>Blackout dates <span className="text-neutral normal-case font-normal">(optional — unavailable ranges)</span></label>
+            <Heading title="What makes your home unique?" sub="Describe the home, the neighbourhood, and what makes it a great exchange — guests read this first." />
+            <label className={label}>Description <span className="text-neutral normal-case font-normal">({v.description.trim().length}/100 min)</span></label>
+            <textarea rows={8} className={input} value={v.description} onChange={(e) => set("description", e.target.value)} placeholder="Bright two-bed five minutes from the lake, quiet street, weekly market around the corner…" />
+          </div>
+        )}
+
+        {/* 4 — Amenities (optional) */}
+        {step === 4 && (
+          <div>
+            <Heading title="What does your home offer?" sub="Select everything that applies — amenities help your home appear in more searches." />
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {AMENITIES.map((a) => (
+                <IconCard key={a.v} icon={a.icon} title={a.l} selected={v.amenities.includes(a.v)} onClick={() => { setError(""); toggle("amenities", a.v) }} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 5 — Photos */}
+        {step === 5 && (
+          <div>
+            <Heading title="Show off your home" sub={`At least 5 photos (${v.photos.length}/20 uploaded). The first photo is your cover image.`} />
+            <label className="flex flex-col items-center justify-center h-32 rounded-xl border-2 border-dashed border-[var(--border)] bg-[var(--background)] cursor-pointer hover:border-[var(--gold)] transition-colors text-center">
+              <UploadCloud size={26} className="text-neutral mb-2" />
+              <span className="text-sm font-semibold text-[var(--navy)]">{photoBusy ? "Processing…" : "Click or drop images to upload"}</span>
+              <span className="text-xs text-neutral mt-1">JPG, PNG, WebP · max 10 MB · min 1080px shortest edge</span>
+              <input type="file" accept={ACCEPT.join(",")} multiple className="hidden" onChange={(e) => addPhotos(e.target.files)} />
+            </label>
+            <div className="space-y-2 mt-4">
+              {v.photos.map((p, i) => (
+                <div key={i} className="flex items-center gap-3 bg-[var(--background)] border border-[var(--border)] rounded-xl p-2">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={p.url} alt="" className="w-16 h-16 rounded-lg object-cover flex-shrink-0" />
+                  <div className="flex-1">
+                    {i === 0 && <span className="text-[10px] font-bold uppercase tracking-wide text-[var(--gold-dark)]">Cover photo</span>}
+                    <input className="block w-full mt-0.5 px-2 py-1.5 border border-[var(--border)] rounded-lg bg-white text-xs text-[var(--navy)]" maxLength={60} placeholder="Caption (optional)" value={p.caption ?? ""} onChange={(e) => { const n = [...v.photos]; n[i] = { ...n[i], caption: e.target.value }; set("photos", n) }} />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <button type="button" onClick={() => movePhoto(i, -1)} disabled={i === 0} className="text-neutral hover:text-[var(--navy)] disabled:opacity-30"><ArrowUp size={15} /></button>
+                    <button type="button" onClick={() => movePhoto(i, 1)} disabled={i === v.photos.length - 1} className="text-neutral hover:text-[var(--navy)] disabled:opacity-30"><ArrowDown size={15} /></button>
+                  </div>
+                  <button type="button" onClick={() => set("photos", v.photos.filter((_, x) => x !== i))} className="text-neutral hover:text-[var(--crimson)]"><X size={16} /></button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 6 — Durations */}
+        {step === 6 && (
+          <div>
+            <Heading title="How long can guests stay?" sub="Pick every stay length your home is open to — this decides which requests you receive." />
+            <div className="grid sm:grid-cols-2 gap-3">
+              {DURATIONS.map((d) => (
+                <IconCard key={d.v} icon={d.icon} title={d.l} desc={d.d} selected={v.swapDurations.includes(d.v)} onClick={() => { setError(""); toggle("swapDurations", d.v) }} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 7 — Exchange type */}
+        {step === 7 && (
+          <div>
+            <Heading title="How do you want to exchange?" sub="Simultaneous swaps happen at the same time; credits let you host now and stay elsewhere later." />
+            <div className="grid sm:grid-cols-3 gap-3">
+              {EXCHANGE_TYPES.map((t) => (
+                <IconCard key={t.v} icon={t.icon} title={t.l} desc={t.d} selected={v.exchangeType === t.v} onClick={() => set("exchangeType", t.v)} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 8 — Blackouts (optional) */}
+        {step === 8 && (
+          <div>
+            <Heading title="Any dates you're unavailable?" sub="Guests can't request stays that overlap these ranges. You can change them anytime." />
             {v.blackouts.map((b, i) => (
               <div key={i} className="flex items-center gap-2 mb-2">
                 <input type="date" className={input} value={b.startDate} onChange={(e) => { const n = [...v.blackouts]; n[i] = { ...n[i], startDate: e.target.value }; set("blackouts", n) }} />
@@ -286,57 +427,70 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
             ))}
             <button type="button" onClick={() => set("blackouts", [...v.blackouts, { startDate: "", endDate: "" }])} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--gold-dark)] hover:text-[var(--gold-hover)]"><Plus size={15} /> Add blackout range</button>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Step 4 — Rules + emergency */}
-      {step === 4 && (
-        <div className="space-y-5">
-          <h2 className="font-display text-xl font-bold text-[var(--navy)]">House rules & emergency contact</h2>
-          <div><label className={label}>House rules <span className="text-neutral normal-case font-normal">(shown before a request)</span></label>
-            <textarea rows={4} maxLength={1000} className={input} value={v.houseRules} onChange={(e) => set("houseRules", e.target.value)} placeholder="No smoking, no shoes indoors, please water the plants." /></div>
-          <div className="rounded-xl bg-[var(--parchment)] border border-[var(--gold)]/20 p-4 space-y-4">
-            <p className="text-xs text-neutral-dark">Emergency contact is encrypted and only shared with a confirmed swap partner.</p>
-            <div className="grid grid-cols-2 gap-4">
-              <div><label className={label}>Contact name</label><input className={input} value={v.emergencyName} onChange={(e) => set("emergencyName", e.target.value)} /></div>
-              <div><label className={label}>Phone</label><input className={input} value={v.emergencyPhone} onChange={(e) => set("emergencyPhone", e.target.value)} placeholder="+41 …" /></div>
-            </div>
-            <div><label className={label}>Relationship to property</label><input className={input} value={v.emergencyRelationship} onChange={(e) => set("emergencyRelationship", e.target.value)} placeholder="Building manager, neighbour…" /></div>
+        {/* 9 — House rules (optional) */}
+        {step === 9 && (
+          <div>
+            <Heading title="Any house rules?" sub="Shown to guests before they send a request — set expectations early." />
+            <textarea rows={6} maxLength={1000} className={input} value={v.houseRules} onChange={(e) => set("houseRules", e.target.value)} placeholder="No smoking, no shoes indoors, please water the plants." />
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Step 5 — Review */}
-      {step === 5 && (
-        <div className="space-y-4">
-          <h2 className="font-display text-xl font-bold text-[var(--navy)]">Review & submit</h2>
-          <p className="text-sm text-neutral">Your listing will be saved as a <strong>draft</strong>. Publish it from My Listings when you&apos;re ready.</p>
-          <dl className="text-sm divide-y divide-[var(--border)] border border-[var(--border)] rounded-xl overflow-hidden">
-            {[
-              ["Title", v.title], ["Type", v.propertyType], ["Location", `${v.neighbourhood ? v.neighbourhood + ", " : ""}${v.city}, ${v.country}`],
-              ["Capacity", `${v.bedrooms} bed · ${v.bathrooms} bath · ${v.maxGuests} guests`],
-              ["Amenities", v.amenities.length ? `${v.amenities.length} selected` : "—"],
-              ["Photos", `${v.photos.length}`], ["Durations", v.swapDurations.length ? v.swapDurations.join(", ") : "—"],
-              ["Exchange", v.exchangeType], ["Emergency contact", v.emergencyName || "—"],
-            ].map(([k, val]) => (
-              <div key={k} className="flex justify-between gap-4 px-4 py-2.5"><dt className="text-neutral">{k}</dt><dd className="font-medium text-[var(--navy)] text-right truncate">{val}</dd></div>
-            ))}
-          </dl>
-        </div>
-      )}
+        {/* 10 — Emergency contact */}
+        {step === 10 && (
+          <div>
+            <Heading title="Who can guests call if something goes wrong?" sub="Encrypted, and only shared with a confirmed swap partner." />
+            <div className="rounded-xl bg-[var(--parchment)] border border-[var(--gold)]/20 p-5 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div><label className={label}>Contact name</label><input className={input} value={v.emergencyName} onChange={(e) => set("emergencyName", e.target.value)} /></div>
+                <div><label className={label}>Phone</label><input className={input} value={v.emergencyPhone} onChange={(e) => set("emergencyPhone", e.target.value)} placeholder="+41 …" /></div>
+              </div>
+              <div><label className={label}>Relationship to property</label><input className={input} value={v.emergencyRelationship} onChange={(e) => set("emergencyRelationship", e.target.value)} placeholder="Building manager, neighbour…" /></div>
+            </div>
+          </div>
+        )}
+
+        {/* 11 — Review */}
+        {step === 11 && (
+          <div>
+            <Heading title="Ready to save?" sub="Your listing is saved as a draft — publish it from My Listings whenever you're ready." />
+            <dl className="text-sm divide-y divide-[var(--border)] border border-[var(--border)] rounded-xl overflow-hidden">
+              {[
+                ["Title", v.title], ["Type", v.propertyType], ["Location", `${v.neighbourhood ? v.neighbourhood + ", " : ""}${v.city}, ${v.country}`],
+                ["Capacity", `${v.bedrooms} bed · ${v.bathrooms} bath · ${v.maxGuests} guests`],
+                ["Amenities", v.amenities.length ? `${v.amenities.length} selected` : "—"],
+                ["Photos", `${v.photos.length}`], ["Durations", v.swapDurations.length ? v.swapDurations.join(", ") : "—"],
+                ["Exchange", v.exchangeType], ["Emergency contact", v.emergencyName || "—"],
+              ].map(([k, val]) => (
+                <div key={k} className="flex justify-between gap-4 px-4 py-2.5"><dt className="text-neutral">{k}</dt><dd className="font-medium text-[var(--navy)] text-right truncate">{val}</dd></div>
+              ))}
+            </dl>
+          </div>
+        )}
+
+        {error && (
+          <p className="mt-6 text-sm text-[var(--crimson)] font-medium" role="alert">{error}</p>
+        )}
+      </div>
 
       {/* Nav */}
-      <div className="mt-8 flex items-center justify-between">
+      <div className="mt-6 flex items-center justify-between gap-3">
         {step > 0 ? (
-          <button type="button" onClick={() => setStep((s) => s - 1)} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--navy)] px-4 py-2.5 rounded-xl border border-[var(--border)] hover:border-[var(--navy)]"><ChevronLeft size={16} /> Back</button>
+          <button type="button" onClick={() => { setError(""); setStep((s) => s - 1) }} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--navy)] px-5 py-2.5 rounded-full border border-[var(--border)] hover:border-[var(--navy)] bg-white"><ChevronLeft size={16} /> Back</button>
         ) : (
           <Link href="/dashboard/listings" className="text-sm font-semibold text-neutral hover:text-[var(--navy)] px-2">Cancel</Link>
         )}
-        {step < STEPS.length - 1 ? (
-          <button type="button" onClick={next} className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] px-6 py-2.5 rounded-xl shadow-sm">Continue <ChevronRight size={16} /></button>
-        ) : (
-          <button type="button" onClick={submit} disabled={loading} className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] px-6 py-2.5 rounded-xl shadow-sm disabled:opacity-50">{loading ? "Saving…" : (<><Check size={16} /> Save listing</>)}</button>
-        )}
+        <div className="flex items-center gap-3">
+          {SCREENS[step].optional && step < SCREENS.length - 1 && (
+            <button type="button" onClick={() => next(true)} className="text-sm font-semibold text-[var(--navy)] px-5 py-2.5 rounded-full border border-[var(--gold)] hover:bg-[var(--parchment)] bg-white">Skip</button>
+          )}
+          {step < SCREENS.length - 1 ? (
+            <button type="button" onClick={() => next()} className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] px-7 py-2.5 rounded-full shadow-sm">Continue <ChevronRight size={16} /></button>
+          ) : (
+            <button type="button" onClick={submit} disabled={loading} className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] px-7 py-2.5 rounded-full shadow-sm disabled:opacity-50">{loading ? "Saving…" : (<><Check size={16} /> Save listing</>)}</button>
+          )}
+        </div>
       </div>
     </div>
   )

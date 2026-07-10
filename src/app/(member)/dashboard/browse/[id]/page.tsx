@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import {
-  MapPin, Star, BadgeCheck, BedDouble, Bath, Users, ArrowLeft, ShieldAlert,
+  MapPin, Star, BadgeCheck, BedDouble, Bath, Users, ShieldAlert, ChevronRight,
 } from "lucide-react"
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
@@ -42,6 +42,9 @@ export default async function ListingDetailPage({
     prisma.user.findUnique({ where: { id: userId } }),
     getListingDetail(userId, id),
   ])
+  // Walled garden: listing details require a confirmed email. The browse page
+  // shows the confirm-email explainer, so send unconfirmed members there.
+  if (viewer?.verificationStatus === "PENDING_EMAIL") redirect("/dashboard/browse")
   if (!listing) redirect("/dashboard/browse")
 
   const reviews = await listReviewsForListing(listing.id)
@@ -50,9 +53,18 @@ export default async function ListingDetailPage({
 
   return (
     <div className="max-w-5xl mx-auto pb-12">
-      <Link href="/dashboard/browse" className="inline-flex items-center gap-1.5 text-sm font-semibold text-neutral hover:text-[var(--navy)] mb-4">
-        <ArrowLeft size={15} /> Back to browse
-      </Link>
+      {/* Breadcrumb — each crumb is a live browse filter */}
+      <nav aria-label="Breadcrumb" className="mb-4 flex items-center gap-1.5 text-sm text-neutral">
+        <Link href="/dashboard/browse" className="hover:text-[var(--navy)] transition-colors">Discover</Link>
+        <ChevronRight size={14} className="text-neutral/50" />
+        <Link href={`/dashboard/browse?q=${encodeURIComponent(listing.country)}`} className="hover:text-[var(--navy)] transition-colors">
+          {listing.country}
+        </Link>
+        <ChevronRight size={14} className="text-neutral/50" />
+        <Link href={`/dashboard/browse?q=${encodeURIComponent(listing.city)}`} className="font-semibold text-[var(--navy)]">
+          {listing.city}
+        </Link>
+      </nav>
 
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Main */}
@@ -183,6 +195,31 @@ export default async function ListingDetailPage({
                 {listing.owner.trustScore != null ? listing.owner.trustScore.toFixed(1) : "New host"}
               </span>
             </div>
+            <div className="mt-2 flex items-center justify-between text-sm">
+              <span className="text-neutral">Member since</span>
+              <span className="font-semibold text-[var(--navy)]">{listing.owner.createdAt.getFullYear()}</span>
+            </div>
+            <div className="mt-2 flex items-center justify-between text-sm">
+              <span className="text-neutral">Exchanges</span>
+              <span className="font-semibold text-[var(--navy)]">
+                {listing.ownerExchanges === 0 ? "First-time host" : listing.ownerExchanges}
+              </span>
+            </div>
+
+            {/* Verification checklist — the walled garden, made visible */}
+            <div className="mt-4 pt-4 border-t border-[var(--border)] space-y-2">
+              <div className="flex items-center gap-2 text-sm text-neutral-dark">
+                <BadgeCheck size={15} className="text-[var(--teal)] flex-shrink-0" />
+                Institutional email verified
+              </div>
+              {listing.owner.verificationStatus === "FULLY_VERIFIED" && (
+                <div className="flex items-center gap-2 text-sm text-neutral-dark">
+                  <BadgeCheck size={15} className="text-[var(--teal)] flex-shrink-0" />
+                  Staff ID &amp; employment verified
+                </div>
+              )}
+            </div>
+
             {listing.owner.bio && <p className="mt-3 text-xs text-neutral-dark leading-relaxed">{listing.owner.bio}</p>}
           </div>
 

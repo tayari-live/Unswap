@@ -1,11 +1,13 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { MapPin, Star, BadgeCheck, SearchX, ChevronLeft, ChevronRight } from "lucide-react"
+import { MapPin, Star, BadgeCheck, SearchX, ChevronLeft, ChevronRight, MailWarning } from "lucide-react"
 import { auth } from "@/server/auth"
+import { prisma } from "@/server/prisma"
 import { searchListings } from "@/server/services/discovery"
 import { PageHeader } from "@/components/ui/page-header"
 import { BrowseControls } from "./browse-controls"
 import { FavouriteButton } from "./favourite-button"
+import { ResendMyVerification } from "./confirm-email-gate"
 
 export const dynamic = "force-dynamic"
 
@@ -24,8 +26,36 @@ export default async function BrowsePage({
   const userId = (session?.user as any)?.id as string | undefined
   if (!userId) redirect("/login")
 
-  // Discovery is open to any signed-in member — verification is only needed to
-  // request or accept a swap, not to browse.
+  // The network is a walled garden: browsing requires at least a confirmed
+  // institutional email (EMAIL_VERIFIED). Full verification is only needed
+  // later, to request or accept a swap.
+  const viewer = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { email: true, verificationStatus: true },
+  })
+  if (viewer?.verificationStatus === "PENDING_EMAIL") {
+    return (
+      <div className="max-w-2xl mx-auto pb-12">
+        <PageHeader title="Discover Homes" subtitle="Browse verified homes across the network." />
+        <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-10 text-center">
+          <div className="mx-auto w-14 h-14 rounded-2xl bg-[var(--parchment)] text-[var(--gold-dark)] flex items-center justify-center mb-5">
+            <MailWarning size={26} />
+          </div>
+          <h2 className="font-display text-2xl font-bold text-[var(--navy)]">Confirm your email to browse</h2>
+          <p className="mt-3 text-neutral leading-relaxed max-w-md mx-auto">
+            Member homes are only visible inside the verified network. Open the
+            confirmation link we sent to{" "}
+            <span className="font-semibold text-[var(--navy)]">{viewer.email}</span>{" "}
+            and this page unlocks instantly.
+          </p>
+          <div className="mt-7">
+            <ResendMyVerification email={viewer.email} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   const sp = await searchParams
   const filters = {
     q: sp.q ?? "",

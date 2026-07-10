@@ -110,6 +110,7 @@ export async function getListingDetail(viewerId: string, id: string) {
           bio: true,
           trustScore: true,
           verificationStatus: true,
+          createdAt: true,
         },
       },
       photos: { select: { id: true, caption: true }, orderBy: { position: "asc" } },
@@ -119,15 +120,26 @@ export async function getListingDetail(viewerId: string, id: string) {
   if (!listing) return null
   if (listing.status !== "ACTIVE" && listing.ownerId !== viewerId) return null
 
-  const fav = await prisma.favourite.findUnique({
-    where: { userId_listingId: { userId: viewerId, listingId: id } },
-  })
+  const [fav, ownerExchanges] = await Promise.all([
+    prisma.favourite.findUnique({
+      where: { userId_listingId: { userId: viewerId, listingId: id } },
+    }),
+    // Completed exchanges the host has been part of, either side — the trust
+    // sidebar's "n exchanges" figure.
+    prisma.swapRequest.count({
+      where: {
+        status: "COMPLETED",
+        OR: [{ hostId: listing.ownerId }, { requesterId: listing.ownerId }],
+      },
+    }),
+  ])
 
   // Never expose the encrypted private fields to the public detail view.
   const { fullAddressEnc, emergencyNameEnc, emergencyPhoneEnc, emergencyRelationEnc, ...pub } = listing
   void fullAddressEnc; void emergencyNameEnc; void emergencyPhoneEnc; void emergencyRelationEnc
   return {
     ...pub,
+    ownerExchanges,
     favourited: !!fav,
     amenities: listing.amenities ? listing.amenities.split(",").filter(Boolean) : [],
     swapDurations: listing.swapDurations ? listing.swapDurations.split(",").filter(Boolean) : [],
