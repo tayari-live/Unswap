@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { CalendarCheck, CheckCircle2, CalendarX2 } from "lucide-react"
+import { useToast } from "@/components/ui/toast"
 
 const MODE_OPTIONS: Record<string, { value: string; label: string }[]> = {
   either: [
@@ -58,6 +59,7 @@ export function SwapRequestForm({
   blackouts?: Blackout[]
 }) {
   const router = useRouter()
+  const toast = useToast()
   const modes = MODE_OPTIONS[exchangeType] ?? MODE_OPTIONS.either
   const [open, setOpen] = useState(false)
   const [startDate, setStartDate] = useState("")
@@ -65,7 +67,6 @@ export function SwapRequestForm({
   const [guests, setGuests] = useState(1)
   const [mode, setMode] = useState(modes[0].value)
   const [message, setMessage] = useState("")
-  const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const [done, setDone] = useState(false)
 
@@ -94,8 +95,10 @@ export function SwapRequestForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (validation) return
-    setError("")
+    if (validation) {
+      toast(validation, "error")
+      return
+    }
     setLoading(true)
     try {
       const res = await fetch("/api/swaps", {
@@ -105,13 +108,13 @@ export function SwapRequestForm({
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error || "Could not send your request.")
+        toast(data.error || "Could not send your request.", "error")
         setLoading(false)
         return
       }
       setDone(true)
     } catch {
-      setError("Something went wrong. Please try again.")
+      toast("Something went wrong. Please try again.", "error")
       setLoading(false)
     }
   }
@@ -152,12 +155,6 @@ export function SwapRequestForm({
   return (
     <form onSubmit={handleSubmit} className="bg-surface border border-[var(--border)] rounded-2xl p-5 space-y-4 shadow-sm">
       <h3 className="font-display text-lg font-bold text-[var(--navy)]">Request a swap</h3>
-
-      {error && (
-        <div className="bg-[var(--crimson)]/10 border-l-4 border-[var(--crimson)] p-3 rounded-lg">
-          <p className="text-sm text-[var(--crimson)] font-medium">{error}</p>
-        </div>
-      )}
 
       {blackouts.length > 0 && (
         <div className="flex items-start gap-2 rounded-lg bg-[var(--parchment)] border border-[var(--gold)]/20 p-3">
@@ -220,16 +217,11 @@ export function SwapRequestForm({
         <textarea id="message" rows={3} value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Introduce yourself and your plans." className={inputCls} />
       </div>
 
-      {/* Inline reason the request can't be sent yet — only once the user has picked dates. */}
-      {validation && startDate && endDate && (
-        <p className="text-xs text-[var(--crimson)] font-medium">{validation}</p>
-      )}
-
       <div className="flex gap-3">
+        {/* Always clickable — a blocked submit explains itself via toast. */}
         <button
           type="submit"
-          disabled={loading || !!validation}
-          title={validation ?? undefined}
+          disabled={loading}
           className="flex-1 py-3 px-4 rounded-xl text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {loading ? "Sending…" : "Send request"}

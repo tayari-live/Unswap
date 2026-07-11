@@ -58,17 +58,15 @@ export function ReviewAction({
   const [cleanliness, setCleanliness] = useState(0)
   const [neighbourhoodSafety, setNeighbourhoodSafety] = useState(0)
   const [body, setBody] = useState("")
-  const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
-    setError("")
-    if (!overall) return setError("Please give an overall rating.")
-    if (!communication) return setError("Please rate communication.")
+    if (!overall) return toast("Please give an overall rating.", "error")
+    if (!communication) return toast("Please rate communication.", "error")
     if (aboutHost && (!propertyAccuracy || !cleanliness || !neighbourhoodSafety))
-      return setError("Please complete all property ratings.")
-    if (body.trim().length < 50) return setError("Please write at least 50 characters.")
+      return toast("Please complete all property ratings.", "error")
+    if (body.trim().length < 50) return toast("Please write at least 50 characters.", "error")
 
     setLoading(true)
     try {
@@ -85,7 +83,6 @@ export function ReviewAction({
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error || "Could not submit your review.")
         toast(data.error || "Could not submit your review.", "error")
         setLoading(false)
         return
@@ -93,7 +90,7 @@ export function ReviewAction({
       toast("Review submitted — thank you!", "success")
       router.refresh()
     } catch {
-      setError("Something went wrong. Please try again.")
+      toast("Something went wrong. Please try again.", "error")
       setLoading(false)
     }
   }
@@ -112,8 +109,6 @@ export function ReviewAction({
   return (
     <form onSubmit={submit} className="mt-2 w-full bg-[var(--background)] border border-[var(--border)] rounded-xl p-4 space-y-3">
       <h4 className="font-display font-bold text-[var(--navy)]">Review {otherName}</h4>
-      {error && <p className="text-xs text-[var(--crimson)] font-medium">{error}</p>}
-
       <StarRating label="Overall" value={overall} onChange={setOverall} />
       <StarRating label="Communication" value={communication} onChange={setCommunication} />
       {aboutHost && (

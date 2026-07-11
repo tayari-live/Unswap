@@ -4,6 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { Check, Copy, Sparkles, Trophy } from "lucide-react"
+import { useToast } from "@/components/ui/toast"
 
 const inputCls =
   "block w-full px-4 py-3 border border-[var(--border)] rounded-xl bg-white placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] text-sm text-[var(--navy)] transition-all"
@@ -18,17 +19,16 @@ type Result = {
 
 export function WaitlistForm() {
   const ref = useSearchParams().get("ref") || undefined
+  const toast = useToast()
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
   const [email, setEmail] = useState("")
-  const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<Result | null>(null)
   const [copied, setCopied] = useState(false)
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
-    setError("")
     setLoading(true)
     try {
       const res = await fetch("/api/waitlist", {
@@ -38,13 +38,13 @@ export function WaitlistForm() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error || "Could not join the waitlist.")
+        toast(data.error || "Could not join the waitlist.", "error")
         setLoading(false)
         return
       }
       setResult(data)
     } catch {
-      setError("Something went wrong. Please try again.")
+      toast("Something went wrong. Please try again.", "error")
       setLoading(false)
     }
   }
@@ -101,11 +101,6 @@ export function WaitlistForm() {
       </p>
 
       <form onSubmit={submit} className="mt-7 space-y-5">
-        {error && (
-          <div className="bg-[var(--crimson)]/10 border-l-4 border-[var(--crimson)] p-3 rounded-lg">
-            <p className="text-sm text-[var(--crimson)] font-medium">{error}</p>
-          </div>
-        )}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label htmlFor="firstName" className={labelCls}>First name</label>

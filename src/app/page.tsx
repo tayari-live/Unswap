@@ -127,14 +127,15 @@ export default function LandingPage() {
       {/* ============================================================ */}
       <section className="relative bg-[var(--navy)] text-white overflow-hidden min-h-[90vh] flex items-center">
         {/* Background video — self-hosted so it always plays (no third-party
-            CDN). Poster shows instantly and covers blocked-autoplay cases. */}
+            CDN). The poster IS the video's first frame, so the moment playback
+            starts is imperceptible; it also covers blocked-autoplay cases. */}
         <video
           autoPlay
           loop
           muted
           playsInline
           preload="auto"
-          poster="/images/hero-sovereign.png"
+          poster="/images/hero-poster.jpg"
           className="absolute inset-0 w-full h-full object-cover opacity-80"
         >
           <source src="/videos/hero.mp4" type="video/mp4" />

@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { UploadCloud, X, Check } from "lucide-react"
+import { useToast } from "@/components/ui/toast"
 
 const ORGANISATIONS = [
   "United Nations", "UNDP", "UNICEF", "WHO", "UNHCR", "IMF", "World Bank Group",
@@ -34,8 +35,8 @@ export function ProfileForm({
   submitLabel?: string
   onSaved?: (completion: number) => void
 }) {
+  const toast = useToast()
   const [v, setV] = useState<ProfileValues>(initial)
-  const [error, setError] = useState("")
   const [saved, setSaved] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -44,8 +45,8 @@ export function ProfileForm({
 
   function pickFile(file: File | undefined) {
     if (!file) return
-    if (!ACCEPT.split(",").includes(file.type)) return setError("Photo must be a PNG, JPG, or WebP image.")
-    if (file.size > MAX_BYTES) return setError("That image is over 5 MB.")
+    if (!ACCEPT.split(",").includes(file.type)) return toast("Photo must be a PNG, JPG, or WebP image.", "error")
+    if (file.size > MAX_BYTES) return toast("That image is over 5 MB.", "error")
     const reader = new FileReader()
     reader.onload = () => set("imageUrl", reader.result as string)
     reader.readAsDataURL(file)
@@ -53,7 +54,6 @@ export function ProfileForm({
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
-    setError("")
     setSaved(false)
     setLoading(true)
     try {
@@ -64,15 +64,16 @@ export function ProfileForm({
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error || "Could not save your profile.")
+        toast(data.error || "Could not save your profile.", "error")
         setLoading(false)
         return
       }
       setSaved(true)
       setLoading(false)
+      toast("Profile saved.", "success")
       onSaved?.(data.completion ?? 0)
     } catch {
-      setError("Something went wrong. Please try again.")
+      toast("Something went wrong. Please try again.", "error")
       setLoading(false)
     }
   }
@@ -83,12 +84,6 @@ export function ProfileForm({
 
   return (
     <form onSubmit={submit} className="space-y-5">
-      {error && (
-        <div className="bg-[var(--crimson)]/10 border-l-4 border-[var(--crimson)] p-3 rounded-lg">
-          <p className="text-sm text-[var(--crimson)] font-medium">{error}</p>
-        </div>
-      )}
-
       {/* Photo */}
       <div className="flex items-center gap-4">
         {v.imageUrl ? (

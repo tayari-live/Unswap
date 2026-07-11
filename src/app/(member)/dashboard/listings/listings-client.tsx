@@ -49,11 +49,9 @@ export function ListingsClient({
   const router = useRouter()
   const toast = useToast()
   const [busyId, setBusyId] = useState<string | null>(null)
-  const [error, setError] = useState("")
 
   async function setStatus(id: string, status: string) {
     setBusyId(id)
-    setError("")
     try {
       const res = await fetch(`/api/listings/${id}`, {
         method: "PATCH",
@@ -62,7 +60,6 @@ export function ListingsClient({
       })
       if (!res.ok) {
         const d = await res.json().catch(() => ({}))
-        setError(d.error || "Could not update the listing.")
         toast(d.error || "Could not update the listing.", "error")
       } else {
         toast(STATUS_MSG[status] ?? "Listing updated", "success")
@@ -76,12 +73,10 @@ export function ListingsClient({
   async function remove(id: string) {
     if (!confirm("Delete this listing permanently? This cannot be undone.")) return
     setBusyId(id)
-    setError("")
     try {
       const res = await fetch(`/api/listings/${id}`, { method: "DELETE" })
       if (!res.ok) {
         const d = await res.json().catch(() => ({}))
-        setError(d.error || "Could not delete the listing.")
         toast(d.error || "Could not delete the listing.", "error")
       } else {
         toast("Listing deleted", "success")
@@ -97,11 +92,6 @@ export function ListingsClient({
 
   return (
     <>
-      {error && (
-        <div className="bg-[var(--crimson)]/10 border-l-4 border-[var(--crimson)] p-3 rounded-lg mb-4">
-          <p className="text-sm text-[var(--crimson)] font-medium">{error}</p>
-        </div>
-      )}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {listings.map((l) => {
           const busy = busyId === l.id

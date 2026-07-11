@@ -4,6 +4,7 @@ import { prisma } from "@/server/prisma"
 import { MemberSidebar } from "@/components/layout/member-sidebar"
 import { MemberTopbar } from "@/components/layout/member-topbar"
 import { MobileNav } from "@/components/layout/mobile-nav"
+import { AppAssistant } from "@/components/assistant/app-assistant"
 
 export default async function MemberLayout({
   children,
@@ -50,6 +51,7 @@ export default async function MemberLayout({
         </main>
       </div>
       <MobileNav variant="member" />
+      <AppAssistant />
     </div>
   )
 }

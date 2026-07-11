@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { ShieldCheck, X, Check, FileText, Mail, MapPin, Building2 } from "lucide-react"
 import { PageHeader } from "@/components/ui/page-header"
 import { Badge } from "@/components/ui/badges"
+import { useToast } from "@/components/ui/toast"
 
 type Submission = {
   id: string
@@ -25,26 +26,24 @@ type Submission = {
 
 export default function VerificationClient({ initialSubmissions }: { initialSubmissions: Submission[] }) {
   const router = useRouter()
+  const toast = useToast()
   const [submissions, setSubmissions] = useState(initialSubmissions)
   const [selected, setSelected] = useState<Submission | null>(null)
   const [note, setNote] = useState("")
   const [busy, setBusy] = useState(false)
-  const [error, setError] = useState("")
 
   function open(s: Submission) {
     setSelected(s)
     setNote("")
-    setError("")
   }
 
   async function review(action: "approve" | "reject") {
     if (!selected) return
     if (action === "reject" && note.trim().length < 3) {
-      setError("A rejection note is required.")
+      toast("A rejection note is required.", "error")
       return
     }
     setBusy(true)
-    setError("")
     try {
       const res = await fetch(`/api/verification/${selected.id}`, {
         method: "PATCH",
@@ -53,15 +52,16 @@ export default function VerificationClient({ initialSubmissions }: { initialSubm
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error || "Something went wrong.")
+        toast(data.error || "Something went wrong.", "error")
         setBusy(false)
         return
       }
       setSubmissions((prev) => prev.filter((s) => s.id !== selected.id))
       setSelected(null)
+      toast(action === "approve" ? "Member approved." : "Submission rejected.", "success")
       router.refresh()
     } catch {
-      setError("Network error. Please try again.")
+      toast("Network error. Please try again.", "error")
     } finally {
       setBusy(false)
     }
@@ -162,8 +162,6 @@ export default function VerificationClient({ initialSubmissions }: { initialSubm
                   className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--background)] text-sm text-[var(--navy)] focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)]"
                 />
               </div>
-
-              {error && <p className="text-sm text-[var(--crimson)] font-medium">{error}</p>}
 
               <div className="flex gap-3">
                 <button

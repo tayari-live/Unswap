@@ -7,12 +7,13 @@ import { signIn, getSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Mail, Eye, EyeOff, ShieldCheck } from "lucide-react"
 import { Logo } from "@/components/brand/logo"
+import { useToast } from "@/components/ui/toast"
 
 export default function LoginPage() {
   const router = useRouter()
+  const toast = useToast()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [remember, setRemember] = useState(false)
@@ -20,7 +21,6 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    setError("")
 
     try {
       const res = await signIn("credentials", {
@@ -31,7 +31,7 @@ export default function LoginPage() {
       })
 
       if (res?.error) {
-        setError("Those credentials were not recognised. Please try again.")
+        toast("Those credentials were not recognised. Please try again.", "error")
         setLoading(false)
       } else {
         // Route by role: admins to the ops console, members to their dashboard.
@@ -45,9 +45,9 @@ export default function LoginPage() {
       // credentials sign-in. Treat that as invalid credentials.
       const detail = String(err?.type || err?.name || err?.message || "")
       if (detail.toLowerCase().includes("credentials")) {
-        setError("Those credentials were not recognised. Please try again.")
+        toast("Those credentials were not recognised. Please try again.", "error")
       } else {
-        setError("Something went wrong. Please try again.")
+        toast("Something went wrong. Please try again.", "error")
       }
       setLoading(false)
     }
@@ -106,12 +106,6 @@ export default function LoginPage() {
           </p>
 
           <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
-            {error && (
-              <div className="bg-[var(--crimson)]/10 border-l-4 border-[var(--crimson)] p-3 rounded-lg">
-                <p className="text-sm text-[var(--crimson)] font-medium">{error}</p>
-              </div>
-            )}
-
             <div>
               <label
                 htmlFor="email"

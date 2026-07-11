@@ -4,21 +4,21 @@ import { useState } from "react"
 import { Plus, Trash2, Globe, Zap } from "lucide-react"
 import { PageHeader } from "@/components/ui/page-header"
 import { Badge } from "@/components/ui/badges"
+import { useToast } from "@/components/ui/toast"
 
 type Domain = { id: string; domain: string; label: string; fastTrack: boolean }
 
 export default function DomainsClient({ initialDomains }: { initialDomains: Domain[] }) {
+  const toast = useToast()
   const [domains, setDomains] = useState(initialDomains)
   const [domain, setDomain] = useState("")
   const [label, setLabel] = useState("")
   const [fastTrack, setFastTrack] = useState(true)
-  const [error, setError] = useState("")
   const [busy, setBusy] = useState(false)
 
   async function add(e: React.FormEvent) {
     e.preventDefault()
     setBusy(true)
-    setError("")
     try {
       const res = await fetch("/api/domains", {
         method: "POST",
@@ -27,12 +27,13 @@ export default function DomainsClient({ initialDomains }: { initialDomains: Doma
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error || "Could not add domain.")
+        toast(data.error || "Could not add domain.", "error")
         return
       }
       setDomains((prev) => [...prev, data].sort((a, b) => a.domain.localeCompare(b.domain)))
       setDomain("")
       setLabel("")
+      toast(`@${data.domain} added to the allowlist.`, "success")
     } finally {
       setBusy(false)
     }
@@ -86,7 +87,6 @@ export default function DomainsClient({ initialDomains }: { initialDomains: Doma
             <Plus size={16} /> Add domain
           </button>
         </div>
-        {error && <p className="text-sm text-[var(--crimson)] font-medium mt-3">{error}</p>}
       </form>
 
       <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm divide-y divide-[var(--border)]">

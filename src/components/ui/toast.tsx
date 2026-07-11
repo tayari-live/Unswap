@@ -1,6 +1,7 @@
 "use client"
 
-import { createContext, useCallback, useContext, useState } from "react"
+import { createContext, useCallback, useContext, useEffect, useState } from "react"
+import { usePathname } from "next/navigation"
 import { CheckCircle2, AlertTriangle, Info, X } from "lucide-react"
 
 type ToastType = "success" | "error" | "info"
@@ -23,12 +24,24 @@ const STYLE: Record<ToastType, { icon: typeof Info; cls: string; iconCls: string
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([])
+  const pathname = usePathname()
 
   const toast = useCallback((message: string, type: ToastType = "info") => {
     const id = Date.now() + Math.random()
-    setToasts((t) => [...t, { id, type, message }])
-    setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 4000)
+    // A new toast replaces any lingering error toast.
+    setToasts((t) => [...t.filter((x) => x.type !== "error"), { id, type, message }])
+    // Errors stay until dismissed, replaced, or the user navigates away;
+    // success/info auto-dismiss.
+    if (type !== "error") {
+      setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 4000)
+    }
   }, [])
+
+  // Leaving the page clears error toasts (success toasts fired just before a
+  // redirect survive their normal 4s).
+  useEffect(() => {
+    setToasts((t) => t.filter((x) => x.type !== "error"))
+  }, [pathname])
 
   const dismiss = (id: number) => setToasts((t) => t.filter((x) => x.id !== id))
 

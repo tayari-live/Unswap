@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import {
-  UploadCloud, X, ArrowUp, ArrowDown, Plus, Minus, Check, ChevronRight, ChevronLeft,
+  UploadCloud, X, Plus, Minus, Check, ChevronRight, ChevronLeft, Star, Sparkles,
   Building2, Home, Castle, DoorOpen, Building,
   Wifi, Laptop, Car, Flower2, Waves, Utensils, WashingMachine, AirVent, ArrowUpDown, PawPrint, Accessibility,
   CalendarDays, CalendarRange, CalendarClock, Calendar, Shuffle, Repeat, Coins,
@@ -61,10 +61,12 @@ export type WizardValues = {
   houseRules: string; emergencyName: string; emergencyPhone: string; emergencyRelationship: string
 }
 
+// Nothing selectable is pre-selected — members must actively choose their
+// property type and exchange mode before they can continue.
 const EMPTY: WizardValues = {
-  title: "", propertyType: "Apartment", fullAddress: "", city: "", neighbourhood: "", country: "",
+  title: "", propertyType: "", fullAddress: "", city: "", neighbourhood: "", country: "",
   bedrooms: 1, bathrooms: 1, maxGuests: 2, description: "", amenities: [],
-  photos: [], swapDurations: [], exchangeType: "either", blackouts: [],
+  photos: [], swapDurations: [], exchangeType: "", blackouts: [],
   houseRules: "", emergencyName: "", emergencyPhone: "", emergencyRelationship: "",
 }
 
@@ -169,14 +171,45 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
   const toast = useToast()
   const [step, setStep] = useState(0)
   const [v, setV] = useState<WizardValues>(initial ?? EMPTY)
-  const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const [photoBusy, setPhotoBusy] = useState(false)
+  const [aiBusy, setAiBusy] = useState(false)
 
-  const set = <K extends keyof WizardValues>(k: K, val: WizardValues[K]) => {
-    setError("")
-    setV((p) => ({ ...p, [k]: val }))
+  // Draft the description with AI from the facts gathered so far.
+  async function writeWithAi() {
+    setAiBusy(true)
+    try {
+      const res = await fetch("/api/ai/describe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: v.title,
+          propertyType: v.propertyType,
+          city: v.city,
+          country: v.country,
+          neighbourhood: v.neighbourhood,
+          bedrooms: v.bedrooms,
+          bathrooms: v.bathrooms,
+          maxGuests: v.maxGuests,
+          amenities: v.amenities,
+          notes: v.description,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        toast(data.error || "Could not draft a description.", "error")
+        return
+      }
+      setV((p) => ({ ...p, description: data.description }))
+    } catch {
+      toast("Could not draft a description. Please try again.", "error")
+    } finally {
+      setAiBusy(false)
+    }
   }
+
+  const set = <K extends keyof WizardValues>(k: K, val: WizardValues[K]) =>
+    setV((p) => ({ ...p, [k]: val }))
   const toggle = (k: "amenities" | "swapDurations", val: string) =>
     setV((p) => ({ ...p, [k]: p[k].includes(val) ? p[k].filter((x) => x !== val) : [...p[k], val] }))
 
@@ -199,12 +232,16 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
     set("photos", next)
     setPhotoBusy(false)
   }
-  const movePhoto = (i: number, dir: -1 | 1) => {
-    const j = i + dir
-    if (j < 0 || j >= v.photos.length) return
-    const next = [...v.photos]
-    ;[next[i], next[j]] = [next[j], next[i]]
-    set("photos", next)
+  // Drag-and-drop reorder (with "Make cover" as the click fallback).
+  const [dragIdx, setDragIdx] = useState<number | null>(null)
+  const reorder = (from: number, to: number) => {
+    if (from === to) return
+    setV((p) => {
+      const next = [...p.photos]
+      const [moved] = next.splice(from, 1)
+      next.splice(to, 0, moved)
+      return { ...p, photos: next }
+    })
   }
 
   // Per-screen gate before advancing.
@@ -212,6 +249,7 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
     if (s === 0) {
       if (!v.title.trim()) return "Add a property title."
       if (v.title.length > 80) return "Title must be 80 characters or fewer."
+      if (!v.propertyType) return "Choose a property type."
     }
     if (s === 1) {
       if (!v.city.trim()) return "City is required."
@@ -220,6 +258,7 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
     if (s === 3 && v.description.trim().length < 100) return "Description must be at least 100 characters."
     if (s === 5 && v.photos.length < 5) return "Upload at least 5 photos."
     if (s === 6 && v.swapDurations.length === 0) return "Select at least one swap duration type."
+    if (s === 7 && !v.exchangeType) return "Choose how you want to exchange."
     if (s === 10 && (!v.emergencyName.trim() || !v.emergencyPhone.trim())) return "Emergency contact name and phone are required."
     return null
   }
@@ -227,16 +266,15 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
   function next(skip = false) {
     if (!skip) {
       const err = screenValid(step)
-      if (err) { setError(err); return }
+      if (err) { toast(err, "error"); return }
     }
-    setError("")
     setStep((s) => Math.min(SCREENS.length - 1, s + 1))
   }
 
   async function submit() {
     for (let s = 0; s < SCREENS.length - 1; s++) {
       const err = screenValid(s)
-      if (err) { setError(err); setStep(s); return }
+      if (err) { toast(err, "error"); setStep(s); return }
     }
     setLoading(true)
     try {
@@ -342,8 +380,21 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
         {step === 3 && (
           <div>
             <Heading title="What makes your home unique?" sub="Describe the home, the neighbourhood, and what makes it a great exchange — guests read this first." />
-            <label className={label}>Description <span className="text-neutral normal-case font-normal">({v.description.trim().length}/100 min)</span></label>
+            <div className="flex items-end justify-between gap-3 mb-2">
+              <label className={`${label} mb-0`}>Description <span className="text-neutral normal-case font-normal">({v.description.trim().length}/100 min)</span></label>
+              <button
+                type="button"
+                onClick={writeWithAi}
+                disabled={aiBusy}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--gold-dark)] border border-[var(--gold)]/50 hover:bg-[var(--parchment)] px-3 py-1.5 rounded-full transition-colors disabled:opacity-60"
+              >
+                <Sparkles size={13} /> {aiBusy ? "Drafting…" : "Write with AI"}
+              </button>
+            </div>
             <textarea rows={8} className={input} value={v.description} onChange={(e) => set("description", e.target.value)} placeholder="Bright two-bed five minutes from the lake, quiet street, weekly market around the corner…" />
+            <p className="mt-2 text-xs text-neutral">
+              Write a few rough notes and “Write with AI” will polish them — it only uses the details you&apos;ve entered.
+            </p>
           </div>
         )}
 
@@ -353,7 +404,7 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
             <Heading title="What does your home offer?" sub="Select everything that applies — amenities help your home appear in more searches." />
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {AMENITIES.map((a) => (
-                <IconCard key={a.v} icon={a.icon} title={a.l} selected={v.amenities.includes(a.v)} onClick={() => { setError(""); toggle("amenities", a.v) }} />
+                <IconCard key={a.v} icon={a.icon} title={a.l} selected={v.amenities.includes(a.v)} onClick={() => toggle("amenities", a.v)} />
               ))}
             </div>
           </div>
@@ -362,30 +413,65 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
         {/* 5 — Photos */}
         {step === 5 && (
           <div>
-            <Heading title="Show off your home" sub={`At least 5 photos (${v.photos.length}/20 uploaded). The first photo is your cover image.`} />
-            <label className="flex flex-col items-center justify-center h-32 rounded-xl border-2 border-dashed border-[var(--border)] bg-[var(--background)] cursor-pointer hover:border-[var(--gold)] transition-colors text-center">
-              <UploadCloud size={26} className="text-neutral mb-2" />
-              <span className="text-sm font-semibold text-[var(--navy)]">{photoBusy ? "Processing…" : "Click or drop images to upload"}</span>
-              <span className="text-xs text-neutral mt-1">JPG, PNG, WebP · max 10 MB · min 1080px shortest edge</span>
-              <input type="file" accept={ACCEPT.join(",")} multiple className="hidden" onChange={(e) => addPhotos(e.target.files)} />
-            </label>
-            <div className="space-y-2 mt-4">
-              {v.photos.map((p, i) => (
-                <div key={i} className="flex items-center gap-3 bg-[var(--background)] border border-[var(--border)] rounded-xl p-2">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={p.url} alt="" className="w-16 h-16 rounded-lg object-cover flex-shrink-0" />
-                  <div className="flex-1">
-                    {i === 0 && <span className="text-[10px] font-bold uppercase tracking-wide text-[var(--gold-dark)]">Cover photo</span>}
-                    <input className="block w-full mt-0.5 px-2 py-1.5 border border-[var(--border)] rounded-lg bg-white text-xs text-[var(--navy)]" maxLength={60} placeholder="Caption (optional)" value={p.caption ?? ""} onChange={(e) => { const n = [...v.photos]; n[i] = { ...n[i], caption: e.target.value }; set("photos", n) }} />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <button type="button" onClick={() => movePhoto(i, -1)} disabled={i === 0} className="text-neutral hover:text-[var(--navy)] disabled:opacity-30"><ArrowUp size={15} /></button>
-                    <button type="button" onClick={() => movePhoto(i, 1)} disabled={i === v.photos.length - 1} className="text-neutral hover:text-[var(--navy)] disabled:opacity-30"><ArrowDown size={15} /></button>
-                  </div>
-                  <button type="button" onClick={() => set("photos", v.photos.filter((_, x) => x !== i))} className="text-neutral hover:text-[var(--crimson)]"><X size={16} /></button>
+            <Heading title="Add at least 5 pictures" sub="Start with your home's main rooms." />
+            {v.photos.length === 0 ? (
+              <label className="flex flex-col items-center justify-center h-64 rounded-xl border-2 border-dashed border-[var(--border)] bg-[var(--background)] cursor-pointer hover:border-[var(--gold)] transition-colors text-center px-4">
+                <UploadCloud size={28} className="text-[var(--gold-dark)] mb-2" />
+                <span className="text-sm font-semibold text-[var(--gold-dark)]">{photoBusy ? "Processing…" : "Upload pictures"}</span>
+                <span className="text-xs text-neutral mt-1.5">JPG, PNG, WebP · max 10 MB · min 1080px shortest edge</span>
+                <input type="file" accept={ACCEPT.join(",")} multiple className="hidden" onChange={(e) => addPhotos(e.target.files)} />
+              </label>
+            ) : (
+              <>
+                <p className="text-xs text-neutral mb-3">
+                  Drag and drop pictures to reorder them — the first picture is your cover photo ({v.photos.length}/20).
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  {v.photos.map((p, i) => (
+                    <div
+                      key={i}
+                      draggable
+                      onDragStart={() => setDragIdx(i)}
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={() => { if (dragIdx !== null) reorder(dragIdx, i); setDragIdx(null) }}
+                      onDragEnd={() => setDragIdx(null)}
+                      className={`relative rounded-xl overflow-hidden border border-[var(--border)] bg-[var(--background)] cursor-grab active:cursor-grabbing ${
+                        i === 0 ? "col-span-2 h-56" : "h-36"
+                      } ${dragIdx === i ? "opacity-60 ring-2 ring-[var(--gold)]" : ""}`}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={p.url} alt="" className="absolute inset-0 w-full h-full object-cover pointer-events-none" />
+                      <button
+                        type="button"
+                        onClick={() => set("photos", v.photos.filter((_, x) => x !== i))}
+                        aria-label={`Remove photo ${i + 1}`}
+                        className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/95 text-[var(--navy)] flex items-center justify-center shadow hover:bg-white"
+                      >
+                        <X size={14} />
+                      </button>
+                      {i === 0 ? (
+                        <span className="absolute bottom-2 left-2 text-[10px] font-bold uppercase tracking-wide bg-[var(--navy)]/90 text-white px-2.5 py-1 rounded-md">
+                          Cover photo
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => reorder(i, 0)}
+                          className="absolute bottom-2 left-2 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide bg-white/95 text-[var(--navy)] px-2.5 py-1 rounded-md shadow hover:bg-white"
+                        >
+                          <Star size={11} /> Make cover
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <label className="flex flex-col items-center justify-center h-36 rounded-xl border-2 border-dashed border-[var(--border)] bg-[var(--background)] cursor-pointer hover:border-[var(--gold)] transition-colors text-center px-3">
+                    <UploadCloud size={22} className="text-[var(--gold-dark)] mb-1.5" />
+                    <span className="text-xs font-semibold text-[var(--gold-dark)]">{photoBusy ? "Processing…" : "Add more pictures"}</span>
+                    <input type="file" accept={ACCEPT.join(",")} multiple className="hidden" onChange={(e) => addPhotos(e.target.files)} />
+                  </label>
                 </div>
-              ))}
-            </div>
+              </>
+            )}
           </div>
         )}
 
@@ -395,7 +481,7 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
             <Heading title="How long can guests stay?" sub="Pick every stay length your home is open to — this decides which requests you receive." />
             <div className="grid sm:grid-cols-2 gap-3">
               {DURATIONS.map((d) => (
-                <IconCard key={d.v} icon={d.icon} title={d.l} desc={d.d} selected={v.swapDurations.includes(d.v)} onClick={() => { setError(""); toggle("swapDurations", d.v) }} />
+                <IconCard key={d.v} icon={d.icon} title={d.l} desc={d.d} selected={v.swapDurations.includes(d.v)} onClick={() => toggle("swapDurations", d.v)} />
               ))}
             </div>
           </div>
@@ -469,15 +555,12 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
           </div>
         )}
 
-        {error && (
-          <p className="mt-6 text-sm text-[var(--crimson)] font-medium" role="alert">{error}</p>
-        )}
       </div>
 
       {/* Nav */}
       <div className="mt-6 flex items-center justify-between gap-3">
         {step > 0 ? (
-          <button type="button" onClick={() => { setError(""); setStep((s) => s - 1) }} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--navy)] px-5 py-2.5 rounded-full border border-[var(--border)] hover:border-[var(--navy)] bg-white"><ChevronLeft size={16} /> Back</button>
+          <button type="button" onClick={() => setStep((s) => s - 1)} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--navy)] px-5 py-2.5 rounded-full border border-[var(--border)] hover:border-[var(--navy)] bg-white"><ChevronLeft size={16} /> Back</button>
         ) : (
           <Link href="/dashboard/listings" className="text-sm font-semibold text-neutral hover:text-[var(--navy)] px-2">Cancel</Link>
         )}

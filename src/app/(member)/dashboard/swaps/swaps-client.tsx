@@ -46,7 +46,6 @@ function SwapCard({ swap, role }: { swap: SwapRow; role: "incoming" | "outgoing"
   const router = useRouter()
   const toast = useToast()
   const [busy, setBusy] = useState(false)
-  const [error, setError] = useState("")
   const [countering, setCountering] = useState(false)
   const [cStart, setCStart] = useState(swap.startDate.slice(0, 10))
   const [cEnd, setCEnd] = useState(swap.endDate.slice(0, 10))
@@ -55,7 +54,6 @@ function SwapCard({ swap, role }: { swap: SwapRow; role: "incoming" | "outgoing"
 
   async function act(action: string, extra?: Record<string, unknown>) {
     setBusy(true)
-    setError("")
     try {
       const res = await fetch(`/api/swaps/${swap.id}`, {
         method: "PATCH",
@@ -64,7 +62,6 @@ function SwapCard({ swap, role }: { swap: SwapRow; role: "incoming" | "outgoing"
       })
       if (!res.ok) {
         const d = await res.json().catch(() => ({}))
-        setError(d.error || "Action failed.")
         toast(d.error || "Action failed.", "error")
       } else {
         toast(ACTION_MSG[action] ?? "Done", "success")
@@ -105,8 +102,6 @@ function SwapCard({ swap, role }: { swap: SwapRow; role: "incoming" | "outgoing"
       </div>
 
       {swap.message && <p className="mt-3 text-sm text-neutral-dark bg-[var(--background)] rounded-lg p-3">“{swap.message}”</p>}
-
-      {error && <p className="mt-3 text-sm text-[var(--crimson)] font-medium">{error}</p>}
 
       {countering && (
         <div className="mt-3 flex flex-wrap items-end gap-2">

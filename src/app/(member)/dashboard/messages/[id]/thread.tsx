@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react"
 import Link from "next/link"
 import { ArrowLeft, Send, ImagePlus, X, BadgeCheck } from "lucide-react"
 import { ReportButton } from "@/components/report-button"
+import { useToast } from "@/components/ui/toast"
 
 type Msg = { id: string; senderId: string; body: string; attachmentUrl: string | null; createdAt: string }
 type Other = { id: string; fullName: string; avatarInitials: string; verificationStatus: string; organisation?: string | null } | null
@@ -27,11 +28,11 @@ export function Thread({
   initialMessages: Msg[]
   swapRequest?: any
 }) {
+  const toast = useToast()
   const [messages, setMessages] = useState<Msg[]>(initialMessages)
   const [body, setBody] = useState("")
   const [attachment, setAttachment] = useState<string | null>(null)
   const [sending, setSending] = useState(false)
-  const [error, setError] = useState("")
   const bottomRef = useRef<HTMLDivElement>(null)
 
   const refresh = useCallback(async () => {
@@ -59,8 +60,8 @@ export function Thread({
 
   function pickFile(file: File | undefined) {
     if (!file) return
-    if (!file.type.startsWith("image/")) return setError("Attachments must be an image.")
-    if (file.size > MAX_BYTES) return setError("Image is over 10 MB.")
+    if (!file.type.startsWith("image/")) return toast("Attachments must be an image.", "error")
+    if (file.size > MAX_BYTES) return toast("Image is over 10 MB.", "error")
     const reader = new FileReader()
     reader.onload = () => setAttachment(reader.result as string)
     reader.readAsDataURL(file)
@@ -72,7 +73,6 @@ export function Thread({
     const finalBody = presetBody ?? body
     if (!finalBody.trim() && !attachment) return
     setSending(true)
-    setError("")
     try {
       const res = await fetch(`/api/conversations/${conversationId}`, {
         method: "POST",
@@ -81,7 +81,7 @@ export function Thread({
       })
       if (!res.ok) {
         const d = await res.json().catch(() => ({}))
-        setError(d.error || "Could not send.")
+        toast(d.error || "Could not send.", "error")
       } else {
         if (!presetBody) setBody("")
         setAttachment(null)
@@ -163,8 +163,6 @@ export function Thread({
 
         {/* Composer Area */}
         <div className="bg-white border-t border-[var(--border)] p-4 relative z-10 shadow-[0_-4px_10px_rgba(0,0,0,0.02)]">
-          {error && <p className="text-xs text-[var(--crimson)] font-medium mb-2">{error}</p>}
-          
           {/* Quick Responses */}
           <div className="flex items-center gap-0 overflow-x-auto pb-3 mb-1 no-scrollbar border-b border-[var(--border)] text-sm font-semibold text-[var(--navy)]">
             <span className="px-3 whitespace-nowrap text-neutral">Quick response</span>

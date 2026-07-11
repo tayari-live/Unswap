@@ -1,9 +1,11 @@
 "use client"
 
 import { useState } from "react"
+import { useToast } from "@/components/ui/toast"
 
 /** Lets someone whose link expired request a fresh confirmation email. */
 export function ResendVerification() {
+  const toast = useToast()
   const [email, setEmail] = useState("")
   const [state, setState] = useState<"idle" | "sending" | "sent">("idle")
 
@@ -21,14 +23,7 @@ export function ResendVerification() {
       /* always show a neutral confirmation */
     }
     setState("sent")
-  }
-
-  if (state === "sent") {
-    return (
-      <p className="mt-6 text-sm text-[var(--teal)] font-medium">
-        If that account still needs confirming, a new link is on its way. Check your inbox.
-      </p>
-    )
+    toast("If that account still needs confirming, a new link is on its way.", "success")
   }
 
   return (
@@ -43,10 +38,10 @@ export function ResendVerification() {
       />
       <button
         type="submit"
-        disabled={state === "sending"}
+        disabled={state !== "idle"}
         className="py-2.5 px-5 rounded-xl text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] disabled:opacity-50 transition-colors"
       >
-        {state === "sending" ? "Sending…" : "Resend link"}
+        {state === "sending" ? "Sending…" : state === "sent" ? "Sent" : "Resend link"}
       </button>
     </form>
   )

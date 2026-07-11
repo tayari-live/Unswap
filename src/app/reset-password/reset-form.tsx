@@ -4,25 +4,25 @@ import { useState } from "react"
 import Link from "next/link"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Eye, EyeOff, CheckCircle2 } from "lucide-react"
+import { useToast } from "@/components/ui/toast"
 
 export function ResetForm() {
   const params = useSearchParams()
   const router = useRouter()
+  const toast = useToast()
   const token = params.get("token") || ""
 
   const [password, setPassword] = useState("")
   const [confirm, setConfirm] = useState("")
   const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const [done, setDone] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError("")
-    if (password.length < 8) return setError("Password must be at least 8 characters.")
-    if (password !== confirm) return setError("Passwords do not match.")
-    if (!token) return setError("This reset link is missing its token.")
+    if (password.length < 8) return toast("Password must be at least 8 characters.", "error")
+    if (password !== confirm) return toast("Passwords do not match.", "error")
+    if (!token) return toast("This reset link is missing its token.", "error")
 
     setLoading(true)
     try {
@@ -33,14 +33,15 @@ export function ResetForm() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error || "Could not reset your password.")
+        toast(data.error || "Could not reset your password.", "error")
         setLoading(false)
         return
       }
       setDone(true)
+      toast("Password updated.", "success")
       setTimeout(() => router.push("/login"), 2500)
     } catch {
-      setError("Something went wrong. Please try again.")
+      toast("Something went wrong. Please try again.", "error")
       setLoading(false)
     }
   }
@@ -69,12 +70,6 @@ export function ResetForm() {
       <p className="mt-2 text-neutral text-sm">Enter a new password for your account.</p>
 
       <form className="mt-7 space-y-5" onSubmit={handleSubmit}>
-        {error && (
-          <div className="bg-[var(--crimson)]/10 border-l-4 border-[var(--crimson)] p-3 rounded-lg">
-            <p className="text-sm text-[var(--crimson)] font-medium">{error}</p>
-          </div>
-        )}
-
         <div>
           <label htmlFor="password" className="block text-xs font-semibold uppercase tracking-wider text-[var(--navy)] mb-2">
             New Password

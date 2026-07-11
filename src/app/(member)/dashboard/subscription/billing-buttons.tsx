@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { useToast } from "@/components/ui/toast"
 
 export function CheckoutButton({
   tier,
@@ -12,12 +13,11 @@ export function CheckoutButton({
   label: string
   variant?: "primary" | "ghost" | "gold"
 }) {
+  const toast = useToast()
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
 
   async function go() {
     setLoading(true)
-    setError("")
     try {
       const res = await fetch("/api/billing/checkout", {
         method: "POST",
@@ -26,13 +26,13 @@ export function CheckoutButton({
       })
       const data = await res.json()
       if (!res.ok || !data.url) {
-        setError(data.error || "Could not start checkout.")
+        toast(data.error || "Could not start checkout.", "error")
         setLoading(false)
         return
       }
       window.location.href = data.url
     } catch {
-      setError("Something went wrong.")
+      toast("Something went wrong.", "error")
       setLoading(false)
     }
   }
@@ -45,16 +45,13 @@ export function CheckoutButton({
         : "bg-[var(--gold-dark)] text-white hover:bg-[var(--gold-hover)]"
 
   return (
-    <div>
-      <button
-        onClick={go}
-        disabled={loading}
-        className={`w-full text-center text-sm font-semibold py-2.5 px-4 rounded-xl transition-colors disabled:opacity-50 ${styles}`}
-      >
-        {loading ? "Redirecting…" : label}
-      </button>
-      {error && <p className="mt-1.5 text-xs text-[var(--crimson)] font-medium">{error}</p>}
-    </div>
+    <button
+      onClick={go}
+      disabled={loading}
+      className={`w-full text-center text-sm font-semibold py-2.5 px-4 rounded-xl transition-colors disabled:opacity-50 ${styles}`}
+    >
+      {loading ? "Redirecting…" : label}
+    </button>
   )
 }
 
