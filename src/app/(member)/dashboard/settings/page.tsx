@@ -49,7 +49,7 @@ export default async function SettingsPage() {
       icon: Bell,
       title: "Notifications",
       desc: "Email preferences",
-      href: "/dashboard/notifications",
+      href: "/dashboard/settings/notifications",
     },
   ]
 

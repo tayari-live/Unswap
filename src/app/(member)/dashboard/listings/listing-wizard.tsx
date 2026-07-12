@@ -11,6 +11,7 @@ import {
   type LucideIcon,
 } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
+import { COUNTRIES } from "@/lib/geo"
 
 const PROPERTY_TYPES: { v: string; icon: LucideIcon }[] = [
   { v: "Apartment", icon: Building2 },
@@ -294,6 +295,11 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
     }
   }
 
+  // Keep a previously-saved country selectable even if it's not in the list.
+  const countryOptions = COUNTRIES.includes(v.country) || !v.country
+    ? COUNTRIES
+    : [v.country, ...COUNTRIES]
+
   const section = SCREENS[step].section
   // Per-section fill: fraction of that section's screens already passed.
   const fillFor = (i: number) => {
@@ -354,7 +360,13 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div><label className={label}>City</label><input className={input} value={v.city} onChange={(e) => set("city", e.target.value)} placeholder="Geneva" /></div>
-                <div><label className={label}>Country</label><input className={input} value={v.country} onChange={(e) => set("country", e.target.value)} placeholder="Switzerland" /></div>
+                <div>
+                  <label className={label}>Country</label>
+                  <select className={input} value={v.country} onChange={(e) => set("country", e.target.value)}>
+                    <option value="">Select…</option>
+                    {countryOptions.map((c) => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
               </div>
               <div>
                 <label className={label}>Neighbourhood <span className="text-neutral normal-case font-normal">(shown publicly)</span></label>

@@ -141,13 +141,14 @@ export default function LandingPage() {
           <source src="/videos/hero.mp4" type="video/mp4" />
         </video>
         
-        {/* Overlay to ensure text legibility while maintaining brand color */}
-        <div className="absolute inset-0 bg-[var(--navy)]/60 backdrop-blur-[2px]" />
-        
-        {/* Soft light from upper-right + faint gold wash */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(255,255,255,0.15),transparent_60%)]" />
+        {/* Overlay — lighter in the centre so the video reads clearly, with a
+            darker top/bottom band to keep the nav and hero text legible. */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[var(--navy)]/65 via-[var(--navy)]/25 to-[var(--navy)]/70" />
 
-        <div className="relative w-full max-w-[1200px] mx-auto px-6 py-20 flex flex-col items-center text-center mt-10">
+        {/* Soft light from upper-right + faint gold wash */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(255,255,255,0.12),transparent_60%)]" />
+
+        <div className="relative w-full max-w-[1200px] mx-auto px-6 py-20 flex flex-col items-center text-center mt-10 [text-shadow:_0_2px_24px_rgba(6,12,34,0.55)]">
           <h1 className="font-display font-bold leading-[1.05] tracking-tight text-[clamp(3rem,7vw,5.5rem)] text-balance">
             Exchange Homes.<br />Not Money.
           </h1>

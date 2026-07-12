@@ -12,7 +12,6 @@ import {
   type MemberNotification,
 } from "@/server/services/member-notifications"
 import { PageHeader } from "@/components/ui/page-header"
-import { NotificationPrefs } from "./notification-prefs"
 
 export const dynamic = "force-dynamic"
 
@@ -43,7 +42,7 @@ export default async function NotificationsPage() {
     getMemberNotifications(userId),
     prisma.user.findUnique({
       where: { id: userId },
-      select: { notifySwaps: true, notifyMessages: true, notifyReviews: true, notifyReminders: true, notifyMarketing: true, notificationsSeenAt: true },
+      select: { notificationsSeenAt: true },
     }),
   ])
 
@@ -57,8 +56,6 @@ export default async function NotificationsPage() {
   return (
     <div className="max-w-2xl mx-auto pb-12">
       <PageHeader title="Notifications" subtitle="Everything that needs your attention, in one place." />
-
-      {user && <NotificationPrefs initial={user} />}
 
       {items.length === 0 ? (
         <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-12 text-center">

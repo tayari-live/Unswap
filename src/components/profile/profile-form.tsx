@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { UploadCloud, X, Check } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
+import { NATIONALITIES } from "@/lib/geo"
 
 const ORGANISATIONS = [
   "United Nations", "UNDP", "UNICEF", "WHO", "UNHCR", "IMF", "World Bank Group",
@@ -81,6 +82,10 @@ export function ProfileForm({
   const orgOptions = ORGANISATIONS.includes(v.organisation) || !v.organisation
     ? ORGANISATIONS
     : [v.organisation, ...ORGANISATIONS]
+  // Keep any previously-saved value selectable even if it's not in the canonical list.
+  const nationalityOptions = NATIONALITIES.includes(v.nationality) || !v.nationality
+    ? NATIONALITIES
+    : [v.nationality, ...NATIONALITIES]
 
   return (
     <form onSubmit={submit} className="space-y-5">
@@ -121,7 +126,10 @@ export function ProfileForm({
         </div>
         <div>
           <label htmlFor="nationality" className={labelCls}>Nationality</label>
-          <input id="nationality" value={v.nationality} onChange={(e) => set("nationality", e.target.value)} className={inputCls} placeholder="Nigerian" />
+          <select id="nationality" value={v.nationality} onChange={(e) => set("nationality", e.target.value)} className={inputCls}>
+            <option value="">Select…</option>
+            {nationalityOptions.map((n) => <option key={n} value={n}>{n}</option>)}
+          </select>
         </div>
       </div>
 
