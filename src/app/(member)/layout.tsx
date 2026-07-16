@@ -44,7 +44,7 @@ export default async function MemberLayout({
       <MemberTopbar name={u.name || ""} initials={initials} image={u.image || null} verificationStatus={dbUser.verificationStatus} />
       <div className="flex flex-1 overflow-hidden">
         <div className="hidden md:block">
-          <MemberSidebar />
+          <MemberSidebar name={u.name || ""} initials={initials} image={u.image || null} verificationStatus={dbUser.verificationStatus} />
         </div>
         <main className="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8">
           {children}
