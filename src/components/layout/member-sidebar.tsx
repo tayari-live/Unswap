@@ -3,7 +3,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { signOut } from "next-auth/react"
 import { UserCircle, Settings, LogOut, BadgeCheck, Clock, ShieldAlert, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -75,18 +75,24 @@ export function MemberSidebar({
       onMouseEnter={() => setCollapsed(false)}
       onMouseLeave={() => setCollapsed(true)}
       className={cn(
-        "flex flex-col bg-white border-r border-border h-full transition-all duration-300 shadow-[2px_0_15px_rgba(0,0,0,0.04)] z-20 relative",
+        // Navy rail: subtle top-to-bottom gradient with a gold hairline on the right edge.
+        "flex flex-col h-full transition-all duration-300 relative z-20 text-white",
+        "bg-gradient-to-b from-[var(--navy)] to-[var(--navy-dark)]",
+        "border-r border-white/10 shadow-[2px_0_24px_rgba(7,23,43,0.35)]",
+        "after:absolute after:inset-y-0 after:right-0 after:w-px after:bg-gradient-to-b after:from-transparent after:via-[var(--gold)]/40 after:to-transparent",
         collapsed ? "w-20" : "w-64",
       )}
     >
       {/* Logo */}
       <Link href="/dashboard" className="flex items-center gap-2.5 px-5 pt-5 pb-4 overflow-hidden">
         <Image src="/unswap-logo.png" alt="UnSwap" width={80} height={80} priority className="w-9 h-9 flex-shrink-0 object-contain" />
-        <span className={cn("font-display font-bold text-xl text-navy", label(!collapsed))}>UnSwap</span>
+        <span className={cn("font-display font-bold text-xl text-white", label(!collapsed))}>UnSwap</span>
       </Link>
 
+      <div className="mx-4 h-px bg-white/10" />
+
       {/* Main nav */}
-      <nav className="flex-1 px-3 pb-4 space-y-1.5 overflow-y-auto no-scrollbar">
+      <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto no-scrollbar">
         {mainNav.map((item) => {
           // Home matches exactly so it doesn't stay active on /dashboard/*.
           const isActive =
@@ -101,16 +107,23 @@ export function MemberSidebar({
               href={item.href}
               title={collapsed ? item.name : undefined}
               className={cn(
-                "relative flex items-center gap-3 py-3 px-3 mx-1 rounded-xl text-[13px] font-bold transition-all duration-200 overflow-hidden",
-                isActive ? "bg-navy text-white shadow-md border border-navy" : "text-navy/60 hover:bg-navy/5 hover:text-navy",
+                "group relative flex items-center gap-3 py-3 px-3 mx-1 rounded-xl text-[13px] font-bold transition-all duration-200 overflow-hidden",
+                isActive
+                  ? "bg-gradient-to-r from-[var(--gold)]/25 via-[var(--gold)]/10 to-transparent text-white ring-1 ring-inset ring-[var(--gold)]/25"
+                  : "text-white/55 hover:bg-white/5 hover:text-white",
               )}
             >
-              <item.icon size={20} className={cn("flex-shrink-0 transition-colors", isActive ? "text-gold" : "text-navy/40")} />
+              {/* Gold accent bar on the active item */}
+              {isActive && <span className="absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-[var(--gold)]" />}
+              <item.icon
+                size={20}
+                className={cn("flex-shrink-0 transition-colors", isActive ? "text-[var(--gold)]" : "text-white/40 group-hover:text-white/70")}
+              />
               <span className={cn("flex-1", label(!collapsed))}>{item.name}</span>
               {badge > 0 && (
                 <span
                   className={cn(
-                    "rounded-full bg-gold text-navy font-bold flex items-center justify-center shadow-sm",
+                    "rounded-full bg-[var(--gold)] text-[var(--navy)] font-bold flex items-center justify-center shadow-sm",
                     collapsed ? "absolute top-1 left-7 w-3 h-3 min-w-3 p-0 text-[0px]" : "ml-auto min-w-5 h-5 px-1.5 text-[11px]",
                   )}
                 >
@@ -123,7 +136,7 @@ export function MemberSidebar({
       </nav>
 
       {/* Account footer */}
-      <div className="mt-auto border-t border-border bg-[var(--background)] p-2 relative">
+      <div className="mt-auto border-t border-white/10 bg-black/20 p-2 relative">
         {/* Inline account menu (opens upward, stays inside the rail) */}
         {accountOpen && !collapsed && (
           <div className="mb-1.5 space-y-0.5">
@@ -135,7 +148,7 @@ export function MemberSidebar({
             <button
               type="button"
               onClick={() => signOut({ callbackUrl: "/login" })}
-              className="w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-[13px] font-semibold text-[var(--crimson)] hover:bg-[var(--crimson)]/10 transition-colors"
+              className="w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-[13px] font-semibold text-red-300 hover:bg-red-400/10 hover:text-red-200 transition-colors"
             >
               <LogOut size={18} className="flex-shrink-0" />
               Sign out
@@ -148,31 +161,31 @@ export function MemberSidebar({
           type="button"
           onClick={() => !collapsed && setAccountOpen((o) => !o)}
           title={collapsed ? name : undefined}
-          className="w-full flex items-center gap-3 py-2 px-2 rounded-xl hover:bg-navy/5 transition-colors overflow-hidden"
+          className="w-full flex items-center gap-3 py-2 px-2 rounded-xl hover:bg-white/5 transition-colors overflow-hidden"
         >
-          <span className="relative w-9 h-9 flex-shrink-0 rounded-full bg-navy/10 border-2 border-gold/40 flex items-center justify-center overflow-hidden">
+          <span className="relative w-9 h-9 flex-shrink-0 rounded-full bg-white/10 border-2 border-[var(--gold)]/50 flex items-center justify-center overflow-hidden">
             {image ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={image} alt="" className="w-full h-full object-cover" />
             ) : (
-              <span className="text-xs font-bold text-navy">{initials || "M"}</span>
+              <span className="text-xs font-bold text-white">{initials || "M"}</span>
             )}
             {/* Collapsed: dot when there's any account-area activity */}
-            {collapsed && notifs > 0 && <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-gold border border-white" />}
+            {collapsed && notifs > 0 && <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[var(--gold)] border border-[var(--navy-dark)]" />}
           </span>
           <span className={cn("flex-1 min-w-0 text-left", label(!collapsed))}>
-            <span className="block text-[13px] font-bold text-navy truncate">{name || "Member"}</span>
+            <span className="block text-[13px] font-bold text-white truncate">{name || "Member"}</span>
             {v ? (
               <span className={cn("flex items-center gap-1 text-[11px] font-semibold", v.tone)}>
                 <v.icon size={11} /> {v.label}
               </span>
             ) : (
-              <Link href="/verify-identity" onClick={(e) => e.stopPropagation()} className="flex items-center gap-1 text-[11px] font-semibold text-[var(--gold-dark)] hover:underline">
+              <Link href="/verify-identity" onClick={(e) => e.stopPropagation()} className="flex items-center gap-1 text-[11px] font-semibold text-[var(--gold)] hover:underline">
                 <ShieldAlert size={11} /> Verify now
               </Link>
             )}
           </span>
-          <ChevronDown size={16} className={cn("text-navy/40 flex-shrink-0 transition-transform", label(!collapsed), accountOpen && "rotate-180")} />
+          <ChevronDown size={16} className={cn("text-white/40 flex-shrink-0 transition-transform", label(!collapsed), accountOpen && "rotate-180")} />
         </button>
       </div>
     </div>
@@ -197,13 +210,13 @@ function AccountLink({
       href={href}
       className={cn(
         "flex items-center gap-3 py-2.5 px-3 rounded-xl text-[13px] font-semibold transition-colors",
-        active ? "bg-navy text-white" : "text-navy/70 hover:bg-navy/5 hover:text-navy",
+        active ? "bg-white/10 text-white ring-1 ring-inset ring-white/10" : "text-white/70 hover:bg-white/5 hover:text-white",
       )}
     >
-      <Icon size={18} className={cn("flex-shrink-0", active ? "text-gold" : "text-navy/40")} />
+      <Icon size={18} className={cn("flex-shrink-0", active ? "text-[var(--gold)]" : "text-white/40")} />
       <span className="flex-1">{label}</span>
       {badge > 0 && (
-        <span className="min-w-5 h-5 px-1.5 rounded-full bg-gold text-navy text-[11px] font-bold flex items-center justify-center">{badge}</span>
+        <span className="min-w-5 h-5 px-1.5 rounded-full bg-[var(--gold)] text-[var(--navy)] text-[11px] font-bold flex items-center justify-center">{badge}</span>
       )}
     </Link>
   )

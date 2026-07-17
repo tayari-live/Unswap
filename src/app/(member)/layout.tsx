@@ -2,7 +2,6 @@ import { redirect } from "next/navigation"
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
 import { MemberSidebar } from "@/components/layout/member-sidebar"
-import { MemberTopbar } from "@/components/layout/member-topbar"
 import { MobileNav } from "@/components/layout/mobile-nav"
 import { AppAssistant } from "@/components/assistant/app-assistant"
 
@@ -40,16 +39,13 @@ export default async function MemberLayout({
     .toUpperCase()
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-[var(--background)]">
-      <MemberTopbar name={u.name || ""} initials={initials} image={u.image || null} verificationStatus={dbUser.verificationStatus} />
-      <div className="flex flex-1 overflow-hidden">
-        <div className="hidden md:block">
-          <MemberSidebar name={u.name || ""} initials={initials} image={u.image || null} verificationStatus={dbUser.verificationStatus} />
-        </div>
-        <main className="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8">
-          {children}
-        </main>
+    <div className="flex h-screen overflow-hidden bg-[var(--background)]">
+      <div className="hidden md:block">
+        <MemberSidebar name={u.name || ""} initials={initials} image={u.image || null} verificationStatus={dbUser.verificationStatus} />
       </div>
+      <main className="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8">
+        {children}
+      </main>
       <MobileNav variant="member" />
       <AppAssistant />
     </div>
