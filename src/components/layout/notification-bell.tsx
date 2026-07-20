@@ -14,7 +14,14 @@ type Notification = {
   createdAt: string
 }
 
-export function NotificationBell() {
+export function NotificationBell({
+  panelClassName,
+  buttonClassName,
+}: {
+  // Override the dropdown position (e.g. open upward from a sidebar footer).
+  panelClassName?: string
+  buttonClassName?: string
+} = {}) {
   const [open, setOpen] = useState(false)
   const [items, setItems] = useState<Notification[]>([])
   const ref = useRef<HTMLDivElement>(null)
@@ -51,7 +58,7 @@ export function NotificationBell() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((v) => !v)}
-        className="relative hover:text-[var(--gold-dark)] transition-colors"
+        className={buttonClassName ?? "relative hover:text-[var(--gold-dark)] transition-colors"}
         aria-label="Notifications"
       >
         <Bell size={20} />
@@ -63,7 +70,7 @@ export function NotificationBell() {
       </button>
 
       {open && (
-        <div className="fixed top-[72px] left-4 right-4 sm:absolute sm:top-full sm:left-auto sm:right-0 sm:mt-2 sm:w-80 bg-surface rounded-xl shadow-lg border border-[var(--border)] z-50 overflow-hidden">
+        <div className={panelClassName ?? "fixed top-[72px] left-4 right-4 sm:absolute sm:top-full sm:left-auto sm:right-0 sm:mt-2 sm:w-80 bg-surface rounded-xl shadow-lg border border-[var(--border)] z-50 overflow-hidden"}>
           <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)]">
             <span className="text-sm font-semibold text-[var(--navy)]">Notifications</span>
             {unread > 0 && (

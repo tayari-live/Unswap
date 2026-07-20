@@ -1,7 +1,5 @@
-import { Sidebar } from "@/components/layout/sidebar"
-import { Header } from "@/components/layout/header"
+import { AdminSidebar } from "@/components/layout/admin-sidebar"
 import { MobileNav } from "@/components/layout/mobile-nav"
-import { ProfileProvider } from "@/context/profile-context"
 import { auth } from "@/server/auth"
 import { redirect } from "next/navigation"
 
@@ -30,25 +28,14 @@ export default async function DashboardLayout({
     .toUpperCase()
 
   return (
-    <ProfileProvider
-      initial={{
-        name: u.name || "",
-        image: u.image || null,
-        initials,
-      }}
-    >
-      <div className="flex flex-col h-screen overflow-hidden bg-[var(--background)]">
-        <Header />
-        <div className="flex flex-1 overflow-hidden">
-          <div className="hidden md:block">
-            <Sidebar />
-          </div>
-          <main className="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8">
-            {children}
-          </main>
-        </div>
-        <MobileNav />
+    <div className="flex h-screen overflow-hidden bg-[var(--background)]">
+      <div className="hidden md:block">
+        <AdminSidebar name={u.name || ""} initials={initials} image={u.image || null} />
       </div>
-    </ProfileProvider>
+      <main className="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8">
+        {children}
+      </main>
+      <MobileNav />
+    </div>
   )
 }
