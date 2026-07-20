@@ -38,6 +38,8 @@ export default async function ConversationPage({
       initialMessages={initialMessages}
       swapRequest={convo.swapRequest}
       initialOtherLastReadAt={convo.otherLastReadAt ? convo.otherLastReadAt.toISOString() : null}
+      initialOtherLastSeenAt={convo.otherLastSeenAt ? convo.otherLastSeenAt.toISOString() : null}
+      initialOtherOnline={convo.otherOnline}
     />
   )
 }

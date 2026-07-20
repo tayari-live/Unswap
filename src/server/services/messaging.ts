@@ -8,10 +8,23 @@ const esc = (s: string) =>
   s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c] as string))
 
 const ATTACH_MAX_CHARS = 13_000_000 // ~10 MB encoded
-const IMAGE_DATA_URL = /^data:image\/(png|jpe?g|webp|gif);base64,/
+// Chat attachments: images plus common documents (PDF, Office, text/CSV).
+const ATTACHMENT_DATA_URL =
+  /^data:(image\/(png|jpe?g|webp|gif)|application\/pdf|application\/msword|application\/vnd\.openxmlformats-officedocument\.(wordprocessingml\.document|spreadsheetml\.sheet|presentationml\.presentation)|application\/vnd\.ms-(excel|powerpoint)|text\/(plain|csv));base64,/
+
+// A member counts as "online" if seen within this window (heartbeat is ~10s).
+const ONLINE_WINDOW_MS = 35_000
+function onlineFrom(lastSeenAt: Date | null | undefined) {
+  return !!lastSeenAt && Date.now() - new Date(lastSeenAt).getTime() < ONLINE_WINDOW_MS
+}
+
+/** Bump the member's presence timestamp (called from frequent authed polls). */
+export function touchLastSeen(userId: string) {
+  return prisma.user.update({ where: { id: userId }, data: { lastSeenAt: new Date() } })
+}
 
 const PARTICIPANT_USER = {
-  select: { id: true, fullName: true, avatarInitials: true, organisation: true, verificationStatus: true },
+  select: { id: true, fullName: true, avatarInitials: true, organisation: true, verificationStatus: true, lastSeenAt: true },
 } as const
 
 /** Messaging is reserved for fully verified members (the walled garden). */
@@ -76,7 +89,7 @@ export async function listConversations(userId: string) {
       const last = p.conversation.messages[0]
       return {
         id: p.conversationId,
-        other,
+        other: other ? { ...other, online: onlineFrom(other.lastSeenAt) } : other,
         lastMessage: last ? { body: last.body, createdAt: last.createdAt, hasAttachment: !!last.attachmentUrl } : null,
         lastMessageAt: p.conversation.lastMessageAt,
         unread,
@@ -133,9 +146,11 @@ export async function getConversationForUser(userId: string, conversationId: str
     other: otherParticipant?.user,
     messages: convo.messages,
     swapRequest: convo.swapRequest,
-    // Read-receipt + typing signals for the other party.
+    // Read-receipt, typing, and presence signals for the other party.
     otherLastReadAt: otherParticipant?.lastReadAt ?? null,
     otherTyping: isRecent(otherParticipant?.typingAt),
+    otherLastSeenAt: otherParticipant?.user.lastSeenAt ?? null,
+    otherOnline: onlineFrom(otherParticipant?.user.lastSeenAt),
   }
 }
 
@@ -158,18 +173,22 @@ export async function setTyping(userId: string, conversationId: string) {
   return { ok: true }
 }
 
-/** Lightweight read/typing status for the open thread (no message payload). */
+/** Lightweight read/typing/presence status for the open thread (no messages). */
 export async function getConversationStatus(userId: string, conversationId: string) {
   const parts = await prisma.conversationParticipant.findMany({
     where: { conversationId },
-    select: { userId: true, lastReadAt: true, typingAt: true },
+    select: { userId: true, lastReadAt: true, typingAt: true, user: { select: { lastSeenAt: true } } },
   })
   const me = parts.find((p) => p.userId === userId)
   if (!me) throw new ApiError(404, "Conversation not found.")
+  // Viewing a thread counts as presence, on any device.
+  await touchLastSeen(userId)
   const other = parts.find((p) => p.userId !== userId)
   return {
     otherLastReadAt: other?.lastReadAt ?? null,
     otherTyping: isRecent(other?.typingAt),
+    otherLastSeenAt: other?.user.lastSeenAt ?? null,
+    otherOnline: onlineFrom(other?.user.lastSeenAt),
   }
 }
 
@@ -196,7 +215,7 @@ export async function sendMessage(input: {
   const body = input.body?.trim() ?? ""
   let attachmentUrl = input.attachmentUrl
   if (attachmentUrl) {
-    if (!IMAGE_DATA_URL.test(attachmentUrl)) throw new ApiError(400, "Attachments must be an image.")
+    if (!ATTACHMENT_DATA_URL.test(attachmentUrl)) throw new ApiError(400, "Unsupported attachment type.")
     if (attachmentUrl.length > ATTACH_MAX_CHARS) throw new ApiError(413, "Attachment is too large (max 10 MB).")
   }
   if (!body && !attachmentUrl) throw new ApiError(400, "Message cannot be empty.")

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react"
 import Link from "next/link"
-import { ArrowLeft, Send, ImagePlus, X, BadgeCheck, Check, CheckCheck } from "lucide-react"
+import { ArrowLeft, Send, Paperclip, X, BadgeCheck, Check, CheckCheck, FileText } from "lucide-react"
 import { ReportButton } from "@/components/report-button"
 import { useToast } from "@/components/ui/toast"
 
@@ -10,9 +10,44 @@ type Msg = { id: string; senderId: string; body: string; attachmentUrl: string |
 type Other = { id: string; fullName: string; avatarInitials: string; verificationStatus: string; organisation?: string | null } | null
 
 const MAX_BYTES = 10 * 1024 * 1024
+// Attachment types accepted by the composer (mirrors the server allowlist).
+const ATTACH_ACCEPT = "image/*,application/pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv"
+const ATTACH_DOC_TYPES = new Set([
+  "application/pdf", "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  "text/plain", "text/csv",
+])
+
+const isImageData = (url: string) => url.startsWith("data:image/")
+// Human label for a non-image attachment, derived from its data-URL mime.
+function fileKind(url: string) {
+  if (url.startsWith("data:application/pdf")) return "PDF document"
+  if (url.includes("word")) return "Word document"
+  if (url.includes("spreadsheet") || url.includes("excel") || url.startsWith("data:text/csv")) return "Spreadsheet"
+  if (url.includes("presentation") || url.includes("powerpoint")) return "Presentation"
+  if (url.startsWith("data:text/")) return "Text file"
+  return "Attachment"
+}
 
 function clock(iso: string) {
   return new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit" }).format(new Date(iso))
+}
+
+// "last seen today at 14:30" / "…yesterday at 14:30" / "…on 12 Jul".
+function lastSeenLabel(iso: string | null) {
+  if (!iso) return "Offline"
+  const d = new Date(iso)
+  const now = new Date()
+  const days = Math.round(
+    (new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() -
+      new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()) / 86_400_000,
+  )
+  const t = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit" }).format(d)
+  if (days === 0) return `last seen today at ${t}`
+  if (days === 1) return `last seen yesterday at ${t}`
+  return `last seen ${new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short" }).format(d)}`
 }
 
 // Calendar-day key, so messages can be grouped under date separators.
@@ -45,6 +80,8 @@ export function Thread({
   initialMessages,
   swapRequest,
   initialOtherLastReadAt = null,
+  initialOtherLastSeenAt = null,
+  initialOtherOnline = false,
 }: {
   conversationId: string
   currentUserId: string
@@ -52,6 +89,8 @@ export function Thread({
   initialMessages: Msg[]
   swapRequest?: any
   initialOtherLastReadAt?: string | null
+  initialOtherLastSeenAt?: string | null
+  initialOtherOnline?: boolean
 }) {
   const toast = useToast()
   const [messages, setMessages] = useState<Msg[]>(initialMessages)
@@ -60,6 +99,8 @@ export function Thread({
   const [sending, setSending] = useState(false)
   const [otherLastReadAt, setOtherLastReadAt] = useState<string | null>(initialOtherLastReadAt)
   const [otherTyping, setOtherTyping] = useState(false)
+  const [otherOnline, setOtherOnline] = useState(initialOtherOnline)
+  const [otherLastSeenAt, setOtherLastSeenAt] = useState<string | null>(initialOtherLastSeenAt)
   const bottomRef = useRef<HTMLDivElement>(null)
   const lastTypingPing = useRef(0)
 
@@ -68,17 +109,23 @@ export function Thread({
       const res = await fetch(`/api/conversations/${conversationId}`, { cache: "no-store" })
       if (res.ok) {
         const data = await res.json()
-        setMessages(data.messages)
+        // Reconcile server truth without dropping still-in-flight optimistic sends.
+        setMessages((prev) => {
+          const optimistic = prev.filter((m) => m.id.startsWith("temp-"))
+          return [...data.messages, ...optimistic]
+        })
         setOtherLastReadAt(data.otherLastReadAt ?? null)
         setOtherTyping(!!data.otherTyping)
+        setOtherOnline(!!data.otherOnline)
+        setOtherLastSeenAt(data.otherLastSeenAt ?? null)
       }
     } catch {
       /* ignore transient poll errors */
     }
   }, [conversationId])
 
-  // Cheap status poll (read receipts + typing) — runs faster than the message
-  // poll so "typing…" and read ticks feel responsive without re-fetching bodies.
+  // Cheap status poll (read receipts + typing + presence) — runs faster than the
+  // message poll so "typing…", read ticks, and online state feel responsive.
   const pollStatus = useCallback(async () => {
     try {
       const res = await fetch(`/api/conversations/${conversationId}/typing`, { cache: "no-store" })
@@ -86,6 +133,8 @@ export function Thread({
         const data = await res.json()
         setOtherLastReadAt(data.otherLastReadAt ?? null)
         setOtherTyping(!!data.otherTyping)
+        setOtherOnline(!!data.otherOnline)
+        setOtherLastSeenAt(data.otherLastSeenAt ?? null)
       }
     } catch {
       /* ignore transient poll errors */
@@ -125,33 +174,56 @@ export function Thread({
 
   function pickFile(file: File | undefined) {
     if (!file) return
-    if (!file.type.startsWith("image/")) return toast("Attachments must be an image.", "error")
-    if (file.size > MAX_BYTES) return toast("Image is over 10 MB.", "error")
+    const ok = file.type.startsWith("image/") || ATTACH_DOC_TYPES.has(file.type)
+    if (!ok) return toast("Unsupported file type. Use an image, PDF, or document.", "error")
+    if (file.size > MAX_BYTES) return toast("File is over 10 MB.", "error")
     const reader = new FileReader()
     reader.onload = () => setAttachment(reader.result as string)
     reader.readAsDataURL(file)
   }
 
-  async function send(e?: React.FormEvent, presetBody?: string) {
+  async function send(e?: React.FormEvent) {
     if (e) e.preventDefault()
     if (sending) return
-    const finalBody = presetBody ?? body
-    if (!finalBody.trim() && !attachment) return
+    const text = body.trim()
+    const sentAttachment = attachment
+    if (!text && !sentAttachment) return
+
+    // Optimistic: show the message immediately (this also triggers auto-scroll),
+    // then reconcile the temp id with the server's once the POST returns.
+    const tempId = `temp-${Date.now()}`
+    const optimistic: Msg = { id: tempId, senderId: currentUserId, body: text, attachmentUrl: sentAttachment, createdAt: new Date().toISOString() }
+    setMessages((m) => [...m, optimistic])
+    setBody("")
+    setAttachment(null)
     setSending(true)
     try {
       const res = await fetch(`/api/conversations/${conversationId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ body: finalBody, attachmentUrl: attachment }),
+        body: JSON.stringify({ body: text, attachmentUrl: sentAttachment }),
       })
       if (!res.ok) {
         const d = await res.json().catch(() => ({}))
         toast(d.error || "Could not send.", "error")
+        setMessages((m) => m.filter((x) => x.id !== tempId)) // roll back
+        setBody(text)
+        setAttachment(sentAttachment)
       } else {
-        if (!presetBody) setBody("")
-        setAttachment(null)
-        await refresh()
+        const real = await res.json()
+        setMessages((m) =>
+          m.map((x) =>
+            x.id === tempId
+              ? { id: real.id, senderId: real.senderId, body: real.body, attachmentUrl: real.attachmentUrl, createdAt: real.createdAt }
+              : x,
+          ),
+        )
       }
+    } catch {
+      toast("Could not send. Please try again.", "error")
+      setMessages((m) => m.filter((x) => x.id !== tempId))
+      setBody(text)
+      setAttachment(sentAttachment)
     } finally {
       setSending(false)
     }
@@ -186,13 +258,24 @@ export function Thread({
           <Link href="/dashboard/messages" className="md:hidden text-neutral hover:text-[var(--navy)] mr-2">
             <ArrowLeft size={20} />
           </Link>
-          <div className="w-8 h-8 rounded-full bg-[var(--navy)]/10 text-[var(--navy)] flex items-center justify-center text-xs font-bold flex-shrink-0">
-            {other?.avatarInitials ?? "?"}
+          <div className="relative flex-shrink-0">
+            <div className="w-8 h-8 rounded-full bg-[var(--navy)]/10 text-[var(--navy)] flex items-center justify-center text-xs font-bold">
+              {other?.avatarInitials ?? "?"}
+            </div>
+            {otherOnline && (
+              <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-green-500 border-2 border-white" aria-label="Online" />
+            )}
           </div>
           <div className="min-w-0">
             <div className="font-bold text-[var(--navy)] truncate leading-tight">{other?.fullName ?? "Member"}</div>
             {otherTyping ? (
               <div className="text-[11px] text-[var(--teal)] font-semibold truncate">typing…</div>
+            ) : otherOnline ? (
+              <div className="text-[11px] text-green-600 font-semibold truncate flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500" /> Online
+              </div>
+            ) : otherLastSeenAt ? (
+              <div className="text-[11px] text-neutral truncate">{lastSeenLabel(otherLastSeenAt)}</div>
             ) : other?.organisation ? (
               <div className="text-[11px] text-neutral truncate">{other.organisation}</div>
             ) : null}
@@ -243,8 +326,26 @@ export function Thread({
                   )}
                   <div className={`max-w-[75%] rounded-2xl px-4 py-3 shadow-sm ${mine ? "bg-[#f4efe8] text-[var(--navy)] rounded-br-sm" : "bg-white border border-[var(--border)] text-[var(--navy)] rounded-bl-sm"}`}>
                     {m.attachmentUrl && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={m.attachmentUrl} alt="attachment" className="rounded-lg mb-2 max-h-60 object-cover" />
+                      isImageData(m.attachmentUrl) ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={m.attachmentUrl} alt="attachment" className="rounded-lg mb-2 max-h-60 object-cover" />
+                      ) : (
+                        <a
+                          href={m.attachmentUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          download
+                          className="flex items-center gap-2.5 mb-2 rounded-lg border border-[var(--border)] bg-white/70 px-3 py-2.5 hover:bg-white transition-colors"
+                        >
+                          <span className="w-8 h-8 rounded-lg bg-[var(--navy)]/10 text-[var(--navy)] flex items-center justify-center flex-shrink-0">
+                            <FileText size={16} />
+                          </span>
+                          <span className="min-w-0">
+                            <span className="block text-xs font-semibold text-[var(--navy)] truncate">{fileKind(m.attachmentUrl)}</span>
+                            <span className="block text-[10px] text-neutral">Tap to open</span>
+                          </span>
+                        </a>
+                      )
                     )}
                     {m.body && <p className="text-sm whitespace-pre-wrap break-words">{m.body}</p>}
                     <div className={`text-[10px] mt-1.5 text-neutral/70 font-medium flex items-center gap-1 ${mine ? "justify-end" : ""}`}>
@@ -284,22 +385,28 @@ export function Thread({
 
         {/* Composer Area */}
         <div className="bg-white border-t border-[var(--border)] p-4 relative z-10 shadow-[0_-4px_10px_rgba(0,0,0,0.02)]">
-          {/* Quick Responses */}
-          <div className="flex items-center gap-0 overflow-x-auto pb-3 mb-1 no-scrollbar border-b border-[var(--border)] text-sm font-semibold text-[var(--navy)]">
-            <span className="px-3 whitespace-nowrap text-neutral">Quick response</span>
-            <button onClick={() => send(undefined, "Yes, that sounds great!")} className="px-4 py-1 hover:text-[var(--gold-dark)] transition-colors border-l border-[var(--border)]">Yes</button>
-            <button onClick={() => send(undefined, "Maybe, let me check my calendar.")} className="px-4 py-1 hover:text-[var(--gold-dark)] transition-colors border-l border-[var(--border)]">Maybe</button>
-            <button onClick={() => send(undefined, "No, sorry we are not available then.")} className="px-4 py-1 hover:text-[var(--gold-dark)] transition-colors border-l border-[var(--border)]">No</button>
-          </div>
-
-          <form onSubmit={(e) => send(e)} className="pt-3">
+          <form onSubmit={(e) => send(e)}>
             {attachment && (
-              <div className="relative inline-block mb-3">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={attachment} alt="preview" className="h-20 rounded-lg border border-[var(--border)]" />
-                <button type="button" onClick={() => setAttachment(null)} className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-white border border-[var(--border)] text-[var(--navy)] flex items-center justify-center shadow">
-                  <X size={13} />
-                </button>
+              <div className="mb-3">
+                {isImageData(attachment) ? (
+                  <div className="relative inline-block">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={attachment} alt="preview" className="h-20 rounded-lg border border-[var(--border)]" />
+                    <button type="button" onClick={() => setAttachment(null)} className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-white border border-[var(--border)] text-[var(--navy)] flex items-center justify-center shadow">
+                      <X size={13} />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center gap-2.5 rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-2 pr-2">
+                    <span className="w-8 h-8 rounded-lg bg-[var(--navy)]/10 text-[var(--navy)] flex items-center justify-center flex-shrink-0">
+                      <FileText size={16} />
+                    </span>
+                    <span className="text-xs font-semibold text-[var(--navy)]">{fileKind(attachment)}</span>
+                    <button type="button" onClick={() => setAttachment(null)} aria-label="Remove attachment" className="w-6 h-6 rounded-full text-neutral hover:text-[var(--navy)] flex items-center justify-center">
+                      <X size={14} />
+                    </button>
+                  </div>
+                )}
               </div>
             )}
             <div className="flex items-end gap-2">
@@ -311,9 +418,9 @@ export function Thread({
                 placeholder="Write your response here..."
                 className="flex-1 resize-none px-0 py-3 bg-transparent text-sm text-[var(--navy)] placeholder-neutral focus:outline-none"
               />
-              <label className="flex-shrink-0 p-3 text-neutral hover:text-[var(--navy)] cursor-pointer transition-colors">
-                <ImagePlus size={20} />
-                <input type="file" accept="image/*" className="hidden" onChange={(e) => pickFile(e.target.files?.[0])} />
+              <label className="flex-shrink-0 p-3 text-neutral hover:text-[var(--navy)] cursor-pointer transition-colors" title="Attach a file">
+                <Paperclip size={20} />
+                <input type="file" accept={ATTACH_ACCEPT} className="hidden" onChange={(e) => pickFile(e.target.files?.[0])} />
               </label>
               <button
                 type="submit"

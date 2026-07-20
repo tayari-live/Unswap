@@ -81,8 +81,13 @@ export function MessagesLayoutShell({
                     }`}
                   >
                     <div className="flex gap-3">
-                      <span className="relative w-10 h-10 flex-shrink-0 rounded-full bg-white border border-[var(--border)] text-[var(--navy)] flex items-center justify-center text-sm font-bold mt-0.5 overflow-hidden">
-                        {c.other?.avatarInitials ?? "?"}
+                      <span className="relative flex-shrink-0 mt-0.5">
+                        <span className="w-10 h-10 rounded-full bg-white border border-[var(--border)] text-[var(--navy)] flex items-center justify-center text-sm font-bold overflow-hidden">
+                          {c.other?.avatarInitials ?? "?"}
+                        </span>
+                        {c.other?.online && (
+                          <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-500 border-2 border-[#faf9f6]" aria-label="Online" />
+                        )}
                       </span>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2 mb-0.5">

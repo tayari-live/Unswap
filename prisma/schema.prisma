@@ -52,6 +52,9 @@ model User {
   // member opens their notifications page.
   notificationsSeenAt DateTime?
 
+  // Presence: bumped on activity; recent value => "online" in chat.
+  lastSeenAt         DateTime?
+
   notifySwaps        Boolean   @default(true)
   notifyMessages     Boolean   @default(true)
   notifyReviews      Boolean   @default(true)

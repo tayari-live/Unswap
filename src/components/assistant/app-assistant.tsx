@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { MessageCircleQuestion, Send, X, Sparkles } from "lucide-react"
+import { MessageCircleQuestion, Send, X, Sparkles, Check, CheckCheck } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
 
 type Msg = { role: "user" | "assistant"; content: string; at: number }
@@ -121,22 +121,33 @@ export function AppAssistant() {
                 </div>
               </div>
             )}
-            {messages.map((m, i) => (
-              <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div
-                  className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed whitespace-pre-wrap break-words ${
-                    m.role === "user"
-                      ? "bg-[var(--navy)] text-white"
-                      : "bg-[var(--background)] border border-[var(--border)] text-[var(--navy)]"
-                  }`}
-                >
-                  {m.content}
-                  <div className={`text-[10px] mt-1 font-medium ${m.role === "user" ? "text-white/50" : "text-neutral/70"}`}>
-                    {clock(m.at)}
+            {messages.map((m, i) => {
+              // A user message is "seen" once the guide has replied to it.
+              const seen = m.role === "user" && messages.slice(i + 1).some((n) => n.role === "assistant")
+              return (
+                <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+                  <div
+                    className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed whitespace-pre-wrap break-words ${
+                      m.role === "user"
+                        ? "bg-[var(--navy)] text-white"
+                        : "bg-[var(--background)] border border-[var(--border)] text-[var(--navy)]"
+                    }`}
+                  >
+                    {m.content}
+                    <div className={`text-[10px] mt-1 font-medium flex items-center gap-1 ${m.role === "user" ? "justify-end text-white/50" : "text-neutral/70"}`}>
+                      <span>{clock(m.at)}</span>
+                      {m.role === "user" && (
+                        seen ? (
+                          <CheckCheck size={13} className="text-[var(--gold)]" aria-label="Seen by the guide" />
+                        ) : (
+                          <Check size={13} className="text-white/50" aria-label="Sent" />
+                        )
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
             {busy && (
               <div className="flex justify-start">
                 <div className="rounded-2xl px-3.5 py-2.5 bg-[var(--background)] border border-[var(--border)] text-neutral text-sm">
