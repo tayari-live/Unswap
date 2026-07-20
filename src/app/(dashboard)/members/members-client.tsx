@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Search, ShieldCheck, Ban, Star, ChevronDown } from "lucide-react"
 import { PageHeader } from "@/components/ui/page-header"
@@ -35,6 +35,11 @@ export default function MembersClient({ initialMembers }: { initialMembers: Memb
   const [query, setQuery] = useState("")
   const [filter, setFilter] = useState("all")
   const [busyId, setBusyId] = useState<string | null>(null)
+
+  // Re-sync with the server after router.refresh() so rows never go stale.
+  useEffect(() => {
+    setMembers(initialMembers)
+  }, [initialMembers])
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -168,7 +173,13 @@ export default function MembersClient({ initialMembers }: { initialMembers: Memb
                     <div className="flex items-center justify-end gap-2">
                       {m.verificationStatus !== "FULLY_VERIFIED" && (
                         <button
-                          onClick={() => patch(m.id, { status: "FULLY_VERIFIED" })}
+                          onClick={() => {
+                            // Verifying grants full network access — confirm to
+                            // prevent an accidental one-click approval.
+                            if (window.confirm(`Mark ${m.fullName} as fully verified?`)) {
+                              patch(m.id, { status: "FULLY_VERIFIED" })
+                            }
+                          }}
                           disabled={busyId === m.id}
                           title="Verify"
                           className="p-1.5 rounded-lg text-[var(--teal)] hover:bg-[var(--teal)]/10 disabled:opacity-50"
@@ -178,7 +189,11 @@ export default function MembersClient({ initialMembers }: { initialMembers: Memb
                       )}
                       {m.verificationStatus !== "SUSPENDED" ? (
                         <button
-                          onClick={() => patch(m.id, { status: "SUSPENDED" })}
+                          onClick={() => {
+                            if (window.confirm(`Suspend ${m.fullName}? They will lose access to the network.`)) {
+                              patch(m.id, { status: "SUSPENDED" })
+                            }
+                          }}
                           disabled={busyId === m.id}
                           title="Suspend"
                           className="p-1.5 rounded-lg text-[var(--crimson)] hover:bg-[var(--crimson)]/10 disabled:opacity-50"
@@ -187,7 +202,11 @@ export default function MembersClient({ initialMembers }: { initialMembers: Memb
                         </button>
                       ) : (
                         <button
-                          onClick={() => patch(m.id, { status: "FULLY_VERIFIED" })}
+                          onClick={() => {
+                            if (window.confirm(`Reinstate ${m.fullName} as fully verified?`)) {
+                              patch(m.id, { status: "FULLY_VERIFIED" })
+                            }
+                          }}
                           disabled={busyId === m.id}
                           className="text-xs font-semibold text-[var(--teal)] hover:underline disabled:opacity-50"
                         >

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { ShieldCheck, X, Check, FileText, Mail, MapPin, Building2 } from "lucide-react"
 import { PageHeader } from "@/components/ui/page-header"
@@ -32,6 +32,13 @@ export default function VerificationClient({ initialSubmissions }: { initialSubm
   const [note, setNote] = useState("")
   const [busy, setBusy] = useState(false)
 
+  // Keep the queue in sync with the server after router.refresh() — otherwise a
+  // submission reviewed elsewhere (another tab/admin) lingers here as a stale
+  // card, and acting on it 409s while the member keeps the earlier outcome.
+  useEffect(() => {
+    setSubmissions(initialSubmissions)
+  }, [initialSubmissions])
+
   function open(s: Submission) {
     setSelected(s)
     setNote("")
@@ -52,6 +59,13 @@ export default function VerificationClient({ initialSubmissions }: { initialSubm
       })
       const data = await res.json()
       if (!res.ok) {
+        // 409 = already reviewed elsewhere. The card is stale — drop it and
+        // re-sync so the admin sees the real state instead of a phantom entry.
+        if (res.status === 409) {
+          setSubmissions((prev) => prev.filter((s) => s.id !== selected.id))
+          setSelected(null)
+          router.refresh()
+        }
         toast(data.error || "Something went wrong.", "error")
         setBusy(false)
         return
