@@ -1,8 +1,9 @@
 "use client"
 
+import { useMemo, useState } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
-import { Search, Menu, MessageSquare, Paperclip } from "lucide-react"
+import { Search, Paperclip } from "lucide-react"
 
 function timeAgo(d: Date) {
   const s = Math.floor((Date.now() - new Date(d).getTime()) / 1000)
@@ -21,6 +22,19 @@ export function MessagesLayoutShell({
 }) {
   const params = useParams()
   const activeId = params.id as string | undefined
+  const [query, setQuery] = useState("")
+
+  // Filter by the other member's name/organisation or the last message text.
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    if (!q) return conversations
+    return conversations.filter(
+      (c) =>
+        (c.other?.fullName ?? "").toLowerCase().includes(q) ||
+        (c.other?.organisation ?? "").toLowerCase().includes(q) ||
+        (c.lastMessage?.body ?? "").toLowerCase().includes(q)
+    )
+  }, [conversations, query])
 
   return (
     <div className="flex h-[calc(100vh-10rem)] md:h-[calc(100vh-5.5rem)] -mt-6 -mx-4 md:-mx-8 bg-white border-t border-[var(--border)] overflow-hidden relative">
@@ -32,30 +46,29 @@ export function MessagesLayoutShell({
       >
         <div className="p-4 border-b border-[var(--border)] bg-white flex items-center justify-between">
           <h2 className="font-bold text-[var(--navy)]">All messages</h2>
-          <button className="md:hidden p-2 -mr-2 text-neutral">
-            <Menu size={20} />
-          </button>
         </div>
-        
+
         <div className="p-3">
           <div className="relative">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral" />
-            <input 
-              type="text" 
-              placeholder="Search messages" 
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search messages"
               className="w-full pl-9 pr-3 py-2 bg-white border border-[var(--border)] rounded-lg text-sm text-[var(--navy)] focus:outline-none focus:border-[var(--gold)] shadow-sm"
             />
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          {conversations.length === 0 ? (
+          {filtered.length === 0 ? (
             <div className="p-8 text-center text-sm text-neutral">
-              No conversations yet.
+              {query ? "No conversations match your search." : "No conversations yet."}
             </div>
           ) : (
             <div className="divide-y divide-[var(--border)]/50">
-              {conversations.map((c) => {
+              {filtered.map((c) => {
                 const isActive = c.id === activeId
                 return (
                   <Link 

@@ -127,12 +127,49 @@ export async function getConversationForUser(userId: string, conversationId: str
     data: { lastReadAt: new Date() },
   })
 
-  const other = convo.participants.find((p) => p.userId !== userId)?.user
-  return { 
-    id: convo.id, 
-    other, 
+  const otherParticipant = convo.participants.find((p) => p.userId !== userId)
+  return {
+    id: convo.id,
+    other: otherParticipant?.user,
     messages: convo.messages,
-    swapRequest: convo.swapRequest 
+    swapRequest: convo.swapRequest,
+    // Read-receipt + typing signals for the other party.
+    otherLastReadAt: otherParticipant?.lastReadAt ?? null,
+    otherTyping: isRecent(otherParticipant?.typingAt),
+  }
+}
+
+// The other member is "typing…" if they pinged within this window.
+const TYPING_WINDOW_MS = 6_000
+function isRecent(ts: Date | null | undefined) {
+  return !!ts && Date.now() - new Date(ts).getTime() < TYPING_WINDOW_MS
+}
+
+/** Record that the member is currently typing in a conversation. */
+export async function setTyping(userId: string, conversationId: string) {
+  const me = await prisma.conversationParticipant.findUnique({
+    where: { conversationId_userId: { conversationId, userId } },
+  })
+  if (!me) throw new ApiError(404, "Conversation not found.")
+  await prisma.conversationParticipant.update({
+    where: { id: me.id },
+    data: { typingAt: new Date() },
+  })
+  return { ok: true }
+}
+
+/** Lightweight read/typing status for the open thread (no message payload). */
+export async function getConversationStatus(userId: string, conversationId: string) {
+  const parts = await prisma.conversationParticipant.findMany({
+    where: { conversationId },
+    select: { userId: true, lastReadAt: true, typingAt: true },
+  })
+  const me = parts.find((p) => p.userId === userId)
+  if (!me) throw new ApiError(404, "Conversation not found.")
+  const other = parts.find((p) => p.userId !== userId)
+  return {
+    otherLastReadAt: other?.lastReadAt ?? null,
+    otherTyping: isRecent(other?.typingAt),
   }
 }
 
@@ -175,6 +212,11 @@ export async function sendMessage(input: {
   await prisma.conversation.update({
     where: { id: input.conversationId },
     data: { lastMessageAt: new Date() },
+  })
+  // Sending ends the sender's "typing…" immediately (don't wait for it to expire).
+  await prisma.conversationParticipant.update({
+    where: { id: member.id },
+    data: { typingAt: null },
   })
 
   // Email the other participant — but only when this starts a new "turn"

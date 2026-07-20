@@ -4,7 +4,11 @@ import { useEffect, useRef, useState } from "react"
 import { MessageCircleQuestion, Send, X, Sparkles } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
 
-type Msg = { role: "user" | "assistant"; content: string }
+type Msg = { role: "user" | "assistant"; content: string; at: number }
+
+function clock(ts: number) {
+  return new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit" }).format(new Date(ts))
+}
 
 const SUGGESTIONS = [
   "How do I get verified?",
@@ -33,7 +37,7 @@ export function AppAssistant() {
     const q = question.trim()
     if (!q || busy) return
     setInput("")
-    const next: Msg[] = [...messages, { role: "user", content: q }]
+    const next: Msg[] = [...messages, { role: "user", content: q, at: Date.now() }]
     setMessages(next)
     setBusy(true)
     try {
@@ -47,7 +51,7 @@ export function AppAssistant() {
         toast(data.error || "The guide couldn't answer. Please try again.", "error")
         return
       }
-      setMessages((m) => [...m, { role: "assistant", content: data.reply }])
+      setMessages((m) => [...m, { role: "assistant", content: data.reply, at: Date.now() }])
     } catch {
       toast("The guide couldn't answer. Please try again.", "error")
     } finally {
@@ -127,6 +131,9 @@ export function AppAssistant() {
                   }`}
                 >
                   {m.content}
+                  <div className={`text-[10px] mt-1 font-medium ${m.role === "user" ? "text-white/50" : "text-neutral/70"}`}>
+                    {clock(m.at)}
+                  </div>
                 </div>
               </div>
             ))}

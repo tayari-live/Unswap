@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react"
 import Link from "next/link"
-import { ArrowLeft, Send, ImagePlus, X, BadgeCheck } from "lucide-react"
+import { ArrowLeft, Send, ImagePlus, X, BadgeCheck, Check, CheckCheck } from "lucide-react"
 import { ReportButton } from "@/components/report-button"
 import { useToast } from "@/components/ui/toast"
 
@@ -15,25 +15,53 @@ function clock(iso: string) {
   return new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit" }).format(new Date(iso))
 }
 
+// Calendar-day key, so messages can be grouped under date separators.
+function dayKey(iso: string) {
+  const d = new Date(iso)
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`
+}
+
+// "Today" / "Yesterday" / "Mon 14 Jul 2025" for the separator chip.
+function dayLabel(iso: string) {
+  const d = new Date(iso)
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const that = new Date(d.getFullYear(), d.getMonth(), d.getDate())
+  const diffDays = Math.round((today.getTime() - that.getTime()) / 86_400_000)
+  if (diffDays === 0) return "Today"
+  if (diffDays === 1) return "Yesterday"
+  return new Intl.DateTimeFormat("en-GB", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    ...(d.getFullYear() !== now.getFullYear() ? { year: "numeric" } : {}),
+  }).format(d)
+}
+
 export function Thread({
   conversationId,
   currentUserId,
   other,
   initialMessages,
   swapRequest,
+  initialOtherLastReadAt = null,
 }: {
   conversationId: string
   currentUserId: string
   other: Other
   initialMessages: Msg[]
   swapRequest?: any
+  initialOtherLastReadAt?: string | null
 }) {
   const toast = useToast()
   const [messages, setMessages] = useState<Msg[]>(initialMessages)
   const [body, setBody] = useState("")
   const [attachment, setAttachment] = useState<string | null>(null)
   const [sending, setSending] = useState(false)
+  const [otherLastReadAt, setOtherLastReadAt] = useState<string | null>(initialOtherLastReadAt)
+  const [otherTyping, setOtherTyping] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const lastTypingPing = useRef(0)
 
   const refresh = useCallback(async () => {
     try {
@@ -41,22 +69,59 @@ export function Thread({
       if (res.ok) {
         const data = await res.json()
         setMessages(data.messages)
+        setOtherLastReadAt(data.otherLastReadAt ?? null)
+        setOtherTyping(!!data.otherTyping)
       }
     } catch {
       /* ignore transient poll errors */
     }
   }, [conversationId])
 
-  // Poll for new messages.
-  useEffect(() => {
-    const t = setInterval(refresh, 4000)
-    return () => clearInterval(t)
-  }, [refresh])
+  // Cheap status poll (read receipts + typing) — runs faster than the message
+  // poll so "typing…" and read ticks feel responsive without re-fetching bodies.
+  const pollStatus = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/conversations/${conversationId}/typing`, { cache: "no-store" })
+      if (res.ok) {
+        const data = await res.json()
+        setOtherLastReadAt(data.otherLastReadAt ?? null)
+        setOtherTyping(!!data.otherTyping)
+      }
+    } catch {
+      /* ignore transient poll errors */
+    }
+  }, [conversationId])
 
-  // Keep pinned to the latest message.
+  // Tell the other party we're typing — throttled to at most once every 3s.
+  const pingTyping = useCallback(() => {
+    const now = Date.now()
+    if (now - lastTypingPing.current < 3000) return
+    lastTypingPing.current = now
+    fetch(`/api/conversations/${conversationId}/typing`, { method: "POST" }).catch(() => {})
+  }, [conversationId])
+
+  // Poll for new messages (4s) and status (2s).
+  useEffect(() => {
+    const m = setInterval(refresh, 4000)
+    const s = setInterval(pollStatus, 2000)
+    return () => { clearInterval(m); clearInterval(s) }
+  }, [refresh, pollStatus])
+
+  // Keep pinned to the latest message (and when the typing bubble appears).
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages])
+  }, [messages, otherTyping])
+
+  // My latest sent message that the other party has read → drives the ✓✓.
+  const lastReadMine = (() => {
+    if (!otherLastReadAt) return -1
+    const readTs = new Date(otherLastReadAt).getTime()
+    let idx = -1
+    messages.forEach((m, i) => {
+      if (m.senderId === currentUserId && new Date(m.createdAt).getTime() <= readTs) idx = i
+    })
+    return idx
+  })()
 
   function pickFile(file: File | undefined) {
     if (!file) return
@@ -98,22 +163,45 @@ export function Thread({
   const guests = swapRequest?.guests || 1
   const arrival = swapRequest?.startDate ? new Intl.DateTimeFormat("en-GB", { month: "short", day: "numeric" }).format(new Date(swapRequest.startDate)) : "--"
   const departure = swapRequest?.endDate ? new Intl.DateTimeFormat("en-GB", { month: "short", day: "numeric" }).format(new Date(swapRequest.endDate)) : "--"
-  const exchangeType = swapRequest?.type === "RECIPROCAL" ? "Reciprocal" : "Non-reciprocal"
+  // SwapRequest.mode is "simultaneous" | "credits".
+  const exchangeType = swapRequest?.mode === "credits" ? "Credits" : "Simultaneous"
+  // Human-readable swap stage for the header chip.
+  const SWAP_STAGE: Record<string, string> = {
+    REQUESTED: "Requested",
+    COUNTER_OFFERED: "Counter-offered",
+    ACCEPTED: "Accepted",
+    CONFIRMED: "Confirmed",
+    IN_PROGRESS: "In progress",
+    COMPLETED: "Completed",
+    CANCELLED: "Cancelled",
+  }
+  const swapStage = swapRequest?.status ? SWAP_STAGE[swapRequest.status] ?? swapRequest.status : null
 
   return (
     <div className="flex w-full h-full">
       {/* Middle Pane - Chat Thread */}
       <div className="flex-1 flex flex-col min-w-0 h-full relative">
-        {/* Header Breadcrumb */}
+        {/* Header — who you're talking to, and the swap stage if one is linked */}
         <div className="flex items-center gap-3 p-4 border-b border-[var(--border)] bg-white sticky top-0 z-10 text-sm">
           <Link href="/dashboard/messages" className="md:hidden text-neutral hover:text-[var(--navy)] mr-2">
             <ArrowLeft size={20} />
           </Link>
-          <span className="font-bold text-[var(--navy)]">Conversation</span>
-          <span className="text-neutral">&gt;</span>
-          <span className="text-neutral">Pre-approval</span>
-          <span className="text-neutral">&gt;</span>
-          <span className="text-neutral">Finalization</span>
+          <div className="w-8 h-8 rounded-full bg-[var(--navy)]/10 text-[var(--navy)] flex items-center justify-center text-xs font-bold flex-shrink-0">
+            {other?.avatarInitials ?? "?"}
+          </div>
+          <div className="min-w-0">
+            <div className="font-bold text-[var(--navy)] truncate leading-tight">{other?.fullName ?? "Member"}</div>
+            {otherTyping ? (
+              <div className="text-[11px] text-[var(--teal)] font-semibold truncate">typing…</div>
+            ) : other?.organisation ? (
+              <div className="text-[11px] text-neutral truncate">{other.organisation}</div>
+            ) : null}
+          </div>
+          {swapStage && (
+            <span className="ml-auto flex-shrink-0 text-[10px] font-bold uppercase tracking-wide bg-[var(--gold)]/15 text-[var(--gold-dark)] px-2.5 py-1 rounded-full">
+              Swap · {swapStage}
+            </span>
+          )}
         </div>
 
         {/* Messages Scroll Area */}
@@ -134,10 +222,20 @@ export function Thread({
           </div>
 
           <div className="space-y-4">
-            {messages.map((m) => {
+            {messages.map((m, i) => {
               const mine = m.senderId === currentUserId
+              // Show a date chip whenever the calendar day changes.
+              const newDay = i === 0 || dayKey(m.createdAt) !== dayKey(messages[i - 1].createdAt)
               return (
-                <div key={m.id} className={`flex items-end gap-2 ${mine ? "justify-end" : "justify-start"}`}>
+                <div key={m.id}>
+                  {newDay && (
+                    <div className="flex justify-center my-4">
+                      <span className="text-[11px] font-semibold text-neutral bg-white border border-[var(--border)] rounded-full px-3 py-1 shadow-sm">
+                        {dayLabel(m.createdAt)}
+                      </span>
+                    </div>
+                  )}
+                  <div className={`flex items-end gap-2 ${mine ? "justify-end" : "justify-start"}`}>
                   {!mine && (
                     <div className="w-8 h-8 rounded-full bg-white border border-[var(--border)] text-[var(--navy)] flex items-center justify-center text-xs font-bold overflow-hidden flex-shrink-0 mb-1">
                       {other?.avatarInitials ?? "?"}
@@ -149,14 +247,37 @@ export function Thread({
                       <img src={m.attachmentUrl} alt="attachment" className="rounded-lg mb-2 max-h-60 object-cover" />
                     )}
                     {m.body && <p className="text-sm whitespace-pre-wrap break-words">{m.body}</p>}
-                    <div className="text-[10px] mt-1.5 text-neutral/70 font-medium">
-                      {mine ? "You" : other?.fullName?.split(" ")[0] || "Member"} • {clock(m.createdAt)}
+                    <div className={`text-[10px] mt-1.5 text-neutral/70 font-medium flex items-center gap-1 ${mine ? "justify-end" : ""}`}>
+                      <span>{mine ? "You" : other?.fullName?.split(" ")[0] || "Member"} • {clock(m.createdAt)}</span>
+                      {mine && (
+                        i <= lastReadMine ? (
+                          <CheckCheck size={13} className="text-[var(--teal)]" aria-label="Read" />
+                        ) : (
+                          <Check size={13} className="text-neutral/50" aria-label="Sent" />
+                        )
+                      )}
                     </div>
                   </div>
                   {!mine && <div className="mb-1"><ReportButton targetType="message" targetId={m.id} /></div>}
+                  </div>
                 </div>
               )
             })}
+
+            {otherTyping && (
+              <div className="flex items-end gap-2 justify-start">
+                <div className="w-8 h-8 rounded-full bg-white border border-[var(--border)] text-[var(--navy)] flex items-center justify-center text-xs font-bold overflow-hidden flex-shrink-0 mb-1">
+                  {other?.avatarInitials ?? "?"}
+                </div>
+                <div className="bg-white border border-[var(--border)] rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm">
+                  <span className="flex items-center gap-1" aria-label={`${other?.fullName?.split(" ")[0] || "Member"} is typing`}>
+                    <span className="w-1.5 h-1.5 rounded-full bg-neutral/50 animate-bounce [animation-delay:-0.3s]" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-neutral/50 animate-bounce [animation-delay:-0.15s]" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-neutral/50 animate-bounce" />
+                  </span>
+                </div>
+              </div>
+            )}
             <div ref={bottomRef} />
           </div>
         </div>
@@ -184,7 +305,7 @@ export function Thread({
             <div className="flex items-end gap-2">
               <textarea
                 value={body}
-                onChange={(e) => setBody(e.target.value)}
+                onChange={(e) => { setBody(e.target.value); if (e.target.value.trim()) pingTyping() }}
                 onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(e) } }}
                 rows={1}
                 placeholder="Write your response here..."
@@ -245,14 +366,25 @@ export function Thread({
               </div>
             </div>
 
-            <div className="flex items-center justify-between py-3 border-t border-[var(--border)] mb-5">
-              <span className="text-xs text-neutral">Exchange Type</span>
-              <span className="font-bold text-sm text-[var(--navy)]">{exchangeType}</span>
+            <div className="py-3 border-t border-[var(--border)] mb-5 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-neutral">Exchange type</span>
+                <span className="font-bold text-sm text-[var(--navy)]">{exchangeType}</span>
+              </div>
+              {swapStage && (
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-neutral">Status</span>
+                  <span className="font-bold text-sm text-[var(--navy)]">{swapStage}</span>
+                </div>
+              )}
             </div>
 
-            <button className="w-full py-3.5 px-4 rounded-xl text-sm font-bold text-[var(--navy)] bg-[#e6e8eb] hover:bg-[#d8dce2] transition-colors shadow-sm">
-              Pre-approve the exchange
-            </button>
+            <Link
+              href="/dashboard/swaps"
+              className="block w-full py-3.5 px-4 rounded-xl text-sm font-bold text-center text-[var(--navy)] bg-[var(--gold)] hover:bg-[var(--gold-hover)] transition-colors shadow-sm"
+            >
+              View swap request
+            </Link>
           </div>
         ) : (
           <div className="p-8 text-center text-sm text-neutral flex flex-col items-center">
