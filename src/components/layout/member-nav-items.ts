@@ -1,6 +1,6 @@
 import {
   LayoutDashboard,
-  Compass,
+  Search,
   Home,
   ArrowLeftRight,
   CalendarCheck,
@@ -25,8 +25,8 @@ export type MemberNavItem = {
 // Member dashboard navigation (PRD 5.8). Only Home is implemented so far; the
 // rest are shown disabled until their pages are built.
 export const memberNavigation: MemberNavItem[] = [
-  { name: "Home", href: "/dashboard", icon: LayoutDashboard, live: true },
-  { name: "Discover", href: "/dashboard/browse", icon: Compass, live: true },
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, live: true },
+  { name: "Discover", href: "/dashboard/browse", icon: Search, live: true },
   { name: "My Listings", href: "/dashboard/listings", icon: Home, live: true },
   { name: "Swap Requests", href: "/dashboard/swaps", icon: ArrowLeftRight, live: true },
   { name: "My Exchanges", href: "/dashboard/exchanges", icon: CalendarCheck, live: true },
@@ -40,7 +40,7 @@ export const memberNavigation: MemberNavItem[] = [
 
 // Same destinations reordered for the mobile bottom bar: the four most-used
 // actions on the go sit inline, everything else goes under "More".
-const MOBILE_INLINE = ["Home", "Discover", "Swap Requests", "Messages"]
+const MOBILE_INLINE = ["Dashboard", "Discover", "Swap Requests", "Messages"]
 export const memberMobileNavigation: MemberNavItem[] = [
   ...MOBILE_INLINE.map((n) => memberNavigation.find((i) => i.name === n)!),
   ...memberNavigation.filter((i) => !MOBILE_INLINE.includes(i.name)),
