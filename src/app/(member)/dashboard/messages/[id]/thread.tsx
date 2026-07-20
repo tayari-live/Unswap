@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react"
 import Link from "next/link"
-import { ArrowLeft, Send, Paperclip, X, BadgeCheck, Check, CheckCheck, FileText } from "lucide-react"
+import { ArrowLeft, Send, Paperclip, X, BadgeCheck, Check, CheckCheck, FileText, ChevronDown } from "lucide-react"
 import { ReportButton } from "@/components/report-button"
 import { useToast } from "@/components/ui/toast"
 
@@ -101,7 +101,12 @@ export function Thread({
   const [otherTyping, setOtherTyping] = useState(false)
   const [otherOnline, setOtherOnline] = useState(initialOtherOnline)
   const [otherLastSeenAt, setOtherLastSeenAt] = useState<string | null>(initialOtherLastSeenAt)
+  const [atBottom, setAtBottom] = useState(true)
+  const [newCount, setNewCount] = useState(0)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const atBottomRef = useRef(true)
+  const prevLastIdRef = useRef<string | null>(null)
   const lastTypingPing = useRef(0)
 
   const refresh = useCallback(async () => {
@@ -110,9 +115,13 @@ export function Thread({
       if (res.ok) {
         const data = await res.json()
         // Reconcile server truth without dropping still-in-flight optimistic sends.
+        // Bail out (return the same ref) when nothing changed so the list doesn't
+        // re-render — and the scroll effect doesn't fire — on every idle poll.
         setMessages((prev) => {
           const optimistic = prev.filter((m) => m.id.startsWith("temp-"))
-          return [...data.messages, ...optimistic]
+          const next = [...data.messages, ...optimistic]
+          if (next.length === prev.length && next.every((m, i) => m.id === prev[i].id)) return prev
+          return next
         })
         setOtherLastReadAt(data.otherLastReadAt ?? null)
         setOtherTyping(!!data.otherTyping)
@@ -156,10 +165,41 @@ export function Thread({
     return () => { clearInterval(m); clearInterval(s) }
   }, [refresh, pollStatus])
 
-  // Keep pinned to the latest message (and when the typing bubble appears).
+  const scrollToBottom = useCallback((smooth = true) => {
+    bottomRef.current?.scrollIntoView({ behavior: smooth ? "smooth" : "auto" })
+    atBottomRef.current = true
+    setAtBottom(true)
+    setNewCount(0)
+  }, [])
+
+  // Track whether the reader is at the bottom; clear the "new messages" pill
+  // once they catch up.
+  function handleScroll() {
+    const el = scrollRef.current
+    if (!el) return
+    const near = el.scrollHeight - el.scrollTop - el.clientHeight < 80
+    atBottomRef.current = near
+    setAtBottom(near)
+    if (near) setNewCount(0)
+  }
+
+  // Land at the latest message when the thread first opens.
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages, otherTyping])
+    prevLastIdRef.current = messages[messages.length - 1]?.id ?? null
+    bottomRef.current?.scrollIntoView({ behavior: "auto" })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // On a genuinely new message: follow it if I sent it or I'm already at the
+  // bottom; otherwise leave the scroll alone and surface the jump-to-latest pill.
+  useEffect(() => {
+    const last = messages[messages.length - 1]
+    if (!last || last.id === prevLastIdRef.current) return
+    const mine = last.senderId === currentUserId
+    if (mine || atBottomRef.current) scrollToBottom()
+    else setNewCount((c) => c + 1)
+    prevLastIdRef.current = last.id
+  }, [messages, currentUserId, scrollToBottom])
 
   // My latest sent message that the other party has read → drives the ✓✓.
   const lastReadMine = (() => {
@@ -288,7 +328,7 @@ export function Thread({
         </div>
 
         {/* Messages Scroll Area */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-[#faf9f6]">
+        <div ref={scrollRef} onScroll={handleScroll} className="flex-1 overflow-y-auto p-4 md:p-6 bg-[#faf9f6]">
           {messages.length === 0 && (
             <p className="text-center text-sm text-neutral py-10">No messages yet. Say hello.</p>
           )}
@@ -382,6 +422,18 @@ export function Thread({
             <div ref={bottomRef} />
           </div>
         </div>
+
+        {/* Jump to latest — appears when scrolled up; badges unseen new messages */}
+        {!atBottom && (
+          <button
+            type="button"
+            onClick={() => scrollToBottom()}
+            className="absolute bottom-24 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 rounded-full bg-white border border-[var(--border)] shadow-lg pl-3 pr-3.5 py-2 text-xs font-semibold text-[var(--navy)] hover:bg-[var(--background)] transition-colors"
+          >
+            <ChevronDown size={16} className="text-[var(--gold-dark)]" />
+            {newCount > 0 ? `${newCount} new message${newCount > 1 ? "s" : ""}` : "Jump to latest"}
+          </button>
+        )}
 
         {/* Composer Area */}
         <div className="bg-white border-t border-[var(--border)] p-4 relative z-10 shadow-[0_-4px_10px_rgba(0,0,0,0.02)]">
