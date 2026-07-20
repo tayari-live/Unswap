@@ -4,7 +4,7 @@ import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
 import { listReviewsForUser } from "@/server/services/reviews"
 import { PageHeader } from "@/components/ui/page-header"
-import { ProfileForm } from "@/components/profile/profile-form"
+import { ProfileWizard } from "@/components/profile/profile-wizard"
 
 function fmtDate(d: Date) {
   return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(d)
@@ -78,7 +78,7 @@ export default async function ProfilePage() {
       </div>
 
       <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6 sm:p-8">
-        <ProfileForm initial={initial} submitLabel="Save changes" />
+        <ProfileWizard initial={initial} />
       </div>
 
       {/* Reviews received */}

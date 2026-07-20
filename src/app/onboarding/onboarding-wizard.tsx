@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { ArrowRight, ArrowLeft, Home, Compass, PartyPopper } from "lucide-react"
 import { Logo } from "@/components/brand/logo"
-import { ProfileForm, type ProfileValues } from "@/components/profile/profile-form"
+import { type ProfileValues } from "@/components/profile/profile-form"
+import { ProfileWizard } from "@/components/profile/profile-wizard"
 
 const STEPS = ["Welcome", "Your profile", "Your first home", "Explore"]
 
@@ -87,20 +88,12 @@ export function OnboardingWizard({
         {step === 2 && (
           <div>
             <h1 className="font-display text-2xl font-bold text-[var(--navy)]">Complete your profile</h1>
-            <p className="mt-1 text-sm text-neutral">Members exchange with people, not listings. Reach 50% to continue.</p>
-            <div className="mt-4 mb-6">
-              <div className="flex items-center justify-between text-xs mb-1">
-                <span className="font-semibold text-neutral-dark">Profile completion</span>
-                <span className="font-bold text-[var(--gold-dark)]">{completion}%</span>
-              </div>
-              <div className="h-2 rounded-full bg-neutral-light overflow-hidden">
-                <div className="h-full bg-[var(--gold)] transition-all" style={{ width: `${completion}%` }} />
-              </div>
-              {hint && <p className="mt-2 text-xs text-[var(--crimson)] font-medium">{hint}</p>}
-            </div>
-            <ProfileForm
+            <p className="mt-1 mb-5 text-sm text-neutral">
+              Members exchange with people, not listings. One question at a time — reach 50% to continue.
+            </p>
+            {hint && <p className="mb-4 text-xs text-[var(--crimson)] font-medium">{hint}</p>}
+            <ProfileWizard
               initial={initialProfile}
-              submitLabel="Save & continue"
               onSaved={(c) => {
                 setCompletion(c)
                 if (c >= 50) { setHint(""); setStep(3) }
