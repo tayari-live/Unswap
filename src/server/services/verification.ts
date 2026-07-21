@@ -57,8 +57,10 @@ export async function approveSubmission(input: { actorId: string; id: string; no
 
 /** Reject a submission with a required note; member status becomes REJECTED. */
 export async function rejectSubmission(input: { actorId: string; id: string; note?: string }) {
-  if (!input.note || input.note.trim().length < 3) {
-    throw new ApiError(400, "A rejection note is required so the member understands why.")
+  // The note is emailed to the member as their reason, so require a real
+  // sentence (kept in sync with the client's MIN_NOTE).
+  if (!input.note || input.note.trim().length < 10) {
+    throw new ApiError(400, "A rejection reason of at least 10 characters is required so the member understands why.")
   }
 
   const submission = await prisma.verificationSubmission.findUnique({

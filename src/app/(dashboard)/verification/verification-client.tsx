@@ -7,6 +7,10 @@ import { PageHeader } from "@/components/ui/page-header"
 import { Badge } from "@/components/ui/badges"
 import { useToast } from "@/components/ui/toast"
 
+// A rejection note is emailed to the member as their reason, so require a real
+// sentence — not "no". Kept in sync with the server (rejectSubmission).
+const MIN_NOTE = 10
+
 type Submission = {
   id: string
   type: string
@@ -46,8 +50,8 @@ export default function VerificationClient({ initialSubmissions }: { initialSubm
 
   async function review(action: "approve" | "reject") {
     if (!selected) return
-    if (action === "reject" && note.trim().length < 3) {
-      toast("A rejection note is required.", "error")
+    if (action === "reject" && note.trim().length < MIN_NOTE) {
+      toast(`Add a rejection reason of at least ${MIN_NOTE} characters — the member sees this as why they were declined.`, "error")
       return
     }
     setBusy(true)
@@ -165,23 +169,30 @@ export default function VerificationClient({ initialSubmissions }: { initialSubm
               </div>
 
               <div>
-                <label className="text-xs font-semibold uppercase tracking-wide text-neutral mb-1.5 block">
-                  Reviewer note {`(required to reject)`}
-                </label>
+                <div className="flex items-baseline justify-between mb-1.5">
+                  <label className="text-xs font-semibold uppercase tracking-wide text-neutral">
+                    Reviewer note <span className="normal-case font-normal">(required to reject · min {MIN_NOTE} characters)</span>
+                  </label>
+                  <span className={`text-[11px] font-semibold ${note.trim().length >= MIN_NOTE ? "text-[var(--teal)]" : "text-neutral"}`}>
+                    {note.trim().length}/{MIN_NOTE}
+                  </span>
+                </div>
                 <textarea
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   rows={3}
-                  placeholder="Add a note for the audit trail / member email…"
+                  placeholder="Explain why — the member receives this as the reason (e.g. “Staff ID photo was blurry, please re-upload a clear scan”)."
                   className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--background)] text-sm text-[var(--navy)] focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)]"
                 />
+                <p className="mt-1.5 text-xs text-neutral">Approving needs no note. A note is only required to reject.</p>
               </div>
 
               <div className="flex gap-3">
                 <button
                   onClick={() => review("reject")}
-                  disabled={busy}
-                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[var(--crimson)] text-[var(--crimson)] text-sm font-semibold hover:bg-[var(--crimson)]/10 transition disabled:opacity-50"
+                  disabled={busy || note.trim().length < MIN_NOTE}
+                  title={note.trim().length < MIN_NOTE ? `Add a reason of at least ${MIN_NOTE} characters to reject` : undefined}
+                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[var(--crimson)] text-[var(--crimson)] text-sm font-semibold hover:bg-[var(--crimson)]/10 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <X size={16} /> Reject
                 </button>
