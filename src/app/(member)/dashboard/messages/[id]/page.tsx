@@ -28,6 +28,7 @@ export default async function ConversationPage({
     body: m.body,
     attachmentUrl: m.attachmentUrl,
     createdAt: m.createdAt.toISOString(),
+    deletedForEveryone: m.deletedForEveryone,
   }))
 
   return (

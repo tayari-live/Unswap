@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useState, useCallback } from "react"
 import Link from "next/link"
-import { ArrowLeft, Send, Paperclip, X, BadgeCheck, Check, CheckCheck, FileText, ChevronDown } from "lucide-react"
+import { ArrowLeft, Send, Paperclip, X, Check, CheckCheck, FileText, ChevronDown, MoreVertical, Trash2, Ban } from "lucide-react"
 import { ReportButton } from "@/components/report-button"
 import { useToast } from "@/components/ui/toast"
 
-type Msg = { id: string; senderId: string; body: string; attachmentUrl: string | null; createdAt: string }
+type Msg = { id: string; senderId: string; body: string; attachmentUrl: string | null; createdAt: string; deletedForEveryone?: boolean }
 type Other = { id: string; fullName: string; avatarInitials: string; verificationStatus: string; organisation?: string | null } | null
 
 const MAX_BYTES = 10 * 1024 * 1024
@@ -103,6 +103,7 @@ export function Thread({
   const [otherLastSeenAt, setOtherLastSeenAt] = useState<string | null>(initialOtherLastSeenAt)
   const [atBottom, setAtBottom] = useState(true)
   const [newCount, setNewCount] = useState(0)
+  const [menuId, setMenuId] = useState<string | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
   const atBottomRef = useRef(true)
@@ -254,7 +255,7 @@ export function Thread({
         setMessages((m) =>
           m.map((x) =>
             x.id === tempId
-              ? { id: real.id, senderId: real.senderId, body: real.body, attachmentUrl: real.attachmentUrl, createdAt: real.createdAt }
+              ? { id: real.id, senderId: real.senderId, body: real.body, attachmentUrl: real.attachmentUrl, createdAt: real.createdAt, deletedForEveryone: false }
               : x,
           ),
         )
@@ -266,6 +267,31 @@ export function Thread({
       setAttachment(sentAttachment)
     } finally {
       setSending(false)
+    }
+  }
+
+  async function doDelete(id: string, scope: "me" | "everyone") {
+    setMenuId(null)
+    // Optimistic: hide it for me, or tombstone it for everyone.
+    setMessages((m) =>
+      scope === "me"
+        ? m.filter((x) => x.id !== id)
+        : m.map((x) => (x.id === id ? { ...x, deletedForEveryone: true, body: "", attachmentUrl: null } : x)),
+    )
+    try {
+      const res = await fetch(`/api/messages/${id}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ scope }),
+      })
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}))
+        toast(d.error || "Could not delete the message.", "error")
+        refresh() // restore server truth
+      }
+    } catch {
+      toast("Could not delete the message.", "error")
+      refresh()
     }
   }
 
@@ -333,20 +359,11 @@ export function Thread({
             <p className="text-center text-sm text-neutral py-10">No messages yet. Say hello.</p>
           )}
 
-          {/* Scammer Warning (placed at top of thread) */}
-          <div className="max-w-xl mx-auto mb-8 text-center bg-white border border-[var(--border)] rounded-xl p-4 shadow-sm">
-            <div className="flex items-center justify-center gap-1.5 text-[var(--crimson)] font-bold text-sm mb-2">
-              <BadgeCheck size={16} />
-              Tips to avoid scammers
-            </div>
-            <p className="text-xs text-neutral leading-relaxed">
-              Never pay a deposit or upfront fee. Only settle agreed charges once your stay begins. Whenever possible, keep your conversations on UnSwap and share only essential information.
-            </p>
-          </div>
-
           <div className="space-y-4">
             {messages.map((m, i) => {
               const mine = m.senderId === currentUserId
+              const isTemp = m.id.startsWith("temp-")
+              const deleted = !!m.deletedForEveryone
               // Show a date chip whenever the calendar day changes.
               const newDay = i === 0 || dayKey(m.createdAt) !== dayKey(messages[i - 1].createdAt)
               return (
@@ -365,32 +382,40 @@ export function Thread({
                     </div>
                   )}
                   <div className={`max-w-[75%] rounded-2xl px-4 py-3 shadow-sm ${mine ? "bg-[#f4efe8] text-[var(--navy)] rounded-br-sm" : "bg-white border border-[var(--border)] text-[var(--navy)] rounded-bl-sm"}`}>
-                    {m.attachmentUrl && (
-                      isImageData(m.attachmentUrl) ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={m.attachmentUrl} alt="attachment" className="rounded-lg mb-2 max-h-60 object-cover" />
-                      ) : (
-                        <a
-                          href={m.attachmentUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          download
-                          className="flex items-center gap-2.5 mb-2 rounded-lg border border-[var(--border)] bg-white/70 px-3 py-2.5 hover:bg-white transition-colors"
-                        >
-                          <span className="w-8 h-8 rounded-lg bg-[var(--navy)]/10 text-[var(--navy)] flex items-center justify-center flex-shrink-0">
-                            <FileText size={16} />
-                          </span>
-                          <span className="min-w-0">
-                            <span className="block text-xs font-semibold text-[var(--navy)] truncate">{fileKind(m.attachmentUrl)}</span>
-                            <span className="block text-[10px] text-neutral">Tap to open</span>
-                          </span>
-                        </a>
-                      )
+                    {deleted ? (
+                      <p className="flex items-center gap-1.5 text-sm italic text-neutral">
+                        <Ban size={14} /> This message was deleted
+                      </p>
+                    ) : (
+                      <>
+                        {m.attachmentUrl && (
+                          isImageData(m.attachmentUrl) ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={m.attachmentUrl} alt="attachment" className="rounded-lg mb-2 max-h-60 object-cover" />
+                          ) : (
+                            <a
+                              href={m.attachmentUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              download
+                              className="flex items-center gap-2.5 mb-2 rounded-lg border border-[var(--border)] bg-white/70 px-3 py-2.5 hover:bg-white transition-colors"
+                            >
+                              <span className="w-8 h-8 rounded-lg bg-[var(--navy)]/10 text-[var(--navy)] flex items-center justify-center flex-shrink-0">
+                                <FileText size={16} />
+                              </span>
+                              <span className="min-w-0">
+                                <span className="block text-xs font-semibold text-[var(--navy)] truncate">{fileKind(m.attachmentUrl)}</span>
+                                <span className="block text-[10px] text-neutral">Tap to open</span>
+                              </span>
+                            </a>
+                          )
+                        )}
+                        {m.body && <p className="text-sm whitespace-pre-wrap break-words">{m.body}</p>}
+                      </>
                     )}
-                    {m.body && <p className="text-sm whitespace-pre-wrap break-words">{m.body}</p>}
                     <div className={`text-[10px] mt-1.5 text-neutral/70 font-medium flex items-center gap-1 ${mine ? "justify-end" : ""}`}>
                       <span>{mine ? "You" : other?.fullName?.split(" ")[0] || "Member"} • {clock(m.createdAt)}</span>
-                      {mine && (
+                      {mine && !deleted && (
                         i <= lastReadMine ? (
                           <CheckCheck size={13} className="text-[var(--teal)]" aria-label="Read" />
                         ) : (
@@ -399,7 +424,33 @@ export function Thread({
                       )}
                     </div>
                   </div>
-                  {!mine && <div className="mb-1"><ReportButton targetType="message" targetId={m.id} /></div>}
+
+                  {/* Per-message options: delete for me / everyone */}
+                  {!isTemp && (
+                    <div className="relative flex-shrink-0 self-center">
+                      <button
+                        type="button"
+                        onClick={() => setMenuId(menuId === m.id ? null : m.id)}
+                        aria-label="Message options"
+                        className="p-1 rounded-full text-neutral/50 hover:text-[var(--navy)] hover:bg-black/5 transition-colors"
+                      >
+                        <MoreVertical size={16} />
+                      </button>
+                      {menuId === m.id && (
+                        <div className={`absolute bottom-full mb-1 z-40 w-48 bg-white border border-[var(--border)] rounded-xl shadow-lg py-1 ${mine ? "right-0" : "left-0"}`}>
+                          <button onClick={() => doDelete(m.id, "me")} className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--navy)] hover:bg-[var(--background)] text-left">
+                            <Trash2 size={15} className="text-neutral" /> Delete for me
+                          </button>
+                          {mine && !deleted && (
+                            <button onClick={() => doDelete(m.id, "everyone")} className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--crimson)] hover:bg-[var(--crimson)]/10 text-left">
+                              <Trash2 size={15} /> Delete for everyone
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {!mine && !deleted && <div className="mb-1"><ReportButton targetType="message" targetId={m.id} /></div>}
                   </div>
                 </div>
               )
@@ -422,6 +473,9 @@ export function Thread({
             <div ref={bottomRef} />
           </div>
         </div>
+
+        {/* Click-away layer that closes an open message menu */}
+        {menuId && <div className="fixed inset-0 z-30" onClick={() => setMenuId(null)} />}
 
         {/* Jump to latest — appears when scrolled up; badges unseen new messages */}
         {!atBottom && (

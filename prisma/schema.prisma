@@ -133,12 +133,14 @@ model ConversationParticipant {
 }
 
 model Message {
-  id             String   @id @default(uuid())
-  conversationId String
-  senderId       String
-  body           String
-  attachmentUrl  String?  // inline base64 image data URL
-  createdAt      DateTime @default(now())
+  id                 String   @id @default(uuid())
+  conversationId     String
+  senderId           String
+  body               String
+  attachmentUrl      String?  // inline base64 image data URL
+  createdAt          DateTime @default(now())
+  deletedForEveryone Boolean  @default(false) // tombstone: content cleared, shows "deleted"
+  hiddenFor          String[] @default([])    // user ids who deleted it just for themselves
 
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)

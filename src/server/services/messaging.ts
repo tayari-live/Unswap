@@ -23,6 +23,38 @@ export function touchLastSeen(userId: string) {
   return prisma.user.update({ where: { id: userId }, data: { lastSeenAt: new Date() } })
 }
 
+/**
+ * Delete a message. `scope: "me"` hides it only for the caller; `scope:
+ * "everyone"` tombstones it for both parties (sender only, WhatsApp-style).
+ */
+export async function deleteMessage(input: { userId: string; messageId: string; scope: "me" | "everyone" }) {
+  const msg = await prisma.message.findUnique({
+    where: { id: input.messageId },
+    select: { id: true, senderId: true, conversationId: true, deletedForEveryone: true },
+  })
+  if (!msg) throw new ApiError(404, "Message not found.")
+
+  const part = await prisma.conversationParticipant.findUnique({
+    where: { conversationId_userId: { conversationId: msg.conversationId, userId: input.userId } },
+  })
+  if (!part) throw new ApiError(403, "You are not part of this conversation.")
+
+  if (input.scope === "everyone") {
+    if (msg.senderId !== input.userId) throw new ApiError(403, "You can only delete your own messages for everyone.")
+    if (msg.deletedForEveryone) return { ok: true }
+    await prisma.message.update({
+      where: { id: msg.id },
+      data: { deletedForEveryone: true, body: "", attachmentUrl: null },
+    })
+  } else {
+    await prisma.message.update({
+      where: { id: msg.id },
+      data: { hiddenFor: { push: input.userId } },
+    })
+  }
+  return { ok: true }
+}
+
 const PARTICIPANT_USER = {
   select: { id: true, fullName: true, avatarInitials: true, organisation: true, verificationStatus: true, lastSeenAt: true },
 } as const
@@ -87,10 +119,15 @@ export async function listConversations(userId: string) {
         },
       })
       const last = p.conversation.messages[0]
+      const lastPreview = last
+        ? last.deletedForEveryone
+          ? { body: "This message was deleted", createdAt: last.createdAt, hasAttachment: false }
+          : { body: last.body, createdAt: last.createdAt, hasAttachment: !!last.attachmentUrl }
+        : null
       return {
         id: p.conversationId,
         other: other ? { ...other, online: onlineFrom(other.lastSeenAt) } : other,
-        lastMessage: last ? { body: last.body, createdAt: last.createdAt, hasAttachment: !!last.attachmentUrl } : null,
+        lastMessage: lastPreview,
         lastMessageAt: p.conversation.lastMessageAt,
         unread,
       }
@@ -124,7 +161,8 @@ export async function getConversationForUser(userId: string, conversationId: str
     where: { id: conversationId },
     include: {
       participants: { include: { user: PARTICIPANT_USER } },
-      messages: { orderBy: { createdAt: "asc" } },
+      // Skip messages this user deleted just for themselves.
+      messages: { where: { NOT: { hiddenFor: { has: userId } } }, orderBy: { createdAt: "asc" } },
       swapRequest: {
         include: {
           listing: { select: { id: true, title: true, city: true, country: true, primaryPhotoUrl: true } },
@@ -144,7 +182,15 @@ export async function getConversationForUser(userId: string, conversationId: str
   return {
     id: convo.id,
     other: otherParticipant?.user,
-    messages: convo.messages,
+    // Clean client shape (don't leak hiddenFor); tombstones surface as deletedForEveryone.
+    messages: convo.messages.map((m) => ({
+      id: m.id,
+      senderId: m.senderId,
+      body: m.body,
+      attachmentUrl: m.attachmentUrl,
+      createdAt: m.createdAt,
+      deletedForEveryone: m.deletedForEveryone,
+    })),
     swapRequest: convo.swapRequest,
     // Read-receipt, typing, and presence signals for the other party.
     otherLastReadAt: otherParticipant?.lastReadAt ?? null,
