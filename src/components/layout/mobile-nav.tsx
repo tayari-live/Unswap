@@ -2,9 +2,10 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import { MoreHorizontal } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useVisiblePolling } from "@/lib/use-visible-polling"
 import { adminNavigation } from "./nav-items"
 import { memberMobileNavigation } from "./member-nav-items"
 
@@ -27,26 +28,19 @@ export function MobileNav({ variant = "admin" }: { variant?: "admin" | "member" 
     return () => document.removeEventListener("mousedown", onClick)
   }, [])
 
-  // Members: poll the unread-message count for the Messages tab badge (same
-  // endpoint and cadence as the desktop sidebar).
-  useEffect(() => {
+  // Members: poll the unread-message count for the Messages tab badge — only
+  // while the tab is visible, at a relaxed cadence (matches the desktop sidebar).
+  const load = useCallback(async () => {
     if (variant !== "member") return
-    let active = true
-    const load = async () => {
-      try {
-        const res = await fetch("/api/conversations?count=1", { cache: "no-store" })
-        if (res.ok && active) setUnread((await res.json()).unread ?? 0)
-      } catch {
-        /* ignore */
-      }
-    }
-    load()
-    const t = setInterval(load, 10000)
-    return () => {
-      active = false
-      clearInterval(t)
+    try {
+      const res = await fetch("/api/conversations?count=1", { cache: "no-store" })
+      if (res.ok) setUnread((await res.json()).unread ?? 0)
+    } catch {
+      /* ignore */
     }
   }, [variant, pathname])
+  useEffect(() => { load() }, [load])
+  useVisiblePolling(load, 20000, { immediate: false })
 
   // The member Home tab matches exactly so it doesn't stay lit on /dashboard/*.
   const isActive = (href: string) =>

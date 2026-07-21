@@ -3,10 +3,11 @@
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { signOut } from "next-auth/react"
 import { UserCircle, Settings, LogOut, BadgeCheck, Clock, ShieldAlert, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useVisiblePolling } from "@/lib/use-visible-polling"
 import { memberNavigation } from "./member-nav-items"
 
 // These live in the bottom account menu, not the main nav list.
@@ -34,29 +35,24 @@ export function MemberSidebar({
   const [collapsed, setCollapsed] = useState(true)
   const [accountOpen, setAccountOpen] = useState(false)
 
-  // Poll unread messages + new-activity counts for the two badges.
-  useEffect(() => {
-    let active = true
-    const load = async () => {
-      try {
-        const [m, n] = await Promise.all([
-          fetch("/api/conversations?count=1", { cache: "no-store" }).then((r) => (r.ok ? r.json() : null)),
-          fetch("/api/member-notifications", { cache: "no-store" }).then((r) => (r.ok ? r.json() : null)),
-        ])
-        if (!active) return
-        if (m) setUnread(m.unread ?? 0)
-        if (n) setNotifs(n.unread ?? 0)
-      } catch {
-        /* ignore */
-      }
-    }
-    load()
-    const t = setInterval(load, 10000)
-    return () => {
-      active = false
-      clearInterval(t)
+  // Poll unread messages + new-activity counts for the two badges — only while
+  // the tab is visible, at a relaxed cadence (also the app-wide presence beat).
+  const load = useCallback(async () => {
+    try {
+      const [m, n] = await Promise.all([
+        fetch("/api/conversations?count=1", { cache: "no-store" }).then((r) => (r.ok ? r.json() : null)),
+        fetch("/api/member-notifications", { cache: "no-store" }).then((r) => (r.ok ? r.json() : null)),
+      ])
+      if (m) setUnread(m.unread ?? 0)
+      if (n) setNotifs(n.unread ?? 0)
+    } catch {
+      /* ignore */
     }
   }, [pathname])
+  // Refresh badges on mount and whenever the route changes (e.g. after visiting
+  // the notifications page clears it); the interval handles ongoing updates.
+  useEffect(() => { load() }, [load])
+  useVisiblePolling(load, 20000, { immediate: false })
 
   // Collapsing the rail (mouse leave) closes the account menu too.
   useEffect(() => {

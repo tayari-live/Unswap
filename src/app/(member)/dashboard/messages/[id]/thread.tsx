@@ -5,6 +5,7 @@ import Link from "next/link"
 import { ArrowLeft, Send, Paperclip, X, Check, CheckCheck, FileText, ChevronDown, MoreVertical, Trash2, Ban } from "lucide-react"
 import { ReportButton } from "@/components/report-button"
 import { useToast } from "@/components/ui/toast"
+import { useVisiblePolling } from "@/lib/use-visible-polling"
 
 type Msg = { id: string; senderId: string; body: string; attachmentUrl: string | null; createdAt: string; deletedForEveryone?: boolean }
 type Other = { id: string; fullName: string; avatarInitials: string; verificationStatus: string; organisation?: string | null } | null
@@ -109,42 +110,59 @@ export function Thread({
   const atBottomRef = useRef(true)
   const prevLastIdRef = useRef<string | null>(null)
   const lastTypingPing = useRef(0)
+  // Always-current messages, so the poll can compute "after" without re-creating.
+  const messagesRef = useRef(messages)
+  messagesRef.current = messages
 
-  const refresh = useCallback(async () => {
+  const applyStatus = (data: any) => {
+    setOtherLastReadAt(data.otherLastReadAt ?? null)
+    setOtherTyping(!!data.otherTyping)
+    setOtherOnline(!!data.otherOnline)
+    setOtherLastSeenAt(data.otherLastSeenAt ?? null)
+  }
+
+  // Hot poll: read/typing/presence + only messages newer than what we hold.
+  // Ships almost nothing when idle and never re-sends old attachment blobs.
+  const syncFast = useCallback(async () => {
+    const msgs = messagesRef.current
+    const lastReal = [...msgs].reverse().find((m) => !m.id.startsWith("temp-"))
+    const qs = lastReal ? `?after=${encodeURIComponent(new Date(lastReal.createdAt).toISOString())}` : ""
     try {
-      const res = await fetch(`/api/conversations/${conversationId}`, { cache: "no-store" })
-      if (res.ok) {
-        const data = await res.json()
-        // Reconcile server truth without dropping still-in-flight optimistic sends.
-        // Bail out (return the same ref) when nothing changed so the list doesn't
-        // re-render — and the scroll effect doesn't fire — on every idle poll.
+      const res = await fetch(`/api/conversations/${conversationId}/typing${qs}`, { cache: "no-store" })
+      if (!res.ok) return
+      const data = await res.json()
+      applyStatus(data)
+      if (Array.isArray(data.messages) && data.messages.length) {
         setMessages((prev) => {
-          const optimistic = prev.filter((m) => m.id.startsWith("temp-"))
-          const next = [...data.messages, ...optimistic]
-          if (next.length === prev.length && next.every((m, i) => m.id === prev[i].id)) return prev
-          return next
+          const known = new Set(prev.map((m) => m.id))
+          const add = data.messages.filter((m: Msg) => !known.has(m.id))
+          return add.length ? [...prev, ...add] : prev
         })
-        setOtherLastReadAt(data.otherLastReadAt ?? null)
-        setOtherTyping(!!data.otherTyping)
-        setOtherOnline(!!data.otherOnline)
-        setOtherLastSeenAt(data.otherLastSeenAt ?? null)
       }
     } catch {
       /* ignore transient poll errors */
     }
   }, [conversationId])
 
-  // Cheap status poll (read receipts + typing + presence) — runs faster than the
-  // message poll so "typing…", read ticks, and online state feel responsive.
-  const pollStatus = useCallback(async () => {
+  // Rare full reconcile: catches edits the hot poll can't see (the other party's
+  // "delete for everyone"). Ships the full history, so keep it infrequent.
+  const refresh = useCallback(async () => {
     try {
-      const res = await fetch(`/api/conversations/${conversationId}/typing`, { cache: "no-store" })
+      const res = await fetch(`/api/conversations/${conversationId}`, { cache: "no-store" })
       if (res.ok) {
         const data = await res.json()
-        setOtherLastReadAt(data.otherLastReadAt ?? null)
-        setOtherTyping(!!data.otherTyping)
-        setOtherOnline(!!data.otherOnline)
-        setOtherLastSeenAt(data.otherLastSeenAt ?? null)
+        setMessages((prev) => {
+          const optimistic = prev.filter((m) => m.id.startsWith("temp-"))
+          const next = [...data.messages, ...optimistic]
+          // Bail (same ref, no re-render/scroll) when nothing changed.
+          if (
+            next.length === prev.length &&
+            next.every((m, i) => m.id === prev[i].id && !!m.deletedForEveryone === !!prev[i].deletedForEveryone)
+          )
+            return prev
+          return next
+        })
+        applyStatus(data)
       }
     } catch {
       /* ignore transient poll errors */
@@ -159,12 +177,10 @@ export function Thread({
     fetch(`/api/conversations/${conversationId}/typing`, { method: "POST" }).catch(() => {})
   }, [conversationId])
 
-  // Poll for new messages (4s) and status (2s).
-  useEffect(() => {
-    const m = setInterval(refresh, 4000)
-    const s = setInterval(pollStatus, 2000)
-    return () => { clearInterval(m); clearInterval(s) }
-  }, [refresh, pollStatus])
+  // Poll only while the tab is visible: fast incremental sync every 6s, and a
+  // full reconcile every 60s (also runs on tab focus).
+  useVisiblePolling(syncFast, 6000)
+  useVisiblePolling(refresh, 60000, { immediate: false })
 
   const scrollToBottom = useCallback((smooth = true) => {
     bottomRef.current?.scrollIntoView({ behavior: smooth ? "smooth" : "auto" })

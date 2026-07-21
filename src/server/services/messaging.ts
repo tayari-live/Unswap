@@ -59,6 +59,17 @@ const PARTICIPANT_USER = {
   select: { id: true, fullName: true, avatarInitials: true, organisation: true, verificationStatus: true, lastSeenAt: true },
 } as const
 
+type RawMessage = { id: string; senderId: string; body: string; attachmentUrl: string | null; createdAt: Date; deletedForEveryone: boolean }
+// Clean client shape — never leaks hiddenFor; tombstones surface via deletedForEveryone.
+const toClientMessage = (m: RawMessage) => ({
+  id: m.id,
+  senderId: m.senderId,
+  body: m.body,
+  attachmentUrl: m.attachmentUrl,
+  createdAt: m.createdAt,
+  deletedForEveryone: m.deletedForEveryone,
+})
+
 /** Messaging is reserved for fully verified members (the walled garden). */
 async function assertCanMessage(userId: string) {
   const u = await prisma.user.findUnique({ where: { id: userId } })
@@ -182,15 +193,7 @@ export async function getConversationForUser(userId: string, conversationId: str
   return {
     id: convo.id,
     other: otherParticipant?.user,
-    // Clean client shape (don't leak hiddenFor); tombstones surface as deletedForEveryone.
-    messages: convo.messages.map((m) => ({
-      id: m.id,
-      senderId: m.senderId,
-      body: m.body,
-      attachmentUrl: m.attachmentUrl,
-      createdAt: m.createdAt,
-      deletedForEveryone: m.deletedForEveryone,
-    })),
+    messages: convo.messages.map(toClientMessage),
     swapRequest: convo.swapRequest,
     // Read-receipt, typing, and presence signals for the other party.
     otherLastReadAt: otherParticipant?.lastReadAt ?? null,
@@ -219,22 +222,45 @@ export async function setTyping(userId: string, conversationId: string) {
   return { ok: true }
 }
 
-/** Lightweight read/typing/presence status for the open thread (no messages). */
-export async function getConversationStatus(userId: string, conversationId: string) {
+/**
+ * Lightweight sync for the open thread: read/typing/presence plus, when `after`
+ * (the client's newest message time) is given, only the messages created since
+ * then. This is the hot poll — it must stay cheap, so it never re-ships history
+ * or attachment blobs the client already holds.
+ */
+export async function getConversationStatus(userId: string, conversationId: string, after?: string) {
   const parts = await prisma.conversationParticipant.findMany({
     where: { conversationId },
-    select: { userId: true, lastReadAt: true, typingAt: true, user: { select: { lastSeenAt: true } } },
+    select: { id: true, userId: true, lastReadAt: true, typingAt: true, user: { select: { lastSeenAt: true } } },
   })
   const me = parts.find((p) => p.userId === userId)
   if (!me) throw new ApiError(404, "Conversation not found.")
   // Viewing a thread counts as presence, on any device.
   await touchLastSeen(userId)
   const other = parts.find((p) => p.userId !== userId)
+
+  let messages: ReturnType<typeof toClientMessage>[] = []
+  if (after) {
+    const afterDate = new Date(after)
+    if (!Number.isNaN(afterDate.getTime())) {
+      const rows = await prisma.message.findMany({
+        where: { conversationId, createdAt: { gt: afterDate }, NOT: { hiddenFor: { has: userId } } },
+        orderBy: { createdAt: "asc" },
+      })
+      messages = rows.map(toClientMessage)
+      // New incoming messages mean the viewer has now read up to here.
+      if (rows.some((r) => r.senderId !== userId)) {
+        await prisma.conversationParticipant.update({ where: { id: me.id }, data: { lastReadAt: new Date() } })
+      }
+    }
+  }
+
   return {
     otherLastReadAt: other?.lastReadAt ?? null,
     otherTyping: isRecent(other?.typingAt),
     otherLastSeenAt: other?.user.lastSeenAt ?? null,
     otherOnline: onlineFrom(other?.user.lastSeenAt),
+    messages,
   }
 }
 

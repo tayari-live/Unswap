@@ -13,13 +13,14 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
   }
 }
 
-// GET /api/conversations/:id/typing → the other party's read + typing status
-// (cheap: no message payload, does not mark the thread read)
-export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+// GET /api/conversations/:id/typing[?after=<ISO>] → read/typing/presence status,
+// plus only the messages newer than `after` (the hot, cheap incremental poll).
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await requireSession()
     const { id } = await params
-    return NextResponse.json(await getConversationStatus(session.user!.id as string, id))
+    const after = req.nextUrl.searchParams.get("after") ?? undefined
+    return NextResponse.json(await getConversationStatus(session.user!.id as string, id, after))
   } catch (err) {
     return toErrorResponse(err)
   }
