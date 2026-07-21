@@ -99,9 +99,15 @@ export function ProfileWizard({ initial, onSaved }: { initial: ProfileValues; on
       const data = await res.json()
       if (!res.ok) { toast(data.error || "Could not save your profile.", "error"); setLoading(false); return }
       toast("Profile saved.", "success")
-      onSaved?.(data.completion ?? completion)
-      // Re-render the server page so the completion stat card reflects the new %.
-      router.refresh()
+      if (onSaved) {
+        // Onboarding flow: hand control back to the parent (advances the step).
+        onSaved(data.completion ?? completion)
+        router.refresh()
+      } else {
+        // Standalone profile page: return to the dashboard after saving.
+        router.push("/dashboard")
+        router.refresh()
+      }
     } catch {
       toast("Something went wrong. Please try again.", "error")
     } finally {
