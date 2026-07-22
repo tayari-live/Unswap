@@ -4,6 +4,7 @@ import { UserCircle, ShieldCheck, CreditCard, Bell, ChevronRight } from "lucide-
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
 import { PageHeader } from "@/components/ui/page-header"
+import { ChangePasswordForm } from "@/components/account/change-password-form"
 
 export const dynamic = "force-dynamic"
 
@@ -75,8 +76,14 @@ export default async function SettingsPage() {
         ))}
       </div>
 
+      <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6 sm:p-8 mt-6">
+        <h2 className="font-display font-bold text-lg text-[var(--navy)] mb-1.5">Password</h2>
+        <p className="text-sm text-neutral mb-5">Change the password you use to sign in.</p>
+        <ChangePasswordForm />
+      </div>
+
       <p className="mt-4 text-center text-xs text-neutral">
-        Sign out from the account menu in the top-right corner.
+        Sign out from the account menu in the sidebar.
       </p>
     </div>
   )

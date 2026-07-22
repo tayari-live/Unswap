@@ -55,6 +55,36 @@ export async function requestPasswordReset(rawEmail: string) {
   return { ok: true }
 }
 
+/** Change the signed-in user's password (verifies their current one first). */
+export async function changePassword(userId: string, currentPassword: string, newPassword: string) {
+  if (!newPassword || newPassword.length < 8) {
+    throw new ApiError(400, "Your new password must be at least 8 characters.")
+  }
+  const user = await prisma.user.findUnique({ where: { id: userId } })
+  if (!user) throw new ApiError(404, "Account not found.")
+
+  const valid = await bcrypt.compare(currentPassword ?? "", user.passwordHash)
+  if (!valid) throw new ApiError(400, "Your current password is incorrect.")
+  if (currentPassword === newPassword) {
+    throw new ApiError(400, "Your new password must be different from your current one.")
+  }
+
+  const passwordHash = await bcrypt.hash(newPassword, 12)
+  await prisma.$transaction([
+    prisma.user.update({ where: { id: userId }, data: { passwordHash } }),
+    // Any outstanding email-reset links are invalidated by the change.
+    prisma.passwordResetToken.updateMany({ where: { userId, usedAt: null }, data: { usedAt: new Date() } }),
+  ])
+
+  await logAudit({
+    actorId: userId,
+    action: "PASSWORD_CHANGED",
+    subject: `Password changed: ${user.fullName}`,
+  })
+
+  return { ok: true }
+}
+
 /** Complete a password reset using a one-time token. */
 export async function resetPassword(rawToken: string, password: string) {
   if (!rawToken) throw new ApiError(400, "Missing reset token.")

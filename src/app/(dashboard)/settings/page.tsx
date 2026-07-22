@@ -4,6 +4,7 @@ import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
 import { PageHeader } from "@/components/ui/page-header"
 import { SignOutButton } from "@/components/layout/sign-out-button"
+import { ChangePasswordForm } from "@/components/account/change-password-form"
 
 export const dynamic = "force-dynamic"
 
@@ -47,6 +48,12 @@ export default async function AdminSettingsPage() {
             </div>
           ))}
         </dl>
+      </div>
+
+      <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6 sm:p-8 mt-6">
+        <h2 className="font-display font-bold text-lg text-[var(--navy)] mb-1.5">Password</h2>
+        <p className="text-sm text-neutral mb-5">Change the password for your admin account.</p>
+        <ChangePasswordForm />
       </div>
 
       <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6 sm:p-8 mt-6">
