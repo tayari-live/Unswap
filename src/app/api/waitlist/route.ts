@@ -8,9 +8,9 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
     const result = await initiateWaitlist({
-      firstName: body.firstName,
-      lastName: body.lastName,
+      name: body.name,
       email: body.email,
+      organization: body.organization,
       ref: body.ref,
     })
     return NextResponse.json(result)

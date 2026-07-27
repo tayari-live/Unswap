@@ -47,6 +47,18 @@
 
   --font-sans: var(--font-dm-sans), "Helvetica Neue", Arial, sans-serif;
   --font-display: var(--font-cormorant), Georgia, "Times New Roman", serif;
+
+  /* Waitlist — ported dark/gold luxury palette (namespaced, scoped to /join). */
+  --color-wl-navy: #0a0e1a;
+  --color-wl-deep: #060910;
+  --color-wl-gold: #c9a84c;
+  --color-wl-gold-light: #e4c97a;
+  --color-wl-gold-dim: rgba(201, 168, 76, 0.18);
+  --color-wl-ivory: #f5f0e8;
+  --color-wl-ivory-dim: rgba(245, 240, 232, 0.65);
+  --color-wl-cream: #ede8dd;
+  --color-wl-muted: rgba(245, 240, 232, 0.4);
+  --color-wl-border: rgba(201, 168, 76, 0.25);
 }
 
 :root {

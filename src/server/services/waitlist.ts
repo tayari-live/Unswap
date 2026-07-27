@@ -3,7 +3,6 @@ import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
 import { logAudit } from "@/server/services/audit"
 import { sendEmail } from "@/server/email"
-import { matchAllowedDomain } from "@/server/services/registration"
 import { kitSendWaitlistConfirmation, kitAddToForm, kitUpdateReferralCount, kitConfigured } from "@/server/kit"
 
 const baseUrl = () => process.env.AUTH_URL || "http://localhost:3000"
@@ -57,18 +56,20 @@ async function resolveRef(ref: string | undefined, selfEmail: string) {
 /**
  * Step 1 of double opt-in: register intent and email a confirmation link (via
  * Kit). Nothing counts toward the waitlist until the link is clicked, so the
- * referrer is NOT credited here.
+ * referrer is NOT credited here. Open signup — a single name + free-text
+ * organisation, no institutional-domain gate (that's enforced later, at
+ * identity verification, not at the waitlist).
  */
-export async function initiateWaitlist(input: { firstName: string; lastName: string; email: string; ref?: string }) {
-  const firstName = input.firstName?.trim()
-  const lastName = input.lastName?.trim()
+export async function initiateWaitlist(input: { name: string; email: string; organization?: string; ref?: string }) {
+  const name = input.name?.trim()
   const email = input.email?.trim().toLowerCase()
 
-  if (!firstName || !lastName) throw new ApiError(400, "First and last name are required.")
+  if (!name) throw new ApiError(400, "Your full name is required.")
   if (!EMAIL_RE.test(email)) throw new ApiError(400, "Enter a valid email address.")
 
-  const matched = await matchAllowedDomain(email)
-  if (!matched) throw new ApiError(400, "Please use your institutional email (e.g. @un.org, @undp.org).")
+  const [firstName, ...rest] = name.split(/\s+/)
+  const lastName = rest.join(" ")
+  const organisation = input.organization?.trim() || null
 
   const existing = await prisma.waitlistEntry.findUnique({ where: { email } })
   if (existing?.confirmedAt) {
@@ -82,11 +83,11 @@ export async function initiateWaitlist(input: { firstName: string; lastName: str
     // Unconfirmed already — refresh their details + token and re-send the link.
     await prisma.waitlistEntry.update({
       where: { id: existing.id },
-      data: { firstName, lastName, organisation: matched.label, confirmToken: token, referredBy: existing.referredBy ?? referredBy },
+      data: { firstName, lastName, organisation, confirmToken: token, referredBy: existing.referredBy ?? referredBy },
     })
   } else {
     await prisma.waitlistEntry.create({
-      data: { firstName, lastName, email, organisation: matched.label, referralCode: await uniqueReferralCode(), referredBy, confirmToken: token },
+      data: { firstName, lastName, email, organisation, referralCode: await uniqueReferralCode(), referredBy, confirmToken: token },
     })
   }
 

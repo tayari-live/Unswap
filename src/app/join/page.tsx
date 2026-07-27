@@ -1,23 +1,11 @@
-import { Suspense } from "react"
-import Link from "next/link"
-import { Logo } from "@/components/brand/logo"
-import { WaitlistForm } from "./waitlist-form"
+import { WaitlistClient } from "./waitlist-client"
 
-export const metadata = { title: "Join the Waitlist" }
+export const metadata = {
+  title: "Join the Waitlist",
+  description:
+    "Join the UnSwap waitlist — a closed-loop home exchange ecosystem for verified UN, World Bank, IMF and international organisation staff.",
+}
 
 export default function WaitlistPage() {
-  return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-[var(--background)]">
-      <div className="w-full max-w-md">
-        <div className="flex justify-center mb-8">
-          <Logo underline wordClassName="text-[var(--navy)]" />
-        </div>
-        <div className="bg-white rounded-3xl shadow-xl border border-[var(--border)] p-8 sm:p-10">
-          <Suspense fallback={<p className="text-center text-sm text-neutral">Loading…</p>}>
-            <WaitlistForm />
-          </Suspense>
-        </div>
-      </div>
-    </div>
-  )
+  return <WaitlistClient />
 }

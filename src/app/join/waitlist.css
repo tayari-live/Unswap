@@ -1,0 +1,108 @@
+/* Scoped luxury theme for the ported waitlist (/join + /join/success).
+   Everything lives under .wl-root so it never touches the rest of the app. */
+
+.wl-root {
+  /* Raw vars so ported inline `var(--…)` styles resolve exactly as in the
+     original app, without leaking to the global light theme. */
+  --navy: #0a0e1a;
+  --deep: #060910;
+  --gold: #c9a84c;
+  --gold-light: #e4c97a;
+  --gold-dim: rgba(201, 168, 76, 0.18);
+  --ivory: #f5f0e8;
+  --ivory-dim: rgba(245, 240, 232, 0.65);
+  --cream: #ede8dd;
+  --muted: rgba(245, 240, 232, 0.4);
+  --border: rgba(201, 168, 76, 0.25);
+  --serif: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  --sans: var(--font-dm-sans), "DM Sans", sans-serif;
+
+  min-height: 100vh;
+  background-color: var(--navy);
+  color: var(--ivory);
+  font-family: var(--font-dm-sans), "DM Sans", sans-serif;
+  font-size: 17px;
+  line-height: 1.7;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Cormorant Garamond for the display headings. */
+.wl-root .font-display {
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+}
+
+/* Fine film-grain noise overlay. */
+.wl-root::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.5;
+}
+
+.wl-root .btn-gold {
+  display: inline-block;
+  background: var(--gold);
+  color: var(--navy);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 17px 38px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.25s, transform 0.2s;
+}
+.wl-root .btn-gold:hover {
+  background: var(--gold-light);
+  transform: translateY(-2px);
+}
+.wl-root .btn-gold:disabled {
+  opacity: 0.6;
+  cursor: default;
+  transform: none;
+}
+
+.wl-root .btn-outline {
+  display: inline-block;
+  background: transparent;
+  color: var(--gold);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 17px 38px;
+  border: 1px solid var(--gold);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.25s, color 0.25s, transform 0.2s;
+}
+.wl-root .btn-outline:hover {
+  background: var(--gold-dim);
+  transform: translateY(-2px);
+}
+
+/* Platform share buttons — colour-on-hover driven by inline --btn-* vars. */
+.wl-root .platform-btn {
+  transition: all 0.2s ease;
+}
+.wl-root .platform-btn:hover,
+.wl-root .platform-btn:focus-visible {
+  border-color: var(--btn-color) !important;
+  background-color: var(--btn-bg) !important;
+  color: #ffffff !important;
+  transform: translateY(-2px);
+  box-shadow: var(--btn-glow);
+}
+
+.wl-root .no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.wl-root .no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
