@@ -4,13 +4,18 @@ import { ApiError } from "@/server/http"
 import { logAudit } from "@/server/services/audit"
 import { sendEmail } from "@/server/email"
 import { matchAllowedDomain } from "@/server/services/registration"
+import { kitSendWaitlistConfirmation, kitAddToForm, kitUpdateReferralCount, kitConfigured } from "@/server/kit"
 
 const baseUrl = () => process.env.AUTH_URL || "http://localhost:3000"
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const EARLY_BIRD_CAP = 500
 
+/** Admin: the real waitlist (confirmed entries only), best-referrers first. */
 export function listWaitlist() {
-  return prisma.waitlistEntry.findMany({ orderBy: [{ referrals: "desc" }, { createdAt: "asc" }] })
+  return prisma.waitlistEntry.findMany({
+    where: { confirmedAt: { not: null } },
+    orderBy: [{ referrals: "desc" }, { confirmedAt: "asc" }],
+  })
 }
 
 async function uniqueReferralCode(): Promise<string> {
@@ -23,14 +28,38 @@ async function uniqueReferralCode(): Promise<string> {
 }
 
 const referralUrl = (code: string) => `${baseUrl()}/join?ref=${code}`
+const confirmUrl = (token: string) => `${baseUrl()}/api/waitlist/confirm?token=${token}`
 
-/** Public: join the pre-launch waitlist (institutional email required). */
-export async function joinWaitlist(input: {
-  firstName: string
-  lastName: string
-  email: string
-  ref?: string
-}) {
+/**
+ * Referral-boosted queue position (confirmed entries only): more referrals =
+ * higher; ties broken by who confirmed first. Inviting friends moves you up.
+ */
+async function positionOf(entry: { referrals: number; confirmedAt: Date }) {
+  const ahead = await prisma.waitlistEntry.count({
+    where: {
+      confirmedAt: { not: null },
+      OR: [
+        { referrals: { gt: entry.referrals } },
+        { AND: [{ referrals: entry.referrals }, { confirmedAt: { lt: entry.confirmedAt } }] },
+      ],
+    },
+  })
+  return ahead + 1
+}
+
+/** Validate a referral code → the referrer's code (never self, never blank). */
+async function resolveRef(ref: string | undefined, selfEmail: string) {
+  if (!ref) return null
+  const referrer = await prisma.waitlistEntry.findUnique({ where: { referralCode: ref } })
+  return referrer && referrer.email !== selfEmail ? referrer.referralCode : null
+}
+
+/**
+ * Step 1 of double opt-in: register intent and email a confirmation link (via
+ * Kit). Nothing counts toward the waitlist until the link is clicked, so the
+ * referrer is NOT credited here.
+ */
+export async function initiateWaitlist(input: { firstName: string; lastName: string; email: string; ref?: string }) {
   const firstName = input.firstName?.trim()
   const lastName = input.lastName?.trim()
   const email = input.email?.trim().toLowerCase()
@@ -39,62 +68,109 @@ export async function joinWaitlist(input: {
   if (!EMAIL_RE.test(email)) throw new ApiError(400, "Enter a valid email address.")
 
   const matched = await matchAllowedDomain(email)
-  if (!matched) {
-    throw new ApiError(400, "Please use your institutional email (e.g. @un.org, @undp.org).")
-  }
+  if (!matched) throw new ApiError(400, "Please use your institutional email (e.g. @un.org, @undp.org).")
 
-  // Already on the list → return their existing referral details (idempotent).
   const existing = await prisma.waitlistEntry.findUnique({ where: { email } })
+  if (existing?.confirmedAt) {
+    return { status: "already_confirmed" as const, email }
+  }
+
+  const token = randomBytes(32).toString("hex")
+  const referredBy = await resolveRef(input.ref, email)
+
   if (existing) {
-    const position = await prisma.waitlistEntry.count({ where: { createdAt: { lte: existing.createdAt } } })
-    return {
-      alreadyJoined: true,
-      referralCode: existing.referralCode,
-      referralUrl: referralUrl(existing.referralCode),
-      position,
-      earlyBird: position <= EARLY_BIRD_CAP,
-    }
+    // Unconfirmed already — refresh their details + token and re-send the link.
+    await prisma.waitlistEntry.update({
+      where: { id: existing.id },
+      data: { firstName, lastName, organisation: matched.label, confirmToken: token, referredBy: existing.referredBy ?? referredBy },
+    })
+  } else {
+    await prisma.waitlistEntry.create({
+      data: { firstName, lastName, email, organisation: matched.label, referralCode: await uniqueReferralCode(), referredBy, confirmToken: token },
+    })
   }
 
-  const referralCode = await uniqueReferralCode()
-  // Resolve and credit the referrer, if any.
-  let referredBy: string | null = null
-  if (input.ref) {
-    const referrer = await prisma.waitlistEntry.findUnique({ where: { referralCode: input.ref } })
-    if (referrer && referrer.email !== email) {
-      referredBy = referrer.referralCode
-      await prisma.waitlistEntry.update({ where: { id: referrer.id }, data: { referrals: { increment: 1 } } })
-    }
-  }
+  const { sent } = await kitSendWaitlistConfirmation({ email, firstName, token })
+  await logAudit({ action: "WAITLIST_INITIATED", subject: `${firstName} ${lastName}`, metadata: { email, referredBy } })
 
-  const entry = await prisma.waitlistEntry.create({
-    data: { firstName, lastName, email, organisation: matched.label, referralCode, referredBy },
-  })
-  const position = await prisma.waitlistEntry.count()
-  const earlyBird = position <= EARLY_BIRD_CAP
-
-  await sendEmail({
-    to: email,
-    subject: "You're on the UnSwap waitlist",
-    html: `
-      <h2>Welcome to the waitlist, ${firstName}.</h2>
-      <p>You're <strong>#${position}</strong> in line for UnSwap — the verified home exchange network for UN and international organisation professionals.</p>
-      ${earlyBird ? `<p>As one of our first ${EARLY_BIRD_CAP} members you qualify for <strong>50% off the Limited 1X plan</strong> at launch.</p>` : ""}
-      <p>Move up the list by inviting peers. Refer 5 or more and earn <strong>6 months of Unlimited Pro, free</strong>.</p>
-      <p>Your referral link: <a href="${referralUrl(referralCode)}">${referralUrl(referralCode)}</a></p>
-    `,
-    text: `You're #${position} on the UnSwap waitlist. Your referral link: ${referralUrl(referralCode)}`,
-  })
-
-  await logAudit({ action: "WAITLIST_JOINED", subject: `${firstName} ${lastName}`, metadata: { email, referredBy } })
-  return { alreadyJoined: false, referralCode, referralUrl: referralUrl(referralCode), position, earlyBird, entryId: entry.id }
+  // Without Kit configured (local dev), hand back the link so the flow is testable.
+  return { status: "pending" as const, email, emailSent: sent, confirmUrl: kitConfigured() ? undefined : confirmUrl(token) }
 }
 
-/** Public leaderboard of top referrers (last name masked for privacy). */
+/**
+ * Step 2: the emailed link lands here. Finalize the entry, credit the referrer
+ * once, sync Kit, and return their position + referral link for the share page.
+ */
+export async function confirmWaitlist(token: string) {
+  if (!token) throw new ApiError(400, "Missing confirmation token.")
+  const entry = await prisma.waitlistEntry.findUnique({ where: { confirmToken: token } })
+  if (!entry) throw new ApiError(400, "This confirmation link is invalid or has already been used.")
+
+  const confirmedAt = new Date()
+  await prisma.waitlistEntry.update({ where: { id: entry.id }, data: { confirmedAt, confirmToken: null } })
+
+  // Credit the referrer now (only verified sign-ups count).
+  if (entry.referredBy) {
+    const referrer = await prisma.waitlistEntry.findUnique({ where: { referralCode: entry.referredBy } })
+    if (referrer) {
+      const updated = await prisma.waitlistEntry.update({ where: { id: referrer.id }, data: { referrals: { increment: 1 } } })
+      await kitUpdateReferralCount(referrer.email, updated.referrals)
+    }
+  }
+  await kitAddToForm(entry.email)
+
+  const position = await positionOf({ referrals: entry.referrals, confirmedAt })
+  await logAudit({ action: "WAITLIST_CONFIRMED", subject: `${entry.firstName} ${entry.lastName}`, metadata: { email: entry.email } })
+
+  return {
+    referralCode: entry.referralCode,
+    referralUrl: referralUrl(entry.referralCode),
+    position,
+    earlyBird: position <= EARLY_BIRD_CAP,
+    email: entry.email,
+  }
+}
+
+/** Public: a confirmed member's live status (position, referral count, link). */
+export async function getWaitlistStatus(rawEmail: string) {
+  const email = rawEmail?.trim().toLowerCase()
+  if (!email) throw new ApiError(400, "Email is required.")
+  const e = await prisma.waitlistEntry.findUnique({ where: { email } })
+  if (!e || !e.confirmedAt) return { found: false as const }
+  const position = await positionOf({ referrals: e.referrals, confirmedAt: e.confirmedAt })
+  return {
+    found: true as const,
+    referralCode: e.referralCode,
+    referralUrl: referralUrl(e.referralCode),
+    position,
+    referrals: e.referrals,
+    earlyBird: position <= EARLY_BIRD_CAP,
+  }
+}
+
+/** Same as above but keyed by referral code — used by the share page. */
+export async function getWaitlistStatusByCode(rawCode: string) {
+  const code = rawCode?.trim()
+  if (!code) throw new ApiError(400, "Referral code is required.")
+  const e = await prisma.waitlistEntry.findUnique({ where: { referralCode: code } })
+  if (!e || !e.confirmedAt) return { found: false as const }
+  const position = await positionOf({ referrals: e.referrals, confirmedAt: e.confirmedAt })
+  return {
+    found: true as const,
+    firstName: e.firstName,
+    referralCode: e.referralCode,
+    referralUrl: referralUrl(e.referralCode),
+    position,
+    referrals: e.referrals,
+    earlyBird: position <= EARLY_BIRD_CAP,
+  }
+}
+
+/** Public leaderboard of top referrers (confirmed only; last name masked). */
 export async function getLeaderboard(limit = 10) {
   const rows = await prisma.waitlistEntry.findMany({
-    where: { referrals: { gt: 0 } },
-    orderBy: [{ referrals: "desc" }, { createdAt: "asc" }],
+    where: { confirmedAt: { not: null }, referrals: { gt: 0 } },
+    orderBy: [{ referrals: "desc" }, { confirmedAt: "asc" }],
     take: limit,
     select: { firstName: true, lastName: true, organisation: true, referrals: true },
   })
@@ -105,8 +181,26 @@ export async function getLeaderboard(limit = 10) {
   }))
 }
 
+/** Confirmed-member count (used on the marketing page). */
 export async function getWaitlistCount() {
-  return prisma.waitlistEntry.count()
+  return prisma.waitlistEntry.count({ where: { confirmedAt: { not: null } } })
+}
+
+/** Public social proof: total confirmed + a few recent joiners' initials. */
+export async function getWaitlistCountData() {
+  const [count, recent] = await Promise.all([
+    prisma.waitlistEntry.count({ where: { confirmedAt: { not: null } } }),
+    prisma.waitlistEntry.findMany({
+      where: { confirmedAt: { not: null } },
+      orderBy: { confirmedAt: "desc" },
+      take: 4,
+      select: { firstName: true, lastName: true },
+    }),
+  ])
+  const recentJoiners = recent.map((r) => ({
+    initials: `${r.firstName?.[0] ?? ""}${r.lastName?.[0] ?? ""}`.toUpperCase() || "?",
+  }))
+  return { count, recentJoiners }
 }
 
 /** Admin: CSV of all waitlist entries. */

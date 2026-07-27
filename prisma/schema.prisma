@@ -354,18 +354,22 @@ model SwapRequest {
 
 // Pre-launch waitlist signups with referral tracking.
 model WaitlistEntry {
-  id           String   @id @default(uuid())
+  id           String    @id @default(uuid())
   firstName    String
   lastName     String
-  email        String   @unique
+  email        String    @unique
   organisation String?
-  referralCode String   @unique
-  referredBy   String?  // referralCode of the referrer
-  referrals    Int      @default(0)
-  status       String   @default("pending") // pending | invited | converted
-  createdAt    DateTime @default(now())
+  referralCode String    @unique
+  referredBy   String?   // referralCode of the referrer
+  referrals    Int       @default(0)
+  status       String    @default("pending") // pending | invited | converted
+  // Double opt-in: an entry only counts once the emailed link is clicked.
+  confirmToken String?   @unique
+  confirmedAt  DateTime? // null = email not yet confirmed (not on the list yet)
+  createdAt    DateTime  @default(now())
 
   @@index([createdAt])
+  @@index([confirmedAt, referrals])
 }
 
 model AuditLog {

@@ -206,6 +206,7 @@ async function main() {
         referralCode: `${w.first.toUpperCase()}-${Math.random().toString(36).slice(2, 7).toUpperCase()}`,
         referrals: w.referrals,
         status: w.status,
+        confirmedAt: new Date(), // seeded entries are already confirmed
       },
     })
   }
