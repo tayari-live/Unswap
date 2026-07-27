@@ -1,6 +1,7 @@
 import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
 import { logAudit } from "@/server/services/audit"
+import { grantCreditsOnce } from "@/server/services/credits"
 
 /** List all members (excludes admins), with their subscription. */
 export function listMembers() {
@@ -22,6 +23,9 @@ export async function setMemberStatus(input: { actorId: string; id: string; stat
   if (!member || member.role !== "member") throw new ApiError(404, "Member not found.")
 
   await prisma.user.update({ where: { id: input.id }, data: { verificationStatus: input.status } })
+
+  // Manually verifying a member also grants the verified credit (once).
+  if (input.status === "FULLY_VERIFIED") await grantCreditsOnce(input.id, "verified")
 
   await logAudit({
     actorId: input.actorId,

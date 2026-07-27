@@ -1,6 +1,7 @@
 import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
 import { logAudit } from "@/server/services/audit"
+import { grantCreditsOnce } from "@/server/services/credits"
 import { sendEmail } from "@/server/email"
 
 const loginUrl = () => `${process.env.AUTH_URL || "http://localhost:3000"}/login`
@@ -44,6 +45,9 @@ export async function approveSubmission(input: { actorId: string; id: string; no
       <p><a href="${loginUrl()}">Sign in to UnSwap</a></p>
     `,
   })
+
+  // Reward reaching full verification — once per member.
+  await grantCreditsOnce(submission.memberId, "verified")
 
   await logAudit({
     actorId: input.actorId,

@@ -2,6 +2,7 @@ import Stripe from "stripe"
 import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
 import { logAudit } from "@/server/services/audit"
+import { grantCreditsOnce } from "@/server/services/credits"
 import { sendEmail, renderEmail } from "@/server/email"
 
 // Tier catalogue — the single source of truth for entitlements and pricing.
@@ -77,6 +78,8 @@ export async function activateSubscription(
     })
   }
   await logAudit({ actorId: userId, action: "SUBSCRIPTION_ACTIVATED", subject: `Activated ${t.name}`, metadata: { tier: tierKey } })
+  // First paid subscription grants a credit bonus (idempotent — renewals don't re-pay).
+  await grantCreditsOnce(userId, "first_subscription")
 }
 
 async function getOrCreateCustomer(userId: string): Promise<string> {

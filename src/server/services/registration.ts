@@ -4,6 +4,7 @@ import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
 import { sendEmail } from "@/server/email"
 import { logAudit } from "@/server/services/audit"
+import { grantCreditsOnce } from "@/server/services/credits"
 
 const baseUrl = () => process.env.AUTH_URL || "http://localhost:3000"
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -108,6 +109,9 @@ export async function registerMember(input: RegisterInput) {
   })
 
   const emailSent = await issueVerificationLink({ id: user.id, email, firstName }, fastTrack)
+
+  // Free sign-up credit (once per account).
+  await grantCreditsOnce(user.id, "welcome")
 
   await logAudit({
     action: "MEMBER_REGISTERED",

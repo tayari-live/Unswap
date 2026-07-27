@@ -1,6 +1,7 @@
 import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
 import { logAudit } from "@/server/services/audit"
+import { grantCreditsOnce } from "@/server/services/credits"
 import { encryptField, decryptField } from "@/server/crypto"
 
 // Admin moderation grid. Card fields only — photos are served via
@@ -202,6 +203,8 @@ export async function createListing(ownerId: string, input: ListingInput) {
   })
 
   await logAudit({ actorId: ownerId, action: "LISTING_CREATED", subject: listing.title })
+  // Reward the first published (ACTIVE) listing — once per member.
+  if (status === "ACTIVE") await grantCreditsOnce(ownerId, "first_listing")
   return listing
 }
 
@@ -218,6 +221,9 @@ export async function updateMemberListing(ownerId: string, id: string, input: Li
 
   if (input.status !== undefined && !STATUSES.includes(input.status)) throw new ApiError(400, "Invalid status.")
 
+  // First time this listing goes live → first-listing credit (granted below, once per member).
+  const publishing = input.status === "ACTIVE" && existing.status !== "ACTIVE"
+
   // Publishing (going ACTIVE) requires the gates + minimum content.
   if (input.status === "ACTIVE" && existing.status !== "ACTIVE") {
     await assertCanList(ownerId)
@@ -230,6 +236,7 @@ export async function updateMemberListing(ownerId: string, id: string, input: Li
   if (isStatusOnly) {
     await prisma.listing.update({ where: { id }, data: { status: input.status } })
     await logAudit({ actorId: ownerId, action: "LISTING_UPDATED", subject: existing.title, metadata: { status: input.status } })
+    if (publishing) await grantCreditsOnce(ownerId, "first_listing")
     return { ok: true }
   }
 
@@ -266,6 +273,7 @@ export async function updateMemberListing(ownerId: string, id: string, input: Li
   })
 
   await logAudit({ actorId: ownerId, action: "LISTING_UPDATED", subject: existing.title })
+  if (publishing) await grantCreditsOnce(ownerId, "first_listing")
   return { ok: true }
 }
 
