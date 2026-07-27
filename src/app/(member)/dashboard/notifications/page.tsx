@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import {
-  ArrowLeftRight, Repeat, CalendarCheck, MessageSquare, Star, ShieldAlert, ShieldCheck, ShieldX, UserCircle, Bell,
+  ArrowLeftRight, Repeat, CalendarCheck, MessageSquare, Star, ShieldAlert, ShieldCheck, ShieldX, UserCircle, Bell, Coins,
 } from "lucide-react"
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
@@ -24,6 +24,7 @@ const KIND: Record<MemberNotification["kind"], { icon: typeof Bell; tone: string
   verification: { icon: ShieldAlert, tone: "bg-[var(--parchment)] text-[var(--gold-dark)]" },
   verified: { icon: ShieldCheck, tone: "bg-[var(--teal)]/15 text-[var(--teal)]" },
   rejected: { icon: ShieldX, tone: "bg-[var(--crimson)]/10 text-[var(--crimson)]" },
+  credit: { icon: Coins, tone: "bg-[var(--gold)]/15 text-[var(--gold-dark)]" },
   profile: { icon: UserCircle, tone: "bg-[var(--navy)]/10 text-[var(--navy)]" },
 }
 
