@@ -9,11 +9,10 @@ const baseUrl = () => process.env.AUTH_URL || "http://localhost:3000"
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const EARLY_BIRD_CAP = 500
 
-/** Admin: the real waitlist (confirmed entries only), best-referrers first. */
+/** Admin: all entries — confirmed first (best-referrers), then unconfirmed leads. */
 export function listWaitlist() {
   return prisma.waitlistEntry.findMany({
-    where: { confirmedAt: { not: null } },
-    orderBy: [{ referrals: "desc" }, { confirmedAt: "asc" }],
+    orderBy: [{ confirmedAt: { sort: "desc", nulls: "last" } }, { referrals: "desc" }, { createdAt: "asc" }],
   })
 }
 
@@ -229,6 +228,102 @@ export async function inviteAllPending(actorId: string) {
   }
   await logAudit({ actorId, action: "WAITLIST_BULK_INVITED", subject: `Invited ${pending.length} pending members` })
   return { invited: pending.length }
+}
+
+/**
+ * Admin: import warm leads (e.g. a Kit export of people who signed up but never
+ * confirmed) as PENDING, UNCONFIRMED entries. Each gets a fresh confirm token so
+ * a confirmation email can be (re)sent; deduped by email. `confirmedAt` stays
+ * null, so they don't count on the public waitlist until they actually confirm.
+ */
+export async function importWaitlist(actorId: string, rows: { email?: string; name?: string; organisation?: string }[]) {
+  let imported = 0
+  let skipped = 0
+  let invalid = 0
+  for (const row of rows) {
+    const email = row.email?.trim().toLowerCase()
+    if (!email || !EMAIL_RE.test(email)) { invalid++; continue }
+    const existing = await prisma.waitlistEntry.findUnique({ where: { email } })
+    if (existing) { skipped++; continue }
+    const name = (row.name || "").trim()
+    const parts = name ? name.split(/\s+/) : [email.split("@")[0]]
+    const firstName = parts[0] || email.split("@")[0]
+    const lastName = parts.slice(1).join(" ")
+    await prisma.waitlistEntry.create({
+      data: {
+        firstName,
+        lastName,
+        email,
+        organisation: row.organisation?.trim() || null,
+        referralCode: await uniqueReferralCode(),
+        confirmToken: randomBytes(32).toString("hex"),
+        status: "pending",
+      },
+    })
+    imported++
+  }
+  await logAudit({ actorId, action: "WAITLIST_IMPORTED", subject: `Imported ${imported} leads`, metadata: { imported, skipped, invalid } })
+  return { imported, skipped, invalid }
+}
+
+/** Parse a pasted/uploaded CSV into import rows, matching columns by header. */
+export function parseWaitlistCsv(text: string): { email?: string; name?: string; organisation?: string }[] {
+  const lines = text.split(/\r?\n/).filter((l) => l.trim().length)
+  if (lines.length === 0) return []
+  const splitRow = (line: string) => {
+    const out: string[] = []
+    let cur = ""
+    let q = false
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i]
+      if (c === '"') {
+        if (q && line[i + 1] === '"') { cur += '"'; i++ } else q = !q
+      } else if (c === "," && !q) { out.push(cur); cur = "" } else cur += c
+    }
+    out.push(cur)
+    return out.map((s) => s.trim())
+  }
+  const header = splitRow(lines[0]).map((h) => h.toLowerCase())
+  const find = (pred: (h: string) => boolean) => header.findIndex(pred)
+  const iEmail = find((h) => h.includes("email"))
+  const iFirst = find((h) => h === "first name" || h === "first_name" || h === "firstname")
+  const iLast = find((h) => h.includes("last name") || h === "lastname")
+  const iName = find((h) => (h === "name" || h.includes("full name")) )
+  const iOrg = find((h) => h.includes("organi") || h === "org" || h.includes("affiliation"))
+  // No recognisable header → assume the first column is email.
+  const emailCol = iEmail >= 0 ? iEmail : 0
+  const dataLines = iEmail >= 0 || iFirst >= 0 || iName >= 0 ? lines.slice(1) : lines
+  return dataLines.map((line) => {
+    const cols = splitRow(line)
+    const name = iName >= 0 ? cols[iName] : [iFirst >= 0 ? cols[iFirst] : "", iLast >= 0 ? cols[iLast] : ""].filter(Boolean).join(" ")
+    return { email: cols[emailCol], name: name || undefined, organisation: iOrg >= 0 ? cols[iOrg] : undefined }
+  })
+}
+
+/** Admin: re-send the confirmation email to one unconfirmed entry (fresh token). */
+export async function resendConfirmation(actorId: string, id: string) {
+  const entry = await prisma.waitlistEntry.findUnique({ where: { id } })
+  if (!entry) throw new ApiError(404, "Waitlist entry not found.")
+  if (entry.confirmedAt) throw new ApiError(409, "This member has already confirmed their spot.")
+  const token = randomBytes(32).toString("hex")
+  await prisma.waitlistEntry.update({ where: { id }, data: { confirmToken: token } })
+  const { sent } = await kitSendWaitlistConfirmation({ email: entry.email, firstName: entry.firstName, token })
+  await logAudit({ actorId, action: "WAITLIST_RESEND", subject: `${entry.firstName} ${entry.lastName}`, metadata: { email: entry.email, sent } })
+  return { sent, confirmUrl: kitConfigured() ? undefined : confirmUrl(token) }
+}
+
+/** Admin: re-send the confirmation email to every unconfirmed entry. */
+export async function resendAllUnconfirmed(actorId: string) {
+  const rows = await prisma.waitlistEntry.findMany({ where: { confirmedAt: null } })
+  let sent = 0
+  for (const e of rows) {
+    const token = randomBytes(32).toString("hex")
+    await prisma.waitlistEntry.update({ where: { id: e.id }, data: { confirmToken: token } })
+    const r = await kitSendWaitlistConfirmation({ email: e.email, firstName: e.firstName, token })
+    if (r.sent) sent++
+  }
+  await logAudit({ actorId, action: "WAITLIST_RESEND_ALL", subject: `Resent to ${rows.length} unconfirmed`, metadata: { total: rows.length, sent } })
+  return { total: rows.length, sent }
 }
 
 const ALLOWED = ["pending", "invited", "converted"]
