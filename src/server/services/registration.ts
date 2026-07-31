@@ -93,6 +93,11 @@ export async function registerMember(input: RegisterInput) {
   const matched = await matchAllowedDomain(email)
   const fastTrack = matched?.fastTrack ?? false
 
+  // Carry over anything they already gave us on the waitlist so they don't set
+  // up twice — pull their organisation onto the new account and mark the entry
+  // converted. Linked purely by email, so it works however they arrive.
+  const waitlisted = await prisma.waitlistEntry.findUnique({ where: { email } })
+
   const passwordHash = await bcrypt.hash(password, 12)
   const user = await prisma.user.create({
     data: {
@@ -104,9 +109,14 @@ export async function registerMember(input: RegisterInput) {
       role: "member",
       avatarInitials: initialsOf(firstName, lastName),
       verificationStatus: "PENDING_EMAIL",
-      profileCompletion: 20,
+      organisation: waitlisted?.organisation ?? null,
+      profileCompletion: waitlisted?.organisation ? 30 : 20,
     },
   })
+
+  if (waitlisted && waitlisted.status !== "converted") {
+    await prisma.waitlistEntry.update({ where: { email }, data: { status: "converted" } })
+  }
 
   const emailSent = await issueVerificationLink({ id: user.id, email, firstName }, fastTrack)
 

@@ -114,6 +114,12 @@ export function WaitlistClient() {
     }
   }
 
+  // Prefilled direct-signup link (bypasses the queue; hands name/email to /register).
+  const signupParams = new URLSearchParams()
+  if (email) signupParams.set("email", email)
+  if (name) signupParams.set("name", name)
+  const signupHref = `/register${signupParams.toString() ? `?${signupParams.toString()}` : ""}`
+
   return (
     <div className="min-h-screen bg-wl-navy text-wl-ivory relative">
       <AnimatePresence mode="wait">
@@ -200,6 +206,15 @@ export function WaitlistClient() {
                     </button>
                   </div>
                 </form>
+
+                {/* Prefer not to wait — book a call or sign up directly (bypass the queue) */}
+                <div className="mt-6 pt-6 border-t border-wl-border text-center">
+                  <p className="text-[12px] text-wl-ivory-dim mb-3">Prefer not to wait?</p>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <a href="https://jo.my/bookdaa" target="_blank" rel="noopener noreferrer" className="btn-outline flex-1 text-center">Book a call</a>
+                    <a href={signupHref} className="btn-gold flex-1 text-center">Sign up now →</a>
+                  </div>
+                </div>
               </div>
             </div>
 

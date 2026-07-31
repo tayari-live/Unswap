@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -36,6 +36,20 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const toast = useToast()
+
+  // Prefill from the waitlist hand-off (?email=&name=) so people who came from
+  // the waitlist don't re-enter their details — they only set a password.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const e = params.get("email")
+    const n = params.get("name")
+    if (e) setEmail(e)
+    if (n) {
+      const [first, ...rest] = n.trim().split(/\s+/)
+      setFirstName(first)
+      if (rest.length) setLastName(rest.join(" "))
+    }
+  }, [])
 
   const status = domainStatus(email)
 
