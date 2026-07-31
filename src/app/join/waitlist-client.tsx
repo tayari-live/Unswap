@@ -211,7 +211,7 @@ export function WaitlistClient() {
                 <div className="mt-6 pt-6 border-t border-wl-border text-center">
                   <p className="text-[12px] text-wl-ivory-dim mb-3">Prefer not to wait?</p>
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    <a href="https://jo.my/bookdaa" target="_blank" rel="noopener noreferrer" className="btn-outline flex-1 text-center">Book a call</a>
+                    <a href="/book" className="btn-outline flex-1 text-center">Book a call</a>
                     <a href={signupHref} className="btn-gold flex-1 text-center">Sign up now →</a>
                   </div>
                 </div>
