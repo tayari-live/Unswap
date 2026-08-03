@@ -65,7 +65,7 @@ export default async function EarlyAccessPage() {
         </div>
 
         <div className="text-center mt-10">
-          <Link href="/join" className="inline-flex items-center gap-2 text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] px-7 py-3.5 rounded-xl transition-colors shadow-sm">
+          <Link href="/waitlist" className="inline-flex items-center gap-2 text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] px-7 py-3.5 rounded-xl transition-colors shadow-sm">
             Claim your spot <ArrowRight size={17} />
           </Link>
         </div>

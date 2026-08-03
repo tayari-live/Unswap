@@ -48,7 +48,7 @@
   --font-sans: var(--font-dm-sans), "Helvetica Neue", Arial, sans-serif;
   --font-display: var(--font-cormorant), Georgia, "Times New Roman", serif;
 
-  /* Waitlist — ported dark/gold luxury palette (namespaced, scoped to /join). */
+  /* Waitlist — ported dark/gold luxury palette (namespaced, scoped to /waitlist). */
   --color-wl-navy: #0a0e1a;
   --color-wl-deep: #060910;
   --color-wl-gold: #c9a84c;

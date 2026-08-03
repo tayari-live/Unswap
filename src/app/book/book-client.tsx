@@ -45,7 +45,7 @@ export function BookClient() {
         </div>
 
         <div style={{ marginTop: "40px", textAlign: "center" }}>
-          <a href="/join" style={{ fontSize: "11px", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, color: "rgba(245,240,232,0.3)", textDecoration: "none" }}>
+          <a href="/waitlist" style={{ fontSize: "11px", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, color: "rgba(245,240,232,0.3)", textDecoration: "none" }}>
             ← Back to Waitlist
           </a>
         </div>

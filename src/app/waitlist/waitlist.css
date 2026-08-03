@@ -1,4 +1,4 @@
-/* Scoped luxury theme for the ported waitlist (/join + /join/success).
+/* Scoped luxury theme for the ported waitlist (/waitlist + /waitlist/success).
    Everything lives under .wl-root so it never touches the rest of the app. */
 
 .wl-root {

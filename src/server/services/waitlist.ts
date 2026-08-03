@@ -25,7 +25,7 @@ async function uniqueReferralCode(): Promise<string> {
   return randomBytes(6).toString("hex")
 }
 
-const referralUrl = (code: string) => `${baseUrl()}/join?ref=${code}`
+const referralUrl = (code: string) => `${baseUrl()}/waitlist?ref=${code}`
 const confirmUrl = (token: string) => `${baseUrl()}/api/waitlist/confirm?token=${token}`
 
 /**

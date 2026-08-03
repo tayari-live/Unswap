@@ -176,7 +176,7 @@ function ImagesModal({ show, onClose, onDownload }: { show: boolean; onClose: ()
 }
 
 export function ShareCard() {
-  const [shareUrl, setShareUrl] = useState("https://app.unswap.net/join")
+  const [shareUrl, setShareUrl] = useState("https://app.unswap.net/waitlist")
   const [isPersonal, setIsPersonal] = useState(false)
   const [copiedId, setCopiedId] = useState<string | number | null>(null)
   const [loadingRef, setLoadingRef] = useState(true)
@@ -340,7 +340,7 @@ export function ShareCard() {
         </div>
 
         <div style={{ marginTop: "48px", textAlign: "center" }}>
-          <a href="/join" style={{ fontSize: "11px", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, color: "rgba(245,240,232,0.3)", textDecoration: "none" }}>← Back to Waitlist</a>
+          <a href="/waitlist" style={{ fontSize: "11px", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, color: "rgba(245,240,232,0.3)", textDecoration: "none" }}>← Back to Waitlist</a>
         </div>
       </div>
 

@@ -103,7 +103,7 @@ export function WaitlistClient() {
       const res = await fetch(`/api/waitlist/status?email=${encodeURIComponent(checkEmail)}`)
       const data = await res.json()
       if (data.found) {
-        window.location.href = `/join/success?ref=${encodeURIComponent(data.referralCode)}`
+        window.location.href = `/waitlist/success?ref=${encodeURIComponent(data.referralCode)}`
       } else {
         setErrorMessage("We couldn't find a confirmed waitlist entry for that email.")
         setStatus("error")

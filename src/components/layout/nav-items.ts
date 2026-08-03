@@ -22,7 +22,7 @@ export const adminNavigation: NavItem[] = [
   { name: "Listings", href: "/listings", icon: Home },
   { name: "Swaps", href: "/swaps", icon: ArrowLeftRight },
   { name: "Moderation", href: "/moderation", icon: Flag },
-  { name: "Waitlist", href: "/waitlist", icon: ListChecks },
+  { name: "Waitlist", href: "/waitlist-admin", icon: ListChecks },
   { name: "Domains", href: "/domains", icon: Globe },
   { name: "Analytics", href: "/analytics", icon: LineChart },
 ]
