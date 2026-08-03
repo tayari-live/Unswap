@@ -56,7 +56,7 @@ export default function LoginPage() {
       <div className="absolute inset-0 lg:static lg:w-[38%] lg:sticky lg:top-0 lg:h-[100dvh] overflow-hidden z-0">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/images/auth-institution.jpg" alt="" className="absolute inset-0 w-full h-full object-cover object-center" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[rgba(10,14,26,0.75)] via-[rgba(10,14,26,0.15)] to-transparent" />
+        <div className="absolute inset-0 bg-[rgba(10,14,26,0.6)]" />
         {/* lighten on mobile so the overlaid form stays readable */}
         <div className="absolute inset-0 bg-[#f5f0e8]/92 lg:hidden" />
         <div className="hidden lg:block absolute bottom-0 left-0 right-0 p-8 lg:p-10">
