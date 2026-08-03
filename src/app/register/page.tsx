@@ -82,7 +82,7 @@ export default function RegisterPage() {
       {/* IMAGE — background on mobile, left column on desktop */}
       <div className="absolute inset-0 lg:static lg:w-[38%] lg:sticky lg:top-0 lg:h-[100dvh] overflow-hidden z-0 bg-wl-deep border-r border-wl-border">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/waitlist/interior.png" alt="Luxury interior" className="absolute inset-0 w-full h-full object-cover object-center opacity-80" />
+        <img src="/images/auth-institution.jpg" alt="" className="absolute inset-0 w-full h-full object-cover object-center opacity-80" />
         <div className="absolute inset-0 bg-wl-navy/90 lg:hidden" />
         <div className="hidden lg:block absolute bottom-0 left-0 right-0 p-8 lg:p-10">
           <div className="flex items-center gap-3">

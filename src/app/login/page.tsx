@@ -2,12 +2,14 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import Image from "next/image"
 import { signIn, getSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { Mail, Eye, EyeOff, ShieldCheck } from "lucide-react"
-import { Logo } from "@/components/brand/logo"
+import { Mail, Eye, EyeOff } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
+
+const inputCls =
+  "w-full bg-white border border-[rgba(201,168,76,0.35)] px-5 py-4 text-[#0a0e1a] placeholder-[rgba(10,14,26,0.4)] focus:outline-none focus:border-[#c9a84c] focus:shadow-[0_0_0_1px_rgba(201,168,76,0.35)] transition-all duration-300 text-[15px]"
+const labelCls = "block text-[rgba(10,14,26,0.6)] text-xs tracking-[0.08em] uppercase font-medium mb-2 pl-1"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -21,7 +23,6 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-
     try {
       const res = await signIn("credentials", {
         email,
@@ -29,20 +30,16 @@ export default function LoginPage() {
         remember: remember ? "true" : "false",
         redirect: false,
       })
-
       if (res?.error) {
         toast("Those credentials were not recognised. Please try again.", "error")
         setLoading(false)
       } else {
-        // Route by role: admins to the ops console, members to their dashboard.
         const session = await getSession()
         const role = (session?.user as any)?.role
         router.push(role === "admin" ? "/overview" : "/dashboard")
         router.refresh()
       }
     } catch (err: any) {
-      // NextAuth v5 beta throws (instead of returning res.error) on a failed
-      // credentials sign-in. Treat that as invalid credentials.
       const detail = String(err?.type || err?.name || err?.message || "")
       if (detail.toLowerCase().includes("credentials")) {
         toast("Those credentials were not recognised. Please try again.", "error")
@@ -54,164 +51,91 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left panel — institutional branding over a photographic backdrop */}
-      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 xl:p-16 relative overflow-hidden text-white">
-        <Image
-          src="/images/auth-institution.jpg"
-          alt=""
-          fill
-          priority
-          sizes="50vw"
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-[var(--navy)]/85 via-[var(--navy)]/80 to-[var(--navy-dark)]/95" />
-
-        <Logo
-          className="relative z-10 text-white"
-          wordClassName="text-white"
-        />
-
-        <div className="relative z-10 max-w-md">
-          <h1 className="font-display text-4xl xl:text-5xl font-bold leading-tight">
-            Welcome back to the network
-          </h1>
-          <p className="mt-4 text-white/60 leading-relaxed">
-            Sign in to manage verifications, listings, and exchanges across the
-            UnSwap home exchange network for UN and international organisation
-            professionals.
-          </p>
-        </div>
-
-        <div className="relative z-10 flex items-center gap-2 text-sm text-white/50">
-          <ShieldCheck size={16} className="text-[var(--gold)]" />
-          Verified institutional access
+    <div className="min-h-screen flex flex-col lg:flex-row w-full relative bg-[#f5f0e8] text-[#0a0e1a] font-sans">
+      {/* IMAGE — background on mobile, left column on desktop (original backdrop kept) */}
+      <div className="absolute inset-0 lg:static lg:w-[38%] lg:sticky lg:top-0 lg:h-[100dvh] overflow-hidden z-0">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/images/auth-institution.jpg" alt="" className="absolute inset-0 w-full h-full object-cover object-center" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[rgba(10,14,26,0.75)] via-[rgba(10,14,26,0.15)] to-transparent" />
+        {/* lighten on mobile so the overlaid form stays readable */}
+        <div className="absolute inset-0 bg-[#f5f0e8]/92 lg:hidden" />
+        <div className="hidden lg:block absolute bottom-0 left-0 right-0 p-8 lg:p-10">
+          <div className="flex items-center gap-3">
+            <div className="w-[60px] h-px bg-[#c9a84c]" />
+            <p className="text-white/80 text-[11px] tracking-[0.22em] uppercase">Verified institutional access</p>
+          </div>
         </div>
       </div>
 
-      {/* Right panel — sign-in form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-10 bg-[var(--background)]">
-        <div className="w-full max-w-md">
-          {/* Compact logo for small screens where the left panel is hidden */}
-          <div className="lg:hidden flex justify-center mb-8">
-            <Logo underline wordClassName="text-[var(--navy)]" />
+      {/* FORM */}
+      <div className="w-full lg:w-[62%] lg:ml-auto flex items-center justify-center p-8 sm:p-12 lg:p-16 relative z-10 min-h-[100dvh] overflow-y-auto">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(201,168,76,0.12)_0%,_transparent_60%)] pointer-events-none" />
+
+        <div className="w-full max-w-md mx-auto relative">
+          <div className="flex justify-center mb-6">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/waitlist/logo.png" alt="UnSwap" className="w-24 h-24 object-contain" />
           </div>
 
-          <h2 className="font-display text-3xl font-bold text-[var(--navy)]">
-            Member Login
-          </h2>
-          <p className="mt-2 text-neutral">
-            Please provide your institutional credentials to access the secure
-            dashboard.
+          <div className="flex items-center justify-center gap-3 mb-5">
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[rgba(201,168,76,0.4)]" />
+            <span className="text-[rgba(10,14,26,0.7)] text-[11px] tracking-[0.22em] uppercase font-medium">Welcome back</span>
+            <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[rgba(201,168,76,0.4)]" />
+          </div>
+
+          <h1 className="font-display text-[32px] sm:text-[40px] font-light text-[#0a0e1a] text-center leading-tight mb-2">
+            Sign in to the network
+          </h1>
+          <p className="text-[rgba(10,14,26,0.6)] text-center text-sm leading-relaxed mb-8">
+            Manage your verifications, listings, and exchanges across UnSwap.
           </p>
 
-          <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label
-                htmlFor="email"
-                className="block text-xs font-semibold uppercase tracking-wider text-[var(--navy)] mb-2"
-              >
-                Work Email
-              </label>
+              <label htmlFor="email" className={labelCls}>Work email</label>
               <div className="relative">
-                <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none">
-                  <Mail size={18} className="text-neutral" />
+                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                  <Mail size={18} className="text-[rgba(10,14,26,0.35)]" />
                 </div>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@organisation.int"
-                  className="block w-full pl-4 pr-11 py-3 border border-[var(--border)] rounded-xl bg-white placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] text-sm text-[var(--navy)] transition-all"
-                />
+                <input id="email" name="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@organisation.int" className={`${inputCls} pr-11`} />
               </div>
             </div>
 
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <label
-                  htmlFor="password"
-                  className="block text-xs font-semibold uppercase tracking-wider text-[var(--navy)]"
-                >
-                  Password
-                </label>
-                <Link
-                  href="/forgot-password"
-                  className="text-xs font-semibold uppercase tracking-wider text-[var(--gold-dark)] hover:text-[var(--gold-hover)] transition-colors"
-                >
+              <div className="flex items-center justify-between mb-2 pl-1">
+                <label htmlFor="password" className="text-[rgba(10,14,26,0.6)] text-xs tracking-[0.08em] uppercase font-medium">Password</label>
+                <Link href="/forgot-password" className="text-xs font-medium tracking-[0.06em] uppercase text-[#9a7c2c] hover:text-[#c9a84c] transition-colors">
                   Forgot password?
                 </Link>
               </div>
               <div className="relative flex items-center">
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  autoComplete="current-password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="block w-full pl-4 pr-11 py-3 border border-[var(--border)] rounded-xl bg-white placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] text-sm text-[var(--navy)] transition-all"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  tabIndex={-1}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                  className="absolute right-3 flex items-center text-neutral hover:text-[var(--navy)] transition-colors"
-                >
+                <input id="password" name="password" type={showPassword ? "text" : "password"} autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className={`${inputCls} pr-11`} />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} tabIndex={-1} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-4 flex items-center text-[rgba(10,14,26,0.4)] hover:text-[#c9a84c] transition-colors">
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
             </div>
 
             <label className="flex items-center gap-2.5 cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={remember}
-                onChange={(e) => setRemember(e.target.checked)}
-                className="w-4 h-4 rounded border-[var(--border)] text-[var(--navy)] accent-[var(--navy)] focus:ring-[var(--gold)]/40"
-              />
-              <span className="text-sm text-neutral">Keep me signed in</span>
+              <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="w-4 h-4 border-[rgba(201,168,76,0.4)] accent-[#c9a84c]" />
+              <span className="text-sm text-[rgba(10,14,26,0.7)]">Keep me signed in</span>
             </label>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full flex items-center justify-center py-3.5 px-4 rounded-xl text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--gold)] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm"
-            >
+            <button type="submit" disabled={loading} className="w-full bg-[#c9a84c] hover:bg-[#e4c97a] text-[#0a0e1a] text-sm font-medium tracking-[0.08em] uppercase py-4 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_4px_24px_rgba(201,168,76,0.25)]">
               {loading ? "Signing in..." : "Log In"}
             </button>
           </form>
 
-          <div className="mt-8 pt-6 border-t border-[var(--border)] text-center">
-            <p className="text-sm text-neutral">
+          <div className="mt-8 pt-6 border-t border-[rgba(201,168,76,0.25)] text-center">
+            <p className="text-sm text-[rgba(10,14,26,0.7)]">
               Don&apos;t have an account?{" "}
-              <Link
-                href="/register"
-                className="font-semibold text-[var(--gold-dark)] hover:text-[var(--gold-hover)] transition-colors"
-              >
-                Sign up
-              </Link>
+              <Link href="/register" className="font-semibold text-[#9a7c2c] hover:text-[#c9a84c] transition-colors">Sign up</Link>
             </p>
           </div>
 
-          <div className="mt-6 flex items-center justify-center gap-2 text-xs text-neutral">
-            <Image
-              src="/unswap-logo.png"
-              alt="UnSwap"
-              width={16}
-              height={16}
-              className="w-4 h-4 object-contain rounded-sm opacity-60"
-            />
-            UnSwap is an independent, staff-led platform, not affiliated with the
-            United Nations.
-          </div>
+          <p className="mt-6 text-center text-[11px] text-[rgba(10,14,26,0.45)]">
+            UnSwap is an independent, staff-led platform, not affiliated with the United Nations.
+          </p>
         </div>
       </div>
     </div>
