@@ -120,6 +120,12 @@ export function ProfileWizard({ initial, onSaved }: { initial: ProfileValues; on
 
   const key = SCREENS[step].key
 
+  // Continue requires the current question to be answered; use Skip to pass an
+  // optional question without answering. Photo counts as answered once added;
+  // the review screen has no field to fill.
+  const answered =
+    key === "review" ? true : key === "photo" ? !!v.imageUrl : String((v as any)[key] ?? "").trim().length > 0
+
   return (
     <div>
       {/* Progress — live profile completion % + step count */}
@@ -252,7 +258,7 @@ export function ProfileWizard({ initial, onSaved }: { initial: ProfileValues; on
             <button type="button" onClick={() => next(true)} className="text-sm font-semibold text-[var(--fg)] px-5 py-2.5 rounded-full border border-[var(--gold)] hover:bg-[var(--parchment)] bg-[var(--surface)]">Skip</button>
           )}
           {step < SCREENS.length - 1 ? (
-            <button type="button" onClick={() => next()} className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] px-7 py-2.5 rounded-full shadow-sm">Continue <ChevronRight size={16} /></button>
+            <button type="button" onClick={() => next()} disabled={!answered} title={!answered ? "Answer this question or use Skip" : undefined} className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] px-7 py-2.5 rounded-full shadow-sm disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[var(--gold-dark)]">Continue <ChevronRight size={16} /></button>
           ) : (
             <button type="button" onClick={submit} disabled={loading} className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] px-7 py-2.5 rounded-full shadow-sm disabled:opacity-50">{loading ? "Saving…" : (<><Check size={16} /> Save profile</>)}</button>
           )}

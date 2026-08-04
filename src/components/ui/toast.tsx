@@ -30,11 +30,11 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     const id = Date.now() + Math.random()
     // A new toast replaces any lingering error toast.
     setToasts((t) => [...t.filter((x) => x.type !== "error"), { id, type, message }])
-    // Errors stay until dismissed, replaced, or the user navigates away;
-    // success/info auto-dismiss.
-    if (type !== "error") {
-      setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 4000)
-    }
+    // Everything auto-dismisses so nothing lingers after the issue is resolved;
+    // errors get a slightly longer window to be read. Can still be closed early,
+    // is replaced by a newer toast, or cleared on navigation.
+    const ttl = type === "error" ? 6000 : 4000
+    setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), ttl)
   }, [])
 
   // Leaving the page clears error toasts (success toasts fired just before a
