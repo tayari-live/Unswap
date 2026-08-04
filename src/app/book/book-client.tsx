@@ -25,9 +25,9 @@ export function BookClient() {
           <p style={{ fontSize: "11px", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, color: "rgba(245,240,232,0.4)", textAlign: "center", marginBottom: "18px" }}>
             Prefer to watch first?
           </p>
-          <h2 className="font-display" style={{ color: "var(--gold-light)", fontSize: "22px", fontWeight: 400, textAlign: "center", marginBottom: "16px" }}>
+          {/* <h2 className="font-display" style={{ color: "var(--gold-light)", fontSize: "22px", fontWeight: 400, textAlign: "center", marginBottom: "16px" }}>
             The UnSwap Masterclass
-          </h2>
+          </h2> */}
           <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: "10px", overflow: "hidden", border: "1px solid rgba(201,168,76,0.15)" }}>
             <iframe
               src="https://www.youtube.com/embed/pgL7SVKtm3g?rel=0"
