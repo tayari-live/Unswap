@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Search, ShieldCheck, Ban, Star, ChevronDown } from "lucide-react"
-import { PageHeader } from "@/components/ui/page-header"
+import { LuxPageHeader } from "@/components/ui/lux"
 import { VerificationBadge, Badge } from "@/components/ui/badges"
 
 type Member = {
@@ -94,7 +94,7 @@ export default function MembersClient({ initialMembers }: { initialMembers: Memb
 
   return (
     <div className="max-w-6xl mx-auto pb-12">
-      <PageHeader title="Members" subtitle="The full member directory. Verify, suspend, or override subscription tiers." />
+      <LuxPageHeader eyebrow="Directory" title="Members" subtitle="The full member directory. Verify, suspend, or override subscription tiers." />
 
       <div className="flex flex-col sm:flex-row gap-3 mb-4">
         <div className="relative flex-1">
@@ -103,17 +103,17 @@ export default function MembersClient({ initialMembers }: { initialMembers: Memb
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search by name, email, or organisation…"
-            className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-[var(--border)] bg-surface text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40"
+            className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-[var(--hair)] bg-surface text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40"
           />
         </div>
-        <div className="flex gap-1 bg-surface border border-[var(--border)] rounded-xl p-1">
+        <div className="flex gap-1 bg-surface border border-[var(--hair)] rounded-xl p-1">
           {filters.map((f) => (
             <button
               key={f.key}
               onClick={() => setFilter(f.key)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-                filter === f.key ? "bg-[var(--navy)] text-white" : "text-neutral-dark hover:bg-neutral-light"
-              }`}
+ filter === f.key ? "bg-[var(--navy)] text-white" : "text-neutral-dark hover:bg-neutral-light"
+ }`}
             >
               {f.label}
             </button>
@@ -121,11 +121,11 @@ export default function MembersClient({ initialMembers }: { initialMembers: Memb
         </div>
       </div>
 
-      <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm overflow-hidden">
+      <div className="bg-surface rounded-md border border-[var(--hair)] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-[11px] uppercase tracking-wide text-neutral border-b border-[var(--border)]">
+              <tr className="text-left text-[11px] uppercase tracking-wide text-neutral border-b border-[var(--hair)]">
                 <th className="px-5 py-3 font-semibold">Member</th>
                 <th className="px-5 py-3 font-semibold">Organisation</th>
                 <th className="px-5 py-3 font-semibold">Status</th>
@@ -134,7 +134,7 @@ export default function MembersClient({ initialMembers }: { initialMembers: Memb
                 <th className="px-5 py-3 font-semibold text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[var(--border)]">
+            <tbody className="divide-y divide-[var(--hair)]">
               {filtered.map((m) => (
                 <tr key={m.id} className="hover:bg-[var(--background)]/60">
                   <td className="px-5 py-3">
@@ -238,7 +238,7 @@ function TierSelect({ value, onChange, disabled }: { value: string; onChange: (v
         value={value}
         disabled={disabled}
         onChange={(e) => e.target.value && onChange(e.target.value)}
-        className="appearance-none pl-2.5 pr-7 py-1 rounded-lg border border-[var(--border)] bg-surface text-xs font-semibold text-[var(--fg)] focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 disabled:opacity-50"
+        className="appearance-none pl-2.5 pr-7 py-1 rounded-lg border border-[var(--hair)] bg-surface text-xs font-semibold text-[var(--fg)] focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 disabled:opacity-50"
       >
         <option value="">No plan</option>
         {Object.entries(TIER_LABELS).map(([k, label]) => (

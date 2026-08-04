@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { MapPin, BedDouble, Bath, Users, Flag, Star } from "lucide-react"
-import { PageHeader } from "@/components/ui/page-header"
+import { LuxPageHeader } from "@/components/ui/lux"
 import { StatusBadge, Badge } from "@/components/ui/badges"
 
 type Listing = {
@@ -55,16 +55,16 @@ export default function ListingsClient({ initialListings }: { initialListings: L
 
   return (
     <div className="max-w-6xl mx-auto pb-12">
-      <PageHeader title="Listings" subtitle="All member home listings. Flag for moderation, pause, or archive." />
+      <LuxPageHeader eyebrow="Inventory" title="Listings" subtitle="All member home listings. Flag for moderation, pause, or archive." />
 
-      <div className="flex gap-1 bg-surface border border-[var(--border)] rounded-xl p-1 mb-5 w-fit">
+      <div className="flex gap-1 bg-surface border border-[var(--hair)] rounded-xl p-1 mb-5 w-fit">
         {STATUS_FILTERS.map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition ${
-              filter === f ? "bg-[var(--navy)] text-white" : "text-neutral-dark hover:bg-neutral-light"
-            }`}
+ filter === f ? "bg-[var(--navy)] text-white" : "text-neutral-dark hover:bg-neutral-light"
+ }`}
           >
             {f === "all" ? "All" : f.toLowerCase()}
           </button>
@@ -73,7 +73,7 @@ export default function ListingsClient({ initialListings }: { initialListings: L
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filtered.map((l) => (
-          <div key={l.id} className={`bg-surface rounded-2xl border shadow-sm overflow-hidden ${l.flagged ? "border-[var(--crimson)]" : "border-[var(--border)]"}`}>
+          <div key={l.id} className={`bg-surface rounded-md border overflow-hidden ${l.flagged ? "border-[var(--crimson)]" : "border-[var(--hair)]"}`}>
             <div className="relative h-36 bg-neutral-light">
               {l.photos[0] && (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -100,7 +100,7 @@ export default function ListingsClient({ initialListings }: { initialListings: L
                 <span className="flex items-center gap-1"><Users size={13} /> {l.maxGuests}</span>
                 <span className="text-neutral">· {l.propertyType}</span>
               </div>
-              <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[var(--border)]">
+              <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[var(--hair)]">
                 <span className="w-7 h-7 rounded-lg bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center text-[10px] font-bold">
                   {l.owner.avatarInitials}
                 </span>
@@ -111,15 +111,15 @@ export default function ListingsClient({ initialListings }: { initialListings: L
                   onClick={() => patch(l.id, { flagged: !l.flagged })}
                   disabled={busyId === l.id}
                   className={`flex-1 text-xs font-semibold py-2 rounded-lg border transition disabled:opacity-50 ${
-                    l.flagged
-                      ? "border-[var(--border)] text-neutral-dark hover:bg-neutral-light"
-                      : "border-[var(--crimson)] text-[var(--crimson)] hover:bg-[var(--crimson)]/10"
-                  }`}
+ l.flagged
+ ? "border-[var(--hair)] text-neutral-dark hover:bg-neutral-light"
+ : "border-[var(--crimson)] text-[var(--crimson)] hover:bg-[var(--crimson)]/10"
+ }`}
                 >
                   {l.flagged ? "Unflag" : "Flag"}
                 </button>
                 {l.status === "ACTIVE" ? (
-                  <button onClick={() => patch(l.id, { status: "PAUSED" })} disabled={busyId === l.id} className="flex-1 text-xs font-semibold py-2 rounded-lg border border-[var(--border)] text-neutral-dark hover:bg-neutral-light transition disabled:opacity-50">Pause</button>
+                  <button onClick={() => patch(l.id, { status: "PAUSED" })} disabled={busyId === l.id} className="flex-1 text-xs font-semibold py-2 rounded-lg border border-[var(--hair)] text-neutral-dark hover:bg-neutral-light transition disabled:opacity-50">Pause</button>
                 ) : l.status === "ARCHIVED" ? (
                   <button onClick={() => patch(l.id, { status: "ACTIVE" })} disabled={busyId === l.id} className="flex-1 text-xs font-semibold py-2 rounded-lg border border-[var(--teal)] text-[var(--teal)] hover:bg-[var(--teal)]/10 transition disabled:opacity-50">Restore</button>
                 ) : (
@@ -130,7 +130,7 @@ export default function ListingsClient({ initialListings }: { initialListings: L
           </div>
         ))}
         {filtered.length === 0 && (
-          <div className="col-span-full bg-surface rounded-2xl border border-[var(--border)] p-10 text-center text-sm text-neutral">No listings in this view.</div>
+          <div className="col-span-full bg-surface rounded-md border border-[var(--hair)] p-10 text-center text-sm text-neutral">No listings in this view.</div>
         )}
       </div>
     </div>

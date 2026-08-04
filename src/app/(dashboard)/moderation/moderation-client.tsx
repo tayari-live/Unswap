@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Check, Trash2, MessageSquare, Star, ShieldX } from "lucide-react"
-import { PageHeader } from "@/components/ui/page-header"
+import { LuxPageHeader } from "@/components/ui/lux"
 
 export type ModReport = {
   id: string
@@ -43,11 +43,11 @@ export default function ModerationClient({ initial }: { initial: ModReport[] }) 
 
   return (
     <div className="max-w-4xl mx-auto pb-12">
-      <PageHeader title="Content Moderation" subtitle="Member-reported messages and reviews awaiting review." />
+      <LuxPageHeader eyebrow="Trust & Safety" title="Content Moderation" subtitle="Member-reported messages and reviews awaiting review." />
 
       {reports.length === 0 ? (
-        <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-12 text-center">
-          <div className="mx-auto w-14 h-14 rounded-2xl bg-[var(--teal)]/15 text-[var(--teal)] flex items-center justify-center mb-4">
+        <div className="bg-surface rounded-md border border-[var(--hair)] p-12 text-center">
+          <div className="mx-auto w-14 h-14 rounded-md bg-[var(--teal)]/15 text-[var(--teal)] flex items-center justify-center mb-4">
             <ShieldX size={26} />
           </div>
           <h2 className="font-display text-xl font-bold text-[var(--fg)]">Queue is clear</h2>
@@ -56,7 +56,7 @@ export default function ModerationClient({ initial }: { initial: ModReport[] }) 
       ) : (
         <div className="space-y-4">
           {reports.map((r) => (
-            <div key={r.id} className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-5">
+            <div key={r.id} className="bg-surface rounded-md border border-[var(--hair)] p-5">
               <div className="flex items-center justify-between gap-3">
                 <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full bg-[var(--gold)]/15 text-[var(--gold-dark)]">
                   {r.targetType === "message" ? <MessageSquare size={12} /> : <Star size={12} />}
@@ -67,7 +67,7 @@ export default function ModerationClient({ initial }: { initial: ModReport[] }) 
 
               {r.reason && <p className="mt-3 text-xs text-neutral-dark"><span className="font-semibold">Reason:</span> {r.reason}</p>}
 
-              <div className="mt-3 rounded-xl bg-[var(--background)] border border-[var(--border)] p-3">
+              <div className="mt-3 rounded-xl bg-[var(--background)] border border-[var(--hair)] p-3">
                 {r.content.removed ? (
                   <p className="text-sm text-neutral italic">This content has already been removed.</p>
                 ) : (
@@ -82,7 +82,7 @@ export default function ModerationClient({ initial }: { initial: ModReport[] }) 
                 <button
                   disabled={busyId === r.id}
                   onClick={() => resolve(r.id, "dismiss")}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg border border-[var(--border)] text-[var(--fg)] hover:bg-neutral-light disabled:opacity-50 transition-colors"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg border border-[var(--hair)] text-[var(--fg)] hover:bg-neutral-light disabled:opacity-50 transition-colors"
                 >
                   <Check size={14} /> Dismiss
                 </button>

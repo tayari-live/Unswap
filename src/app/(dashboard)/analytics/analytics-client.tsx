@@ -15,7 +15,7 @@ import {
   Cell,
   Legend,
 } from "recharts"
-import { PageHeader } from "@/components/ui/page-header"
+import { LuxPageHeader } from "@/components/ui/lux"
 
 const NAVY = "#0B1F3A"
 const GOLD = "#C9A84C"
@@ -41,10 +41,10 @@ export default function AnalyticsClient({ data }: { data: Data }) {
 
   return (
     <div className="max-w-6xl mx-auto pb-12">
-      <PageHeader title="Analytics" subtitle="Growth, verification throughput, and where the network is concentrated." />
+      <LuxPageHeader eyebrow="Metrics" title="Analytics" subtitle="Growth, verification throughput, and where the network is concentrated." />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-5">
+        <div className="lg:col-span-2 bg-surface rounded-md border border-[var(--hair)] p-5">
           <h2 className="font-display font-bold text-[var(--fg)] mb-4">Signups &amp; Swaps · last 6 months</h2>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
@@ -70,7 +70,7 @@ export default function AnalyticsClient({ data }: { data: Data }) {
           </div>
         </div>
 
-        <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-5">
+        <div className="bg-surface rounded-md border border-[var(--hair)] p-5">
           <h2 className="font-display font-bold text-[var(--fg)] mb-4">Tier Distribution</h2>
           {pieData.length === 0 ? (
             <p className="text-sm text-neutral">No active subscriptions yet.</p>
@@ -90,7 +90,7 @@ export default function AnalyticsClient({ data }: { data: Data }) {
           )}
         </div>
 
-        <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-5">
+        <div className="bg-surface rounded-md border border-[var(--hair)] p-5">
           <h2 className="font-display font-bold text-[var(--fg)] mb-4">Verifications · last 6 months</h2>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -105,7 +105,7 @@ export default function AnalyticsClient({ data }: { data: Data }) {
           </div>
         </div>
 
-        <div className="lg:col-span-2 bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-5">
+        <div className="lg:col-span-2 bg-surface rounded-md border border-[var(--hair)] p-5">
           <h2 className="font-display font-bold text-[var(--fg)] mb-4">Popular Duty Stations</h2>
           {data.topStations.length === 0 ? (
             <p className="text-sm text-neutral">No listings yet.</p>

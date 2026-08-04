@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { ShieldCheck, X, Check, FileText, Mail, MapPin, Building2 } from "lucide-react"
-import { PageHeader } from "@/components/ui/page-header"
+import { LuxPageHeader } from "@/components/ui/lux"
 import { Badge } from "@/components/ui/badges"
 import { useToast } from "@/components/ui/toast"
 
@@ -87,14 +87,14 @@ export default function VerificationClient({ initialSubmissions }: { initialSubm
 
   return (
     <div className="max-w-6xl mx-auto pb-12">
-      <PageHeader
+      <LuxPageHeader eyebrow="Queue"
         title="Verification Queue"
         subtitle="Review professional-status submissions. Approve to grant full network access."
         action={<Badge tone="gold">{submissions.length} pending</Badge>}
       />
 
       {submissions.length === 0 ? (
-        <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-12 text-center">
+        <div className="bg-surface rounded-md border border-[var(--hair)] p-12 text-center">
           <ShieldCheck className="mx-auto text-[var(--teal)] mb-3" size={40} />
           <p className="font-display font-bold text-lg text-[var(--fg)]">Queue is clear</p>
           <p className="text-sm text-neutral mt-1">No submissions are awaiting review.</p>
@@ -105,7 +105,7 @@ export default function VerificationClient({ initialSubmissions }: { initialSubm
             <button
               key={s.id}
               onClick={() => open(s)}
-              className="text-left bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-5 hover:border-[var(--gold)] hover:shadow-md transition"
+              className="text-left bg-surface rounded-md border border-[var(--hair)] p-5 hover:border-[var(--gold)] transition"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -134,8 +134,8 @@ export default function VerificationClient({ initialSubmissions }: { initialSubm
       {/* Review drawer/modal */}
       {selected && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[var(--navy)]/40" onClick={() => !busy && setSelected(null)}>
-          <div className="bg-surface rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] sticky top-0 bg-surface">
+          <div className="bg-surface rounded-md shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--hair)] sticky top-0 bg-surface">
               <h2 className="font-display font-bold text-lg text-[var(--fg)]">Review Submission</h2>
               <button onClick={() => setSelected(null)} disabled={busy} className="text-neutral hover:text-[var(--fg)]">
                 <X size={20} />
@@ -182,7 +182,7 @@ export default function VerificationClient({ initialSubmissions }: { initialSubm
                   onChange={(e) => setNote(e.target.value)}
                   rows={3}
                   placeholder="Explain why — the member receives this as the reason (e.g. “Staff ID photo was blurry, please re-upload a clear scan”)."
-                  className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--background)] text-sm text-[var(--fg)] focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)]"
+                  className="w-full px-3 py-2 rounded-xl border border-[var(--hair)] bg-[var(--background)] text-sm text-[var(--fg)] focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)]"
                 />
                 <p className="mt-1.5 text-xs text-neutral">Approving needs no note. A note is only required to reject.</p>
               </div>
@@ -224,7 +224,7 @@ function Field({ label, value }: { label: string; value: string | null }) {
 function DocPreview({ label, url }: { label: string; url: string | null }) {
   if (!url) {
     return (
-      <div className="rounded-xl border border-dashed border-[var(--border)] bg-[var(--background)] h-28 flex items-center justify-center text-xs text-neutral">
+      <div className="rounded-xl border border-dashed border-[var(--hair)] bg-[var(--background)] h-28 flex items-center justify-center text-xs text-neutral">
         No {label.toLowerCase()}
       </div>
     )
@@ -232,7 +232,7 @@ function DocPreview({ label, url }: { label: string; url: string | null }) {
   return (
     <a href={url} target="_blank" rel="noreferrer" className="block group">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={url} alt={label} className="rounded-xl border border-[var(--border)] h-28 w-full object-cover group-hover:opacity-90" />
+      <img src={url} alt={label} className="rounded-xl border border-[var(--hair)] h-28 w-full object-cover group-hover:opacity-90" />
       <span className="text-[10px] text-neutral mt-1 block">{label}</span>
     </a>
   )
