@@ -1,31 +1,15 @@
 "use client"
 
-import { useEffect } from "react"
-
-// Same Trafft account/calendar the sales funnel (jo.my/bookdaa) already books into.
-const TRAFFT_QUERY = "&t=s&uuid=bafee450-aaf8-43be-a37b-bdae72cddc89"
-
 export function BookingWidget() {
-  useEffect(() => {
-    const script = document.createElement("script")
-    script.src = "https://tayarilive.trafft.com/embed.js"
-    script.async = true
-    document.body.appendChild(script)
-    return () => {
-      document.body.removeChild(script)
-    }
-  }, [])
+  const BOOKING_URL = "https://calendar.app.google/sdPCuG2bVAXxivVd6"
 
   return (
-    <div
-      className="embedded-booking"
-      data-url="https://tayarilive.trafft.com"
-      data-query={TRAFFT_QUERY}
-      data-lang="en"
-      data-autoresize="0"
-      data-showsidebar="1"
-      data-showservices="0"
-      style={{ minWidth: 320, height: 768, display: "flex", flexDirection: "column" }}
-    />
+    <div style={{ position: "relative", width: "100%", paddingTop: "133%", borderRadius: "10px", overflow: "hidden" }}>
+      <iframe
+        src={BOOKING_URL}
+        title="Book an assessment call"
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
+      />
+    </div>
   )
 }
