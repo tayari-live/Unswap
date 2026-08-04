@@ -45,7 +45,7 @@ export default async function OverviewPage() {
   ] as const
 
   const toneRing: Record<string, string> = {
-    navy: "text-[var(--navy)] bg-[var(--navy)]/10",
+    navy: "text-[var(--fg)] bg-[var(--navy)]/10",
     gold: "text-[var(--gold-dark)] bg-[var(--gold)]/15",
     teal: "text-[var(--teal)] bg-[var(--teal)]/15",
     crimson: "text-[var(--crimson)] bg-[var(--crimson)]/10",
@@ -72,7 +72,7 @@ export default async function OverviewPage() {
               </span>
               <ChevronRight size={16} className="text-neutral group-hover:text-[var(--gold-dark)] transition-colors" />
             </div>
-            <div className="mt-4 text-3xl font-display font-bold text-[var(--navy)]">{c.value}</div>
+            <div className="mt-4 text-3xl font-display font-bold text-[var(--fg)]">{c.value}</div>
             <div className="text-xs text-neutral uppercase tracking-wide mt-1 font-semibold">{c.label}</div>
           </Link>
         ))}
@@ -82,7 +82,7 @@ export default async function OverviewPage() {
         {/* Verification queue preview */}
         <div className="lg:col-span-2 bg-surface rounded-2xl border border-[var(--border)] shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
-            <h2 className="font-display font-bold text-lg text-[var(--navy)]">Awaiting Verification</h2>
+            <h2 className="font-display font-bold text-lg text-[var(--fg)]">Awaiting Verification</h2>
             <Link href="/verification" className="text-xs font-semibold text-[var(--teal)] hover:underline">
               View queue
             </Link>
@@ -94,11 +94,11 @@ export default async function OverviewPage() {
             {recentSubmissions.map((s) => (
               <div key={s.id} className="flex items-center justify-between px-6 py-3">
                 <div className="flex items-center gap-3">
-                  <span className="w-9 h-9 rounded-xl bg-[var(--navy)]/10 text-[var(--navy)] flex items-center justify-center text-xs font-bold">
+                  <span className="w-9 h-9 rounded-xl bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center text-xs font-bold">
                     {s.member.avatarInitials}
                   </span>
                   <div>
-                    <div className="text-sm font-semibold text-[var(--navy)]">{s.member.fullName}</div>
+                    <div className="text-sm font-semibold text-[var(--fg)]">{s.member.fullName}</div>
                     <div className="text-xs text-neutral">{s.member.organisation} · {s.member.dutyStation}</div>
                   </div>
                 </div>
@@ -115,7 +115,7 @@ export default async function OverviewPage() {
 
         {/* Tier distribution */}
         <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6">
-          <h2 className="font-display font-bold text-lg text-[var(--navy)] mb-4">Subscription Mix</h2>
+          <h2 className="font-display font-bold text-lg text-[var(--fg)] mb-4">Subscription Mix</h2>
           {stats.tierDistribution.length === 0 && (
             <p className="text-sm text-neutral">No active subscriptions yet.</p>
           )}

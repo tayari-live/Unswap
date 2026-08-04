@@ -41,11 +41,11 @@ export default async function BrowsePage({
           <div className="mx-auto w-14 h-14 rounded-2xl bg-[var(--parchment)] text-[var(--gold-dark)] flex items-center justify-center mb-5">
             <MailWarning size={26} />
           </div>
-          <h2 className="font-display text-2xl font-bold text-[var(--navy)]">Confirm your email to browse</h2>
+          <h2 className="font-display text-2xl font-bold text-[var(--fg)]">Confirm your email to browse</h2>
           <p className="mt-3 text-neutral leading-relaxed max-w-md mx-auto">
             Member homes are only visible inside the verified network. Open the
             confirmation link we sent to{" "}
-            <span className="font-semibold text-[var(--navy)]">{viewer.email}</span>{" "}
+            <span className="font-semibold text-[var(--fg)]">{viewer.email}</span>{" "}
             and this page unlocks instantly.
           </p>
           <div className="mt-7">
@@ -104,7 +104,7 @@ export default async function BrowsePage({
           <div className="mx-auto w-14 h-14 rounded-2xl bg-neutral-light text-neutral flex items-center justify-center mb-4">
             <SearchX size={26} />
           </div>
-          <h2 className="font-display text-xl font-bold text-[var(--navy)]">No homes match</h2>
+          <h2 className="font-display text-xl font-bold text-[var(--fg)]">No homes match</h2>
           <p className="mt-2 text-sm text-neutral">Try a different city or relax your filters.</p>
         </div>
       ) : (
@@ -128,7 +128,7 @@ export default async function BrowsePage({
                   <FavouriteButton listingId={l.id} initial={l.favourited} />
                 </div>
                 {l.owner.verificationStatus === "FULLY_VERIFIED" && (
-                  <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide bg-white/90 text-[var(--navy)] px-2.5 py-1 rounded-full">
+                  <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide bg-white/90 text-[var(--fg)] px-2.5 py-1 rounded-full">
                     <BadgeCheck size={12} className="text-[var(--teal)]" /> Verified host
                   </span>
                 )}
@@ -137,13 +137,13 @@ export default async function BrowsePage({
                 <div className="flex items-center gap-1.5 text-xs text-neutral">
                   <MapPin size={13} /> {l.city}, {l.country}
                 </div>
-                <h3 className="mt-1 font-display font-bold text-[var(--navy)] leading-snug">{l.title}</h3>
+                <h3 className="mt-1 font-display font-bold text-[var(--fg)] leading-snug">{l.title}</h3>
                 <div className="mt-1 text-xs text-neutral">
                   {l.propertyType} · {l.bedrooms} {l.bedrooms === 1 ? "bed" : "beds"} · up to {l.maxGuests} guests
                 </div>
                 <div className="mt-3 pt-3 border-t border-[var(--border)] flex items-center justify-between">
                   <span className="text-xs text-neutral">{EXCHANGE_LABEL[l.exchangeType] ?? l.exchangeType}</span>
-                  <span className="flex items-center gap-1 text-xs font-bold text-[var(--navy)]">
+                  <span className="flex items-center gap-1 text-xs font-bold text-[var(--fg)]">
                     <Star size={12} className="text-[var(--gold)]" />
                     {l.owner.trustScore != null ? l.owner.trustScore.toFixed(1) : "New"}
                   </span>
@@ -157,7 +157,7 @@ export default async function BrowsePage({
       {pageCount > 1 && (
         <nav className="mt-8 flex items-center justify-center gap-3" aria-label="Pagination">
           {page > 1 ? (
-            <Link href={pageHref(page - 1)} className="inline-flex items-center gap-1 text-sm font-semibold text-[var(--navy)] px-4 py-2 rounded-xl border border-[var(--border)] hover:border-[var(--navy)] transition-colors">
+            <Link href={pageHref(page - 1)} className="inline-flex items-center gap-1 text-sm font-semibold text-[var(--fg)] px-4 py-2 rounded-xl border border-[var(--border)] hover:border-[var(--navy)] transition-colors">
               <ChevronLeft size={15} /> Previous
             </Link>
           ) : (
@@ -167,7 +167,7 @@ export default async function BrowsePage({
           )}
           <span className="text-sm text-neutral">Page {page} of {pageCount}</span>
           {page < pageCount ? (
-            <Link href={pageHref(page + 1)} className="inline-flex items-center gap-1 text-sm font-semibold text-[var(--navy)] px-4 py-2 rounded-xl border border-[var(--border)] hover:border-[var(--navy)] transition-colors">
+            <Link href={pageHref(page + 1)} className="inline-flex items-center gap-1 text-sm font-semibold text-[var(--fg)] px-4 py-2 rounded-xl border border-[var(--border)] hover:border-[var(--navy)] transition-colors">
               Next <ChevronRight size={15} />
             </Link>
           ) : (

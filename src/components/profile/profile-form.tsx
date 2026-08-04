@@ -24,8 +24,8 @@ export type ProfileValues = {
 }
 
 const inputCls =
-  "block w-full px-4 py-3 border border-[var(--border)] rounded-xl bg-white placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] text-sm text-[var(--navy)] transition-all"
-const labelCls = "block text-xs font-semibold uppercase tracking-wider text-[var(--navy)] mb-2"
+  "block w-full px-4 py-3 border border-[var(--border)] rounded-xl bg-[var(--surface)] placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] text-sm text-[var(--fg)] transition-all"
+const labelCls = "block text-xs font-semibold uppercase tracking-wider text-[var(--fg)] mb-2"
 
 export function ProfileForm({
   initial,
@@ -95,7 +95,7 @@ export function ProfileForm({
           <div className="relative">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={v.imageUrl} alt="Profile" className="w-20 h-20 rounded-full object-cover border border-[var(--border)]" />
-            <button type="button" onClick={() => set("imageUrl", null)} aria-label="Remove photo" className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-white border border-[var(--border)] text-[var(--navy)] flex items-center justify-center shadow">
+            <button type="button" onClick={() => set("imageUrl", null)} aria-label="Remove photo" className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-[var(--surface)] border border-[var(--border)] text-[var(--fg)] flex items-center justify-center shadow">
               <X size={13} />
             </button>
           </div>
@@ -106,7 +106,7 @@ export function ProfileForm({
           </label>
         )}
         <div>
-          <div className="text-sm font-semibold text-[var(--navy)]">Profile photo</div>
+          <div className="text-sm font-semibold text-[var(--fg)]">Profile photo</div>
           <div className="text-xs text-neutral">PNG, JPG or WebP · max 5 MB</div>
         </div>
       </div>

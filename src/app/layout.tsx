@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { DM_Sans, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/toast";
+import { ThemeProvider } from "@/components/theme/theme-provider";
 
 // Body / UI — DM Sans (300, 400, 500)
 const dmSans = DM_Sans({
@@ -54,11 +55,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${dmSans.variable} ${cormorant.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans bg-background text-foreground">
-        <ToastProvider>
-          {children}
+        <ThemeProvider>
+          <ToastProvider>
+            {children}
           {/*
             No cookie-consent banner is mounted: the app only sets the
             strictly-necessary NextAuth session cookie, which requires no consent.
@@ -67,7 +70,8 @@ export default function RootLayout({
             from src/components/site/cookie-consent.tsx and gate the script on the
             stored choice. Cookieless analytics (Plausible/Fathom) need no banner.
           */}
-        </ToastProvider>
+          </ToastProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

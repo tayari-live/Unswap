@@ -45,7 +45,7 @@ export default async function SubscriptionPage({
       {activated && (
         <div className="flex items-center gap-3 rounded-2xl border border-[var(--teal)]/30 bg-[var(--teal-light)] p-4 mb-6">
           <CheckCircle2 size={20} className="text-[var(--teal)] flex-shrink-0" />
-          <p className="text-sm font-semibold text-[var(--navy)]">Your {activated} membership is now active.</p>
+          <p className="text-sm font-semibold text-[var(--fg)]">Your {activated} membership is now active.</p>
         </div>
       )}
       {sp.cancelled && (
@@ -92,7 +92,7 @@ export default async function SubscriptionPage({
       </div>
 
       {/* Tier ladder */}
-      <h2 className="font-display font-bold text-lg text-[var(--navy)] mb-3">Membership tiers</h2>
+      <h2 className="font-display font-bold text-lg text-[var(--fg)] mb-3">Membership tiers</h2>
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {TIERS.map((t) => {
           const current = t.key === currentKey
@@ -106,9 +106,9 @@ export default async function SubscriptionPage({
                   <BadgeCheck size={12} className="text-[var(--gold)]" /> Current
                 </span>
               )}
-              <h3 className="font-display text-base font-bold text-[var(--navy)]">{t.name}</h3>
+              <h3 className="font-display text-base font-bold text-[var(--fg)]">{t.name}</h3>
               <div className="mt-2 flex items-baseline gap-1">
-                <span className="font-display text-2xl font-bold text-[var(--navy)]">{t.price}</span>
+                <span className="font-display text-2xl font-bold text-[var(--fg)]">{t.price}</span>
                 <span className="text-xs text-neutral">{t.per}</span>
               </div>
               <ul className="mt-4 space-y-2 text-xs text-neutral-dark flex-1">

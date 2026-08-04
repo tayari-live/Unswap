@@ -113,7 +113,7 @@ export function AppAssistant() {
                       key={s}
                       type="button"
                       onClick={() => ask(s)}
-                      className="text-xs font-semibold text-[var(--navy)] bg-white border border-[var(--border)] hover:border-[var(--gold)] px-3 py-1.5 rounded-full transition-colors"
+                      className="text-xs font-semibold text-[var(--fg)] bg-[var(--surface)] border border-[var(--border)] hover:border-[var(--gold)] px-3 py-1.5 rounded-full transition-colors"
                     >
                       {s}
                     </button>
@@ -130,7 +130,7 @@ export function AppAssistant() {
                     className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed whitespace-pre-wrap break-words ${
                       m.role === "user"
                         ? "bg-[var(--navy)] text-white"
-                        : "bg-[var(--background)] border border-[var(--border)] text-[var(--navy)]"
+                        : "bg-[var(--background)] border border-[var(--border)] text-[var(--fg)]"
                     }`}
                   >
                     {m.content}
@@ -170,7 +170,7 @@ export function AppAssistant() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask the guide…"
-              className="flex-1 px-3.5 py-2.5 border border-[var(--border)] rounded-xl bg-white text-sm text-[var(--navy)] placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)]"
+              className="flex-1 px-3.5 py-2.5 border border-[var(--border)] rounded-xl bg-[var(--surface)] text-sm text-[var(--fg)] placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)]"
             />
             <button
               type="submit"

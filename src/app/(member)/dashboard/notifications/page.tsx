@@ -19,13 +19,13 @@ const KIND: Record<MemberNotification["kind"], { icon: typeof Bell; tone: string
   swap: { icon: ArrowLeftRight, tone: "bg-[var(--gold)]/15 text-[var(--gold-dark)]" },
   counter: { icon: Repeat, tone: "bg-[var(--gold)]/15 text-[var(--gold-dark)]" },
   confirmed: { icon: CalendarCheck, tone: "bg-[var(--teal)]/15 text-[var(--teal)]" },
-  message: { icon: MessageSquare, tone: "bg-[var(--navy)]/10 text-[var(--navy)]" },
+  message: { icon: MessageSquare, tone: "bg-[var(--navy)]/10 text-[var(--fg)]" },
   review: { icon: Star, tone: "bg-[var(--gold)]/15 text-[var(--gold-dark)]" },
   verification: { icon: ShieldAlert, tone: "bg-[var(--parchment)] text-[var(--gold-dark)]" },
   verified: { icon: ShieldCheck, tone: "bg-[var(--teal)]/15 text-[var(--teal)]" },
   rejected: { icon: ShieldX, tone: "bg-[var(--crimson)]/10 text-[var(--crimson)]" },
   credit: { icon: Coins, tone: "bg-[var(--gold)]/15 text-[var(--gold-dark)]" },
-  profile: { icon: UserCircle, tone: "bg-[var(--navy)]/10 text-[var(--navy)]" },
+  profile: { icon: UserCircle, tone: "bg-[var(--navy)]/10 text-[var(--fg)]" },
 }
 
 function timeAgo(d: Date) {
@@ -62,10 +62,10 @@ export default async function NotificationsPage() {
 
       {items.length === 0 ? (
         <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-12 text-center">
-          <div className="mx-auto w-14 h-14 rounded-2xl bg-[var(--navy)]/10 text-[var(--navy)] flex items-center justify-center mb-4">
+          <div className="mx-auto w-14 h-14 rounded-2xl bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center mb-4">
             <Bell size={26} />
           </div>
-          <h2 className="font-display text-xl font-bold text-[var(--navy)]">You&apos;re all caught up</h2>
+          <h2 className="font-display text-xl font-bold text-[var(--fg)]">You&apos;re all caught up</h2>
           <p className="mt-2 text-sm text-neutral">No new activity right now.</p>
         </div>
       ) : (
@@ -79,7 +79,7 @@ export default async function NotificationsPage() {
                 </span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-[var(--navy)]">{n.title}</span>
+                    <span className="text-sm font-semibold text-[var(--fg)]">{n.title}</span>
                     {isNew(n) && (
                       <span className="text-[9px] font-bold uppercase tracking-wide bg-[var(--gold)]/20 text-[var(--gold-dark)] px-1.5 py-0.5 rounded-full">
                         New

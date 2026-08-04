@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils"
 type Tone = "navy" | "gold" | "teal" | "crimson" | "neutral"
 
 const toneClasses: Record<Tone, string> = {
-  navy: "bg-[var(--navy)]/10 text-[var(--navy)]",
+  navy: "bg-[var(--navy)]/10 text-[var(--fg)]",
   gold: "bg-[var(--gold)]/15 text-[var(--gold-dark)]",
   teal: "bg-[var(--teal)]/15 text-[var(--teal)]",
   crimson: "bg-[var(--crimson)]/10 text-[var(--crimson)]",

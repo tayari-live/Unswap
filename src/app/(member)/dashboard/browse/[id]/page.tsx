@@ -55,13 +55,13 @@ export default async function ListingDetailPage({
     <div className="max-w-5xl mx-auto pb-12">
       {/* Breadcrumb — each crumb is a live browse filter */}
       <nav aria-label="Breadcrumb" className="mb-4 flex items-center gap-1.5 text-sm text-neutral">
-        <Link href="/dashboard/browse" className="hover:text-[var(--navy)] transition-colors">Discover</Link>
+        <Link href="/dashboard/browse" className="hover:text-[var(--fg)] transition-colors">Discover</Link>
         <ChevronRight size={14} className="text-neutral/50" />
-        <Link href={`/dashboard/browse?q=${encodeURIComponent(listing.country)}`} className="hover:text-[var(--navy)] transition-colors">
+        <Link href={`/dashboard/browse?q=${encodeURIComponent(listing.country)}`} className="hover:text-[var(--fg)] transition-colors">
           {listing.country}
         </Link>
         <ChevronRight size={14} className="text-neutral/50" />
-        <Link href={`/dashboard/browse?q=${encodeURIComponent(listing.city)}`} className="font-semibold text-[var(--navy)]">
+        <Link href={`/dashboard/browse?q=${encodeURIComponent(listing.city)}`} className="font-semibold text-[var(--fg)]">
           {listing.city}
         </Link>
       </nav>
@@ -83,7 +83,7 @@ export default async function ListingDetailPage({
             <div className="flex items-center gap-1.5 text-sm text-neutral">
               <MapPin size={15} /> {listing.neighbourhood ? `${listing.neighbourhood}, ` : ""}{listing.city}, {listing.country}
             </div>
-            <h1 className="mt-1 font-display text-3xl font-bold text-[var(--navy)]">{listing.title}</h1>
+            <h1 className="mt-1 font-display text-3xl font-bold text-[var(--fg)]">{listing.title}</h1>
             <div className="mt-4 flex flex-wrap gap-5 text-sm text-neutral-dark">
               <span className="inline-flex items-center gap-1.5"><BedDouble size={16} className="text-neutral" /> {listing.bedrooms} {listing.bedrooms === 1 ? "bedroom" : "bedrooms"}</span>
               <span className="inline-flex items-center gap-1.5"><Bath size={16} className="text-neutral" /> {listing.bathrooms} {listing.bathrooms === 1 ? "bathroom" : "bathrooms"}</span>
@@ -93,26 +93,26 @@ export default async function ListingDetailPage({
 
           {listing.description && (
             <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6">
-              <h2 className="font-display font-bold text-lg text-[var(--navy)] mb-2">About this home</h2>
+              <h2 className="font-display font-bold text-lg text-[var(--fg)] mb-2">About this home</h2>
               <p className="text-sm text-neutral-dark leading-relaxed whitespace-pre-line">{listing.description}</p>
             </div>
           )}
 
           <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6 space-y-4">
             <div>
-              <h2 className="font-display font-bold text-lg text-[var(--navy)] mb-1">{listing.propertyType}</h2>
+              <h2 className="font-display font-bold text-lg text-[var(--fg)] mb-1">{listing.propertyType}</h2>
               <p className="text-sm text-neutral">Exchange preference: {EXCHANGE_LABEL[listing.exchangeType] ?? listing.exchangeType}</p>
             </div>
             {listing.swapDurations.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {listing.swapDurations.map((d) => (
-                  <span key={d} className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[var(--navy)]/10 text-[var(--navy)]">{DURATION_LABEL[d] ?? d}</span>
+                  <span key={d} className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[var(--navy)]/10 text-[var(--fg)]">{DURATION_LABEL[d] ?? d}</span>
                 ))}
               </div>
             )}
             {listing.amenities.length > 0 && (
               <div>
-                <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--navy)] mb-2">Amenities</h3>
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--fg)] mb-2">Amenities</h3>
                 <div className="flex flex-wrap gap-2">
                   {listing.amenities.map((a) => (
                     <span key={a} className="text-xs px-2.5 py-1 rounded-full bg-neutral-light text-neutral-dark">{AMENITY_LABEL[a] ?? a}</span>
@@ -122,7 +122,7 @@ export default async function ListingDetailPage({
             )}
             {listing.houseRules && (
               <div>
-                <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--navy)] mb-1">House rules</h3>
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--fg)] mb-1">House rules</h3>
                 <p className="text-sm text-neutral-dark whitespace-pre-line">{listing.houseRules}</p>
               </div>
             )}
@@ -131,9 +131,9 @@ export default async function ListingDetailPage({
           {/* Reviews */}
           <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-display font-bold text-lg text-[var(--navy)]">Reviews</h2>
+              <h2 className="font-display font-bold text-lg text-[var(--fg)]">Reviews</h2>
               {listing.rating != null && (
-                <span className="flex items-center gap-1 text-sm font-bold text-[var(--navy)]">
+                <span className="flex items-center gap-1 text-sm font-bold text-[var(--fg)]">
                   <Star size={15} className="text-[var(--gold)]" fill="currentColor" />
                   {listing.rating.toFixed(1)} · {reviews.length}
                 </span>
@@ -147,11 +147,11 @@ export default async function ListingDetailPage({
                   <div key={rv.id} className="border-b border-[var(--border)] last:border-0 pb-5 last:pb-0">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
-                        <span className="w-9 h-9 rounded-full bg-[var(--navy)]/10 text-[var(--navy)] flex items-center justify-center text-xs font-bold">
+                        <span className="w-9 h-9 rounded-full bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center text-xs font-bold">
                           {rv.author.avatarInitials}
                         </span>
                         <div>
-                          <div className="text-sm font-semibold text-[var(--navy)]">{rv.author.fullName}</div>
+                          <div className="text-sm font-semibold text-[var(--fg)]">{rv.author.fullName}</div>
                           <div className="text-xs text-neutral">{rv.author.organisation ?? ""}</div>
                         </div>
                       </div>
@@ -175,12 +175,12 @@ export default async function ListingDetailPage({
           {/* Host card */}
           <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6">
             <div className="flex items-center gap-3">
-              <span className="w-12 h-12 rounded-full bg-[var(--navy)]/10 text-[var(--navy)] flex items-center justify-center font-bold">
+              <span className="w-12 h-12 rounded-full bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center font-bold">
                 {listing.owner.avatarInitials}
               </span>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <span className="font-display font-bold text-[var(--navy)]">{listing.owner.fullName}</span>
+                  <span className="font-display font-bold text-[var(--fg)]">{listing.owner.fullName}</span>
                   {listing.owner.verificationStatus === "FULLY_VERIFIED" && (
                     <BadgeCheck size={15} className="text-[var(--teal)]" />
                   )}
@@ -190,18 +190,18 @@ export default async function ListingDetailPage({
             </div>
             <div className="mt-4 flex items-center justify-between text-sm border-t border-[var(--border)] pt-3">
               <span className="text-neutral">Trust score</span>
-              <span className="flex items-center gap-1 font-bold text-[var(--navy)]">
+              <span className="flex items-center gap-1 font-bold text-[var(--fg)]">
                 <Star size={14} className="text-[var(--gold)]" />
                 {listing.owner.trustScore != null ? listing.owner.trustScore.toFixed(1) : "New host"}
               </span>
             </div>
             <div className="mt-2 flex items-center justify-between text-sm">
               <span className="text-neutral">Member since</span>
-              <span className="font-semibold text-[var(--navy)]">{listing.owner.createdAt.getFullYear()}</span>
+              <span className="font-semibold text-[var(--fg)]">{listing.owner.createdAt.getFullYear()}</span>
             </div>
             <div className="mt-2 flex items-center justify-between text-sm">
               <span className="text-neutral">Exchanges</span>
-              <span className="font-semibold text-[var(--navy)]">
+              <span className="font-semibold text-[var(--fg)]">
                 {listing.ownerExchanges === 0 ? "First-time host" : listing.ownerExchanges}
               </span>
             </div>

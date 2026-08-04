@@ -139,11 +139,11 @@ export default function MembersClient({ initialMembers }: { initialMembers: Memb
                 <tr key={m.id} className="hover:bg-[var(--background)]/60">
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-3">
-                      <span className="w-9 h-9 rounded-xl bg-[var(--navy)]/10 text-[var(--navy)] flex items-center justify-center text-xs font-bold flex-shrink-0">
+                      <span className="w-9 h-9 rounded-xl bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center text-xs font-bold flex-shrink-0">
                         {m.avatarInitials}
                       </span>
                       <div className="min-w-0">
-                        <div className="font-semibold text-[var(--navy)] truncate">{m.fullName}</div>
+                        <div className="font-semibold text-[var(--fg)] truncate">{m.fullName}</div>
                         <div className="text-xs text-neutral truncate">{m.email}</div>
                       </div>
                     </div>
@@ -162,7 +162,7 @@ export default function MembersClient({ initialMembers }: { initialMembers: Memb
                   </td>
                   <td className="px-5 py-3">
                     {m.trustScore != null ? (
-                      <span className="inline-flex items-center gap-1 text-[var(--navy)] font-semibold">
+                      <span className="inline-flex items-center gap-1 text-[var(--fg)] font-semibold">
                         <Star size={13} className="text-[var(--gold)] fill-[var(--gold)]" /> {m.trustScore.toFixed(1)}
                       </span>
                     ) : (
@@ -238,7 +238,7 @@ function TierSelect({ value, onChange, disabled }: { value: string; onChange: (v
         value={value}
         disabled={disabled}
         onChange={(e) => e.target.value && onChange(e.target.value)}
-        className="appearance-none pl-2.5 pr-7 py-1 rounded-lg border border-[var(--border)] bg-surface text-xs font-semibold text-[var(--navy)] focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 disabled:opacity-50"
+        className="appearance-none pl-2.5 pr-7 py-1 rounded-lg border border-[var(--border)] bg-surface text-xs font-semibold text-[var(--fg)] focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 disabled:opacity-50"
       >
         <option value="">No plan</option>
         {Object.entries(TIER_LABELS).map(([k, label]) => (

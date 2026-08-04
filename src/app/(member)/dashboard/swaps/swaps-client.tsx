@@ -78,11 +78,11 @@ function SwapCard({ swap, role }: { swap: SwapRow; role: "incoming" | "outgoing"
     <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-5">
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <span className="w-10 h-10 rounded-xl bg-[var(--navy)]/10 text-[var(--navy)] flex items-center justify-center text-xs font-bold">
+          <span className="w-10 h-10 rounded-xl bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center text-xs font-bold">
             {other.avatarInitials}
           </span>
           <div>
-            <div className="text-sm font-semibold text-[var(--navy)]">{other.fullName}</div>
+            <div className="text-sm font-semibold text-[var(--fg)]">{other.fullName}</div>
             <div className="text-xs text-neutral">
               {role === "incoming" ? "wants to stay at" : "your request for"}{" "}
               <span className="font-medium">{swap.listing.title}</span>
@@ -134,14 +134,14 @@ function SwapCard({ swap, role }: { swap: SwapRow; role: "incoming" | "outgoing"
           </>
         )}
         {swap.status === "CONFIRMED" && (
-          <button disabled={busy} onClick={() => act("complete")} className={`${btn} text-[var(--navy)] bg-neutral-light hover:bg-[var(--border)]`}><CheckCheck size={14} /> Mark completed</button>
+          <button disabled={busy} onClick={() => act("complete")} className={`${btn} text-[var(--fg)] bg-neutral-light hover:bg-[var(--border)]`}><CheckCheck size={14} /> Mark completed</button>
         )}
         {role !== "past" && (
           <MessageButton
             otherUserId={other.id}
             swapRequestId={swap.id}
             label="Message"
-            className={`${btn} text-[var(--navy)] bg-neutral-light hover:bg-[var(--border)]`}
+            className={`${btn} text-[var(--fg)] bg-neutral-light hover:bg-[var(--border)]`}
           />
         )}
       </div>

@@ -112,7 +112,7 @@ export function ListingsClient({
               </div>
 
               <div className="p-4 flex-1 flex flex-col">
-                <h3 className="font-display font-bold text-[var(--navy)] leading-snug">{l.title}</h3>
+                <h3 className="font-display font-bold text-[var(--fg)] leading-snug">{l.title}</h3>
                 <div className="flex items-center gap-1.5 text-xs text-neutral mt-1">
                   <MapPin size={13} /> {l.city}, {l.country}
                 </div>
@@ -121,7 +121,7 @@ export function ListingsClient({
                 </div>
 
                 <div className="mt-4 pt-3 border-t border-[var(--border)] flex flex-wrap items-center gap-2">
-                  <Link href={`/dashboard/listings/${l.id}/edit`} className={`${btn} text-[var(--navy)] bg-neutral-light hover:bg-[var(--border)]`}>
+                  <Link href={`/dashboard/listings/${l.id}/edit`} className={`${btn} text-[var(--fg)] bg-neutral-light hover:bg-[var(--border)]`}>
                     <Pencil size={13} /> Edit
                   </Link>
 

@@ -19,7 +19,7 @@ export function useToast() {
 const STYLE: Record<ToastType, { icon: typeof Info; cls: string; iconCls: string }> = {
   success: { icon: CheckCircle2, cls: "border-[var(--teal)]/30", iconCls: "text-[var(--teal)]" },
   error: { icon: AlertTriangle, cls: "border-[var(--crimson)]/30", iconCls: "text-[var(--crimson)]" },
-  info: { icon: Info, cls: "border-[var(--border)]", iconCls: "text-[var(--navy)]" },
+  info: { icon: Info, cls: "border-[var(--border)]", iconCls: "text-[var(--fg)]" },
 }
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
@@ -58,8 +58,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
               className={`flex items-start gap-3 bg-surface border ${s.cls} rounded-xl shadow-lg p-3.5 animate-[fadeIn_0.15s_ease-out]`}
             >
               <s.icon size={18} className={`${s.iconCls} flex-shrink-0 mt-0.5`} />
-              <p className="flex-1 text-sm text-[var(--navy)] leading-snug">{t.message}</p>
-              <button onClick={() => dismiss(t.id)} aria-label="Dismiss" className="text-neutral hover:text-[var(--navy)] transition-colors">
+              <p className="flex-1 text-sm text-[var(--fg)] leading-snug">{t.message}</p>
+              <button onClick={() => dismiss(t.id)} aria-label="Dismiss" className="text-neutral hover:text-[var(--fg)] transition-colors">
                 <X size={15} />
               </button>
             </div>

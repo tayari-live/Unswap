@@ -72,7 +72,7 @@ export function NotificationBell({
       {open && (
         <div className={panelClassName ?? "fixed top-[72px] left-4 right-4 sm:absolute sm:top-full sm:left-auto sm:right-0 sm:mt-2 sm:w-80 bg-surface rounded-xl shadow-lg border border-[var(--border)] z-50 overflow-hidden"}>
           <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)]">
-            <span className="text-sm font-semibold text-[var(--navy)]">Notifications</span>
+            <span className="text-sm font-semibold text-[var(--fg)]">Notifications</span>
             {unread > 0 && (
               <button onClick={markAllRead} className="text-xs font-semibold text-[var(--teal)] hover:underline">
                 Mark all read
@@ -86,7 +86,7 @@ export function NotificationBell({
             {items.map((n) => {
               const inner = (
                 <div className={`px-4 py-3 border-b border-[var(--border)] last:border-0 ${n.read ? "" : "bg-[var(--teal-light)]/40"}`}>
-                  <div className="text-sm font-semibold text-[var(--navy)]">{n.title}</div>
+                  <div className="text-sm font-semibold text-[var(--fg)]">{n.title}</div>
                   {n.body && <div className="text-xs text-neutral mt-0.5">{n.body}</div>}
                 </div>
               )

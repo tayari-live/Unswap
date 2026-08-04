@@ -37,7 +37,7 @@ export default async function CreditsPage() {
         </div>
         <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6">
           <div className="text-xs text-neutral uppercase tracking-wide font-semibold">Spent</div>
-          <div className="mt-3 font-display text-3xl font-bold text-[var(--navy)]">-{spent}</div>
+          <div className="mt-3 font-display text-3xl font-bold text-[var(--fg)]">-{spent}</div>
           <div className="text-xs text-neutral mt-1">nights stayed</div>
         </div>
       </div>
@@ -50,7 +50,7 @@ export default async function CreditsPage() {
       {/* Ledger */}
       <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-[var(--border)]">
-          <h2 className="font-display font-bold text-lg text-[var(--navy)]">Earn & spend history</h2>
+          <h2 className="font-display font-bold text-lg text-[var(--fg)]">Earn & spend history</h2>
         </div>
         {transactions.length === 0 ? (
           <p className="px-6 py-10 text-center text-sm text-neutral">No credit activity yet. Host a member to start earning.</p>
@@ -59,15 +59,15 @@ export default async function CreditsPage() {
             {transactions.map((t) => (
               <div key={t.id} className="flex items-center justify-between px-6 py-3.5">
                 <div className="flex items-center gap-3">
-                  <span className={`w-9 h-9 rounded-xl flex items-center justify-center ${t.amount > 0 ? "bg-[var(--teal)]/15 text-[var(--teal)]" : "bg-[var(--navy)]/10 text-[var(--navy)]"}`}>
+                  <span className={`w-9 h-9 rounded-xl flex items-center justify-center ${t.amount > 0 ? "bg-[var(--teal)]/15 text-[var(--teal)]" : "bg-[var(--navy)]/10 text-[var(--fg)]"}`}>
                     {t.amount > 0 ? <ArrowUpRight size={18} /> : <ArrowDownRight size={18} />}
                   </span>
                   <div>
-                    <div className="text-sm font-semibold text-[var(--navy)]">{t.title}</div>
+                    <div className="text-sm font-semibold text-[var(--fg)]">{t.title}</div>
                     <div className="text-xs text-neutral">{t.listing} · {fmt(t.date)}</div>
                   </div>
                 </div>
-                <span className={`text-sm font-bold ${t.amount > 0 ? "text-[var(--teal)]" : "text-[var(--navy)]"}`}>
+                <span className={`text-sm font-bold ${t.amount > 0 ? "text-[var(--teal)]" : "text-[var(--fg)]"}`}>
                   {t.amount > 0 ? `+${t.amount}` : t.amount}
                 </span>
               </div>

@@ -39,7 +39,7 @@ export function OnboardingWizard({
   return (
     <div className="w-full max-w-xl">
       <div className="flex justify-center mb-8">
-        <Logo underline wordClassName="text-[var(--navy)]" />
+        <Logo underline wordClassName="text-[var(--fg)]" />
       </div>
 
       {/* Progress */}
@@ -51,7 +51,7 @@ export function OnboardingWizard({
           return (
             <div key={label} className="flex-1">
               <div className={`h-1.5 rounded-full transition-colors ${done || active ? "bg-[var(--gold)]" : "bg-[var(--border)]"}`} />
-              <div className={`mt-1.5 text-[10px] font-semibold uppercase tracking-wide ${active ? "text-[var(--navy)]" : "text-neutral"}`}>{label}</div>
+              <div className={`mt-1.5 text-[10px] font-semibold uppercase tracking-wide ${active ? "text-[var(--fg)]" : "text-neutral"}`}>{label}</div>
             </div>
           )
         })}
@@ -69,7 +69,7 @@ export function OnboardingWizard({
               priority
               className="mx-auto mb-5 w-16 h-16 object-contain rounded-2xl"
             />
-            <h1 className="font-display text-3xl font-bold text-[var(--navy)]">Welcome to UnSwap, {firstName}</h1>
+            <h1 className="font-display text-3xl font-bold text-[var(--fg)]">Welcome to UnSwap, {firstName}</h1>
             <p className="mt-4 text-neutral leading-relaxed">
               You&apos;ve joined a closed, verified network built exclusively for UN and
               international organisation professionals. Exchange homes, not money —
@@ -87,7 +87,7 @@ export function OnboardingWizard({
         {/* Step 2 — Complete your profile (needs 50% to proceed) */}
         {step === 2 && (
           <div>
-            <h1 className="font-display text-2xl font-bold text-[var(--navy)]">Complete your profile</h1>
+            <h1 className="font-display text-2xl font-bold text-[var(--fg)]">Complete your profile</h1>
             <p className="mt-1 mb-5 text-sm text-neutral">
               Members exchange with people, not listings. One question at a time — reach 50% to continue.
             </p>
@@ -109,7 +109,7 @@ export function OnboardingWizard({
             <div className="mx-auto w-14 h-14 rounded-2xl bg-[var(--teal-light)] text-[var(--teal)] flex items-center justify-center mb-5">
               <Home size={26} />
             </div>
-            <h1 className="font-display text-2xl font-bold text-[var(--navy)]">List your first home</h1>
+            <h1 className="font-display text-2xl font-bold text-[var(--fg)]">List your first home</h1>
             <p className="mt-3 text-neutral leading-relaxed">
               Add the home you&apos;d like to offer for exchange. You can publish it once
               you&apos;re fully verified — or add it later.
@@ -118,7 +118,7 @@ export function OnboardingWizard({
               <button onClick={() => finishAndGo("/dashboard/listings/new")} disabled={leaving} className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] disabled:opacity-50 transition-colors">
                 Add my home <ArrowRight size={16} />
               </button>
-              <button onClick={() => setStep(4)} disabled={leaving} className="py-3 px-6 rounded-xl text-sm font-semibold text-[var(--navy)] border border-[var(--border)] hover:border-[var(--navy)] transition-colors">
+              <button onClick={() => setStep(4)} disabled={leaving} className="py-3 px-6 rounded-xl text-sm font-semibold text-[var(--fg)] border border-[var(--border)] hover:border-[var(--navy)] transition-colors">
                 Skip for now
               </button>
             </div>
@@ -131,7 +131,7 @@ export function OnboardingWizard({
             <div className="mx-auto w-14 h-14 rounded-2xl bg-[var(--gold)]/15 text-[var(--gold-dark)] flex items-center justify-center mb-5">
               <PartyPopper size={26} />
             </div>
-            <h1 className="font-display text-2xl font-bold text-[var(--navy)]">You&apos;re all set</h1>
+            <h1 className="font-display text-2xl font-bold text-[var(--fg)]">You&apos;re all set</h1>
             <p className="mt-3 text-neutral leading-relaxed">
               Discover verified homes across duty stations worldwide, save your
               favourites, and send your first swap request.
@@ -140,7 +140,7 @@ export function OnboardingWizard({
               <button onClick={() => finishAndGo("/dashboard/browse")} disabled={leaving} className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] disabled:opacity-50 transition-colors">
                 <Compass size={16} /> Explore homes
               </button>
-              <button onClick={() => finishAndGo("/dashboard")} disabled={leaving} className="py-3 px-6 rounded-xl text-sm font-semibold text-[var(--navy)] border border-[var(--border)] hover:border-[var(--navy)] transition-colors">
+              <button onClick={() => finishAndGo("/dashboard")} disabled={leaving} className="py-3 px-6 rounded-xl text-sm font-semibold text-[var(--fg)] border border-[var(--border)] hover:border-[var(--navy)] transition-colors">
                 Go to my dashboard
               </button>
             </div>
@@ -153,7 +153,7 @@ export function OnboardingWizard({
           type="button"
           onClick={() => { setHint(""); setStep((s) => Math.max(1, s - 1)) }}
           disabled={leaving}
-          className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-neutral hover:text-[var(--navy)] disabled:opacity-50 transition-colors"
+          className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-neutral hover:text-[var(--fg)] disabled:opacity-50 transition-colors"
         >
           <ArrowLeft size={16} /> Back
         </button>

@@ -64,11 +64,11 @@ export default async function SettingsPage() {
             href={r.href}
             className="flex items-center gap-4 p-5 hover:bg-[var(--background)] transition-colors"
           >
-            <span className="w-10 h-10 rounded-xl bg-[var(--navy)]/10 text-[var(--navy)] flex items-center justify-center flex-shrink-0">
+            <span className="w-10 h-10 rounded-xl bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center flex-shrink-0">
               <r.icon size={20} />
             </span>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-semibold text-[var(--navy)]">{r.title}</div>
+              <div className="text-sm font-semibold text-[var(--fg)]">{r.title}</div>
               <div className="text-xs text-neutral mt-0.5">{r.desc}</div>
             </div>
             <ChevronRight size={18} className="text-neutral flex-shrink-0" />
@@ -77,7 +77,7 @@ export default async function SettingsPage() {
       </div>
 
       <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6 sm:p-8 mt-6">
-        <h2 className="font-display font-bold text-lg text-[var(--navy)] mb-1.5">Password</h2>
+        <h2 className="font-display font-bold text-lg text-[var(--fg)] mb-1.5">Password</h2>
         <p className="text-sm text-neutral mb-5">Change the password you use to sign in.</p>
         <ChangePasswordForm />
       </div>

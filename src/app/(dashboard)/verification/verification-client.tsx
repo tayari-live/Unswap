@@ -96,7 +96,7 @@ export default function VerificationClient({ initialSubmissions }: { initialSubm
       {submissions.length === 0 ? (
         <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-12 text-center">
           <ShieldCheck className="mx-auto text-[var(--teal)] mb-3" size={40} />
-          <p className="font-display font-bold text-lg text-[var(--navy)]">Queue is clear</p>
+          <p className="font-display font-bold text-lg text-[var(--fg)]">Queue is clear</p>
           <p className="text-sm text-neutral mt-1">No submissions are awaiting review.</p>
         </div>
       ) : (
@@ -109,11 +109,11 @@ export default function VerificationClient({ initialSubmissions }: { initialSubm
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <span className="w-11 h-11 rounded-xl bg-[var(--navy)]/10 text-[var(--navy)] flex items-center justify-center font-bold">
+                  <span className="w-11 h-11 rounded-xl bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center font-bold">
                     {s.member.avatarInitials}
                   </span>
                   <div>
-                    <div className="font-semibold text-[var(--navy)]">{s.member.fullName}</div>
+                    <div className="font-semibold text-[var(--fg)]">{s.member.fullName}</div>
                     <div className="text-xs text-neutral">{s.member.email}</div>
                   </div>
                 </div>
@@ -136,19 +136,19 @@ export default function VerificationClient({ initialSubmissions }: { initialSubm
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[var(--navy)]/40" onClick={() => !busy && setSelected(null)}>
           <div className="bg-surface rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] sticky top-0 bg-surface">
-              <h2 className="font-display font-bold text-lg text-[var(--navy)]">Review Submission</h2>
-              <button onClick={() => setSelected(null)} disabled={busy} className="text-neutral hover:text-[var(--navy)]">
+              <h2 className="font-display font-bold text-lg text-[var(--fg)]">Review Submission</h2>
+              <button onClick={() => setSelected(null)} disabled={busy} className="text-neutral hover:text-[var(--fg)]">
                 <X size={20} />
               </button>
             </div>
 
             <div className="p-6 space-y-5">
               <div className="flex items-center gap-3">
-                <span className="w-12 h-12 rounded-xl bg-[var(--navy)]/10 text-[var(--navy)] flex items-center justify-center font-bold text-lg">
+                <span className="w-12 h-12 rounded-xl bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center font-bold text-lg">
                   {selected.member.avatarInitials}
                 </span>
                 <div>
-                  <div className="font-semibold text-[var(--navy)] text-lg">{selected.member.fullName}</div>
+                  <div className="font-semibold text-[var(--fg)] text-lg">{selected.member.fullName}</div>
                   <div className="text-sm text-neutral flex items-center gap-1"><Mail size={13} /> {selected.member.email}</div>
                 </div>
               </div>
@@ -182,7 +182,7 @@ export default function VerificationClient({ initialSubmissions }: { initialSubm
                   onChange={(e) => setNote(e.target.value)}
                   rows={3}
                   placeholder="Explain why — the member receives this as the reason (e.g. “Staff ID photo was blurry, please re-upload a clear scan”)."
-                  className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--background)] text-sm text-[var(--navy)] focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)]"
+                  className="w-full px-3 py-2 rounded-xl border border-[var(--border)] bg-[var(--background)] text-sm text-[var(--fg)] focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)]"
                 />
                 <p className="mt-1.5 text-xs text-neutral">Approving needs no note. A note is only required to reject.</p>
               </div>
@@ -216,7 +216,7 @@ function Field({ label, value }: { label: string; value: string | null }) {
   return (
     <div>
       <div className="text-[10px] uppercase tracking-wide text-neutral font-semibold">{label}</div>
-      <div className="text-[var(--navy)] font-medium">{value ?? "—"}</div>
+      <div className="text-[var(--fg)] font-medium">{value ?? "—"}</div>
     </div>
   )
 }

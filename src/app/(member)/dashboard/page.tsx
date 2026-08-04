@@ -141,7 +141,7 @@ export default async function MemberDashboardPage() {
   ] as const
 
   const toneRing: Record<string, string> = {
-    navy: "text-[var(--navy)] bg-[var(--navy)]/10",
+    navy: "text-[var(--fg)] bg-[var(--navy)]/10",
     gold: "text-[var(--gold-dark)] bg-[var(--gold)]/15",
     teal: "text-[var(--teal)] bg-[var(--teal)]/15",
   }
@@ -157,7 +157,7 @@ export default async function MemberDashboardPage() {
       {showChecklist && (
         <div className="rounded-2xl border border-[var(--border)] bg-surface shadow-sm p-5 mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-display text-lg font-bold text-[var(--navy)]">Getting started</h2>
+            <h2 className="font-display text-lg font-bold text-[var(--fg)]">Getting started</h2>
             <span className="text-xs font-semibold text-neutral">{checklistDone} of {checklist.length} done</span>
           </div>
           <ul className="space-y-3">
@@ -165,13 +165,13 @@ export default async function MemberDashboardPage() {
               <li key={s.title} className="flex items-center gap-3">
                 <span
                   className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                    s.done ? "bg-[var(--teal)]/15 text-[var(--teal)]" : "bg-[var(--navy)]/10 text-[var(--navy)]"
+                    s.done ? "bg-[var(--teal)]/15 text-[var(--teal)]" : "bg-[var(--navy)]/10 text-[var(--fg)]"
                   }`}
                 >
                   {s.done ? <Check size={14} /> : i + 1}
                 </span>
                 <div className="flex-1 min-w-0">
-                  <div className={`text-sm font-semibold ${s.done ? "text-neutral line-through" : "text-[var(--navy)]"}`}>
+                  <div className={`text-sm font-semibold ${s.done ? "text-neutral line-through" : "text-[var(--fg)]"}`}>
                     {s.title}
                   </div>
                   {s.sub && <div className="text-xs text-neutral mt-0.5">{s.sub}</div>}
@@ -203,7 +203,7 @@ export default async function MemberDashboardPage() {
             <span className={`w-9 h-9 rounded-xl flex items-center justify-center ${toneRing[c.tone]}`}>
               <c.icon size={18} />
             </span>
-            <div className="mt-4 text-3xl font-display font-bold text-[var(--navy)]">{c.value}</div>
+            <div className="mt-4 text-3xl font-display font-bold text-[var(--fg)]">{c.value}</div>
             <div className="text-xs text-neutral uppercase tracking-wide mt-1 font-semibold">{c.label}</div>
           </div>
         ))}
@@ -213,7 +213,7 @@ export default async function MemberDashboardPage() {
         {/* Incoming swap requests */}
         <div className="lg:col-span-2 bg-surface rounded-2xl border border-[var(--border)] shadow-sm overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
-            <h2 className="font-display font-bold text-lg text-[var(--navy)]">Incoming Swap Requests</h2>
+            <h2 className="font-display font-bold text-lg text-[var(--fg)]">Incoming Swap Requests</h2>
           </div>
           <div className="divide-y divide-[var(--border)]">
             {incoming.length === 0 && (
@@ -222,11 +222,11 @@ export default async function MemberDashboardPage() {
             {incoming.slice(0, 5).map((r) => (
               <div key={r.id} className="flex items-center justify-between px-6 py-3">
                 <div className="flex items-center gap-3">
-                  <span className="w-9 h-9 rounded-xl bg-[var(--navy)]/10 text-[var(--navy)] flex items-center justify-center text-xs font-bold">
+                  <span className="w-9 h-9 rounded-xl bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center text-xs font-bold">
                     {r.requester.avatarInitials}
                   </span>
                   <div>
-                    <div className="text-sm font-semibold text-[var(--navy)]">{r.requester.fullName}</div>
+                    <div className="text-sm font-semibold text-[var(--fg)]">{r.requester.fullName}</div>
                     <div className="text-xs text-neutral">
                       {r.listing.title} · {fmtDate(r.startDate)} – {fmtDate(r.endDate)}
                     </div>
@@ -250,14 +250,14 @@ export default async function MemberDashboardPage() {
               ) : (
                 <ShieldAlert size={18} className="text-[var(--gold-dark)]" />
               )}
-              <h2 className="font-display font-bold text-base text-[var(--navy)]">Verification</h2>
+              <h2 className="font-display font-bold text-base text-[var(--fg)]">Verification</h2>
             </div>
             <p className="text-sm text-neutral-dark">
               {VERIFICATION_LABELS[user.verificationStatus] ?? user.verificationStatus}
             </p>
             <div className="mt-4 pt-4 border-t border-[var(--border)] flex items-center justify-between">
               <span className="text-xs text-neutral uppercase tracking-wide font-semibold">Trust Score</span>
-              <span className="flex items-center gap-1 text-sm font-bold text-[var(--navy)]">
+              <span className="flex items-center gap-1 text-sm font-bold text-[var(--fg)]">
                 <Star size={14} className="text-[var(--gold)]" />
                 {user.trustScore != null ? user.trustScore.toFixed(1) : "—"}
               </span>
@@ -266,7 +266,7 @@ export default async function MemberDashboardPage() {
 
           {/* Subscription */}
           <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6">
-            <h2 className="font-display font-bold text-base text-[var(--navy)] mb-3">Subscription</h2>
+            <h2 className="font-display font-bold text-base text-[var(--fg)] mb-3">Subscription</h2>
             {user.subscription ? (
               <>
                 <div className="inline-flex items-center text-sm font-bold px-3 py-1 rounded-full bg-[var(--navy)] text-[var(--gold)]">
@@ -294,7 +294,7 @@ export default async function MemberDashboardPage() {
       {/* Upcoming exchanges */}
       <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm overflow-hidden mt-6">
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
-          <h2 className="font-display font-bold text-lg text-[var(--navy)]">Upcoming Exchanges</h2>
+          <h2 className="font-display font-bold text-lg text-[var(--fg)]">Upcoming Exchanges</h2>
         </div>
         <div className="divide-y divide-[var(--border)]">
           {upcoming.length === 0 && (
@@ -308,7 +308,7 @@ export default async function MemberDashboardPage() {
           {upcoming.slice(0, 5).map((r) => (
             <div key={r.id} className="flex items-center justify-between px-6 py-3">
               <div>
-                <div className="text-sm font-semibold text-[var(--navy)]">{r.listing.title}</div>
+                <div className="text-sm font-semibold text-[var(--fg)]">{r.listing.title}</div>
                 <div className="text-xs text-neutral">
                   {fmtDate(r.startDate)} – {fmtDate(r.endDate)} · {nights(r.startDate, r.endDate)} nights
                 </div>

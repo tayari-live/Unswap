@@ -108,7 +108,7 @@ export function ReviewAction({
 
   return (
     <form onSubmit={submit} className="mt-2 w-full bg-[var(--background)] border border-[var(--border)] rounded-xl p-4 space-y-3">
-      <h4 className="font-display font-bold text-[var(--navy)]">Review {otherName}</h4>
+      <h4 className="font-display font-bold text-[var(--fg)]">Review {otherName}</h4>
       <StarRating label="Overall" value={overall} onChange={setOverall} />
       <StarRating label="Communication" value={communication} onChange={setCommunication} />
       {aboutHost && (
@@ -124,13 +124,13 @@ export function ReviewAction({
         onChange={(e) => setBody(e.target.value)}
         rows={3}
         placeholder={`Share how the exchange went (min 50 characters)…`}
-        className="block w-full px-3 py-2 border border-[var(--border)] rounded-lg bg-white text-sm text-[var(--navy)] placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)]"
+        className="block w-full px-3 py-2 border border-[var(--border)] rounded-lg bg-[var(--surface)] text-sm text-[var(--fg)] placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)]"
       />
       <div className="flex items-center gap-2">
         <button type="submit" disabled={loading} className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] px-4 py-2 rounded-lg disabled:opacity-50 transition-colors">
           {loading ? "Submitting…" : (<><Check size={14} /> Submit review</>)}
         </button>
-        <button type="button" onClick={() => setOpen(false)} className="text-xs font-semibold text-neutral hover:text-[var(--navy)] px-3 py-2">
+        <button type="button" onClick={() => setOpen(false)} className="text-xs font-semibold text-neutral hover:text-[var(--fg)] px-3 py-2">
           Cancel
         </button>
       </div>

@@ -53,7 +53,7 @@ function FileField({
 
   return (
     <div>
-      <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--navy)] mb-2">
+      <label className="block text-xs font-semibold uppercase tracking-wider text-[var(--fg)] mb-2">
         {label}
       </label>
       {value ? (
@@ -64,7 +64,7 @@ function FileField({
             type="button"
             onClick={() => onChange(null)}
             aria-label="Remove file"
-            className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 text-[var(--navy)] flex items-center justify-center shadow hover:bg-white"
+            className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 text-[var(--fg)] flex items-center justify-center shadow hover:bg-[var(--surface)]"
           >
             <X size={16} />
           </button>
@@ -75,7 +75,7 @@ function FileField({
       ) : (
         <label className="flex flex-col items-center justify-center h-44 rounded-xl border-2 border-dashed border-[var(--border)] bg-[var(--background)] cursor-pointer hover:border-[var(--gold)] transition-colors text-center px-4">
           <UploadCloud size={26} className="text-neutral mb-2" />
-          <span className="text-sm font-semibold text-[var(--navy)]">Click to upload</span>
+          <span className="text-sm font-semibold text-[var(--fg)]">Click to upload</span>
           <span className="text-xs text-neutral mt-1">{hint}</span>
           <input
             type="file"

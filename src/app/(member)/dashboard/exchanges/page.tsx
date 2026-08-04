@@ -42,7 +42,7 @@ function ExchangeCard({ r, review }: { r: Row; review?: { aboutHost: boolean } }
             <span className="text-[10px] font-bold uppercase tracking-wide text-[var(--gold-dark)]">
               {r.role === "host" ? "You're hosting" : "You're staying"}
             </span>
-            <h3 className="font-display text-lg font-bold text-[var(--navy)] leading-snug">{r.listing.title}</h3>
+            <h3 className="font-display text-lg font-bold text-[var(--fg)] leading-snug">{r.listing.title}</h3>
             <div className="flex items-center gap-1.5 text-xs text-neutral mt-0.5">
               <MapPin size={13} /> {r.listing.city}, {r.listing.country}
             </div>
@@ -54,7 +54,7 @@ function ExchangeCard({ r, review }: { r: Row; review?: { aboutHost: boolean } }
 
         <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-xs text-neutral">
           <span className="inline-flex items-center gap-1.5">
-            <span className="w-6 h-6 rounded-full bg-[var(--navy)]/10 text-[var(--navy)] flex items-center justify-center text-[10px] font-bold">{r.other.avatarInitials}</span>
+            <span className="w-6 h-6 rounded-full bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center text-[10px] font-bold">{r.other.avatarInitials}</span>
             {r.role === "host" ? "Guest" : "Host"}: {r.other.fullName}
           </span>
           <span className="inline-flex items-center gap-1.5"><Calendar size={13} /> {fmt(r.startDate)} – {fmt(r.endDate)} · {nights(r.startDate, r.endDate)} nights</span>
@@ -66,7 +66,7 @@ function ExchangeCard({ r, review }: { r: Row; review?: { aboutHost: boolean } }
             href={`/api/swaps/${r.id}/agreement`}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--navy)] bg-neutral-light hover:bg-[var(--border)] px-3 py-2 rounded-lg transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--fg)] bg-neutral-light hover:bg-[var(--border)] px-3 py-2 rounded-lg transition-colors"
           >
             <FileDown size={14} /> Download Swap Agreement
           </a>
@@ -96,23 +96,23 @@ export default async function ExchangesPage() {
 
       {upcoming.length === 0 && past.length === 0 ? (
         <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-12 text-center">
-          <div className="mx-auto w-14 h-14 rounded-2xl bg-[var(--navy)]/10 text-[var(--navy)] flex items-center justify-center mb-4">
+          <div className="mx-auto w-14 h-14 rounded-2xl bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center mb-4">
             <CalendarCheck size={26} />
           </div>
-          <h2 className="font-display text-xl font-bold text-[var(--navy)]">No exchanges yet</h2>
+          <h2 className="font-display text-xl font-bold text-[var(--fg)]">No exchanges yet</h2>
           <p className="mt-2 text-sm text-neutral">Once a swap request is accepted, it appears here with its agreement.</p>
         </div>
       ) : (
         <div className="space-y-8">
           {upcoming.length > 0 && (
             <section>
-              <h2 className="font-display font-bold text-lg text-[var(--navy)] mb-3">Upcoming & ongoing</h2>
+              <h2 className="font-display font-bold text-lg text-[var(--fg)] mb-3">Upcoming & ongoing</h2>
               <div className="space-y-4">{upcoming.map((r) => <ExchangeCard key={r.id} r={r} />)}</div>
             </section>
           )}
           {past.length > 0 && (
             <section>
-              <h2 className="font-display font-bold text-lg text-[var(--navy)] mb-3">Past exchanges</h2>
+              <h2 className="font-display font-bold text-lg text-[var(--fg)] mb-3">Past exchanges</h2>
               <div className="space-y-4">{past.map((r) => (
                 <ExchangeCard
                   key={r.id}

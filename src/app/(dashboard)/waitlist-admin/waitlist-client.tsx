@@ -145,7 +145,7 @@ export default function WaitlistClient({ initialEntries }: { initialEntries: Ent
         subtitle="Pre-launch signups with referral tracking. Import leads, resend confirmations, invite founders."
         action={
           <div className="flex items-center gap-2 flex-wrap">
-            <button onClick={() => setImportOpen(true)} className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--border)] bg-surface text-sm font-semibold text-[var(--navy)] hover:bg-neutral-light transition">
+            <button onClick={() => setImportOpen(true)} className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--border)] bg-surface text-sm font-semibold text-[var(--fg)] hover:bg-neutral-light transition">
               <Upload size={16} /> Import leads
             </button>
             {unconfirmedCount > 0 && (
@@ -158,7 +158,7 @@ export default function WaitlistClient({ initialEntries }: { initialEntries: Ent
                 <Send size={16} /> {bulkBusy ? "Inviting…" : `Invite all (${pendingCount})`}
               </button>
             )}
-            <button onClick={exportCsv} className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--border)] bg-surface text-sm font-semibold text-[var(--navy)] hover:bg-neutral-light transition">
+            <button onClick={exportCsv} className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--border)] bg-surface text-sm font-semibold text-[var(--fg)] hover:bg-neutral-light transition">
               <Download size={16} /> Export CSV
             </button>
           </div>
@@ -199,11 +199,11 @@ export default function WaitlistClient({ initialEntries }: { initialEntries: Ent
               {entries.map((e) => (
                 <tr key={e.id} className="hover:bg-[var(--background)]/60">
                   <td className="px-5 py-3">
-                    <div className="font-semibold text-[var(--navy)]">{e.firstName} {e.lastName}</div>
+                    <div className="font-semibold text-[var(--fg)]">{e.firstName} {e.lastName}</div>
                     <div className="text-xs text-neutral">{e.email}</div>
                   </td>
                   <td className="px-5 py-3 text-neutral-dark">{e.organisation ?? "—"}</td>
-                  <td className="px-5 py-3 font-semibold text-[var(--navy)]">{e.referrals}</td>
+                  <td className="px-5 py-3 font-semibold text-[var(--fg)]">{e.referrals}</td>
                   <td className="px-5 py-3">
                     {e.confirmedAt ? (
                       <span className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--teal)]"><Check size={13} /> Confirmed</span>
@@ -259,8 +259,8 @@ export default function WaitlistClient({ initialEntries }: { initialEntries: Ent
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[var(--navy)]/40" onClick={() => !importBusy && setImportOpen(false)}>
           <div className="bg-surface rounded-2xl shadow-2xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
-              <h2 className="font-display font-bold text-lg text-[var(--navy)]">Import leads</h2>
-              <button onClick={() => setImportOpen(false)} disabled={importBusy} className="text-neutral hover:text-[var(--navy)]"><X size={20} /></button>
+              <h2 className="font-display font-bold text-lg text-[var(--fg)]">Import leads</h2>
+              <button onClick={() => setImportOpen(false)} disabled={importBusy} className="text-neutral hover:text-[var(--fg)]"><X size={20} /></button>
             </div>
             <div className="p-6 space-y-4">
               <p className="text-sm text-neutral">
@@ -271,14 +271,14 @@ export default function WaitlistClient({ initialEntries }: { initialEntries: Ent
                 onChange={(e) => setImportText(e.target.value)}
                 rows={8}
                 placeholder={"email,name,organisation\njane@un.org,Jane Doe,United Nations\njohn@who.int,John Smith,WHO"}
-                className="w-full px-3 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--background)] text-sm font-mono text-[var(--navy)] focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40"
+                className="w-full px-3 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--background)] text-sm font-mono text-[var(--fg)] focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40"
               />
               <label className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--gold-dark)] cursor-pointer hover:underline">
                 <Upload size={15} /> Upload .csv
                 <input type="file" accept=".csv,text/csv" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
               </label>
               <div className="flex justify-end gap-3 pt-2">
-                <button onClick={() => setImportOpen(false)} disabled={importBusy} className="px-4 py-2.5 rounded-xl border border-[var(--border)] text-sm font-semibold text-[var(--navy)] hover:bg-neutral-light transition">Cancel</button>
+                <button onClick={() => setImportOpen(false)} disabled={importBusy} className="px-4 py-2.5 rounded-xl border border-[var(--border)] text-sm font-semibold text-[var(--fg)] hover:bg-neutral-light transition">Cancel</button>
                 <button onClick={doImport} disabled={importBusy} className="px-5 py-2.5 rounded-xl bg-[var(--gold-dark)] text-sm font-semibold text-white hover:bg-[var(--gold-hover)] transition disabled:opacity-50">
                   {importBusy ? "Importing…" : "Import"}
                 </button>

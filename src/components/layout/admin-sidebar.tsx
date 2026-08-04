@@ -9,6 +9,7 @@ import { Settings, LogOut, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { adminNavigation } from "./nav-items"
 import { NotificationBell } from "./notification-bell"
+import { ThemeToggle } from "@/components/theme/theme-toggle"
 
 // Admin console rail. Shares the navy visual language of the member sidebar so
 // both areas of the app feel like one product.
@@ -108,6 +109,7 @@ export function AdminSidebar({
               <Settings size={18} className={cn("flex-shrink-0", settingsActive ? "text-[var(--gold)]" : "text-white/40")} />
               <span className="flex-1">Settings</span>
             </Link>
+            <ThemeToggle className="w-full" />
             <button
               type="button"
               onClick={() => signOut({ callbackUrl: "/login" })}

@@ -9,6 +9,7 @@ import { UserCircle, Settings, LogOut, BadgeCheck, Clock, ShieldAlert, ChevronDo
 import { cn } from "@/lib/utils"
 import { useVisiblePolling } from "@/lib/use-visible-polling"
 import { memberNavigation } from "./member-nav-items"
+import { ThemeToggle } from "@/components/theme/theme-toggle"
 
 // These live in the bottom account menu, not the main nav list.
 const ACCOUNT_ITEMS = new Set(["Profile", "Subscription", "Settings", "Notifications"])
@@ -141,6 +142,7 @@ export function MemberSidebar({
             )}
             <AccountLink href="/dashboard/profile" icon={UserCircle} label="Profile" active={pathname.startsWith("/dashboard/profile")} />
             <AccountLink href="/dashboard/settings" icon={Settings} label="Settings" active={pathname.startsWith("/dashboard/settings")} />
+            <ThemeToggle className="w-full" />
             <button
               type="button"
               onClick={() => signOut({ callbackUrl: "/login" })}

@@ -84,9 +84,9 @@ export default function ListingsClient({ initialListings }: { initialListings: L
             </div>
             <div className="p-4">
               <div className="flex items-start justify-between gap-2">
-                <h3 className="font-semibold text-[var(--navy)] leading-snug">{l.title}</h3>
+                <h3 className="font-semibold text-[var(--fg)] leading-snug">{l.title}</h3>
                 {l.rating != null && (
-                  <span className="flex items-center gap-1 text-xs font-semibold text-[var(--navy)] flex-shrink-0">
+                  <span className="flex items-center gap-1 text-xs font-semibold text-[var(--fg)] flex-shrink-0">
                     <Star size={12} className="text-[var(--gold)] fill-[var(--gold)]" /> {l.rating.toFixed(1)}
                   </span>
                 )}
@@ -101,7 +101,7 @@ export default function ListingsClient({ initialListings }: { initialListings: L
                 <span className="text-neutral">· {l.propertyType}</span>
               </div>
               <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[var(--border)]">
-                <span className="w-7 h-7 rounded-lg bg-[var(--navy)]/10 text-[var(--navy)] flex items-center justify-center text-[10px] font-bold">
+                <span className="w-7 h-7 rounded-lg bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center text-[10px] font-bold">
                   {l.owner.avatarInitials}
                 </span>
                 <span className="text-xs text-neutral-dark truncate">{l.owner.fullName}</span>

@@ -41,7 +41,7 @@ export function CheckoutButton({
     variant === "gold"
       ? "bg-[var(--gold)] text-[var(--navy)] hover:bg-[var(--gold-hover)]"
       : variant === "ghost"
-        ? "border border-[var(--border)] text-[var(--navy)] hover:border-[var(--navy)]"
+        ? "border border-[var(--border)] text-[var(--fg)] hover:border-[var(--navy)]"
         : "bg-[var(--gold-dark)] text-white hover:bg-[var(--gold-hover)]"
 
   return (

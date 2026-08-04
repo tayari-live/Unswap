@@ -85,7 +85,7 @@ export function MobileNav({ variant = "admin" }: { variant?: "admin" | "member" 
             </button>
 
             {moreOpen && (
-              <div className="absolute bottom-full right-0 mb-2 w-44 bg-white rounded-xl border border-[var(--border)] shadow-lg py-1 overflow-hidden">
+              <div className="absolute bottom-full right-0 mb-2 w-44 bg-[var(--surface)] rounded-xl border border-[var(--border)] shadow-lg py-1 overflow-hidden">
                 {overflow.map((item) => {
                   const active = isActive(item.href)
                   return (
@@ -95,7 +95,7 @@ export function MobileNav({ variant = "admin" }: { variant?: "admin" | "member" 
                       onClick={() => setMoreOpen(false)}
                       className={cn(
                         "flex items-center gap-3 px-4 py-3 text-sm font-semibold transition-colors",
-                        active ? "bg-[var(--teal-light)] text-[var(--navy)]" : "text-neutral-dark hover:bg-neutral-light"
+                        active ? "bg-[var(--teal-light)] text-[var(--fg)]" : "text-neutral-dark hover:bg-neutral-light"
                       )}
                     >
                       <item.icon size={18} className={cn(active ? "text-[var(--gold-dark)]" : "text-neutral")} />

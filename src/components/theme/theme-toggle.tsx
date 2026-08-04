@@ -1,0 +1,54 @@
+"use client"
+
+import { useEffect, useState } from "react"
+import { useTheme } from "next-themes"
+import { Sun, Moon } from "lucide-react"
+import { cn } from "@/lib/utils"
+
+// Light/dark switch for the dashboard rails. Renders a stable placeholder until
+// mounted to avoid a hydration mismatch (theme is only known client-side).
+export function ThemeToggle({
+  collapsed = false,
+  className,
+}: {
+  collapsed?: boolean
+  className?: string
+}) {
+  const { resolvedTheme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+
+  const isDark = mounted && resolvedTheme === "dark"
+
+  return (
+    <button
+      type="button"
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+      title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      aria-label="Toggle theme"
+      className={cn(
+        "group flex items-center gap-3 py-2.5 px-3 rounded-xl text-[13px] font-semibold transition-colors overflow-hidden",
+        "text-white/60 hover:bg-white/5 hover:text-white",
+        className,
+      )}
+    >
+      <span className="relative w-5 h-5 flex-shrink-0 flex items-center justify-center">
+        <Sun
+          size={19}
+          className={cn(
+            "absolute transition-all duration-300 text-[var(--gold)]",
+            isDark ? "opacity-0 rotate-90 scale-50" : "opacity-100 rotate-0 scale-100",
+          )}
+        />
+        <Moon
+          size={18}
+          className={cn(
+            "absolute transition-all duration-300 text-[var(--gold)]",
+            isDark ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-50",
+          )}
+        />
+      </span>
+      {!collapsed && <span className="flex-1 text-left">{isDark ? "Light mode" : "Dark mode"}</span>}
+    </button>
+  )
+}

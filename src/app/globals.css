@@ -62,11 +62,17 @@
 }
 
 :root {
+  color-scheme: light;
+
   --background: #F5F6F8;
   --foreground: #0B1F3A;
   --surface: #ffffff;
   --border: #E3E7EE;
   --ring: #C9A84C;
+
+  /* Primary text token — flips with the theme (navy on light, ivory on dark).
+     Distinct from --navy, which stays a fixed brand colour for navy surfaces. */
+  --fg: #0B1F3A;
 
   --navy: #0B1F3A;
   --navy-light: #13355f;
@@ -80,6 +86,48 @@
   --teal-light: #d7efeb;
 
   --crimson: #C1121F;
+
+  /* Messaging surfaces — warm creams on light, obsidian on dark. */
+  --chat-bg: #faf9f6;
+  --chat-active: #f4efe8;
+}
+
+/*
+ * Dark theme — luxury obsidian + gold, mirroring the waitlist aesthetic.
+ * Set on <html class="dark"> by next-themes. Overrides both the :root
+ * aliases (var(--surface) …) and the Tailwind @theme tokens (var(--color-*))
+ * so every utility (bg-surface, text-neutral, border, …) flips at runtime.
+ */
+.dark {
+  color-scheme: dark;
+
+  --background: #0a0e1a;
+  --foreground: #f3eee4;
+  --surface: #121a2b;
+  --border: rgba(233, 201, 122, 0.14);
+  --ring: #C9A84C;
+
+  --fg: #f3eee4;
+
+  /* Navy lifts a few stops so navy buttons/rails stay visible on obsidian. */
+  --navy: #22304f;
+  --navy-light: #30416a;
+  --navy-dark: #18233c;
+
+  --chat-bg: #0d1524;
+  --chat-active: #1a2338;
+
+  /* @theme token overrides (utilities read these via var(--color-*)). */
+  --color-background: #0a0e1a;
+  --color-foreground: #f3eee4;
+  --color-surface: #121a2b;
+  --color-border: rgba(233, 201, 122, 0.14);
+  --color-neutral: #98a2b6;
+  --color-neutral-light: #1e2740;
+  --color-parchment: #161f30;
+  --color-navy: #22304f;
+  --color-navy-light: #30416a;
+  --color-navy-dark: #18233c;
 }
 
 body {
@@ -88,6 +136,7 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 h1, h2, h3, h4, h5, h6 {

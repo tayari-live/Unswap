@@ -15,8 +15,8 @@ const MAX_BYTES = 5 * 1024 * 1024
 const ACCEPT = "image/png,image/jpeg,image/webp"
 
 const input =
-  "block w-full px-4 py-3 border border-[var(--border)] rounded-xl bg-white placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] text-sm text-[var(--navy)]"
-const label = "block text-xs font-semibold uppercase tracking-wider text-[var(--navy)] mb-2"
+  "block w-full px-4 py-3 border border-[var(--border)] rounded-xl bg-[var(--surface)] placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] text-sm text-[var(--fg)]"
+const label = "block text-xs font-semibold uppercase tracking-wider text-[var(--fg)] mb-2"
 
 // The eight fields that count toward profile completion — must match the
 // server's computeCompletion() so the live % matches what gets saved.
@@ -47,7 +47,7 @@ const SCREENS: { key: keyof ProfileValues | "photo" | "review"; optional?: boole
 function Heading({ title, sub }: { title: string; sub?: string }) {
   return (
     <div className="mb-8">
-      <h2 className="font-display text-2xl sm:text-3xl font-bold text-[var(--navy)] leading-tight">{title}</h2>
+      <h2 className="font-display text-2xl sm:text-3xl font-bold text-[var(--fg)] leading-tight">{title}</h2>
       {sub && <p className="mt-2 text-sm text-neutral leading-relaxed">{sub}</p>}
     </div>
   )
@@ -125,7 +125,7 @@ export function ProfileWizard({ initial, onSaved }: { initial: ProfileValues; on
       {/* Progress — live profile completion % + step count */}
       <div className="mb-8">
         <div className="flex items-baseline justify-between mb-2">
-          <span className="text-sm font-bold text-[var(--navy)]">Profile completion · {completion}%</span>
+          <span className="text-sm font-bold text-[var(--fg)]">Profile completion · {completion}%</span>
           <span className="text-xs text-neutral font-semibold">Step {step + 1}/{SCREENS.length}</span>
         </div>
         <div className="h-2 rounded-full bg-[var(--border)] overflow-hidden">
@@ -142,7 +142,7 @@ export function ProfileWizard({ initial, onSaved }: { initial: ProfileValues; on
                 <div className="relative">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={v.imageUrl} alt="Profile" className="w-24 h-24 rounded-full object-cover border border-[var(--border)]" />
-                  <button type="button" onClick={() => set("imageUrl", null)} aria-label="Remove photo" className="absolute -top-1 -right-1 w-7 h-7 rounded-full bg-white border border-[var(--border)] text-[var(--navy)] flex items-center justify-center shadow">
+                  <button type="button" onClick={() => set("imageUrl", null)} aria-label="Remove photo" className="absolute -top-1 -right-1 w-7 h-7 rounded-full bg-[var(--surface)] border border-[var(--border)] text-[var(--fg)] flex items-center justify-center shadow">
                     <X size={14} />
                   </button>
                 </div>
@@ -233,7 +233,7 @@ export function ProfileWizard({ initial, onSaved }: { initial: ProfileValues; on
                 ["Bio", v.bio ? `${v.bio.trim().slice(0, 40)}${v.bio.trim().length > 40 ? "…" : ""}` : "—"],
                 ["LinkedIn", v.linkedinUrl || "—"],
               ].map(([k, val]) => (
-                <div key={k} className="flex justify-between gap-4 px-4 py-2.5"><dt className="text-neutral">{k}</dt><dd className="font-medium text-[var(--navy)] text-right truncate">{val}</dd></div>
+                <div key={k} className="flex justify-between gap-4 px-4 py-2.5"><dt className="text-neutral">{k}</dt><dd className="font-medium text-[var(--fg)] text-right truncate">{val}</dd></div>
               ))}
             </dl>
           </div>
@@ -243,13 +243,13 @@ export function ProfileWizard({ initial, onSaved }: { initial: ProfileValues; on
       {/* Nav */}
       <div className="mt-6 flex items-center justify-between gap-3">
         {step > 0 ? (
-          <button type="button" onClick={() => setStep((s) => s - 1)} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--navy)] px-5 py-2.5 rounded-full border border-[var(--border)] hover:border-[var(--navy)] bg-white"><ChevronLeft size={16} /> Back</button>
+          <button type="button" onClick={() => setStep((s) => s - 1)} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--fg)] px-5 py-2.5 rounded-full border border-[var(--border)] hover:border-[var(--navy)] bg-[var(--surface)]"><ChevronLeft size={16} /> Back</button>
         ) : (
           <span />
         )}
         <div className="flex items-center gap-3">
           {SCREENS[step].optional && step < SCREENS.length - 1 && (
-            <button type="button" onClick={() => next(true)} className="text-sm font-semibold text-[var(--navy)] px-5 py-2.5 rounded-full border border-[var(--gold)] hover:bg-[var(--parchment)] bg-white">Skip</button>
+            <button type="button" onClick={() => next(true)} className="text-sm font-semibold text-[var(--fg)] px-5 py-2.5 rounded-full border border-[var(--gold)] hover:bg-[var(--parchment)] bg-[var(--surface)]">Skip</button>
           )}
           {step < SCREENS.length - 1 ? (
             <button type="button" onClick={() => next()} className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] px-7 py-2.5 rounded-full shadow-sm">Continue <ChevronRight size={16} /></button>

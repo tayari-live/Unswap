@@ -5,8 +5,8 @@ import { Eye, EyeOff, Check } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
 
 const inputCls =
-  "block w-full px-4 py-3 border border-[var(--border)] rounded-xl bg-white placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] text-sm text-[var(--navy)] transition-all"
-const labelCls = "block text-xs font-semibold uppercase tracking-wider text-[var(--navy)] mb-2"
+  "block w-full px-4 py-3 border border-[var(--border)] rounded-xl bg-[var(--surface)] placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] text-sm text-[var(--fg)] transition-all"
+const labelCls = "block text-xs font-semibold uppercase tracking-wider text-[var(--fg)] mb-2"
 
 export function ChangePasswordForm() {
   const toast = useToast()
@@ -96,7 +96,7 @@ export function ChangePasswordForm() {
         <button
           type="button"
           onClick={() => setShow((s) => !s)}
-          className="inline-flex items-center gap-1.5 text-[var(--navy)] hover:text-[var(--gold-dark)] transition-colors"
+          className="inline-flex items-center gap-1.5 text-[var(--fg)] hover:text-[var(--gold-dark)] transition-colors"
         >
           {show ? <EyeOff size={15} /> : <Eye size={15} />}
           {show ? "Hide passwords" : "Show passwords"}

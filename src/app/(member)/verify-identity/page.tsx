@@ -83,7 +83,7 @@ export default async function VerifyIdentityPage() {
             Your previous submission was not approved.
           </p>
           {lastRejection?.reviewNote && (
-            <p className="mt-1.5 text-sm text-[var(--navy)]">
+            <p className="mt-1.5 text-sm text-[var(--fg)]">
               <span className="font-semibold">Reviewer&apos;s note:</span> {lastRejection.reviewNote}
             </p>
           )}
@@ -138,7 +138,7 @@ function StateCard({
       <div className={`mx-auto w-14 h-14 rounded-2xl flex items-center justify-center mb-5 ${toneClass}`}>
         {icon}
       </div>
-      <h2 className="font-display text-2xl font-bold text-[var(--navy)]">{title}</h2>
+      <h2 className="font-display text-2xl font-bold text-[var(--fg)]">{title}</h2>
       <p className="mt-3 text-neutral leading-relaxed">{body}</p>
       <Link
         href={cta.href}

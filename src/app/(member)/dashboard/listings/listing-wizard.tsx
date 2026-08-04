@@ -71,8 +71,8 @@ const EMPTY: WizardValues = {
   houseRules: "", emergencyName: "", emergencyPhone: "", emergencyRelationship: "",
 }
 
-const input = "block w-full px-4 py-3 border border-[var(--border)] rounded-xl bg-white placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] text-sm text-[var(--navy)]"
-const label = "block text-xs font-semibold uppercase tracking-wider text-[var(--navy)] mb-2"
+const input = "block w-full px-4 py-3 border border-[var(--border)] rounded-xl bg-[var(--surface)] placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] text-sm text-[var(--fg)]"
+const label = "block text-xs font-semibold uppercase tracking-wider text-[var(--fg)] mb-2"
 
 // One question per screen, HomeExchange-style. Screens are grouped into
 // sections for the segmented progress bar; `optional` screens get a Skip.
@@ -125,7 +125,7 @@ function Stepper({ value, set, min, max }: { value: number; set: (n: number) => 
   return (
     <div className="flex items-center gap-3">
       <button type="button" onClick={() => set(Math.max(min, value - 1))} className="w-9 h-9 rounded-lg border border-[var(--border)] flex items-center justify-center hover:border-[var(--navy)]"><Minus size={15} /></button>
-      <span className="w-8 text-center font-semibold text-[var(--navy)]">{value}{value >= max ? "+" : ""}</span>
+      <span className="w-8 text-center font-semibold text-[var(--fg)]">{value}{value >= max ? "+" : ""}</span>
       <button type="button" onClick={() => set(Math.min(max, value + 1))} className="w-9 h-9 rounded-lg border border-[var(--border)] flex items-center justify-center hover:border-[var(--navy)]"><Plus size={15} /></button>
     </div>
   )
@@ -143,7 +143,7 @@ function IconCard({
       onClick={onClick}
       aria-pressed={selected}
       className={`relative flex flex-col items-center justify-center gap-2 rounded-xl border p-4 text-center transition-colors ${
-        selected ? "border-[var(--gold)] bg-[var(--parchment)]" : "border-[var(--border)] bg-white hover:border-[var(--navy)]"
+        selected ? "border-[var(--gold)] bg-[var(--parchment)]" : "border-[var(--border)] bg-[var(--surface)] hover:border-[var(--navy)]"
       }`}
     >
       {selected && (
@@ -151,8 +151,8 @@ function IconCard({
           <Check size={12} />
         </span>
       )}
-      <Icon size={22} strokeWidth={1.5} className={selected ? "text-[var(--gold-dark)]" : "text-[var(--navy)]"} />
-      <span className="text-sm font-semibold text-[var(--navy)] leading-tight">{title}</span>
+      <Icon size={22} strokeWidth={1.5} className={selected ? "text-[var(--gold-dark)]" : "text-[var(--fg)]"} />
+      <span className="text-sm font-semibold text-[var(--fg)] leading-tight">{title}</span>
       {desc && <span className="text-xs text-neutral leading-snug">{desc}</span>}
     </button>
   )
@@ -161,7 +161,7 @@ function IconCard({
 function Heading({ title, sub }: { title: string; sub?: string }) {
   return (
     <div className="mb-8">
-      <h2 className="font-display text-2xl sm:text-3xl font-bold text-[var(--navy)] leading-tight">{title}</h2>
+      <h2 className="font-display text-2xl sm:text-3xl font-bold text-[var(--fg)] leading-tight">{title}</h2>
       {sub && <p className="mt-2 text-sm text-neutral leading-relaxed">{sub}</p>}
     </div>
   )
@@ -315,7 +315,7 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
       {/* Progress — section name, step count, segmented bar */}
       <div className="mb-8">
         <div className="flex items-baseline justify-between mb-2">
-          <span className="text-sm font-bold text-[var(--navy)]">{SECTIONS[section]}</span>
+          <span className="text-sm font-bold text-[var(--fg)]">{SECTIONS[section]}</span>
           <span className="text-xs text-neutral font-semibold">{step + 1}/{SCREENS.length}</span>
         </div>
         <div className="flex gap-1.5">
@@ -457,7 +457,7 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
                         type="button"
                         onClick={() => set("photos", v.photos.filter((_, x) => x !== i))}
                         aria-label={`Remove photo ${i + 1}`}
-                        className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/95 text-[var(--navy)] flex items-center justify-center shadow hover:bg-white"
+                        className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/95 text-[var(--fg)] flex items-center justify-center shadow hover:bg-[var(--surface)]"
                       >
                         <X size={14} />
                       </button>
@@ -469,7 +469,7 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
                         <button
                           type="button"
                           onClick={() => reorder(i, 0)}
-                          className="absolute bottom-2 left-2 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide bg-white/95 text-[var(--navy)] px-2.5 py-1 rounded-md shadow hover:bg-white"
+                          className="absolute bottom-2 left-2 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide bg-white/95 text-[var(--fg)] px-2.5 py-1 rounded-md shadow hover:bg-[var(--surface)]"
                         >
                           <Star size={11} /> Make cover
                         </button>
@@ -561,7 +561,7 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
                 ["Photos", `${v.photos.length}`], ["Durations", v.swapDurations.length ? v.swapDurations.join(", ") : "—"],
                 ["Exchange", v.exchangeType], ["Emergency contact", v.emergencyName || "—"],
               ].map(([k, val]) => (
-                <div key={k} className="flex justify-between gap-4 px-4 py-2.5"><dt className="text-neutral">{k}</dt><dd className="font-medium text-[var(--navy)] text-right truncate">{val}</dd></div>
+                <div key={k} className="flex justify-between gap-4 px-4 py-2.5"><dt className="text-neutral">{k}</dt><dd className="font-medium text-[var(--fg)] text-right truncate">{val}</dd></div>
               ))}
             </dl>
           </div>
@@ -572,13 +572,13 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
       {/* Nav */}
       <div className="mt-6 flex items-center justify-between gap-3">
         {step > 0 ? (
-          <button type="button" onClick={() => setStep((s) => s - 1)} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--navy)] px-5 py-2.5 rounded-full border border-[var(--border)] hover:border-[var(--navy)] bg-white"><ChevronLeft size={16} /> Back</button>
+          <button type="button" onClick={() => setStep((s) => s - 1)} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--fg)] px-5 py-2.5 rounded-full border border-[var(--border)] hover:border-[var(--navy)] bg-[var(--surface)]"><ChevronLeft size={16} /> Back</button>
         ) : (
-          <Link href="/dashboard/listings" className="text-sm font-semibold text-neutral hover:text-[var(--navy)] px-2">Cancel</Link>
+          <Link href="/dashboard/listings" className="text-sm font-semibold text-neutral hover:text-[var(--fg)] px-2">Cancel</Link>
         )}
         <div className="flex items-center gap-3">
           {SCREENS[step].optional && step < SCREENS.length - 1 && (
-            <button type="button" onClick={() => next(true)} className="text-sm font-semibold text-[var(--navy)] px-5 py-2.5 rounded-full border border-[var(--gold)] hover:bg-[var(--parchment)] bg-white">Skip</button>
+            <button type="button" onClick={() => next(true)} className="text-sm font-semibold text-[var(--fg)] px-5 py-2.5 rounded-full border border-[var(--gold)] hover:bg-[var(--parchment)] bg-[var(--surface)]">Skip</button>
           )}
           {step < SCREENS.length - 1 ? (
             <button type="button" onClick={() => next()} className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] px-7 py-2.5 rounded-full shadow-sm">Continue <ChevronRight size={16} /></button>

@@ -25,8 +25,8 @@ const DURATION_BANDS: Record<string, { label: string; min: number; max: number }
 type Blackout = { start: string; end: string }
 
 const inputCls =
-  "block w-full px-4 py-3 border border-[var(--border)] rounded-xl bg-white text-sm text-[var(--navy)] focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)]"
-const labelCls = "block text-xs font-semibold uppercase tracking-wider text-[var(--navy)] mb-2"
+  "block w-full px-4 py-3 border border-[var(--border)] rounded-xl bg-[var(--surface)] text-sm text-[var(--fg)] focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)]"
+const labelCls = "block text-xs font-semibold uppercase tracking-wider text-[var(--fg)] mb-2"
 
 /** Whole nights between two YYYY-MM-DD dates (end exclusive of start). */
 function nightsBetween(start: string, end: string) {
@@ -123,7 +123,7 @@ export function SwapRequestForm({
     return (
       <div className="bg-[var(--teal-light)] border border-[var(--teal)]/30 rounded-2xl p-6 text-center">
         <CheckCircle2 size={28} className="mx-auto text-[var(--teal)]" />
-        <h3 className="mt-3 font-display text-lg font-bold text-[var(--navy)]">Request sent</h3>
+        <h3 className="mt-3 font-display text-lg font-bold text-[var(--fg)]">Request sent</h3>
         <p className="mt-1 text-sm text-neutral-dark">The host has been notified and will respond shortly.</p>
         <button
           onClick={() => router.push("/dashboard/swaps")}
@@ -154,13 +154,13 @@ export function SwapRequestForm({
 
   return (
     <form onSubmit={handleSubmit} className="bg-surface border border-[var(--border)] rounded-2xl p-5 space-y-4 shadow-sm">
-      <h3 className="font-display text-lg font-bold text-[var(--navy)]">Request a swap</h3>
+      <h3 className="font-display text-lg font-bold text-[var(--fg)]">Request a swap</h3>
 
       {blackouts.length > 0 && (
         <div className="flex items-start gap-2 rounded-lg bg-[var(--parchment)] border border-[var(--gold)]/20 p-3">
           <CalendarX2 size={15} className="mt-0.5 shrink-0 text-[var(--gold-dark)]" />
           <div className="text-xs text-neutral-dark">
-            <span className="font-semibold text-[var(--navy)]">Host unavailable:</span>{" "}
+            <span className="font-semibold text-[var(--fg)]">Host unavailable:</span>{" "}
             {blackouts.map((b) => fmtRange(b)).join(" · ")}
           </div>
         </div>
@@ -189,7 +189,7 @@ export function SwapRequestForm({
                 className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-colors ${
                   endDate === q.end
                     ? "bg-[var(--navy)] text-white border-[var(--navy)]"
-                    : "bg-white text-[var(--navy)] border-[var(--border)] hover:border-[var(--navy)]"
+                    : "bg-[var(--surface)] text-[var(--fg)] border-[var(--border)] hover:border-[var(--navy)]"
                 }`}
               >
                 {q.label} · {q.nights} nights
@@ -226,7 +226,7 @@ export function SwapRequestForm({
         >
           {loading ? "Sending…" : "Send request"}
         </button>
-        <button type="button" onClick={() => setOpen(false)} className="py-3 px-4 rounded-xl text-sm font-semibold text-[var(--navy)] border border-[var(--border)] hover:border-[var(--navy)] transition-colors">
+        <button type="button" onClick={() => setOpen(false)} className="py-3 px-4 rounded-xl text-sm font-semibold text-[var(--fg)] border border-[var(--border)] hover:border-[var(--navy)] transition-colors">
           Cancel
         </button>
       </div>

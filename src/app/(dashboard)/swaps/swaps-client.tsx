@@ -76,11 +76,11 @@ export default function SwapsClient({ initialSwaps }: { initialSwaps: Swap[] }) 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-4">
                 <div className="flex items-center -space-x-2">
-                  <span className="w-9 h-9 rounded-xl bg-[var(--navy)]/10 text-[var(--navy)] flex items-center justify-center text-xs font-bold border-2 border-surface">{s.requester.avatarInitials}</span>
+                  <span className="w-9 h-9 rounded-xl bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center text-xs font-bold border-2 border-surface">{s.requester.avatarInitials}</span>
                   <span className="w-9 h-9 rounded-xl bg-[var(--gold)]/20 text-[var(--gold-dark)] flex items-center justify-center text-xs font-bold border-2 border-surface">{s.host.avatarInitials}</span>
                 </div>
                 <div>
-                  <div className="text-sm font-semibold text-[var(--navy)] flex items-center gap-2">
+                  <div className="text-sm font-semibold text-[var(--fg)] flex items-center gap-2">
                     {s.requester.fullName} <ArrowLeftRight size={13} className="text-neutral" /> {s.host.fullName}
                   </div>
                   <div className="text-xs text-neutral">{s.listing.title} · {s.listing.city}, {s.listing.country}</div>

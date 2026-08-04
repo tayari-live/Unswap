@@ -42,7 +42,7 @@ export function MessageButton({
       disabled={busy}
       className={
         className ??
-        "inline-flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl text-sm font-semibold text-[var(--navy)] border border-[var(--border)] hover:border-[var(--navy)] disabled:opacity-50 transition-colors"
+        "inline-flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl text-sm font-semibold text-[var(--fg)] border border-[var(--border)] hover:border-[var(--navy)] disabled:opacity-50 transition-colors"
       }
     >
       <MessageSquare size={16} /> {busy ? "Opening…" : label}

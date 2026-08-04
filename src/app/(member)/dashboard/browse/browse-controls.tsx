@@ -20,7 +20,7 @@ export type BrowseFilters = {
 }
 
 const selectCls =
-  "w-full px-3 py-2.5 border border-[var(--border)] rounded-xl bg-white text-sm text-[var(--navy)] focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)]"
+  "w-full px-3 py-2.5 border border-[var(--border)] rounded-xl bg-[var(--surface)] text-sm text-[var(--fg)] focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)]"
 
 export function BrowseControls({ initial }: { initial: BrowseFilters }) {
   const router = useRouter()
@@ -58,7 +58,7 @@ export function BrowseControls({ initial }: { initial: BrowseFilters }) {
             value={f.q}
             onChange={(e) => setF({ ...f, q: e.target.value })}
             placeholder="Search by city, country, or duty station"
-            className="w-full pl-11 pr-4 py-3 border border-[var(--border)] rounded-xl bg-white text-sm text-[var(--navy)] placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] transition-all shadow-sm"
+            className="w-full pl-11 pr-4 py-3 border border-[var(--border)] rounded-xl bg-[var(--surface)] text-sm text-[var(--fg)] placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] transition-all shadow-sm"
           />
         </form>
         <button
@@ -67,7 +67,7 @@ export function BrowseControls({ initial }: { initial: BrowseFilters }) {
           className={`flex items-center justify-center gap-2 px-5 py-3 border rounded-xl text-sm font-bold transition-all shadow-sm ${
             showFilters || hasFilters
               ? "bg-[var(--navy)] border-[var(--navy)] text-white"
-              : "bg-white border-[var(--border)] text-[var(--navy)] hover:border-[var(--navy)]"
+              : "bg-[var(--surface)] border-[var(--border)] text-[var(--fg)] hover:border-[var(--navy)]"
           }`}
         >
           <SlidersHorizontal size={18} />
@@ -81,7 +81,7 @@ export function BrowseControls({ initial }: { initial: BrowseFilters }) {
       </div>
 
       {showFilters && (
-        <div className="p-5 sm:p-6 bg-white border border-[var(--border)] rounded-2xl shadow-lg space-y-6 animate-in slide-in-from-top-2 fade-in duration-200">
+        <div className="p-5 sm:p-6 bg-[var(--surface)] border border-[var(--border)] rounded-2xl shadow-lg space-y-6 animate-in slide-in-from-top-2 fade-in duration-200">
           <div>
             <h4 className="text-[11px] font-bold uppercase tracking-wider text-neutral mb-3">Popular Duty Stations</h4>
             <div className="flex flex-wrap gap-2">
@@ -92,7 +92,7 @@ export function BrowseControls({ initial }: { initial: BrowseFilters }) {
                   className={`text-xs font-semibold px-3.5 py-1.5 rounded-full border transition-all ${
                     f.q === c
                       ? "bg-[var(--navy)] text-white border-[var(--navy)] shadow-md"
-                      : "bg-surface text-neutral-dark border-[var(--border)] hover:border-[var(--navy)] hover:bg-white"
+                      : "bg-surface text-neutral-dark border-[var(--border)] hover:border-[var(--navy)] hover:bg-[var(--surface)]"
                   }`}
                 >
                   {c}
@@ -139,7 +139,7 @@ export function BrowseControls({ initial }: { initial: BrowseFilters }) {
               className={`inline-flex items-center gap-2 text-sm font-semibold px-4 py-2.5 rounded-xl border transition-all ${
                 f.savedOnly
                   ? "bg-[var(--crimson)]/10 text-[var(--crimson)] border-[var(--crimson)]/30"
-                  : "bg-surface text-neutral-dark border-[var(--border)] hover:border-[var(--navy)] hover:bg-white"
+                  : "bg-surface text-neutral-dark border-[var(--border)] hover:border-[var(--navy)] hover:bg-[var(--surface)]"
               }`}
             >
               Saved homes only
@@ -152,7 +152,7 @@ export function BrowseControls({ initial }: { initial: BrowseFilters }) {
                     setF({ q: "", propertyType: "", bedrooms: "", guests: "", exchangeType: "", savedOnly: false })
                     router.push("/dashboard/browse")
                   }}
-                  className="inline-flex items-center gap-1 text-sm font-semibold text-neutral hover:text-[var(--navy)] px-3 py-2"
+                  className="inline-flex items-center gap-1 text-sm font-semibold text-neutral hover:text-[var(--fg)] px-3 py-2"
                 >
                   <X size={16} /> Clear all
                 </button>

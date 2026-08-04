@@ -93,11 +93,11 @@ export default function DomainsClient({ initialDomains }: { initialDomains: Doma
         {domains.map((d) => (
           <div key={d.id} className="flex items-center justify-between px-5 py-3">
             <div className="flex items-center gap-3">
-              <span className="w-9 h-9 rounded-xl bg-[var(--navy)]/10 text-[var(--navy)] flex items-center justify-center">
+              <span className="w-9 h-9 rounded-xl bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center">
                 <Globe size={16} />
               </span>
               <div>
-                <div className="font-semibold text-[var(--navy)]">@{d.domain}</div>
+                <div className="font-semibold text-[var(--fg)]">@{d.domain}</div>
                 <div className="text-xs text-neutral">{d.label}</div>
               </div>
             </div>

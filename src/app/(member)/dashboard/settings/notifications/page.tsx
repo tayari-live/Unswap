@@ -23,7 +23,7 @@ export default async function NotificationSettingsPage() {
     <div className="max-w-2xl mx-auto pb-12">
       <Link
         href="/dashboard/settings"
-        className="inline-flex items-center gap-1.5 text-sm font-semibold text-neutral hover:text-[var(--navy)] mb-4 transition-colors"
+        className="inline-flex items-center gap-1.5 text-sm font-semibold text-neutral hover:text-[var(--fg)] mb-4 transition-colors"
       >
         <ChevronLeft size={16} /> Settings
       </Link>

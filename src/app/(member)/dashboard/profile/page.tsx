@@ -54,12 +54,12 @@ export default async function ProfilePage() {
             <div className="flex-1 h-2 rounded-full bg-neutral-light overflow-hidden">
               <div className="h-full bg-[var(--gold)]" style={{ width: `${user.profileCompletion}%` }} />
             </div>
-            <span className="text-sm font-bold text-[var(--navy)]">{user.profileCompletion}%</span>
+            <span className="text-sm font-bold text-[var(--fg)]">{user.profileCompletion}%</span>
           </div>
         </div>
         <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-5">
           <div className="text-xs text-neutral uppercase tracking-wide font-semibold">Verification</div>
-          <div className="mt-2 text-sm font-semibold text-[var(--navy)]">
+          <div className="mt-2 text-sm font-semibold text-[var(--fg)]">
             {VERIFICATION_LABELS[user.verificationStatus] ?? user.verificationStatus}
           </div>
         </div>
@@ -67,7 +67,7 @@ export default async function ProfilePage() {
           <div className="text-xs text-neutral uppercase tracking-wide font-semibold">Trust score</div>
           <div className="mt-2 flex items-center gap-1.5">
             <Star size={16} className="text-[var(--gold)]" fill={user.trustScore != null ? "currentColor" : "none"} />
-            <span className="text-sm font-bold text-[var(--navy)]">
+            <span className="text-sm font-bold text-[var(--fg)]">
               {user.trustScore != null ? user.trustScore.toFixed(1) : "New host"}
             </span>
             {hostReviews.length > 0 && (
@@ -83,7 +83,7 @@ export default async function ProfilePage() {
 
       {/* Reviews received */}
       <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6 sm:p-8 mt-6">
-        <h2 className="font-display font-bold text-lg text-[var(--navy)] mb-4">Reviews received</h2>
+        <h2 className="font-display font-bold text-lg text-[var(--fg)] mb-4">Reviews received</h2>
         {reviews.length === 0 ? (
           <p className="text-sm text-neutral">No reviews yet. Complete an exchange to start building your reputation.</p>
         ) : (
@@ -92,11 +92,11 @@ export default async function ProfilePage() {
               <div key={rv.id} className="border-b border-[var(--border)] last:border-0 pb-5 last:pb-0">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    <span className="w-9 h-9 rounded-full bg-[var(--navy)]/10 text-[var(--navy)] flex items-center justify-center text-xs font-bold">
+                    <span className="w-9 h-9 rounded-full bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center text-xs font-bold">
                       {rv.author.avatarInitials}
                     </span>
                     <div>
-                      <div className="text-sm font-semibold text-[var(--navy)]">{rv.author.fullName}</div>
+                      <div className="text-sm font-semibold text-[var(--fg)]">{rv.author.fullName}</div>
                       <div className="text-xs text-neutral">
                         {rv.aboutHost ? "Stayed at your home" : "You stayed with them"} · {fmtDate(rv.createdAt)}
                       </div>

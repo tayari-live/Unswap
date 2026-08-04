@@ -45,10 +45,10 @@ export default async function MyListingsPage() {
 
       {listings.length === 0 ? (
         <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-12 text-center">
-          <div className="mx-auto w-14 h-14 rounded-2xl bg-[var(--navy)]/10 text-[var(--navy)] flex items-center justify-center mb-4">
+          <div className="mx-auto w-14 h-14 rounded-2xl bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center mb-4">
             <Home size={26} />
           </div>
-          <h2 className="font-display text-xl font-bold text-[var(--navy)]">No listings yet</h2>
+          <h2 className="font-display text-xl font-bold text-[var(--fg)]">No listings yet</h2>
           <p className="mt-2 text-sm text-neutral">Add your first home to start exchanging with vetted peers.</p>
           <Link
             href="/dashboard/listings/new"

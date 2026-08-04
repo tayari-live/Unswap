@@ -98,7 +98,7 @@ export function PhotoGallery({ photos, title }: { photos: Photo[]; title: string
         <button
           type="button"
           onClick={() => show(0)}
-          className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 text-xs font-semibold bg-white/95 text-[var(--navy)] px-3 py-2 rounded-lg shadow hover:bg-white transition-colors"
+          className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 text-xs font-semibold bg-white/95 text-[var(--fg)] px-3 py-2 rounded-lg shadow hover:bg-[var(--surface)] transition-colors"
         >
           <Images size={14} /> View all {photos.length} {photos.length === 1 ? "photo" : "photos"}
         </button>
