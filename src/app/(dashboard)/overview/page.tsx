@@ -12,7 +12,7 @@ import {
 } from "lucide-react"
 import { getOverviewStats } from "@/server/services/dashboard"
 import { prisma } from "@/server/prisma"
-import { PageHeader } from "@/components/ui/page-header"
+import { LuxPageHeader, LuxCard, SectionLabel } from "@/components/ui/lux"
 
 export const dynamic = "force-dynamic"
 
@@ -34,109 +34,109 @@ export default async function OverviewPage() {
   })
 
   const cards = [
-    { label: "Verified Members", value: stats.verifiedMembers, icon: Users, href: "/members", tone: "navy" },
-    { label: "Pending Verification", value: stats.pendingVerifications, icon: ShieldCheck, href: "/verification", tone: "gold" },
-    { label: "Active Listings", value: stats.activeListings, icon: Home, href: "/listings", tone: "teal" },
-    { label: "Swaps In Progress", value: stats.swapsInProgress, icon: ArrowLeftRight, href: "/swaps", tone: "navy" },
-    { label: "Swaps Completed", value: stats.swapsCompleted, icon: CheckCircle2, href: "/swaps", tone: "teal" },
-    { label: "Open Disputes", value: stats.openDisputes, icon: AlertTriangle, href: "/swaps", tone: "crimson" },
-    { label: "Waitlist", value: stats.waitlistCount, icon: ListChecks, href: "/waitlist", tone: "gold" },
-    { label: "Est. MRR", value: `$${stats.mrr.toLocaleString()}`, icon: DollarSign, href: "/analytics", tone: "navy" },
+    { label: "Verified Members", value: stats.verifiedMembers, icon: Users, href: "/members" },
+    { label: "Pending Verification", value: stats.pendingVerifications, icon: ShieldCheck, href: "/verification" },
+    { label: "Active Listings", value: stats.activeListings, icon: Home, href: "/listings" },
+    { label: "Swaps In Progress", value: stats.swapsInProgress, icon: ArrowLeftRight, href: "/swaps" },
+    { label: "Swaps Completed", value: stats.swapsCompleted, icon: CheckCircle2, href: "/swaps" },
+    { label: "Open Disputes", value: stats.openDisputes, icon: AlertTriangle, href: "/swaps", alert: stats.openDisputes > 0 },
+    { label: "Waitlist", value: stats.waitlistCount, icon: ListChecks, href: "/waitlist-admin" },
+    { label: "Est. MRR", value: `$${stats.mrr.toLocaleString()}`, icon: DollarSign, href: "/analytics" },
   ] as const
-
-  const toneRing: Record<string, string> = {
-    navy: "text-[var(--fg)] bg-[var(--navy)]/10",
-    gold: "text-[var(--gold-dark)] bg-[var(--gold)]/15",
-    teal: "text-[var(--teal)] bg-[var(--teal)]/15",
-    crimson: "text-[var(--crimson)] bg-[var(--crimson)]/10",
-  }
 
   return (
     <div className="max-w-6xl mx-auto pb-12">
-      <PageHeader
+      <LuxPageHeader
+        eyebrow="The Console"
         title="Network Overview"
-        subtitle="Operational snapshot of the UnSwap verified exchange network."
+        subtitle="An operational snapshot of the UnSwap verified exchange network."
       />
 
-      {/* KPI cards */}
+      {/* KPI cards — hairline tiles, gold monochrome icons, Cormorant figures */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {cards.map((c) => (
           <Link
             key={c.label}
             href={c.href}
-            className="bg-surface rounded-2xl p-5 border border-[var(--border)] shadow-sm hover:border-[var(--gold)] hover:shadow-md transition group"
+            className="group bg-[var(--surface)] rounded-md p-6 border border-[var(--hair)] hover:border-[var(--gold)] transition-colors"
           >
             <div className="flex items-center justify-between">
-              <span className={`w-9 h-9 rounded-xl flex items-center justify-center ${toneRing[c.tone]}`}>
-                <c.icon size={18} />
+              <span className="w-11 h-11 border border-[var(--hair)] flex items-center justify-center text-[var(--gold-soft)] group-hover:border-[var(--gold)] transition-colors">
+                <c.icon size={20} strokeWidth={1.4} />
               </span>
-              <ChevronRight size={16} className="text-neutral group-hover:text-[var(--gold-dark)] transition-colors" />
+              <ChevronRight size={16} className="text-neutral group-hover:text-[var(--gold-soft)] transition-colors" />
             </div>
-            <div className="mt-4 text-3xl font-display font-bold text-[var(--fg)]">{c.value}</div>
-            <div className="text-xs text-neutral uppercase tracking-wide mt-1 font-semibold">{c.label}</div>
+            <div className={`mt-5 font-display font-light text-4xl leading-none ${"alert" in c && c.alert ? "text-[var(--crimson)]" : "text-[var(--fg)]"}`}>
+              {c.value}
+            </div>
+            <div className="text-[11px] text-neutral uppercase tracking-[0.18em] mt-2 font-medium">{c.label}</div>
           </Link>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mt-5">
         {/* Verification queue preview */}
-        <div className="lg:col-span-2 bg-surface rounded-2xl border border-[var(--border)] shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
-            <h2 className="font-display font-bold text-lg text-[var(--fg)]">Awaiting Verification</h2>
-            <Link href="/verification" className="text-xs font-semibold text-[var(--teal)] hover:underline">
+        <LuxCard className="lg:col-span-2 overflow-hidden">
+          <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-[var(--hair)]">
+            <div>
+              <SectionLabel>Queue</SectionLabel>
+              <h2 className="font-display font-light text-2xl text-[var(--fg)] leading-none">Awaiting Verification</h2>
+            </div>
+            <Link href="/verification" className="text-[11px] font-medium uppercase tracking-[0.14em] text-[var(--gold-soft)] hover:text-[var(--gold)] transition-colors whitespace-nowrap">
               View queue
             </Link>
           </div>
-          <div className="divide-y divide-[var(--border)]">
+          <div className="divide-y divide-[var(--hair)]">
             {recentSubmissions.length === 0 && (
-              <p className="px-6 py-8 text-center text-sm text-neutral">The verification queue is clear.</p>
+              <p className="px-6 py-10 text-center text-sm text-neutral">The verification queue is clear.</p>
             )}
             {recentSubmissions.map((s) => (
-              <div key={s.id} className="flex items-center justify-between px-6 py-3">
-                <div className="flex items-center gap-3">
-                  <span className="w-9 h-9 rounded-xl bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center text-xs font-bold">
+              <div key={s.id} className="flex items-center justify-between px-6 py-4">
+                <div className="flex items-center gap-3.5">
+                  <span className="w-10 h-10 border border-[var(--hair)] text-[var(--gold-soft)] flex items-center justify-center text-xs font-semibold tracking-wide">
                     {s.member.avatarInitials}
                   </span>
                   <div>
-                    <div className="text-sm font-semibold text-[var(--fg)]">{s.member.fullName}</div>
-                    <div className="text-xs text-neutral">{s.member.organisation} · {s.member.dutyStation}</div>
+                    <div className="text-sm font-medium text-[var(--fg)]">{s.member.fullName}</div>
+                    <div className="text-xs text-neutral mt-0.5">{s.member.organisation} · {s.member.dutyStation}</div>
                   </div>
                 </div>
                 <Link
                   href="/verification"
-                  className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-[var(--gold)] text-[var(--navy)] hover:bg-[var(--gold-hover)] transition"
+                  className="text-[11px] font-medium uppercase tracking-[0.12em] px-4 py-2 rounded-sm bg-[var(--gold)] text-[#0a0e1a] hover:bg-[var(--gold-hover)] transition-colors"
                 >
                   Review
                 </Link>
               </div>
             ))}
           </div>
-        </div>
+        </LuxCard>
 
         {/* Tier distribution */}
-        <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6">
-          <h2 className="font-display font-bold text-lg text-[var(--fg)] mb-4">Subscription Mix</h2>
+        <LuxCard className="p-6">
+          <SectionLabel>Revenue</SectionLabel>
+          <h2 className="font-display font-light text-2xl text-[var(--fg)] leading-none mb-5">Subscription Mix</h2>
           {stats.tierDistribution.length === 0 && (
             <p className="text-sm text-neutral">No active subscriptions yet.</p>
           )}
-          <div className="space-y-3">
+          <div className="space-y-4">
             {stats.tierDistribution.map((t) => {
               const total = stats.tierDistribution.reduce((s, x) => s + x.count, 0) || 1
               const pct = Math.round((t.count / total) * 100)
               return (
                 <div key={t.tier}>
-                  <div className="flex justify-between text-xs mb-1">
-                    <span className="font-semibold text-neutral-dark">{TIER_LABELS[t.tier] ?? t.tier}</span>
-                    <span className="text-neutral">{t.count}</span>
+                  <div className="flex justify-between text-xs mb-1.5">
+                    <span className="font-medium text-[var(--fg)]">{TIER_LABELS[t.tier] ?? t.tier}</span>
+                    <span className="text-neutral tabular-nums">{t.count}</span>
                   </div>
-                  <div className="h-2 rounded-full bg-neutral-light overflow-hidden">
+                  <div className="h-1.5 bg-[var(--hair)] overflow-hidden">
                     <div className="h-full bg-[var(--gold)]" style={{ width: `${pct}%` }} />
                   </div>
                 </div>
               )
             })}
           </div>
-        </div>
+        </LuxCard>
       </div>
     </div>
   )

@@ -90,6 +90,13 @@
   /* Messaging surfaces — warm creams on light, obsidian on dark. */
   --chat-bg: #faf9f6;
   --chat-active: #f4efe8;
+
+  /* Editorial-luxury primitives (match waitlist/landing). --canvas warms the
+     content area, --hair is the gold card hairline, --gold-soft is the eyebrow
+     gold that stays legible on both cream and obsidian. */
+  --canvas: #f5f0e8;
+  --hair: rgba(201, 168, 76, 0.30);
+  --gold-soft: #9a7c2c;
 }
 
 /*
@@ -116,6 +123,10 @@
 
   --chat-bg: #0d1524;
   --chat-active: #1a2338;
+
+  --canvas: #0a0e1a;
+  --hair: rgba(201, 168, 76, 0.22);
+  --gold-soft: #dcc07a;
 
   /* @theme token overrides (utilities read these via var(--color-*)). */
   --color-background: #0a0e1a;
