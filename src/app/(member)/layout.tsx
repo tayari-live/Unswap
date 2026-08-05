@@ -49,6 +49,7 @@ export default async function MemberLayout({
       </main>
       <MobileNav variant="member" />
       <AppAssistant />
+      <CreditCelebration />
     </div>
   )
 }
