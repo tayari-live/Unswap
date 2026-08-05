@@ -9,7 +9,7 @@ import { type ProfileValues } from "@/components/profile/profile-form"
 import { ProfileWizard } from "@/components/profile/profile-wizard"
 import { SectionLabel, LUX_GOLD_BTN, LUX_GHOST_BTN } from "@/components/ui/lux"
 
-const STEPS = ["Welcome", "Your profile", "Your first home", "Explore"]
+const STEPS = ["Welcome", "Your profile", "Get started"]
 
 // How complete a profile must be before onboarding lets you move on. Members can
 // finish the rest later; the dashboard checklist keeps nudging toward 100%.
@@ -26,6 +26,10 @@ export function OnboardingWizard({
   const [step, setStep] = useState(1)
   const [hint, setHint] = useState("")
   const [leaving, setLeaving] = useState(false)
+
+  // The profile step nests ProfileWizard, which brings its own progress and
+  // Back button — so the outer chrome steps aside while it is on screen.
+  const ownsScreen = step === 2
 
   async function finishAndGo(path: string) {
     setLeaving(true)
@@ -44,20 +48,26 @@ export function OnboardingWizard({
         <Logo underline wordClassName="text-[var(--fg)]" />
       </div>
 
-      {/* Progress */}
-      <div className="flex items-center gap-2 mb-10">
-        {STEPS.map((label, i) => {
-          const n = i + 1
-          const done = n < step
-          const active = n === step
-          return (
-            <div key={label} className="flex-1">
-              <div className={`h-px transition-colors ${done || active ? "bg-[var(--gold)]" : "bg-[var(--hair)]"}`} />
-              <div className={`mt-2 text-[10px] font-medium uppercase tracking-[0.18em] ${active ? "text-[var(--gold-soft)]" : "text-neutral"}`}>{label}</div>
-            </div>
-          )
-        })}
-      </div>
+      {/*
+        Progress. Hidden on the profile step: that screen hands the stage to
+        ProfileWizard, which carries its own progress and Back control. Two of
+        each on one screen makes "Back" ambiguous.
+      */}
+      {!ownsScreen && (
+        <div className="flex items-center gap-2 mb-10">
+          {STEPS.map((label, i) => {
+            const n = i + 1
+            const done = n < step
+            const active = n === step
+            return (
+              <div key={label} className="flex-1">
+                <div className={`h-px transition-colors ${done || active ? "bg-[var(--gold)]" : "bg-[var(--hair)]"}`} />
+                <div className={`mt-2 text-[10px] font-medium uppercase tracking-[0.18em] ${active ? "text-[var(--gold-soft)]" : "text-neutral"}`}>{label}</div>
+              </div>
+            )
+          })}
+        </div>
+      )}
 
       <div className="bg-[var(--surface)] rounded-md border border-[var(--hair)] p-8 sm:p-10">
         {/* Step 1 — Welcome + Mission */}
@@ -95,6 +105,7 @@ export function OnboardingWizard({
             {hint && <p className="mb-4 text-xs text-[var(--crimson)] font-medium">{hint}</p>}
             <ProfileWizard
               initial={initialProfile}
+              onExit={() => { setHint(""); setStep(1) }}
               onSaved={(c) => {
                 if (c >= MIN_TO_CONTINUE) { setHint(""); setStep(3) }
                 else setHint(`You are at ${c}%. Add a little more to reach ${MIN_TO_CONTINUE}% and continue.`)
@@ -103,54 +114,44 @@ export function OnboardingWizard({
           </div>
         )}
 
-        {/* Step 3 — List your first property (skippable) */}
+        {/*
+          Step 3 — one destination screen. Previously two screens ("list a home?"
+          then "explore?") that asked the same question: where do you want to land.
+        */}
         {step === 3 && (
-          <div className="text-center">
-            <div className="mx-auto w-16 h-16 border border-[var(--hair)] text-[var(--gold-soft)] flex items-center justify-center mb-6">
-              <Home size={26} strokeWidth={1.4} />
-            </div>
-            <SectionLabel align="center">Your Home</SectionLabel>
-            <h1 className="font-display text-3xl font-light leading-[1.15] text-[var(--fg)]">List your first home</h1>
-            <p className="mt-4 text-neutral leading-[1.8] max-w-md mx-auto">
-              Add the home you would like to offer for exchange. You can publish it once
-              you are fully verified, or add it later.
-            </p>
-            <div className="mt-9 flex flex-col sm:flex-row justify-center gap-3">
-              <button onClick={() => finishAndGo("/dashboard/listings/new")} disabled={leaving} className={`${LUX_GOLD_BTN} disabled:opacity-50`}>
-                Add my home <ArrowRight size={16} />
-              </button>
-              <button onClick={() => setStep(4)} disabled={leaving} className={`${LUX_GHOST_BTN} disabled:opacity-50`}>
-                Skip for now
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Step 4 — Explore */}
-        {step === 4 && (
           <div className="text-center">
             <div className="mx-auto w-16 h-16 border border-[var(--hair)] text-[var(--gold-soft)] flex items-center justify-center mb-6">
               <PartyPopper size={26} strokeWidth={1.4} />
             </div>
             <SectionLabel align="center">Ready</SectionLabel>
-            <h1 className="font-display text-3xl font-light leading-[1.15] text-[var(--fg)]">You are all set</h1>
+            <h1 className="font-display text-3xl font-light leading-[1.15] text-[var(--fg)]">You are all set, {firstName}</h1>
             <p className="mt-4 text-neutral leading-[1.8] max-w-md mx-auto">
-              Discover verified homes across duty stations worldwide, save your
-              favourites, and send your first swap request.
+              Offer your home for exchange, or start with the homes your peers have
+              already listed across duty stations worldwide.
             </p>
+
             <div className="mt-9 flex flex-col sm:flex-row justify-center gap-3">
-              <button onClick={() => finishAndGo("/dashboard/browse")} disabled={leaving} className={`${LUX_GOLD_BTN} disabled:opacity-50`}>
+              <button onClick={() => finishAndGo("/dashboard/listings/new")} disabled={leaving} className={`${LUX_GOLD_BTN} disabled:opacity-50`}>
+                <Home size={16} /> Add my home
+              </button>
+              <button onClick={() => finishAndGo("/dashboard/browse")} disabled={leaving} className={`${LUX_GHOST_BTN} disabled:opacity-50`}>
                 <Compass size={16} /> Explore homes
               </button>
-              <button onClick={() => finishAndGo("/dashboard")} disabled={leaving} className={`${LUX_GHOST_BTN} disabled:opacity-50`}>
-                Go to my dashboard
-              </button>
             </div>
+
+            <button
+              onClick={() => finishAndGo("/dashboard")}
+              disabled={leaving}
+              className="mt-6 text-[11px] font-medium uppercase tracking-[0.14em] text-neutral hover:text-[var(--gold-soft)] disabled:opacity-50 transition-colors"
+            >
+              Go to my dashboard
+            </button>
           </div>
         )}
       </div>
 
-      {step > 1 && (
+      {/* ProfileWizard owns Back while it is on screen, so only one is ever shown. */}
+      {step > 1 && !ownsScreen && (
         <button
           type="button"
           onClick={() => { setHint(""); setStep((s) => Math.max(1, s - 1)) }}

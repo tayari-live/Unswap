@@ -55,7 +55,16 @@ function Heading({ title, sub }: { title: string; sub?: string }) {
   )
 }
 
-export function ProfileWizard({ initial, onSaved }: { initial: ProfileValues; onSaved?: (completion: number) => void }) {
+export function ProfileWizard({
+  initial,
+  onSaved,
+  onExit,
+}: {
+  initial: ProfileValues
+  onSaved?: (completion: number) => void
+  /** Back pressed on the first question — lets a host flow reclaim the screen. */
+  onExit?: () => void
+}) {
   const router = useRouter()
   const toast = useToast()
   const [step, setStep] = useState(0)
@@ -250,8 +259,14 @@ export function ProfileWizard({ initial, onSaved }: { initial: ProfileValues; on
 
       {/* Nav */}
       <div className="mt-6 flex items-center justify-between gap-3">
-        {step > 0 ? (
-          <button type="button" onClick={() => setStep((s) => s - 1)} className="inline-flex items-center gap-1.5 text-[12px] font-medium uppercase tracking-[0.12em] text-[var(--fg)] px-5 py-3 rounded-sm border border-[var(--hair)] hover:border-[var(--gold)] bg-[var(--surface)] transition-colors"><ChevronLeft size={15} /> Back</button>
+        {step > 0 || onExit ? (
+          <button
+            type="button"
+            onClick={() => (step > 0 ? setStep((s) => s - 1) : onExit?.())}
+            className="inline-flex items-center gap-1.5 text-[12px] font-medium uppercase tracking-[0.12em] text-[var(--fg)] px-5 py-3 rounded-sm border border-[var(--hair)] hover:border-[var(--gold)] bg-[var(--surface)] transition-colors"
+          >
+            <ChevronLeft size={15} /> Back
+          </button>
         ) : (
           <span />
         )}
