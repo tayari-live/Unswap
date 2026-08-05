@@ -81,10 +81,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           // this callback would then transfer on every single page render. We
           // select the few fields we need plus a hash of the photo, and serve
           // the bytes from /api/avatar so the browser caches them.
+          // `onboardedAt` and `verificationStatus` ride along here on purpose:
+          // the member layout gates on both, and fetching them separately meant
+          // two sequential round-trips before anything could render — including
+          // the loading skeleton, which sits inside that layout.
           const rows = await prisma.$queryRaw<
-            { fullName: string; role: string; avatarInitials: string; imgHash: string | null }[]
+            {
+              fullName: string
+              role: string
+              avatarInitials: string
+              imgHash: string | null
+              onboardedAt: Date | null
+              verificationStatus: string
+            }[]
           >`
-            SELECT "fullName", "role", "avatarInitials",
+            SELECT "fullName", "role", "avatarInitials", "onboardedAt", "verificationStatus",
                    CASE WHEN "imageUrl" IS NULL OR "imageUrl" = '' THEN NULL
                         ELSE md5("imageUrl") END AS "imgHash"
             FROM "User" WHERE "id" = ${token.id as string}
@@ -98,6 +109,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               : null
             ;(session.user as any).role = dbUser.role
             ;(session.user as any).initials = dbUser.avatarInitials
+            ;(session.user as any).onboardedAt = dbUser.onboardedAt
+            ;(session.user as any).verificationStatus = dbUser.verificationStatus
           } else {
             ;(session.user as any).role = token.role as string
             ;(session.user as any).initials = token.initials as string
