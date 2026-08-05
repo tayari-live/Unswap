@@ -12,12 +12,24 @@ const GOLD = ["#c9a84c", "#e4c97a", "#f5f0e8"]
 
 // A short, celebratory burst — two side cannons so it reads as a moment, not a
 // notification. Respects prefers-reduced-motion.
+//
+// zIndex must clear the dialog's z-[200]: canvas-confetti mounts its canvas at
+// z-index 100 by default, which puts the particles *behind* the backdrop, where
+// the dim and blur swallow them.
 function burst() {
   if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return
-  const opts = { particleCount: 70, spread: 68, colors: GOLD, disableForReducedMotion: true }
-  confetti({ ...opts, origin: { x: 0.2, y: 0.7 }, angle: 60 })
-  confetti({ ...opts, origin: { x: 0.8, y: 0.7 }, angle: 120 })
-  setTimeout(() => confetti({ ...opts, particleCount: 50, origin: { y: 0.65 } }), 220)
+  const opts = {
+    particleCount: 70,
+    spread: 68,
+    colors: GOLD,
+    zIndex: 260,
+    disableForReducedMotion: true,
+  }
+  // Fired from the lower corners so the arcs cross the open space beside the
+  // card rather than launching from behind it.
+  confetti({ ...opts, origin: { x: 0.1, y: 0.85 }, angle: 60 })
+  confetti({ ...opts, origin: { x: 0.9, y: 0.85 }, angle: 120 })
+  setTimeout(() => confetti({ ...opts, particleCount: 50, spread: 100, origin: { y: 0.75 } }), 220)
 }
 
 /**
