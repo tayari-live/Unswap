@@ -5,7 +5,7 @@ import {
 import { auth } from "@/server/auth"
 import { listMemberExchanges } from "@/server/services/swaps"
 import { pendingReviewsFor } from "@/server/services/reviews"
-import { PageHeader } from "@/components/ui/page-header"
+import { LuxPageHeader } from "@/components/ui/lux"
 import { ReviewAction } from "./review-action"
 
 export const dynamic = "force-dynamic"
@@ -27,7 +27,7 @@ type Row = Awaited<ReturnType<typeof listMemberExchanges>>["upcoming"][number]
 
 function ExchangeCard({ r, review }: { r: Row; review?: { aboutHost: boolean } }) {
   return (
-    <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm overflow-hidden flex flex-col sm:flex-row">
+    <div className="bg-surface rounded-md border border-[var(--hair)] overflow-hidden flex flex-col sm:flex-row">
       <div className="relative sm:w-48 h-40 sm:h-auto flex-shrink-0 bg-[var(--background)]">
         {r.listing.photos[0] ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -61,7 +61,7 @@ function ExchangeCard({ r, review }: { r: Row; review?: { aboutHost: boolean } }
           <span className="inline-flex items-center gap-1.5"><Users size={13} /> {r.guests} {r.guests === 1 ? "guest" : "guests"}</span>
         </div>
 
-        <div className="mt-4 pt-3 border-t border-[var(--border)] flex flex-wrap items-center gap-2">
+        <div className="mt-4 pt-3 border-t border-[var(--hair)] flex flex-wrap items-center gap-2">
           <a
             href={`/api/swaps/${r.id}/agreement`}
             target="_blank"
@@ -92,11 +92,11 @@ export default async function ExchangesPage() {
 
   return (
     <div className="max-w-4xl mx-auto pb-12">
-      <PageHeader title="My Exchanges" subtitle="Your confirmed and completed home exchanges." />
+      <LuxPageHeader eyebrow="Exchanges" title="My Exchanges" subtitle="Your confirmed and completed home exchanges." />
 
       {upcoming.length === 0 && past.length === 0 ? (
-        <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-12 text-center">
-          <div className="mx-auto w-14 h-14 rounded-2xl bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center mb-4">
+        <div className="bg-surface rounded-md border border-[var(--hair)] p-12 text-center">
+          <div className="mx-auto w-14 h-14 rounded-md bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center mb-4">
             <CalendarCheck size={26} />
           </div>
           <h2 className="font-display text-xl font-bold text-[var(--fg)]">No exchanges yet</h2>

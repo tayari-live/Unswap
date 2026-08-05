@@ -2,7 +2,7 @@ import { redirect } from "next/navigation"
 import { Coins, ArrowUpRight, ArrowDownRight, Info } from "lucide-react"
 import { auth } from "@/server/auth"
 import { getCreditsLedger } from "@/server/services/credits"
-import { PageHeader } from "@/components/ui/page-header"
+import { LuxPageHeader } from "@/components/ui/lux"
 
 export const dynamic = "force-dynamic"
 
@@ -19,23 +19,23 @@ export default async function CreditsPage() {
 
   return (
     <div className="max-w-3xl mx-auto pb-12">
-      <PageHeader title="UnSwap Credits" subtitle="Host now, stay later. Your non-simultaneous exchange balance." />
+      <LuxPageHeader eyebrow="Balance" title="UnSwap Credits" subtitle="Host now, stay later. Your non-simultaneous exchange balance." />
 
       {/* Balance + summary */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        <div className="bg-[var(--navy)] text-white rounded-2xl p-6 shadow-sm">
+        <div className="bg-[var(--navy)] text-white rounded-md p-6">
           <div className="flex items-center gap-2 text-white/60 text-xs uppercase tracking-wide font-semibold">
             <Coins size={15} className="text-[var(--gold)]" /> Balance
           </div>
           <div className="mt-3 font-display text-4xl font-bold">{balance}</div>
           <div className="text-xs text-white/50 mt-1">credit{balance === 1 ? "" : "s"} available</div>
         </div>
-        <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6">
+        <div className="bg-surface rounded-md border border-[var(--hair)] p-6">
           <div className="text-xs text-neutral uppercase tracking-wide font-semibold">Earned</div>
           <div className="mt-3 font-display text-3xl font-bold text-[var(--teal)]">+{earned}</div>
           <div className="text-xs text-neutral mt-1">nights hosted</div>
         </div>
-        <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6">
+        <div className="bg-surface rounded-md border border-[var(--hair)] p-6">
           <div className="text-xs text-neutral uppercase tracking-wide font-semibold">Spent</div>
           <div className="mt-3 font-display text-3xl font-bold text-[var(--fg)]">-{spent}</div>
           <div className="text-xs text-neutral mt-1">nights stayed</div>
@@ -48,14 +48,14 @@ export default async function CreditsPage() {
       </div>
 
       {/* Ledger */}
-      <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-[var(--border)]">
+      <div className="bg-surface rounded-md border border-[var(--hair)] overflow-hidden">
+        <div className="px-6 py-4 border-b border-[var(--hair)]">
           <h2 className="font-display font-bold text-lg text-[var(--fg)]">Earn & spend history</h2>
         </div>
         {transactions.length === 0 ? (
           <p className="px-6 py-10 text-center text-sm text-neutral">No credit activity yet. Host a member to start earning.</p>
         ) : (
-          <div className="divide-y divide-[var(--border)]">
+          <div className="divide-y divide-[var(--hair)]">
             {transactions.map((t) => (
               <div key={t.id} className="flex items-center justify-between px-6 py-3.5">
                 <div className="flex items-center gap-3">

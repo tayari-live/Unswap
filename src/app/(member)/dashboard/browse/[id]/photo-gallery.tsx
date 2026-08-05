@@ -46,7 +46,7 @@ export function PhotoGallery({ photos, title }: { photos: Photo[]; title: string
 
   if (photos.length === 0) {
     return (
-      <div className="rounded-2xl overflow-hidden border border-[var(--border)] bg-[var(--background)] h-72 sm:h-96 flex items-center justify-center text-neutral/30">
+      <div className="rounded-md overflow-hidden border border-[var(--hair)] bg-[var(--background)] h-72 sm:h-96 flex items-center justify-center text-neutral/30">
         <MapPin size={40} />
       </div>
     )
@@ -59,9 +59,9 @@ export function PhotoGallery({ photos, title }: { photos: Photo[]; title: string
     <>
       <div className="relative">
         <div
-          className={`grid gap-2 rounded-2xl overflow-hidden border border-[var(--border)] bg-[var(--background)] h-72 sm:h-[26rem] ${
-            tiles.length > 0 ? "grid-cols-1 sm:grid-cols-4 sm:grid-rows-2" : "grid-cols-1"
-          }`}
+          className={`grid gap-2 rounded-md overflow-hidden border border-[var(--hair)] bg-[var(--background)] h-72 sm:h-[26rem] ${
+ tiles.length > 0 ? "grid-cols-1 sm:grid-cols-4 sm:grid-rows-2" : "grid-cols-1"
+ }`}
         >
           <button
             type="button"

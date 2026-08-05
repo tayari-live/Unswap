@@ -71,7 +71,7 @@ const EMPTY: WizardValues = {
   houseRules: "", emergencyName: "", emergencyPhone: "", emergencyRelationship: "",
 }
 
-const input = "block w-full px-4 py-3 border border-[var(--border)] rounded-xl bg-[var(--surface)] placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] text-sm text-[var(--fg)]"
+const input = "block w-full px-4 py-3 border border-[var(--hair)] rounded-xl bg-[var(--surface)] placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] text-sm text-[var(--fg)]"
 const label = "block text-xs font-semibold uppercase tracking-wider text-[var(--fg)] mb-2"
 
 // One question per screen, HomeExchange-style. Screens are grouped into
@@ -124,9 +124,9 @@ function readImage(file: File): Promise<{ url?: string; error?: string }> {
 function Stepper({ value, set, min, max }: { value: number; set: (n: number) => void; min: number; max: number }) {
   return (
     <div className="flex items-center gap-3">
-      <button type="button" onClick={() => set(Math.max(min, value - 1))} className="w-9 h-9 rounded-lg border border-[var(--border)] flex items-center justify-center hover:border-[var(--navy)]"><Minus size={15} /></button>
+      <button type="button" onClick={() => set(Math.max(min, value - 1))} className="w-9 h-9 rounded-lg border border-[var(--hair)] flex items-center justify-center hover:border-[var(--navy)]"><Minus size={15} /></button>
       <span className="w-8 text-center font-semibold text-[var(--fg)]">{value}{value >= max ? "+" : ""}</span>
-      <button type="button" onClick={() => set(Math.min(max, value + 1))} className="w-9 h-9 rounded-lg border border-[var(--border)] flex items-center justify-center hover:border-[var(--navy)]"><Plus size={15} /></button>
+      <button type="button" onClick={() => set(Math.min(max, value + 1))} className="w-9 h-9 rounded-lg border border-[var(--hair)] flex items-center justify-center hover:border-[var(--navy)]"><Plus size={15} /></button>
     </div>
   )
 }
@@ -143,8 +143,8 @@ function IconCard({
       onClick={onClick}
       aria-pressed={selected}
       className={`relative flex flex-col items-center justify-center gap-2 rounded-xl border p-4 text-center transition-colors ${
-        selected ? "border-[var(--gold)] bg-[var(--parchment)]" : "border-[var(--border)] bg-[var(--surface)] hover:border-[var(--navy)]"
-      }`}
+ selected ? "border-[var(--gold)] bg-[var(--parchment)]" : "border-[var(--hair)] bg-[var(--surface)] hover:border-[var(--navy)]"
+ }`}
     >
       {selected && (
         <span className="absolute top-2 right-2 w-5 h-5 rounded-full bg-[var(--gold-dark)] text-white flex items-center justify-center">
@@ -327,7 +327,7 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
         </div>
       </div>
 
-      <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6 sm:p-10 min-h-[24rem]">
+      <div className="bg-surface rounded-md border border-[var(--hair)] p-6 sm:p-10 min-h-[24rem]">
         {/* 0 — Title + type */}
         {step === 0 && (
           <div>
@@ -427,7 +427,7 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
           <div>
             <Heading title="Add at least 5 pictures" sub="Start with your home's main rooms." />
             {v.photos.length === 0 ? (
-              <label className="flex flex-col items-center justify-center h-64 rounded-xl border-2 border-dashed border-[var(--border)] bg-[var(--background)] cursor-pointer hover:border-[var(--gold)] transition-colors text-center px-4">
+              <label className="flex flex-col items-center justify-center h-64 rounded-xl border-2 border-dashed border-[var(--hair)] bg-[var(--background)] cursor-pointer hover:border-[var(--gold)] transition-colors text-center px-4">
                 <UploadCloud size={28} className="text-[var(--gold-dark)] mb-2" />
                 <span className="text-sm font-semibold text-[var(--gold-dark)]">{photoBusy ? "Processing…" : "Upload pictures"}</span>
                 <span className="text-xs text-neutral mt-1.5">JPG, PNG, WebP · max 10 MB · min 1080px shortest edge</span>
@@ -447,9 +447,9 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
                       onDragOver={(e) => e.preventDefault()}
                       onDrop={() => { if (dragIdx !== null) reorder(dragIdx, i); setDragIdx(null) }}
                       onDragEnd={() => setDragIdx(null)}
-                      className={`relative rounded-xl overflow-hidden border border-[var(--border)] bg-[var(--background)] cursor-grab active:cursor-grabbing ${
-                        i === 0 ? "col-span-2 h-56" : "h-36"
-                      } ${dragIdx === i ? "opacity-60 ring-2 ring-[var(--gold)]" : ""}`}
+                      className={`relative rounded-xl overflow-hidden border border-[var(--hair)] bg-[var(--background)] cursor-grab active:cursor-grabbing ${
+ i === 0 ? "col-span-2 h-56" : "h-36"
+ } ${dragIdx === i ? "opacity-60 ring-2 ring-[var(--gold)]" : ""}`}
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={p.url} alt="" className="absolute inset-0 w-full h-full object-cover pointer-events-none" />
@@ -476,7 +476,7 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
                       )}
                     </div>
                   ))}
-                  <label className="flex flex-col items-center justify-center h-36 rounded-xl border-2 border-dashed border-[var(--border)] bg-[var(--background)] cursor-pointer hover:border-[var(--gold)] transition-colors text-center px-3">
+                  <label className="flex flex-col items-center justify-center h-36 rounded-xl border-2 border-dashed border-[var(--hair)] bg-[var(--background)] cursor-pointer hover:border-[var(--gold)] transition-colors text-center px-3">
                     <UploadCloud size={22} className="text-[var(--gold-dark)] mb-1.5" />
                     <span className="text-xs font-semibold text-[var(--gold-dark)]">{photoBusy ? "Processing…" : "Add more pictures"}</span>
                     <input type="file" accept={ACCEPT.join(",")} multiple className="hidden" onChange={(e) => addPhotos(e.target.files)} />
@@ -553,7 +553,7 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
         {step === 11 && (
           <div>
             <Heading title="Ready to save?" sub="Your listing is saved as a draft — publish it from My Listings whenever you're ready." />
-            <dl className="text-sm divide-y divide-[var(--border)] border border-[var(--border)] rounded-xl overflow-hidden">
+            <dl className="text-sm divide-y divide-[var(--hair)] border border-[var(--hair)] rounded-xl overflow-hidden">
               {[
                 ["Title", v.title], ["Type", v.propertyType], ["Location", `${v.neighbourhood ? v.neighbourhood + ", " : ""}${v.city}, ${v.country}`],
                 ["Capacity", `${v.bedrooms} bed · ${v.bathrooms} bath · ${v.maxGuests} guests`],
@@ -572,7 +572,7 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
       {/* Nav */}
       <div className="mt-6 flex items-center justify-between gap-3">
         {step > 0 ? (
-          <button type="button" onClick={() => setStep((s) => s - 1)} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--fg)] px-5 py-2.5 rounded-full border border-[var(--border)] hover:border-[var(--navy)] bg-[var(--surface)]"><ChevronLeft size={16} /> Back</button>
+          <button type="button" onClick={() => setStep((s) => s - 1)} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--fg)] px-5 py-2.5 rounded-full border border-[var(--hair)] hover:border-[var(--navy)] bg-[var(--surface)]"><ChevronLeft size={16} /> Back</button>
         ) : (
           <Link href="/dashboard/listings" className="text-sm font-semibold text-neutral hover:text-[var(--fg)] px-2">Cancel</Link>
         )}
@@ -581,9 +581,9 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
             <button type="button" onClick={() => next(true)} className="text-sm font-semibold text-[var(--fg)] px-5 py-2.5 rounded-full border border-[var(--gold)] hover:bg-[var(--parchment)] bg-[var(--surface)]">Skip</button>
           )}
           {step < SCREENS.length - 1 ? (
-            <button type="button" onClick={() => next()} className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] px-7 py-2.5 rounded-full shadow-sm">Continue <ChevronRight size={16} /></button>
+            <button type="button" onClick={() => next()} className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] px-7 py-2.5 rounded-full">Continue <ChevronRight size={16} /></button>
           ) : (
-            <button type="button" onClick={submit} disabled={loading} className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] px-7 py-2.5 rounded-full shadow-sm disabled:opacity-50">{loading ? "Saving…" : (<><Check size={16} /> Save listing</>)}</button>
+            <button type="button" onClick={submit} disabled={loading} className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] px-7 py-2.5 rounded-full disabled:opacity-50">{loading ? "Saving…" : (<><Check size={16} /> Save listing</>)}</button>
           )}
         </div>
       </div>

@@ -2,7 +2,7 @@ import { redirect } from "next/navigation"
 import { Check, BadgeCheck, Info, CheckCircle2 } from "lucide-react"
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
-import { PageHeader } from "@/components/ui/page-header"
+import { LuxPageHeader } from "@/components/ui/lux"
 import { CheckoutButton, CancelButton } from "./billing-buttons"
 
 export const dynamic = "force-dynamic"
@@ -40,23 +40,23 @@ export default async function SubscriptionPage({
 
   return (
     <div className="max-w-4xl mx-auto pb-12">
-      <PageHeader title="Subscription" subtitle="Your membership and exchange entitlements." />
+      <LuxPageHeader eyebrow="Membership" title="Subscription" subtitle="Your membership and exchange entitlements." />
 
       {activated && (
-        <div className="flex items-center gap-3 rounded-2xl border border-[var(--teal)]/30 bg-[var(--teal-light)] p-4 mb-6">
+        <div className="flex items-center gap-3 rounded-md border border-[var(--teal)]/30 bg-[var(--teal-light)] p-4 mb-6">
           <CheckCircle2 size={20} className="text-[var(--teal)] flex-shrink-0" />
           <p className="text-sm font-semibold text-[var(--fg)]">Your {activated} membership is now active.</p>
         </div>
       )}
       {sp.cancelled && (
-        <div className="flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-surface p-4 mb-6">
+        <div className="flex items-center gap-3 rounded-md border border-[var(--hair)] bg-surface p-4 mb-6">
           <Info size={20} className="text-neutral flex-shrink-0" />
           <p className="text-sm text-neutral-dark">Checkout was cancelled. No changes were made.</p>
         </div>
       )}
 
       {/* Current plan */}
-      <div className="bg-[var(--navy)] text-white rounded-2xl p-6 shadow-sm mb-6">
+      <div className="bg-[var(--navy)] text-white rounded-md p-6 mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="text-xs uppercase tracking-wide text-white/50 font-semibold">Current plan</div>
@@ -97,7 +97,7 @@ export default async function SubscriptionPage({
         {TIERS.map((t) => {
           const current = t.key === currentKey
           return (
-            <div key={t.key} className={`relative rounded-2xl border p-5 flex flex-col ${current ? "border-[var(--gold)] ring-1 ring-[var(--gold)] shadow-md" : "border-[var(--border)] shadow-sm"}`}>
+            <div key={t.key} className={`relative rounded-md border p-5 flex flex-col ${current ? "border-[var(--gold)] ring-1 ring-[var(--gold)] " : "border-[var(--hair)] "}`}>
               {t.popular && !current && (
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase tracking-wide bg-[var(--gold)] text-[var(--navy)] px-3 py-1 rounded-full">Most popular</span>
               )}
@@ -129,7 +129,7 @@ export default async function SubscriptionPage({
 
       {/* Lifetime upsell */}
       {!isLifetime && (
-        <div className="mt-6 rounded-2xl bg-[var(--navy)] text-white p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="mt-6 rounded-md bg-[var(--navy)] text-white p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <span className="w-12 h-12 rounded-xl bg-[var(--gold)]/15 text-[var(--gold)] flex items-center justify-center"><BadgeCheck size={24} /></span>
             <div>

@@ -96,7 +96,7 @@ export function ListingsClient({
         {listings.map((l) => {
           const busy = busyId === l.id
           return (
-            <div key={l.id} className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm overflow-hidden flex flex-col">
+            <div key={l.id} className="bg-surface rounded-md border border-[var(--hair)] overflow-hidden flex flex-col">
               <div className="relative h-40 bg-[var(--background)]">
                 {l.photos[0] ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -120,7 +120,7 @@ export function ListingsClient({
                   {l.propertyType} · {l.bedrooms} {l.bedrooms === 1 ? "bedroom" : "bedrooms"}
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-[var(--border)] flex flex-wrap items-center gap-2">
+                <div className="mt-4 pt-3 border-t border-[var(--hair)] flex flex-wrap items-center gap-2">
                   <Link href={`/dashboard/listings/${l.id}/edit`} className={`${btn} text-[var(--fg)] bg-neutral-light hover:bg-[var(--border)]`}>
                     <Pencil size={13} /> Edit
                   </Link>

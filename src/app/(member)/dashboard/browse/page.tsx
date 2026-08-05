@@ -4,7 +4,7 @@ import { MapPin, Star, BadgeCheck, SearchX, ChevronLeft, ChevronRight, MailWarni
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
 import { searchListings } from "@/server/services/discovery"
-import { PageHeader } from "@/components/ui/page-header"
+import { LuxPageHeader } from "@/components/ui/lux"
 import { BrowseControls } from "./browse-controls"
 import { FavouriteButton } from "./favourite-button"
 import { ResendMyVerification } from "./confirm-email-gate"
@@ -36,9 +36,9 @@ export default async function BrowsePage({
   if (viewer?.verificationStatus === "PENDING_EMAIL") {
     return (
       <div className="max-w-2xl mx-auto pb-12">
-        <PageHeader title="Discover Homes" subtitle="Browse verified homes across the network." />
-        <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-10 text-center">
-          <div className="mx-auto w-14 h-14 rounded-2xl bg-[var(--parchment)] text-[var(--gold-dark)] flex items-center justify-center mb-5">
+        <LuxPageHeader eyebrow="The Portfolio" title="Discover Homes" subtitle="Browse verified homes across the network." />
+        <div className="bg-surface rounded-md border border-[var(--hair)] p-10 text-center">
+          <div className="mx-auto w-14 h-14 rounded-md bg-[var(--parchment)] text-[var(--gold-dark)] flex items-center justify-center mb-5">
             <MailWarning size={26} />
           </div>
           <h2 className="font-display text-2xl font-bold text-[var(--fg)]">Confirm your email to browse</h2>
@@ -92,7 +92,7 @@ export default async function BrowsePage({
 
   return (
     <div className="max-w-6xl mx-auto pb-12">
-      <PageHeader title="Discover Homes" subtitle="Browse verified homes across the network." />
+      <LuxPageHeader eyebrow="The Portfolio" title="Discover Homes" subtitle="Browse verified homes across the network." />
       <BrowseControls initial={filters} />
 
       <p className="text-sm text-neutral mb-4">
@@ -100,8 +100,8 @@ export default async function BrowsePage({
       </p>
 
       {listings.length === 0 ? (
-        <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-12 text-center">
-          <div className="mx-auto w-14 h-14 rounded-2xl bg-neutral-light text-neutral flex items-center justify-center mb-4">
+        <div className="bg-surface rounded-md border border-[var(--hair)] p-12 text-center">
+          <div className="mx-auto w-14 h-14 rounded-md bg-neutral-light text-neutral flex items-center justify-center mb-4">
             <SearchX size={26} />
           </div>
           <h2 className="font-display text-xl font-bold text-[var(--fg)]">No homes match</h2>
@@ -113,7 +113,7 @@ export default async function BrowsePage({
             <Link
               key={l.id}
               href={`/dashboard/browse/${l.id}`}
-              className="group bg-surface rounded-2xl border border-[var(--border)] shadow-sm overflow-hidden hover:shadow-md hover:border-[var(--gold)]/50 transition-all"
+              className="group bg-surface rounded-md border border-[var(--hair)] overflow-hidden hover:border-[var(--gold)]/50 transition-all"
             >
               <div className="relative h-44 bg-[var(--background)]">
                 {l.photoId ? (
@@ -141,7 +141,7 @@ export default async function BrowsePage({
                 <div className="mt-1 text-xs text-neutral">
                   {l.propertyType} · {l.bedrooms} {l.bedrooms === 1 ? "bed" : "beds"} · up to {l.maxGuests} guests
                 </div>
-                <div className="mt-3 pt-3 border-t border-[var(--border)] flex items-center justify-between">
+                <div className="mt-3 pt-3 border-t border-[var(--hair)] flex items-center justify-between">
                   <span className="text-xs text-neutral">{EXCHANGE_LABEL[l.exchangeType] ?? l.exchangeType}</span>
                   <span className="flex items-center gap-1 text-xs font-bold text-[var(--fg)]">
                     <Star size={12} className="text-[var(--gold)]" />
@@ -157,21 +157,21 @@ export default async function BrowsePage({
       {pageCount > 1 && (
         <nav className="mt-8 flex items-center justify-center gap-3" aria-label="Pagination">
           {page > 1 ? (
-            <Link href={pageHref(page - 1)} className="inline-flex items-center gap-1 text-sm font-semibold text-[var(--fg)] px-4 py-2 rounded-xl border border-[var(--border)] hover:border-[var(--navy)] transition-colors">
+            <Link href={pageHref(page - 1)} className="inline-flex items-center gap-1 text-sm font-semibold text-[var(--fg)] px-4 py-2 rounded-xl border border-[var(--hair)] hover:border-[var(--navy)] transition-colors">
               <ChevronLeft size={15} /> Previous
             </Link>
           ) : (
-            <span className="inline-flex items-center gap-1 text-sm font-semibold text-neutral/40 px-4 py-2 rounded-xl border border-[var(--border)] cursor-not-allowed">
+            <span className="inline-flex items-center gap-1 text-sm font-semibold text-neutral/40 px-4 py-2 rounded-xl border border-[var(--hair)] cursor-not-allowed">
               <ChevronLeft size={15} /> Previous
             </span>
           )}
           <span className="text-sm text-neutral">Page {page} of {pageCount}</span>
           {page < pageCount ? (
-            <Link href={pageHref(page + 1)} className="inline-flex items-center gap-1 text-sm font-semibold text-[var(--fg)] px-4 py-2 rounded-xl border border-[var(--border)] hover:border-[var(--navy)] transition-colors">
+            <Link href={pageHref(page + 1)} className="inline-flex items-center gap-1 text-sm font-semibold text-[var(--fg)] px-4 py-2 rounded-xl border border-[var(--hair)] hover:border-[var(--navy)] transition-colors">
               Next <ChevronRight size={15} />
             </Link>
           ) : (
-            <span className="inline-flex items-center gap-1 text-sm font-semibold text-neutral/40 px-4 py-2 rounded-xl border border-[var(--border)] cursor-not-allowed">
+            <span className="inline-flex items-center gap-1 text-sm font-semibold text-neutral/40 px-4 py-2 rounded-xl border border-[var(--hair)] cursor-not-allowed">
               Next <ChevronRight size={15} />
             </span>
           )}

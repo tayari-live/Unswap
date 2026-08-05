@@ -37,14 +37,14 @@ export function MessagesLayoutShell({
   }, [conversations, query])
 
   return (
-    <div className="flex h-[calc(100vh-10rem)] md:h-[calc(100vh-5.5rem)] -mt-6 -mx-4 md:-mx-8 bg-[var(--surface)] border-t border-[var(--border)] overflow-hidden relative">
+    <div className="flex h-[calc(100vh-10rem)] md:h-[calc(100vh-5.5rem)] -mt-6 -mx-4 md:-mx-8 bg-[var(--surface)] border-t border-[var(--hair)] overflow-hidden relative">
       {/* Left Pane - List of Conversations */}
       <div 
-        className={`w-full md:w-[320px] lg:w-[340px] flex-shrink-0 border-r border-[var(--border)] flex flex-col bg-[var(--chat-bg)] z-10 ${
-          activeId ? "hidden md:flex" : "flex"
-        }`}
+        className={`w-full md:w-[320px] lg:w-[340px] flex-shrink-0 border-r border-[var(--hair)] flex flex-col bg-[var(--chat-bg)] z-10 ${
+ activeId ? "hidden md:flex" : "flex"
+ }`}
       >
-        <div className="p-4 border-b border-[var(--border)] bg-[var(--surface)] flex items-center justify-between">
+        <div className="p-4 border-b border-[var(--hair)] bg-[var(--surface)] flex items-center justify-between">
           <h2 className="font-bold text-[var(--fg)]">All messages</h2>
         </div>
 
@@ -56,7 +56,7 @@ export function MessagesLayoutShell({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search messages"
-              className="w-full pl-9 pr-3 py-2 bg-[var(--surface)] border border-[var(--border)] rounded-lg text-sm text-[var(--fg)] focus:outline-none focus:border-[var(--gold)] shadow-sm"
+              className="w-full pl-9 pr-3 py-2 bg-[var(--surface)] border border-[var(--hair)] rounded-lg text-sm text-[var(--fg)] focus:outline-none focus:border-[var(--gold)]"
             />
           </div>
         </div>
@@ -67,7 +67,7 @@ export function MessagesLayoutShell({
               {query ? "No conversations match your search." : "No conversations yet."}
             </div>
           ) : (
-            <div className="divide-y divide-[var(--border)]/50">
+            <div className="divide-y divide-[var(--hair)]/50">
               {filtered.map((c) => {
                 const isActive = c.id === activeId
                 return (
@@ -75,14 +75,14 @@ export function MessagesLayoutShell({
                     key={c.id} 
                     href={`/dashboard/messages/${c.id}`} 
                     className={`block p-4 transition-colors ${
-                      isActive 
-                        ? "bg-[var(--chat-active)] border-l-4 border-l-[var(--gold)]" 
-                        : "hover:bg-[var(--surface)] border-l-4 border-l-transparent"
-                    }`}
+ isActive 
+ ? "bg-[var(--chat-active)] border-l-4 border-l-[var(--gold)]" 
+ : "hover:bg-[var(--surface)] border-l-4 border-l-transparent"
+ }`}
                   >
                     <div className="flex gap-3">
                       <span className="relative flex-shrink-0 mt-0.5">
-                        <span className="w-10 h-10 rounded-full bg-[var(--surface)] border border-[var(--border)] text-[var(--fg)] flex items-center justify-center text-sm font-bold overflow-hidden">
+                        <span className="w-10 h-10 rounded-full bg-[var(--surface)] border border-[var(--hair)] text-[var(--fg)] flex items-center justify-center text-sm font-bold overflow-hidden">
                           {c.other?.avatarInitials ?? "?"}
                         </span>
                         {c.other?.online && (
@@ -114,8 +114,8 @@ export function MessagesLayoutShell({
       {/* Right Area - Dynamic Content */}
       <div 
         className={`flex-1 flex-col bg-[var(--surface)] overflow-hidden relative ${
-          !activeId ? "hidden md:flex" : "flex"
-        }`}
+ !activeId ? "hidden md:flex" : "flex"
+ }`}
       >
         {children}
       </div>

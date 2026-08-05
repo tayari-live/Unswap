@@ -92,13 +92,13 @@ export default async function ListingDetailPage({
           </div>
 
           {listing.description && (
-            <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6">
+            <div className="bg-surface rounded-md border border-[var(--hair)] p-6">
               <h2 className="font-display font-bold text-lg text-[var(--fg)] mb-2">About this home</h2>
               <p className="text-sm text-neutral-dark leading-relaxed whitespace-pre-line">{listing.description}</p>
             </div>
           )}
 
-          <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6 space-y-4">
+          <div className="bg-surface rounded-md border border-[var(--hair)] p-6 space-y-4">
             <div>
               <h2 className="font-display font-bold text-lg text-[var(--fg)] mb-1">{listing.propertyType}</h2>
               <p className="text-sm text-neutral">Exchange preference: {EXCHANGE_LABEL[listing.exchangeType] ?? listing.exchangeType}</p>
@@ -129,7 +129,7 @@ export default async function ListingDetailPage({
           </div>
 
           {/* Reviews */}
-          <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6">
+          <div className="bg-surface rounded-md border border-[var(--hair)] p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-display font-bold text-lg text-[var(--fg)]">Reviews</h2>
               {listing.rating != null && (
@@ -144,7 +144,7 @@ export default async function ListingDetailPage({
             ) : (
               <div className="space-y-5">
                 {reviews.map((rv) => (
-                  <div key={rv.id} className="border-b border-[var(--border)] last:border-0 pb-5 last:pb-0">
+                  <div key={rv.id} className="border-b border-[var(--hair)] last:border-0 pb-5 last:pb-0">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
                         <span className="w-9 h-9 rounded-full bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center text-xs font-bold">
@@ -173,7 +173,7 @@ export default async function ListingDetailPage({
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Host card */}
-          <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6">
+          <div className="bg-surface rounded-md border border-[var(--hair)] p-6">
             <div className="flex items-center gap-3">
               <span className="w-12 h-12 rounded-full bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center font-bold">
                 {listing.owner.avatarInitials}
@@ -188,7 +188,7 @@ export default async function ListingDetailPage({
                 <div className="text-xs text-neutral">{listing.owner.organisation ?? ""}{listing.owner.dutyStation ? ` · ${listing.owner.dutyStation}` : ""}</div>
               </div>
             </div>
-            <div className="mt-4 flex items-center justify-between text-sm border-t border-[var(--border)] pt-3">
+            <div className="mt-4 flex items-center justify-between text-sm border-t border-[var(--hair)] pt-3">
               <span className="text-neutral">Trust score</span>
               <span className="flex items-center gap-1 font-bold text-[var(--fg)]">
                 <Star size={14} className="text-[var(--gold)]" />
@@ -207,7 +207,7 @@ export default async function ListingDetailPage({
             </div>
 
             {/* Verification checklist — the walled garden, made visible */}
-            <div className="mt-4 pt-4 border-t border-[var(--border)] space-y-2">
+            <div className="mt-4 pt-4 border-t border-[var(--hair)] space-y-2">
               <div className="flex items-center gap-2 text-sm text-neutral-dark">
                 <BadgeCheck size={15} className="text-[var(--teal)] flex-shrink-0" />
                 Institutional email verified
@@ -225,7 +225,7 @@ export default async function ListingDetailPage({
 
           {/* Request action */}
           {isOwner ? (
-            <div className="bg-[var(--parchment)] border border-[var(--gold)]/20 rounded-2xl p-4 text-sm text-neutral-dark text-center">
+            <div className="bg-[var(--parchment)] border border-[var(--gold)]/20 rounded-md p-4 text-sm text-neutral-dark text-center">
               This is your own listing.
             </div>
           ) : canRequest ? (
@@ -240,7 +240,7 @@ export default async function ListingDetailPage({
               <MessageButton otherUserId={listing.owner.id} label="Message host" />
             </div>
           ) : (
-            <div className="bg-[var(--parchment)] border border-[var(--gold)]/30 rounded-2xl p-5 text-center">
+            <div className="bg-[var(--parchment)] border border-[var(--gold)]/30 rounded-md p-5 text-center">
               <ShieldAlert size={22} className="mx-auto text-[var(--gold-dark)]" />
               <p className="mt-2 text-sm text-neutral-dark">Get verified to request a swap.</p>
               <Link href="/verify-identity" className="mt-3 inline-block text-sm font-semibold text-[var(--gold-dark)] underline">Verify now</Link>

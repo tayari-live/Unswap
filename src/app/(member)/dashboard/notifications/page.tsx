@@ -11,7 +11,7 @@ import {
   ACTIVITY_KINDS,
   type MemberNotification,
 } from "@/server/services/member-notifications"
-import { PageHeader } from "@/components/ui/page-header"
+import { LuxPageHeader } from "@/components/ui/lux"
 
 export const dynamic = "force-dynamic"
 
@@ -58,18 +58,18 @@ export default async function NotificationsPage() {
 
   return (
     <div className="max-w-2xl mx-auto pb-12">
-      <PageHeader title="Notifications" subtitle="Everything that needs your attention, in one place." />
+      <LuxPageHeader eyebrow="Activity" title="Notifications" subtitle="Everything that needs your attention, in one place." />
 
       {items.length === 0 ? (
-        <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-12 text-center">
-          <div className="mx-auto w-14 h-14 rounded-2xl bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center mb-4">
+        <div className="bg-surface rounded-md border border-[var(--hair)] p-12 text-center">
+          <div className="mx-auto w-14 h-14 rounded-md bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center mb-4">
             <Bell size={26} />
           </div>
           <h2 className="font-display text-xl font-bold text-[var(--fg)]">You&apos;re all caught up</h2>
           <p className="mt-2 text-sm text-neutral">No new activity right now.</p>
         </div>
       ) : (
-        <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm overflow-hidden divide-y divide-[var(--border)]">
+        <div className="bg-surface rounded-md border border-[var(--hair)] overflow-hidden divide-y divide-[var(--hair)]">
           {items.map((n) => {
             const k = KIND[n.kind]
             return (

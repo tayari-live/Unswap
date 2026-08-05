@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { UserCircle, ShieldCheck, CreditCard, Bell, ChevronRight } from "lucide-react"
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
-import { PageHeader } from "@/components/ui/page-header"
+import { LuxPageHeader } from "@/components/ui/lux"
 import { ChangePasswordForm } from "@/components/account/change-password-form"
 
 export const dynamic = "force-dynamic"
@@ -56,8 +56,8 @@ export default async function SettingsPage() {
 
   return (
     <div className="max-w-2xl mx-auto pb-12">
-      <PageHeader title="Settings" subtitle="Manage your account, verification, and preferences." />
-      <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm divide-y divide-[var(--border)] overflow-hidden">
+      <LuxPageHeader eyebrow="Account" title="Settings" subtitle="Manage your account, verification, and preferences." />
+      <div className="bg-surface rounded-md border border-[var(--hair)] divide-y divide-[var(--hair)] overflow-hidden">
         {rows.map((r) => (
           <Link
             key={r.title}
@@ -76,7 +76,7 @@ export default async function SettingsPage() {
         ))}
       </div>
 
-      <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6 sm:p-8 mt-6">
+      <div className="bg-surface rounded-md border border-[var(--hair)] p-6 sm:p-8 mt-6">
         <h2 className="font-display font-bold text-lg text-[var(--fg)] mb-1.5">Password</h2>
         <p className="text-sm text-neutral mb-5">Change the password you use to sign in.</p>
         <ChangePasswordForm />

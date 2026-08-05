@@ -39,11 +39,11 @@ export default async function MemberLayout({
     .toUpperCase()
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[var(--background)]">
+    <div className="flex h-screen overflow-hidden bg-[var(--canvas)]">
       <div className="hidden md:block">
         <MemberSidebar name={u.name || ""} initials={initials} image={u.image || null} verificationStatus={dbUser.verificationStatus} />
       </div>
-      <main className="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8">
+      <main className="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8 bg-[var(--canvas)]">
         {children}
       </main>
       <MobileNav variant="member" />

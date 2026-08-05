@@ -57,7 +57,7 @@ function FileField({
         {label}
       </label>
       {value ? (
-        <div className="relative rounded-xl border border-[var(--border)] overflow-hidden">
+        <div className="relative rounded-xl border border-[var(--hair)] overflow-hidden">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={value} alt={label} className="w-full h-44 object-cover" />
           <button
@@ -73,7 +73,7 @@ function FileField({
           </div>
         </div>
       ) : (
-        <label className="flex flex-col items-center justify-center h-44 rounded-xl border-2 border-dashed border-[var(--border)] bg-[var(--background)] cursor-pointer hover:border-[var(--gold)] transition-colors text-center px-4">
+        <label className="flex flex-col items-center justify-center h-44 rounded-xl border-2 border-dashed border-[var(--hair)] bg-[var(--background)] cursor-pointer hover:border-[var(--gold)] transition-colors text-center px-4">
           <UploadCloud size={26} className="text-neutral mb-2" />
           <span className="text-sm font-semibold text-[var(--fg)]">Click to upload</span>
           <span className="text-xs text-neutral mt-1">{hint}</span>
@@ -159,7 +159,7 @@ export function VerifyIdentityForm({ type }: { type: "fast_track" | "manual" }) 
       <button
         type="submit"
         disabled={loading}
-        className="w-full flex items-center justify-center py-3.5 px-4 rounded-xl text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--gold)] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm"
+        className="w-full flex items-center justify-center py-3.5 px-4 rounded-xl text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--gold)] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
       >
         {loading ? "Submitting…" : "Submit for review"}
       </button>

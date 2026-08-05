@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { ChevronLeft } from "lucide-react"
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
-import { PageHeader } from "@/components/ui/page-header"
+import { LuxPageHeader } from "@/components/ui/lux"
 import { NotificationPrefs } from "../../notifications/notification-prefs"
 
 export const dynamic = "force-dynamic"
@@ -27,7 +27,7 @@ export default async function NotificationSettingsPage() {
       >
         <ChevronLeft size={16} /> Settings
       </Link>
-      <PageHeader title="Notification preferences" subtitle="Choose which emails you receive from UnSwap." />
+      <LuxPageHeader eyebrow="Preferences" title="Notification preferences" subtitle="Choose which emails you receive from UnSwap." />
       <NotificationPrefs initial={user} />
     </div>
   )

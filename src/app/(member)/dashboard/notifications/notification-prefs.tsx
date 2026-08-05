@@ -55,12 +55,12 @@ export function NotificationPrefs({ initial }: { initial: Prefs }) {
   }
 
   return (
-    <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm overflow-hidden mb-6">
-      <div className="px-6 py-4 border-b border-[var(--border)]">
+    <div className="bg-surface rounded-md border border-[var(--hair)] overflow-hidden mb-6">
+      <div className="px-6 py-4 border-b border-[var(--hair)]">
         <h2 className="font-display font-bold text-lg text-[var(--fg)]">Email preferences</h2>
         <p className="text-xs text-neutral mt-0.5">Choose which emails you receive. Security and billing emails are always sent.</p>
       </div>
-      <div className="divide-y divide-[var(--border)]">
+      <div className="divide-y divide-[var(--hair)]">
         {CATEGORIES.map((c) => (
           <div key={c.key} className="flex items-center justify-between gap-4 px-6 py-3.5">
             <div>

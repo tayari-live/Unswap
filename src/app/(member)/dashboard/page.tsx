@@ -14,7 +14,7 @@ import {
 } from "lucide-react"
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
-import { PageHeader } from "@/components/ui/page-header"
+import { LuxPageHeader } from "@/components/ui/lux"
 import { ResendEmailButton } from "@/components/ui/resend-email-button"
 
 export const dynamic = "force-dynamic"
@@ -134,28 +134,22 @@ export default async function MemberDashboardPage() {
   const showChecklist = checklistDone < checklist.length
 
   const cards = [
-    { label: "Active Listings", value: activeListings, icon: Home, tone: "navy" },
-    { label: "Incoming Requests", value: incoming.length, icon: ArrowLeftRight, tone: "gold" },
-    { label: "Upcoming Exchanges", value: upcoming.length, icon: CalendarCheck, tone: "teal" },
-    { label: "UnSwap Credits", value: credits, icon: Coins, tone: "navy" },
+    { label: "Active Listings", value: activeListings, icon: Home },
+    { label: "Incoming Requests", value: incoming.length, icon: ArrowLeftRight },
+    { label: "Upcoming Exchanges", value: upcoming.length, icon: CalendarCheck },
+    { label: "UnSwap Credits", value: credits, icon: Coins },
   ] as const
-
-  const toneRing: Record<string, string> = {
-    navy: "text-[var(--fg)] bg-[var(--navy)]/10",
-    gold: "text-[var(--gold-dark)] bg-[var(--gold)]/15",
-    teal: "text-[var(--teal)] bg-[var(--teal)]/15",
-  }
 
   return (
     <div className="max-w-6xl mx-auto pb-12">
-      <PageHeader
+      <LuxPageHeader eyebrow="Your Network"
         title={`Welcome back, ${user.firstName}`}
         subtitle="Your activity across the UnSwap exchange network."
       />
 
       {/* Getting-started checklist — replaces the scattered status cards */}
       {showChecklist && (
-        <div className="rounded-2xl border border-[var(--border)] bg-surface shadow-sm p-5 mb-6">
+        <div className="rounded-md border border-[var(--hair)] bg-surface p-5 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-display text-lg font-bold text-[var(--fg)]">Getting started</h2>
             <span className="text-xs font-semibold text-neutral">{checklistDone} of {checklist.length} done</span>
@@ -165,8 +159,8 @@ export default async function MemberDashboardPage() {
               <li key={s.title} className="flex items-center gap-3">
                 <span
                   className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                    s.done ? "bg-[var(--teal)]/15 text-[var(--teal)]" : "bg-[var(--navy)]/10 text-[var(--fg)]"
-                  }`}
+ s.done ? "bg-[var(--teal)]/15 text-[var(--teal)]" : "bg-[var(--navy)]/10 text-[var(--fg)]"
+ }`}
                 >
                   {s.done ? <Check size={14} /> : i + 1}
                 </span>
@@ -198,24 +192,24 @@ export default async function MemberDashboardPage() {
         {cards.map((c) => (
           <div
             key={c.label}
-            className="bg-surface rounded-2xl p-5 border border-[var(--border)] shadow-sm"
+            className="bg-[var(--surface)] rounded-md p-6 border border-[var(--hair)]"
           >
-            <span className={`w-9 h-9 rounded-xl flex items-center justify-center ${toneRing[c.tone]}`}>
-              <c.icon size={18} />
+            <span className="w-11 h-11 border border-[var(--hair)] flex items-center justify-center text-[var(--gold-soft)]">
+              <c.icon size={20} strokeWidth={1.4} />
             </span>
-            <div className="mt-4 text-3xl font-display font-bold text-[var(--fg)]">{c.value}</div>
-            <div className="text-xs text-neutral uppercase tracking-wide mt-1 font-semibold">{c.label}</div>
+            <div className="mt-5 font-display font-light text-4xl leading-none text-[var(--fg)]">{c.value}</div>
+            <div className="text-[11px] text-neutral uppercase tracking-[0.18em] mt-2 font-medium">{c.label}</div>
           </div>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
         {/* Incoming swap requests */}
-        <div className="lg:col-span-2 bg-surface rounded-2xl border border-[var(--border)] shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
+        <div className="lg:col-span-2 bg-surface rounded-md border border-[var(--hair)] overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--hair)]">
             <h2 className="font-display font-bold text-lg text-[var(--fg)]">Incoming Swap Requests</h2>
           </div>
-          <div className="divide-y divide-[var(--border)]">
+          <div className="divide-y divide-[var(--hair)]">
             {incoming.length === 0 && (
               <p className="px-6 py-8 text-center text-sm text-neutral">No pending requests right now.</p>
             )}
@@ -243,7 +237,7 @@ export default async function MemberDashboardPage() {
         {/* Right column */}
         <div className="space-y-6">
           {/* Verification + trust */}
-          <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6">
+          <div className="bg-surface rounded-md border border-[var(--hair)] p-6">
             <div className="flex items-center gap-2 mb-3">
               {isVerified ? (
                 <ShieldCheck size={18} className="text-[var(--teal)]" />
@@ -255,7 +249,7 @@ export default async function MemberDashboardPage() {
             <p className="text-sm text-neutral-dark">
               {VERIFICATION_LABELS[user.verificationStatus] ?? user.verificationStatus}
             </p>
-            <div className="mt-4 pt-4 border-t border-[var(--border)] flex items-center justify-between">
+            <div className="mt-4 pt-4 border-t border-[var(--hair)] flex items-center justify-between">
               <span className="text-xs text-neutral uppercase tracking-wide font-semibold">Trust Score</span>
               <span className="flex items-center gap-1 text-sm font-bold text-[var(--fg)]">
                 <Star size={14} className="text-[var(--gold)]" />
@@ -265,7 +259,7 @@ export default async function MemberDashboardPage() {
           </div>
 
           {/* Subscription */}
-          <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6">
+          <div className="bg-surface rounded-md border border-[var(--hair)] p-6">
             <h2 className="font-display font-bold text-base text-[var(--fg)] mb-3">Subscription</h2>
             {user.subscription ? (
               <>
@@ -292,11 +286,11 @@ export default async function MemberDashboardPage() {
       </div>
 
       {/* Upcoming exchanges */}
-      <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm overflow-hidden mt-6">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
+      <div className="bg-surface rounded-md border border-[var(--hair)] overflow-hidden mt-6">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--hair)]">
           <h2 className="font-display font-bold text-lg text-[var(--fg)]">Upcoming Exchanges</h2>
         </div>
-        <div className="divide-y divide-[var(--border)]">
+        <div className="divide-y divide-[var(--hair)]">
           {upcoming.length === 0 && (
             <div className="px-6 py-10 text-center">
               <p className="text-sm text-neutral">No upcoming exchanges yet.</p>

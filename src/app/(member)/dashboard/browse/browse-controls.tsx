@@ -20,7 +20,7 @@ export type BrowseFilters = {
 }
 
 const selectCls =
-  "w-full px-3 py-2.5 border border-[var(--border)] rounded-xl bg-[var(--surface)] text-sm text-[var(--fg)] focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)]"
+  "w-full px-3 py-2.5 border border-[var(--hair)] rounded-xl bg-[var(--surface)] text-sm text-[var(--fg)] focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)]"
 
 export function BrowseControls({ initial }: { initial: BrowseFilters }) {
   const router = useRouter()
@@ -58,17 +58,17 @@ export function BrowseControls({ initial }: { initial: BrowseFilters }) {
             value={f.q}
             onChange={(e) => setF({ ...f, q: e.target.value })}
             placeholder="Search by city, country, or duty station"
-            className="w-full pl-11 pr-4 py-3 border border-[var(--border)] rounded-xl bg-[var(--surface)] text-sm text-[var(--fg)] placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] transition-all shadow-sm"
+            className="w-full pl-11 pr-4 py-3 border border-[var(--hair)] rounded-xl bg-[var(--surface)] text-sm text-[var(--fg)] placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] transition-all"
           />
         </form>
         <button
           type="button"
           onClick={() => setShowFilters(!showFilters)}
-          className={`flex items-center justify-center gap-2 px-5 py-3 border rounded-xl text-sm font-bold transition-all shadow-sm ${
-            showFilters || hasFilters
-              ? "bg-[var(--navy)] border-[var(--navy)] text-white"
-              : "bg-[var(--surface)] border-[var(--border)] text-[var(--fg)] hover:border-[var(--navy)]"
-          }`}
+          className={`flex items-center justify-center gap-2 px-5 py-3 border rounded-xl text-sm font-bold transition-all ${
+ showFilters || hasFilters
+ ? "bg-[var(--navy)] border-[var(--navy)] text-white"
+ : "bg-[var(--surface)] border-[var(--hair)] text-[var(--fg)] hover:border-[var(--navy)]"
+ }`}
         >
           <SlidersHorizontal size={18} />
           Filters
@@ -81,7 +81,7 @@ export function BrowseControls({ initial }: { initial: BrowseFilters }) {
       </div>
 
       {showFilters && (
-        <div className="p-5 sm:p-6 bg-[var(--surface)] border border-[var(--border)] rounded-2xl shadow-lg space-y-6 animate-in slide-in-from-top-2 fade-in duration-200">
+        <div className="p-5 sm:p-6 bg-[var(--surface)] border border-[var(--hair)] rounded-md space-y-6 animate-in slide-in-from-top-2 fade-in duration-200">
           <div>
             <h4 className="text-[11px] font-bold uppercase tracking-wider text-neutral mb-3">Popular Duty Stations</h4>
             <div className="flex flex-wrap gap-2">
@@ -90,10 +90,10 @@ export function BrowseControls({ initial }: { initial: BrowseFilters }) {
                   key={c}
                   onClick={() => apply({ q: c })}
                   className={`text-xs font-semibold px-3.5 py-1.5 rounded-full border transition-all ${
-                    f.q === c
-                      ? "bg-[var(--navy)] text-white border-[var(--navy)] shadow-md"
-                      : "bg-surface text-neutral-dark border-[var(--border)] hover:border-[var(--navy)] hover:bg-[var(--surface)]"
-                  }`}
+ f.q === c
+ ? "bg-[var(--navy)] text-white border-[var(--navy)] "
+ : "bg-surface text-neutral-dark border-[var(--hair)] hover:border-[var(--navy)] hover:bg-[var(--surface)]"
+ }`}
                 >
                   {c}
                 </button>
@@ -133,14 +133,14 @@ export function BrowseControls({ initial }: { initial: BrowseFilters }) {
             </div>
           </div>
 
-          <div className="pt-5 border-t border-[var(--border)] flex flex-wrap items-center justify-between gap-4">
+          <div className="pt-5 border-t border-[var(--hair)] flex flex-wrap items-center justify-between gap-4">
             <button
               onClick={() => apply({ savedOnly: !f.savedOnly })}
               className={`inline-flex items-center gap-2 text-sm font-semibold px-4 py-2.5 rounded-xl border transition-all ${
-                f.savedOnly
-                  ? "bg-[var(--crimson)]/10 text-[var(--crimson)] border-[var(--crimson)]/30"
-                  : "bg-surface text-neutral-dark border-[var(--border)] hover:border-[var(--navy)] hover:bg-[var(--surface)]"
-              }`}
+ f.savedOnly
+ ? "bg-[var(--crimson)]/10 text-[var(--crimson)] border-[var(--crimson)]/30"
+ : "bg-surface text-neutral-dark border-[var(--hair)] hover:border-[var(--navy)] hover:bg-[var(--surface)]"
+ }`}
             >
               Saved homes only
             </button>
@@ -159,7 +159,7 @@ export function BrowseControls({ initial }: { initial: BrowseFilters }) {
               )}
               <button
                 onClick={() => setShowFilters(false)}
-                className="bg-[var(--navy)] text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md hover:bg-[var(--navy-light)] transition-colors"
+                className="bg-[var(--navy)] text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-[var(--navy-light)] transition-colors"
               >
                 Apply
               </button>

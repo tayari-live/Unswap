@@ -25,7 +25,7 @@ const DURATION_BANDS: Record<string, { label: string; min: number; max: number }
 type Blackout = { start: string; end: string }
 
 const inputCls =
-  "block w-full px-4 py-3 border border-[var(--border)] rounded-xl bg-[var(--surface)] text-sm text-[var(--fg)] focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)]"
+  "block w-full px-4 py-3 border border-[var(--hair)] rounded-xl bg-[var(--surface)] text-sm text-[var(--fg)] focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)]"
 const labelCls = "block text-xs font-semibold uppercase tracking-wider text-[var(--fg)] mb-2"
 
 /** Whole nights between two YYYY-MM-DD dates (end exclusive of start). */
@@ -121,7 +121,7 @@ export function SwapRequestForm({
 
   if (done) {
     return (
-      <div className="bg-[var(--teal-light)] border border-[var(--teal)]/30 rounded-2xl p-6 text-center">
+      <div className="bg-[var(--teal-light)] border border-[var(--teal)]/30 rounded-md p-6 text-center">
         <CheckCircle2 size={28} className="mx-auto text-[var(--teal)]" />
         <h3 className="mt-3 font-display text-lg font-bold text-[var(--fg)]">Request sent</h3>
         <p className="mt-1 text-sm text-neutral-dark">The host has been notified and will respond shortly.</p>
@@ -139,7 +139,7 @@ export function SwapRequestForm({
     return (
       <button
         onClick={() => setOpen(true)}
-        className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] transition-colors shadow-sm"
+        className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] transition-colors"
       >
         <CalendarCheck size={18} /> Request a swap
       </button>
@@ -153,7 +153,7 @@ export function SwapRequestForm({
     : []
 
   return (
-    <form onSubmit={handleSubmit} className="bg-surface border border-[var(--border)] rounded-2xl p-5 space-y-4 shadow-sm">
+    <form onSubmit={handleSubmit} className="bg-surface border border-[var(--hair)] rounded-md p-5 space-y-4">
       <h3 className="font-display text-lg font-bold text-[var(--fg)]">Request a swap</h3>
 
       {blackouts.length > 0 && (
@@ -187,10 +187,10 @@ export function SwapRequestForm({
                 type="button"
                 onClick={() => setEndDate(q.end)}
                 className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-colors ${
-                  endDate === q.end
-                    ? "bg-[var(--navy)] text-white border-[var(--navy)]"
-                    : "bg-[var(--surface)] text-[var(--fg)] border-[var(--border)] hover:border-[var(--navy)]"
-                }`}
+ endDate === q.end
+ ? "bg-[var(--navy)] text-white border-[var(--navy)]"
+ : "bg-[var(--surface)] text-[var(--fg)] border-[var(--hair)] hover:border-[var(--navy)]"
+ }`}
               >
                 {q.label} · {q.nights} nights
               </button>
@@ -226,7 +226,7 @@ export function SwapRequestForm({
         >
           {loading ? "Sending…" : "Send request"}
         </button>
-        <button type="button" onClick={() => setOpen(false)} className="py-3 px-4 rounded-xl text-sm font-semibold text-[var(--fg)] border border-[var(--border)] hover:border-[var(--navy)] transition-colors">
+        <button type="button" onClick={() => setOpen(false)} className="py-3 px-4 rounded-xl text-sm font-semibold text-[var(--fg)] border border-[var(--hair)] hover:border-[var(--navy)] transition-colors">
           Cancel
         </button>
       </div>

@@ -3,7 +3,7 @@ import { Star } from "lucide-react"
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
 import { listReviewsForUser } from "@/server/services/reviews"
-import { PageHeader } from "@/components/ui/page-header"
+import { LuxPageHeader } from "@/components/ui/lux"
 import { ProfileWizard } from "@/components/profile/profile-wizard"
 
 function fmtDate(d: Date) {
@@ -45,10 +45,10 @@ export default async function ProfilePage() {
 
   return (
     <div className="max-w-2xl mx-auto pb-12">
-      <PageHeader title="Profile" subtitle="How you appear to other members of the network." />
+      <LuxPageHeader eyebrow="Your Profile" title="Profile" subtitle="How you appear to other members of the network." />
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
-        <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-5">
+        <div className="bg-surface rounded-md border border-[var(--hair)] p-5">
           <div className="text-xs text-neutral uppercase tracking-wide font-semibold">Profile completion</div>
           <div className="mt-2 flex items-center gap-3">
             <div className="flex-1 h-2 rounded-full bg-neutral-light overflow-hidden">
@@ -57,13 +57,13 @@ export default async function ProfilePage() {
             <span className="text-sm font-bold text-[var(--fg)]">{user.profileCompletion}%</span>
           </div>
         </div>
-        <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-5">
+        <div className="bg-surface rounded-md border border-[var(--hair)] p-5">
           <div className="text-xs text-neutral uppercase tracking-wide font-semibold">Verification</div>
           <div className="mt-2 text-sm font-semibold text-[var(--fg)]">
             {VERIFICATION_LABELS[user.verificationStatus] ?? user.verificationStatus}
           </div>
         </div>
-        <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-5">
+        <div className="bg-surface rounded-md border border-[var(--hair)] p-5">
           <div className="text-xs text-neutral uppercase tracking-wide font-semibold">Trust score</div>
           <div className="mt-2 flex items-center gap-1.5">
             <Star size={16} className="text-[var(--gold)]" fill={user.trustScore != null ? "currentColor" : "none"} />
@@ -77,19 +77,19 @@ export default async function ProfilePage() {
         </div>
       </div>
 
-      <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6 sm:p-8">
+      <div className="bg-surface rounded-md border border-[var(--hair)] p-6 sm:p-8">
         <ProfileWizard initial={initial} />
       </div>
 
       {/* Reviews received */}
-      <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6 sm:p-8 mt-6">
+      <div className="bg-surface rounded-md border border-[var(--hair)] p-6 sm:p-8 mt-6">
         <h2 className="font-display font-bold text-lg text-[var(--fg)] mb-4">Reviews received</h2>
         {reviews.length === 0 ? (
           <p className="text-sm text-neutral">No reviews yet. Complete an exchange to start building your reputation.</p>
         ) : (
           <div className="space-y-5">
             {reviews.map((rv) => (
-              <div key={rv.id} className="border-b border-[var(--border)] last:border-0 pb-5 last:pb-0">
+              <div key={rv.id} className="border-b border-[var(--hair)] last:border-0 pb-5 last:pb-0">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
                     <span className="w-9 h-9 rounded-full bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center text-xs font-bold">

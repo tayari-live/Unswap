@@ -83,7 +83,7 @@ export function MemberSidebar({
       {/* Logo */}
       <Link href="/dashboard" className="flex items-center gap-2.5 px-5 pt-5 pb-4 overflow-hidden">
         <Image src="/unswap-logo.png" alt="UnSwap" width={80} height={80} priority className="w-9 h-9 flex-shrink-0 object-contain" />
-        <span className={cn("font-display font-bold text-xl text-white", label(!collapsed))}>UnSwap</span>
+        <span className={cn("font-display font-light text-xl tracking-[0.1em] text-white", label(!collapsed))}>UnSwap</span>
       </Link>
 
       <div className="mx-4 h-px bg-white/10" />
@@ -104,16 +104,17 @@ export function MemberSidebar({
               href={item.href}
               title={collapsed ? item.name : undefined}
               className={cn(
-                "group relative flex items-center gap-3 py-3 px-3 mx-1 rounded-xl text-[13px] font-bold transition-all duration-200 overflow-hidden",
+                "group relative flex items-center gap-3 py-3 px-3 mx-1 rounded-sm text-[11px] font-medium uppercase tracking-[0.13em] transition-all duration-200 overflow-hidden",
                 isActive
-                  ? "bg-gradient-to-r from-[var(--gold)]/25 via-[var(--gold)]/10 to-transparent text-white ring-1 ring-inset ring-[var(--gold)]/25"
+                  ? "bg-gradient-to-r from-[var(--gold)]/20 via-[var(--gold)]/8 to-transparent text-white ring-1 ring-inset ring-[var(--gold)]/25"
                   : "text-white/55 hover:bg-white/5 hover:text-white",
               )}
             >
               {/* Gold accent bar on the active item */}
-              {isActive && <span className="absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-[var(--gold)]" />}
+              {isActive && <span className="absolute left-0 top-2 bottom-2 w-0.5 bg-[var(--gold)]" />}
               <item.icon
-                size={20}
+                size={19}
+                strokeWidth={1.6}
                 className={cn("flex-shrink-0 transition-colors", isActive ? "text-[var(--gold)]" : "text-white/40 group-hover:text-white/70")}
               />
               <span className={cn("flex-1", label(!collapsed))}>{item.name}</span>

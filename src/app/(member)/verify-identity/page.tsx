@@ -4,7 +4,7 @@ import { ShieldCheck, Clock, MailWarning } from "lucide-react"
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
 import { reviewTypeForEmail } from "@/server/services/registration"
-import { PageHeader } from "@/components/ui/page-header"
+import { LuxPageHeader } from "@/components/ui/lux"
 import { VerifyIdentityForm } from "./verify-identity-form"
 
 export const dynamic = "force-dynamic"
@@ -92,7 +92,7 @@ export default async function VerifyIdentityPage() {
           </p>
         </div>
       )}
-      <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6 sm:p-8">
+      <div className="bg-surface rounded-md border border-[var(--hair)] p-6 sm:p-8">
         <p className="text-sm text-neutral mb-6">
           {type === "fast_track"
             ? "Your institutional email qualifies for fast-track review — upload your staff ID to complete verification."
@@ -107,7 +107,7 @@ export default async function VerifyIdentityPage() {
 function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div className="max-w-xl mx-auto pb-12">
-      <PageHeader
+      <LuxPageHeader eyebrow="Verification"
         title="Verify your identity"
         subtitle="Complete verification to unlock the full UnSwap network."
       />
@@ -134,8 +134,8 @@ function StateCard({
       ? "bg-[var(--teal-light)] text-[var(--teal)]"
       : "bg-[var(--parchment)] text-[var(--gold-dark)]"
   return (
-    <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-8 text-center">
-      <div className={`mx-auto w-14 h-14 rounded-2xl flex items-center justify-center mb-5 ${toneClass}`}>
+    <div className="bg-surface rounded-md border border-[var(--hair)] p-8 text-center">
+      <div className={`mx-auto w-14 h-14 rounded-md flex items-center justify-center mb-5 ${toneClass}`}>
         {icon}
       </div>
       <h2 className="font-display text-2xl font-bold text-[var(--fg)]">{title}</h2>

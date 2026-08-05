@@ -75,7 +75,7 @@ function SwapCard({ swap, role }: { swap: SwapRow; role: "incoming" | "outgoing"
   const btn = "inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
 
   return (
-    <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-5">
+    <div className="bg-surface rounded-md border border-[var(--hair)] p-5">
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
           <span className="w-10 h-10 rounded-xl bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center text-xs font-bold">
@@ -105,15 +105,15 @@ function SwapCard({ swap, role }: { swap: SwapRow; role: "incoming" | "outgoing"
 
       {countering && (
         <div className="mt-3 flex flex-wrap items-end gap-2">
-          <input type="date" value={cStart} onChange={(e) => setCStart(e.target.value)} className="px-3 py-2 border border-[var(--border)] rounded-lg text-sm" />
-          <input type="date" value={cEnd} onChange={(e) => setCEnd(e.target.value)} className="px-3 py-2 border border-[var(--border)] rounded-lg text-sm" />
+          <input type="date" value={cStart} onChange={(e) => setCStart(e.target.value)} className="px-3 py-2 border border-[var(--hair)] rounded-lg text-sm" />
+          <input type="date" value={cEnd} onChange={(e) => setCEnd(e.target.value)} className="px-3 py-2 border border-[var(--hair)] rounded-lg text-sm" />
           <button disabled={busy} onClick={() => act("counter", { startDate: cStart, endDate: cEnd })} className={`${btn} text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)]`}>Send counter</button>
           <button onClick={() => setCountering(false)} className={`${btn} text-neutral bg-neutral-light`}>Cancel</button>
         </div>
       )}
 
       {/* Actions */}
-      <div className="mt-4 pt-3 border-t border-[var(--border)] flex flex-wrap gap-2">
+      <div className="mt-4 pt-3 border-t border-[var(--hair)] flex flex-wrap gap-2">
         {role === "incoming" && swap.status === "REQUESTED" && !countering && (
           <>
             <button disabled={busy} onClick={() => act("accept")} className={`${btn} text-white bg-[var(--teal)] hover:opacity-90`}><Check size={14} /> Accept</button>
@@ -166,8 +166,8 @@ export function SwapsClient({
     <button
       onClick={() => setTab(key)}
       className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
-        tab === key ? "bg-[var(--navy)] text-white" : "text-neutral-dark hover:bg-neutral-light"
-      }`}
+ tab === key ? "bg-[var(--navy)] text-white" : "text-neutral-dark hover:bg-neutral-light"
+ }`}
     >
       {label} {count > 0 && <span className={tab === key ? "text-[var(--gold)]" : "text-neutral"}>({count})</span>}
     </button>
@@ -182,7 +182,7 @@ export function SwapsClient({
       </div>
 
       {data.length === 0 ? (
-        <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-12 text-center">
+        <div className="bg-surface rounded-md border border-[var(--hair)] p-12 text-center">
           <p className="text-sm text-neutral">
             {tab === "incoming" && "No incoming requests right now."}
             {tab === "outgoing" && "You haven't sent any swap requests yet."}

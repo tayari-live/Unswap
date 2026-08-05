@@ -3,7 +3,7 @@ import { redirect } from "next/navigation"
 import { ShieldAlert, Check, X } from "lucide-react"
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
-import { PageHeader } from "@/components/ui/page-header"
+import { LuxPageHeader } from "@/components/ui/lux"
 import { ListingWizard } from "../listing-wizard"
 
 export const dynamic = "force-dynamic"
@@ -25,11 +25,11 @@ export default async function NewListingPage() {
 
   return (
     <div className="max-w-2xl mx-auto pb-12">
-      <PageHeader title="Add a listing" subtitle="List a home for exchange across the network." />
+      <LuxPageHeader eyebrow="New Listing" title="Add a listing" subtitle="List a home for exchange across the network." />
       {canList ? (
         <ListingWizard mode="create" />
       ) : (
-        <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-8">
+        <div className="bg-surface rounded-md border border-[var(--hair)] p-8">
           <div className="flex items-center gap-3 mb-5">
             <ShieldAlert size={22} className="text-[var(--gold-dark)]" />
             <h2 className="font-display text-xl font-bold text-[var(--fg)]">A few steps before you can list</h2>

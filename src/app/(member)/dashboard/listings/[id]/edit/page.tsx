@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
 import { auth } from "@/server/auth"
 import { getMemberListing } from "@/server/services/listings"
-import { PageHeader } from "@/components/ui/page-header"
+import { LuxPageHeader } from "@/components/ui/lux"
 import { ListingWizard, type WizardValues } from "../../listing-wizard"
 
 export const dynamic = "force-dynamic"
@@ -46,7 +46,7 @@ export default async function EditListingPage({ params }: { params: Promise<{ id
 
   return (
     <div className="max-w-2xl mx-auto pb-12">
-      <PageHeader title="Edit listing" subtitle="Update the details of your home." />
+      <LuxPageHeader eyebrow="Edit Listing" title="Edit listing" subtitle="Update the details of your home." />
       <ListingWizard mode="edit" initial={initial} />
     </div>
   )
