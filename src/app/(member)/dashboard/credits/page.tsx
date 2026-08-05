@@ -3,6 +3,7 @@ import { Coins, ArrowUpRight, ArrowDownRight, Info } from "lucide-react"
 import { auth } from "@/server/auth"
 import { getCreditsLedger } from "@/server/services/credits"
 import { LuxPageHeader } from "@/components/ui/lux"
+import { PageTip } from "@/components/ui/page-tip"
 
 export const dynamic = "force-dynamic"
 
@@ -20,6 +21,7 @@ export default async function CreditsPage() {
   return (
     <div className="max-w-3xl mx-auto pb-12">
       <LuxPageHeader eyebrow="Balance" title="UnSwap Credits" subtitle="Host now, stay later. Your non-simultaneous exchange balance." />
+      <PageTip id="credits">One credit is one night. Earn them by hosting or through milestones, and spend them to stay with a peer when you are not swapping at the same time.</PageTip>
 
       {/* Balance + summary */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">

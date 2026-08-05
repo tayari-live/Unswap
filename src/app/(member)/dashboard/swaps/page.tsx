@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import { auth } from "@/server/auth"
 import { listMemberSwaps } from "@/server/services/swaps"
 import { LuxPageHeader } from "@/components/ui/lux"
+import { PageTip } from "@/components/ui/page-tip"
 import { SwapsClient, type SwapRow } from "./swaps-client"
 
 export const dynamic = "force-dynamic"
@@ -30,6 +31,7 @@ export default async function SwapRequestsPage() {
   return (
     <div className="max-w-4xl mx-auto pb-12">
       <LuxPageHeader eyebrow="Requests" title="Swap Requests" subtitle="Manage incoming and outgoing exchange requests." />
+      <PageTip id="swaps">Requests you send and receive live here. Nothing is confirmed until both sides agree on the dates.</PageTip>
       <SwapsClient
         incoming={incoming.map(toRow)}
         outgoing={outgoing.map(toRow)}

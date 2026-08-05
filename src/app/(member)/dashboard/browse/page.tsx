@@ -5,6 +5,7 @@ import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
 import { searchListings } from "@/server/services/discovery"
 import { LuxPageHeader } from "@/components/ui/lux"
+import { PageTip } from "@/components/ui/page-tip"
 import { BrowseControls } from "./browse-controls"
 import { FavouriteButton } from "./favourite-button"
 import { ResendMyVerification } from "./confirm-email-gate"
@@ -37,6 +38,7 @@ export default async function BrowsePage({
     return (
       <div className="max-w-2xl mx-auto pb-12">
         <LuxPageHeader eyebrow="The Portfolio" title="Discover Homes" subtitle="Browse verified homes across the network." />
+      <PageTip id="discover">Every home here belongs to a verified peer. Save the ones you like, then send a swap request when your dates are set.</PageTip>
         <div className="bg-surface rounded-md border border-[var(--hair)] p-10 text-center">
           <div className="mx-auto w-14 h-14 rounded-md bg-[var(--parchment)] text-[var(--gold-dark)] flex items-center justify-center mb-5">
             <MailWarning size={26} />
@@ -93,6 +95,7 @@ export default async function BrowsePage({
   return (
     <div className="max-w-6xl mx-auto pb-12">
       <LuxPageHeader eyebrow="The Portfolio" title="Discover Homes" subtitle="Browse verified homes across the network." />
+      <PageTip id="discover">Every home here belongs to a verified peer. Save the ones you like, then send a swap request when your dates are set.</PageTip>
       <BrowseControls initial={filters} />
 
       <p className="text-sm text-neutral mb-4">

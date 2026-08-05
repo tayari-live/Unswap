@@ -6,6 +6,7 @@ import { auth } from "@/server/auth"
 import { listMemberExchanges } from "@/server/services/swaps"
 import { pendingReviewsFor } from "@/server/services/reviews"
 import { LuxPageHeader } from "@/components/ui/lux"
+import { PageTip } from "@/components/ui/page-tip"
 import { ReviewAction } from "./review-action"
 
 export const dynamic = "force-dynamic"
@@ -93,6 +94,7 @@ export default async function ExchangesPage() {
   return (
     <div className="max-w-4xl mx-auto pb-12">
       <LuxPageHeader eyebrow="Exchanges" title="My Exchanges" subtitle="Your confirmed and completed home exchanges." />
+      <PageTip id="exchanges">Confirmed and completed exchanges appear here. After a stay, leave a review to build your trust score.</PageTip>
 
       {upcoming.length === 0 && past.length === 0 ? (
         <div className="bg-surface rounded-md border border-[var(--hair)] p-12 text-center">
