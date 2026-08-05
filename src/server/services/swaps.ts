@@ -3,6 +3,7 @@ import { ApiError } from "@/server/http"
 import { logAudit } from "@/server/services/audit"
 import { sendEmail, renderEmail, esc } from "@/server/email"
 import { notifyAllowed } from "@/server/services/notify"
+import { getAvailableCredits } from "@/server/services/credits"
 
 const APP = () => process.env.AUTH_URL || "http://localhost:3000"
 const fmtD = (d: Date) =>
@@ -87,6 +88,27 @@ const earnAmount = (n: number) => (n >= 7 && n <= 14 ? Math.ceil(n * 1.5) : n)
  * confirmation (tracked via `consumesSlot`). The period is anchored to the
  * subscription renewal date.
  */
+/**
+ * A credits stay must be fully funded. Checked when the request is made so the
+ * requester finds out immediately, and again on acceptance because the dates
+ * (and therefore the cost) can change through a counter-offer, and other swaps
+ * may have been accepted in between. A shortfall blocks: balances never go
+ * negative.
+ */
+async function assertCanAffordCredits(requesterId: string, start: Date, end: Date, atAccept = false) {
+  const cost = nightsBetween(start, end)
+  const { available } = await getAvailableCredits(requesterId)
+  if (available >= cost) return
+
+  const short = cost - available
+  throw new ApiError(
+    402,
+    atAccept
+      ? `This exchange costs ${cost} credit${cost === 1 ? "" : "s"} and the requester is ${short} short. They need to earn more credits before it can be accepted.`
+      : `This stay costs ${cost} credit${cost === 1 ? "" : "s"} and you have ${available} available. Host a fellow member to earn ${short} more, or choose a simultaneous exchange.`,
+  )
+}
+
 async function assertWithinExchangeLimit(requesterId: string) {
   const sub = await prisma.subscription.findUnique({ where: { userId: requesterId } })
   if (!sub || sub.status !== "active" || sub.exchangesPerYear === -1) return
@@ -241,6 +263,11 @@ export async function createSwapRequest(input: {
     if (!fits) throw new ApiError(400, "Your stay length doesn't match this home's offered swap durations.")
   }
 
+  // A credits stay is funded by the requester, so refuse one they cannot cover.
+  if (input.mode === "credits") {
+    await assertCanAffordCredits(input.requesterId, start, end)
+  }
+
   const swap = await prisma.swapRequest.create({
     data: {
       requesterId: input.requesterId,
@@ -360,10 +387,24 @@ export async function respondToSwap(input: {
       throw new ApiError(400, "Unknown action.")
   }
 
+  const accepting = input.action === "accept" || input.action === "accept_counter"
+
+  // Re-check funding before confirming: a counter-offer may have changed the
+  // dates, and the requester may have committed credits elsewhere since. This
+  // runs before the update so a shortfall leaves the swap untouched.
+  if (accepting && swap.mode === "credits") {
+    await assertCanAffordCredits(
+      swap.requesterId,
+      (data.startDate as Date) ?? swap.startDate,
+      (data.endDate as Date) ?? swap.endDate,
+      true,
+    )
+  }
+
   await prisma.swapRequest.update({ where: { id: swap.id }, data })
 
   // Credits mode: confirming creates the host's pending earn (posted on completion).
-  if ((input.action === "accept" || input.action === "accept_counter") && swap.mode === "credits") {
+  if (accepting && swap.mode === "credits") {
     await prisma.creditTransaction.create({
       data: { userId: swap.hostId, swapId: swap.id, type: "earned", amount: earnAmount(nightsBetween(swap.startDate, swap.endDate)), status: "pending" },
     })

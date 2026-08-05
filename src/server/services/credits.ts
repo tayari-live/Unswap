@@ -12,6 +12,33 @@ export const CREDIT_GRANTS = {
 } as const
 export type GrantReason = keyof typeof CREDIT_GRANTS
 
+const DAY = 24 * 60 * 60 * 1000
+const nights = (s: Date, e: Date) => Math.max(1, Math.round((e.getTime() - s.getTime()) / DAY))
+
+/**
+ * What a member can actually commit right now.
+ *
+ * `balance` is the confirmed ledger. `held` is what accepted-but-unfinished
+ * credits swaps will spend when they complete — without subtracting it, someone
+ * with five credits could accept three five-night stays and only go negative
+ * once the ledger caught up. `available` is the figure to gate on.
+ */
+export async function getAvailableCredits(userId: string) {
+  const [txns, committed] = await Promise.all([
+    prisma.creditTransaction.findMany({
+      where: { userId, status: "confirmed" },
+      select: { type: true, amount: true },
+    }),
+    prisma.swapRequest.findMany({
+      where: { requesterId: userId, mode: "credits", status: { in: ["CONFIRMED", "IN_PROGRESS"] } },
+      select: { startDate: true, endDate: true },
+    }),
+  ])
+  const balance = txns.reduce((n, t) => n + (t.type === "earned" ? t.amount : -t.amount), 0)
+  const held = committed.reduce((n, s) => n + nights(s.startDate, s.endDate), 0)
+  return { balance, held, available: balance - held }
+}
+
 /**
  * Grant a one-time free-credit bonus. Idempotent per (user, reason): a member
  * can never earn the same bonus twice (re-publishing a listing, re-verifying,
