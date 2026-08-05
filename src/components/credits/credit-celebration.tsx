@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
 import confetti from "canvas-confetti"
@@ -29,18 +29,28 @@ export function CreditCelebration() {
   const pathname = usePathname()
   const [grants, setGrants] = useState<Grant[]>([])
   const [open, setOpen] = useState(false)
+  // Grants already celebrated in this tab. Clicking "View my credits" navigates
+  // immediately, so the next route's check can otherwise outrun the POST below
+  // and show the same grants a second time.
+  const dismissed = useRef<Set<string>>(new Set())
+  const marking = useRef<Promise<unknown> | null>(null)
 
   useEffect(() => {
     let cancelled = false
-    // Don't interrupt the onboarding wizard or the chat.
+    // Don't interrupt the onboarding wizard.
     if (pathname?.startsWith("/onboarding")) return
     ;(async () => {
       try {
+        // Let any in-flight "mark celebrated" settle first.
+        if (marking.current) await marking.current
+        if (cancelled) return
         const res = await fetch("/api/credits/celebrate", { cache: "no-store" })
         if (!res.ok) return
         const data = await res.json()
         if (cancelled || !data.grants?.length) return
-        setGrants(data.grants)
+        const fresh = (data.grants as Grant[]).filter((g) => !dismissed.current.has(g.id))
+        if (!fresh.length) return
+        setGrants(fresh)
         setOpen(true)
         setTimeout(burst, 250)
       } catch {
@@ -52,12 +62,15 @@ export function CreditCelebration() {
 
   const dismiss = useCallback(async () => {
     setOpen(false)
-    try {
-      await fetch("/api/credits/celebrate", { method: "POST" })
-    } catch {
-      /* if this fails the member simply sees it again next load */
-    }
-  }, [])
+    // Record synchronously, before any await, so a navigation triggered by the
+    // same click cannot re-show these grants.
+    grants.forEach((g) => dismissed.current.add(g.id))
+    const done = fetch("/api/credits/celebrate", { method: "POST" }).catch(() => {
+      /* if this fails the member simply sees it again on a later visit */
+    })
+    marking.current = done
+    await done
+  }, [grants])
 
   // Close on Escape.
   useEffect(() => {

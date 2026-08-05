@@ -11,6 +11,10 @@ const ORGANISATIONS = [
   "United Nations", "UNDP", "UNICEF", "WHO", "UNHCR", "IMF", "World Bank Group",
   "ILO", "FAO", "WFP", "UNAIDS", "UNEP", "UNFPA", "UN-Habitat", "OCHA", "Other",
 ]
+// A bio only earns its place if it says something. Short enough to write in one
+// sitting, long enough to be more than a job title. Skipping remains an option.
+const MIN_BIO = 40
+
 const MAX_BYTES = 5 * 1024 * 1024
 const ACCEPT = "image/png,image/jpeg,image/webp"
 
@@ -86,6 +90,10 @@ export function ProfileWizard({
 
   function screenValid(s: number): string | null {
     if (SCREENS[s].key === "fullName" && !v.fullName.trim()) return "Display name is required."
+    if (SCREENS[s].key === "bio") {
+      const len = v.bio.trim().length
+      if (len > 0 && len < MIN_BIO) return `A sentence or two works best — ${MIN_BIO - len} more character${MIN_BIO - len === 1 ? "" : "s"} to go.`
+    }
     return null
   }
 
@@ -135,7 +143,13 @@ export function ProfileWizard({
   // optional question without answering. Photo counts as answered once added;
   // the review screen has no field to fill.
   const answered =
-    key === "review" ? true : key === "photo" ? !!v.imageUrl : String((v as any)[key] ?? "").trim().length > 0
+    key === "review"
+      ? true
+      : key === "photo"
+      ? !!v.imageUrl
+      : key === "bio"
+      ? v.bio.trim().length >= MIN_BIO
+      : String((v as any)[key] ?? "").trim().length > 0
 
   return (
     <div>
@@ -222,9 +236,16 @@ export function ProfileWizard({
 
         {key === "bio" && (
           <div>
-            <Heading title="Tell members about yourself" sub="A short introduction — your work, your interests, what you're looking for." />
+            <Heading title="Tell members about yourself" sub="A short introduction. Your work, your interests, what you are looking for." />
             <label className={label}>Bio</label>
             <textarea rows={5} className={input} value={v.bio} onChange={(e) => set("bio", e.target.value)} placeholder="A short introduction for fellow members." />
+            <p className="mt-2 text-xs text-neutral">
+              {v.bio.trim().length === 0
+                ? `At least ${MIN_BIO} characters, or skip this for now.`
+                : v.bio.trim().length < MIN_BIO
+                ? `${MIN_BIO - v.bio.trim().length} more character${MIN_BIO - v.bio.trim().length === 1 ? "" : "s"} to go.`
+                : "Looks good."}
+            </p>
           </div>
         )}
 
