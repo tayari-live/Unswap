@@ -12,14 +12,6 @@ function fmtDate(d: Date) {
 
 export const dynamic = "force-dynamic"
 
-const VERIFICATION_LABELS: Record<string, string> = {
-  PENDING_EMAIL: "Email not confirmed",
-  EMAIL_VERIFIED: "Email verified",
-  PENDING_ID_REVIEW: "ID under review",
-  FULLY_VERIFIED: "Fully verified",
-  REJECTED: "Verification rejected",
-  SUSPENDED: "Suspended",
-}
 
 export default async function ProfilePage() {
   const session = await auth()
@@ -30,7 +22,6 @@ export default async function ProfilePage() {
   if (!user) redirect("/login")
 
   const reviews = await listReviewsForUser(userId)
-  const hostReviews = reviews.filter((r) => r.aboutHost)
 
   const initial = {
     fullName: user.fullName ?? "",
@@ -46,36 +37,6 @@ export default async function ProfilePage() {
   return (
     <div className="max-w-2xl mx-auto pb-12">
       <LuxPageHeader eyebrow="Your Profile" title="Profile" subtitle="How you appear to other members of the network." />
-
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
-        <div className="bg-surface rounded-md border border-[var(--hair)] p-5">
-          <div className="text-xs text-neutral uppercase tracking-wide font-semibold">Profile completion</div>
-          <div className="mt-2 flex items-center gap-3">
-            <div className="flex-1 h-2 rounded-full bg-neutral-light overflow-hidden">
-              <div className="h-full bg-[var(--gold)]" style={{ width: `${user.profileCompletion}%` }} />
-            </div>
-            <span className="text-sm font-bold text-[var(--fg)]">{user.profileCompletion}%</span>
-          </div>
-        </div>
-        <div className="bg-surface rounded-md border border-[var(--hair)] p-5">
-          <div className="text-xs text-neutral uppercase tracking-wide font-semibold">Verification</div>
-          <div className="mt-2 text-sm font-semibold text-[var(--fg)]">
-            {VERIFICATION_LABELS[user.verificationStatus] ?? user.verificationStatus}
-          </div>
-        </div>
-        <div className="bg-surface rounded-md border border-[var(--hair)] p-5">
-          <div className="text-xs text-neutral uppercase tracking-wide font-semibold">Trust score</div>
-          <div className="mt-2 flex items-center gap-1.5">
-            <Star size={16} className="text-[var(--gold)]" fill={user.trustScore != null ? "currentColor" : "none"} />
-            <span className="text-sm font-bold text-[var(--fg)]">
-              {user.trustScore != null ? user.trustScore.toFixed(1) : "New host"}
-            </span>
-            {hostReviews.length > 0 && (
-              <span className="text-xs text-neutral">· {hostReviews.length} review{hostReviews.length === 1 ? "" : "s"}</span>
-            )}
-          </div>
-        </div>
-      </div>
 
       <div className="bg-surface rounded-md border border-[var(--hair)] p-6 sm:p-8">
         <ProfileWizard initial={initial} />

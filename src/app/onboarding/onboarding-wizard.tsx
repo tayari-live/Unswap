@@ -11,18 +11,19 @@ import { SectionLabel, LUX_GOLD_BTN, LUX_GHOST_BTN } from "@/components/ui/lux"
 
 const STEPS = ["Welcome", "Your profile", "Your first home", "Explore"]
 
+// How complete a profile must be before onboarding lets you move on. Members can
+// finish the rest later; the dashboard checklist keeps nudging toward 100%.
+const MIN_TO_CONTINUE = 50
+
 export function OnboardingWizard({
   firstName,
   initialProfile,
-  initialCompletion,
 }: {
   firstName: string
   initialProfile: ProfileValues
-  initialCompletion: number
 }) {
   const router = useRouter()
   const [step, setStep] = useState(1)
-  const [completion, setCompletion] = useState(initialCompletion)
   const [hint, setHint] = useState("")
   const [leaving, setLeaving] = useState(false)
 
@@ -89,15 +90,14 @@ export function OnboardingWizard({
             <SectionLabel>Your Profile</SectionLabel>
             <h1 className="font-display text-3xl font-light leading-[1.15] text-[var(--fg)]">Complete your profile</h1>
             <p className="mt-2 mb-6 text-sm text-neutral leading-relaxed">
-              Members exchange with people, not listings. One question at a time. Reach 50% to continue.
+              Members exchange with people, not listings. One question at a time. Reach {MIN_TO_CONTINUE}% to continue.
             </p>
             {hint && <p className="mb-4 text-xs text-[var(--crimson)] font-medium">{hint}</p>}
             <ProfileWizard
               initial={initialProfile}
               onSaved={(c) => {
-                setCompletion(c)
-                if (c >= 50) { setHint(""); setStep(3) }
-                else setHint(`You're at ${c}% — add a little more to reach 50% and continue.`)
+                if (c >= MIN_TO_CONTINUE) { setHint(""); setStep(3) }
+                else setHint(`You are at ${c}%. Add a little more to reach ${MIN_TO_CONTINUE}% and continue.`)
               }}
             />
           </div>

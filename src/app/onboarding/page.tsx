@@ -32,7 +32,6 @@ export default async function OnboardingPage() {
       <OnboardingWizard
         firstName={user.firstName}
         initialProfile={initialProfile}
-        initialCompletion={user.profileCompletion}
       />
     </div>
   )
