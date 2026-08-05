@@ -5,6 +5,7 @@ import { prisma } from "@/server/prisma"
 // row and drives both idempotency and the human label shown to members.
 export const CREDIT_GRANTS = {
   welcome: { amount: 1, title: "Welcome bonus" },
+  profile_complete: { amount: 1, title: "Profile completed" },
   first_listing: { amount: 3, title: "First listing published" },
   verified: { amount: 2, title: "Identity verified" },
   first_subscription: { amount: 3, title: "Subscription bonus" },
@@ -27,6 +28,41 @@ export async function grantCreditsOnce(userId: string, reason: GrantReason) {
     data: { userId, type: "earned", amount, status: "confirmed", reason },
   })
   return { granted: true as const, amount }
+}
+
+export type PendingGrant = { id: string; amount: number; title: string; reason: GrantReason }
+
+/**
+ * Free-credit grants the member has earned but not yet been congratulated for.
+ * Drives the one-time celebration; tracked separately from the notifications
+ * badge so reading the bell never swallows the moment.
+ */
+export async function getUncelebratedGrants(userId: string): Promise<PendingGrant[]> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { creditsCelebratedAt: true },
+  })
+  const since = user?.creditsCelebratedAt ?? new Date(0)
+  const rows = await prisma.creditTransaction.findMany({
+    where: { userId, type: "earned", status: "confirmed", reason: { not: null }, createdAt: { gt: since } },
+    orderBy: { createdAt: "asc" },
+  })
+  return rows
+    .filter((r) => r.reason && r.reason in CREDIT_GRANTS)
+    .map((r) => ({
+      id: r.id,
+      amount: r.amount,
+      reason: r.reason as GrantReason,
+      title: CREDIT_GRANTS[r.reason as GrantReason].title,
+    }))
+}
+
+/** Mark the celebration as shown, so it never repeats for the same grants. */
+export function markCreditsCelebrated(userId: string) {
+  return prisma.user.update({
+    where: { id: userId },
+    data: { creditsCelebratedAt: new Date() },
+  })
 }
 
 export type CreditTxn = {

@@ -16,6 +16,7 @@ import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
 import { LuxPageHeader, SectionLabel } from "@/components/ui/lux"
 import { ResendEmailButton } from "@/components/ui/resend-email-button"
+import { PROFILE_COMPLETE_AT } from "@/server/services/profile"
 
 export const dynamic = "force-dynamic"
 
@@ -79,7 +80,7 @@ export default async function MemberDashboardPage() {
   const credits = earned - spent
 
   const isVerified = user.verificationStatus === "FULLY_VERIFIED"
-  const profileIncomplete = user.profileCompletion < 80
+  const profileIncomplete = user.profileCompletion < PROFILE_COMPLETE_AT
 
   // Getting-started checklist — consolidates the onboarding path; hidden once done.
   const idReview = user.verificationStatus === "PENDING_ID_REVIEW"

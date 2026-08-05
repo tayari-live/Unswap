@@ -2,6 +2,7 @@ import { prisma } from "@/server/prisma"
 import { getUnreadTotal } from "@/server/services/messaging"
 import { pendingReviewsFor } from "@/server/services/reviews"
 import { CREDIT_GRANTS, type GrantReason } from "@/server/services/credits"
+import { PROFILE_COMPLETE_AT } from "@/server/services/profile"
 
 export type MemberNotification = {
   id: string
@@ -113,7 +114,7 @@ export async function getMemberNotifications(userId: string): Promise<MemberNoti
       items.push({ id: "ver-approved", kind: "verified", title: "You're verified", body: "Full network access unlocked. You can now list your home and arrange exchanges.", date: reviewedAt, link: "/dashboard/browse" })
     }
   }
-  if (user && user.profileCompletion < 80) {
+  if (user && user.profileCompletion < PROFILE_COMPLETE_AT) {
     items.push({ id: "prof", kind: "profile", title: "Complete your profile", body: `Your profile is ${user.profileCompletion}% complete`, date: new Date(), link: "/dashboard/profile" })
   }
 

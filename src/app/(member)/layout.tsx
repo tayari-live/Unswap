@@ -4,6 +4,7 @@ import { prisma } from "@/server/prisma"
 import { MemberSidebar } from "@/components/layout/member-sidebar"
 import { MobileNav } from "@/components/layout/mobile-nav"
 import { AppAssistant } from "@/components/assistant/app-assistant"
+import { CreditCelebration } from "@/components/credits/credit-celebration"
 
 export default async function MemberLayout({
   children,

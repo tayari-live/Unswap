@@ -1,5 +1,6 @@
 import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
+import { grantCreditsOnce } from "@/server/services/credits"
 
 const IMAGE_DATA_URL = /^data:image\/(png|jpe?g|webp);base64,/
 const MAX_PHOTO_CHARS = 8_000_000 // ~6 MB encoded
@@ -14,6 +15,12 @@ type ProfileShape = {
   bio: string | null
   linkedinUrl: string | null
 }
+
+/**
+ * The score at which a profile counts as complete. Single source of truth so
+ * the checklist, the nudge notification and the credit reward never disagree.
+ */
+export const PROFILE_COMPLETE_AT = 100
 
 /**
  * Profile completion as a percentage of filled fields.
@@ -97,6 +104,10 @@ export async function updateProfile(userId: string, input: ProfileInput) {
       profileCompletion: completion,
     },
   })
+
+  // Reward a fully completed profile (once per member). Members exchange with
+  // people, not listings, so a complete profile is worth encouraging.
+  if (completion >= PROFILE_COMPLETE_AT) await grantCreditsOnce(userId, "profile_complete")
 
   return { completion }
 }

@@ -52,6 +52,10 @@ model User {
   // member opens their notifications page.
   notificationsSeenAt DateTime?
 
+  // Last time the member saw the credit celebration. Kept separate from
+  // notificationsSeenAt so opening the bell never swallows the celebration.
+  creditsCelebratedAt DateTime?
+
   // Presence: bumped on activity; recent value => "online" in chat.
   lastSeenAt         DateTime?
 
