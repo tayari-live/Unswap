@@ -30,10 +30,15 @@ export default async function BrowsePage({
   // The network is a walled garden: browsing requires at least a confirmed
   // institutional email (EMAIL_VERIFIED). Full verification is only needed
   // later, to request or accept a swap.
-  const viewer = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { email: true, verificationStatus: true },
-  })
+  // The gate check and the URL filters are independent — resolve them together
+  // so the page costs one round-trip instead of two.
+  const [viewer, sp] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true, verificationStatus: true },
+    }),
+    searchParams,
+  ])
   if (viewer?.verificationStatus === "PENDING_EMAIL") {
     return (
       <div className="max-w-2xl mx-auto pb-12">
@@ -58,7 +63,6 @@ export default async function BrowsePage({
     )
   }
 
-  const sp = await searchParams
   const filters = {
     q: sp.q ?? "",
     propertyType: sp.type ?? "",
