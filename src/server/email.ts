@@ -15,36 +15,99 @@ export type SendEmailParams = {
   text?: string
 }
 
+/*
+ * Branded email shell — the editorial-luxury language of the app, rendered for
+ * email clients: tables (Outlook ignores flex/grid), inline styles (no <style>
+ * support in Gmail), a Georgia serif stack standing in for Cormorant (webfonts
+ * are unreliable in mail), and a bulletproof table-based CTA button.
+ */
+const NAVY = "#0a0e1a"
+const CREAM = "#f5f0e8"
+const GOLD = "#c9a84c"
+const GOLD_DEEP = "#9a7c2c"
+const HAIR = "#e3d8b8"
+const INK = "#2b3242"
+const MUTED = "#6b7689"
+
+const SERIF = "Georgia,'Times New Roman',Times,serif"
+const SANS = "'Helvetica Neue',Helvetica,Arial,sans-serif"
+
 /**
- * Wrap content in the branded UnSwap email shell (navy header, gold CTA).
- * Keeps all transactional emails visually consistent.
+ * Wrap content in the branded UnSwap email shell.
+ *
+ * `preheader` is the grey preview line mail clients show beside the subject —
+ * without it they scrape the first visible text, which is usually the wordmark.
  */
 export function renderEmail(opts: {
   heading: string
   body: string // HTML (paragraphs)
   ctaLabel?: string
   ctaUrl?: string
+  eyebrow?: string
+  preheader?: string
+  footnote?: string
 }): string {
-  const { heading, body, ctaLabel, ctaUrl } = opts
+  const { heading, body, ctaLabel, ctaUrl, eyebrow, preheader, footnote } = opts
+
+  // Bulletproof button: a single-cell table renders reliably everywhere.
   const cta =
     ctaLabel && ctaUrl
-      ? `<a href="${ctaUrl}" style="display:inline-block;margin-top:20px;background:#9A7C2C;color:#ffffff;text-decoration:none;font-weight:bold;font-size:14px;padding:12px 22px;border-radius:10px">${ctaLabel}</a>`
+      ? `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:30px 0 6px">
+           <tr><td align="center" bgcolor="${GOLD}" style="background:${GOLD};">
+             <a href="${ctaUrl}" style="display:inline-block;padding:15px 34px;font-family:${SANS};font-size:12px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:${NAVY};text-decoration:none;">${ctaLabel}</a>
+           </td></tr>
+         </table>`
       : ""
-  return `
-  <div style="font-family:Helvetica,Arial,sans-serif;max-width:560px;margin:0 auto;border:1px solid #E3E7EE;border-radius:16px;overflow:hidden">
-    <div style="background:#0B1F3A;padding:20px 28px">
-      <span style="color:#ffffff;font-size:22px;font-weight:bold;font-family:Georgia,'Times New Roman',serif">UnSwap</span>
-    </div>
-    <div style="padding:28px">
-      <h1 style="color:#0B1F3A;font-size:20px;margin:0 0 14px;font-family:Georgia,'Times New Roman',serif">${heading}</h1>
-      <div style="color:#3A4357;font-size:14px;line-height:1.65">${body}</div>
-      ${cta}
-      <p style="color:#6B7689;font-size:11px;margin-top:28px;border-top:1px solid #E3E7EE;padding-top:16px">
-        UnSwap — Enabling Mobility. Empowering Community.<br/>
-        An independent, staff-led platform, not affiliated with the United Nations.
-      </p>
-    </div>
-  </div>`
+
+  const eyebrowRow = eyebrow
+    ? `<p style="margin:0 0 14px;font-family:${SANS};font-size:11px;letter-spacing:0.26em;text-transform:uppercase;color:${GOLD_DEEP};">${eyebrow}</p>`
+    : ""
+
+  const footnoteRow = footnote
+    ? `<p style="margin:22px 0 0;font-family:${SANS};font-size:12px;line-height:1.7;color:${MUTED};">${footnote}</p>`
+    : ""
+
+  // Hidden preview text, padded so clients don't pull body copy in after it.
+  const preview = preheader
+    ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all;">${preheader}${"&#8199;&#65279;&#847; ".repeat(60)}</div>`
+    : ""
+
+  return `<!--[if mso]><style>body,table,td{font-family:Arial,sans-serif !important}</style><![endif]-->
+${preview}
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:${CREAM};margin:0;padding:32px 12px;">
+  <tr><td align="center">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="width:600px;max-width:100%;background:#ffffff;border:1px solid ${HAIR};">
+
+      <!-- Masthead -->
+      <tr><td style="background:${NAVY};padding:26px 34px;">
+        <span style="font-family:${SERIF};font-size:23px;font-weight:normal;letter-spacing:0.16em;color:#ffffff;">UnSwap</span>
+      </td></tr>
+      <tr><td style="height:2px;background:${GOLD};font-size:0;line-height:0;">&nbsp;</td></tr>
+
+      <!-- Body -->
+      <tr><td style="padding:38px 34px 34px;">
+        ${eyebrowRow}
+        <h1 style="margin:0 0 16px;font-family:${SERIF};font-size:30px;font-weight:normal;line-height:1.2;color:${NAVY};">${heading}</h1>
+        <div style="font-family:${SANS};font-size:15px;line-height:1.75;color:${INK};">${body}</div>
+        ${cta}
+        ${footnoteRow}
+      </td></tr>
+
+      <!-- Footer -->
+      <tr><td style="border-top:1px solid ${HAIR};padding:22px 34px 28px;background:${CREAM};">
+        <p style="margin:0 0 8px;font-family:${SANS};font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:${GOLD_DEEP};">
+          Enabling Mobility &middot; Empowering Community
+        </p>
+        <p style="margin:0;font-family:${SANS};font-size:11px;line-height:1.7;color:${MUTED};">
+          UnSwap is an independent, staff-led platform. It is not affiliated with, endorsed by, or formally
+          connected to the United Nations, the World Bank Group, the International Monetary Fund, or any
+          international organisation.
+        </p>
+      </td></tr>
+
+    </table>
+  </td></tr>
+</table>`
 }
 
 /**

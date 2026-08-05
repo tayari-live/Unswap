@@ -73,7 +73,15 @@ export async function activateSubscription(
     await sendEmail({
       to: user.email,
       subject: `Your UnSwap ${t.name} membership is active`,
-      html: `<h2>Welcome aboard, ${user.firstName}.</h2><p>Your <strong>${t.name}</strong> membership is now active. Enjoy your exchanges.</p>`,
+      html: renderEmail({
+        eyebrow: "Membership Active",
+        heading: `Welcome aboard, ${user.firstName}.`,
+        preheader: `Your ${t.name} membership is now active.`,
+        body: `<p style="margin:0 0 14px">Your <strong>${t.name}</strong> membership is now active. You have full access to the network and its verified homes.</p>
+               <p style="margin:0">Three credits have been added to your balance as a subscription bonus.</p>`,
+        ctaLabel: "Browse homes",
+        ctaUrl: `${process.env.AUTH_URL || "http://localhost:3000"}/dashboard/browse`,
+      }),
       text: `Your UnSwap ${t.name} membership is now active.`,
     })
   }

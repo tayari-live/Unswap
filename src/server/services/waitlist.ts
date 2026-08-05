@@ -2,7 +2,7 @@ import { randomBytes } from "crypto"
 import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
 import { logAudit } from "@/server/services/audit"
-import { sendEmail } from "@/server/email"
+import { sendEmail, renderEmail } from "@/server/email"
 import { kitSendWaitlistConfirmation, kitAddToForm, kitUpdateReferralCount, kitConfigured } from "@/server/kit"
 
 const baseUrl = () => process.env.AUTH_URL || "http://localhost:3000"
@@ -223,7 +223,14 @@ export async function inviteAllPending(actorId: string) {
     await sendEmail({
       to: e.email,
       subject: "Your UnSwap early access invitation",
-      html: `<h2>You're invited, ${e.firstName}.</h2><p>Your early access to UnSwap is ready. Sign in to verify your status and claim your founding-member incentives.</p>`,
+      html: renderEmail({
+        eyebrow: "By Invitation",
+        heading: `You're invited, ${e.firstName}.`,
+        preheader: "Your early access to UnSwap is ready.",
+        body: `<p style="margin:0">Your early access to UnSwap is ready. Sign in to verify your professional status and claim your founding-member incentives.</p>`,
+        ctaLabel: "Claim your access",
+        ctaUrl: `${baseUrl()}/register?email=${encodeURIComponent(e.email)}`,
+      }),
     })
   }
   await logAudit({ actorId, action: "WAITLIST_BULK_INVITED", subject: `Invited ${pending.length} pending members` })
@@ -339,11 +346,14 @@ export async function setWaitlistStatus(input: { actorId: string; id: string; st
     await sendEmail({
       to: entry.email,
       subject: "Your UnSwap early access invitation",
-      html: `
-        <h2>You're invited, ${entry.firstName}.</h2>
-        <p>Your early access to UnSwap is ready. As a founding waitlist member you qualify
-        for launch incentives. Sign in to verify your professional status and claim your spot.</p>
-      `,
+      html: renderEmail({
+        eyebrow: "By Invitation",
+        heading: `You're invited, ${entry.firstName}.`,
+        preheader: "Your early access to UnSwap is ready.",
+        body: `<p style="margin:0">Your early access to UnSwap is ready. As a founding waitlist member you qualify for launch incentives. Sign in to verify your professional status and claim your spot.</p>`,
+        ctaLabel: "Claim your access",
+        ctaUrl: `${baseUrl()}/register?email=${encodeURIComponent(entry.email)}`,
+      }),
     })
   }
 

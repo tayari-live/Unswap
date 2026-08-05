@@ -2,7 +2,7 @@ import { randomBytes } from "crypto"
 import bcrypt from "bcryptjs"
 import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
-import { sendEmail } from "@/server/email"
+import { sendEmail, renderEmail } from "@/server/email"
 import { logAudit } from "@/server/services/audit"
 import { grantCreditsOnce } from "@/server/services/credits"
 
@@ -59,17 +59,21 @@ async function issueVerificationLink(
   return sendEmail({
     to: user.email,
     subject: "Confirm your UnSwap email",
-    html: `
-      <h2>Welcome to UnSwap, ${user.firstName}.</h2>
-      <p>Confirm your institutional email to ${
-        fastTrack
-          ? "fast-track your verification"
-          : "continue — your application will then enter manual review"
-      }.</p>
-      <p><a href="${verifyUrl}">Confirm my email</a></p>
-      <p style="color:#6B7689;font-size:12px">This link expires in 24 hours. If you didn't request this, ignore this email.</p>
-    `,
-    text: `Welcome to UnSwap, ${user.firstName}. Confirm your email: ${verifyUrl}`,
+    html: renderEmail({
+      eyebrow: "Verified Access",
+      heading: `Welcome to UnSwap, ${user.firstName}.`,
+      preheader: "Confirm your email to continue your verification.",
+      body: `<p style="margin:0 0 14px">You have joined a closed network built exclusively for UN, World Bank, IMF and international organisation professionals.</p>
+             <p style="margin:0">Confirm your institutional email to ${
+               fastTrack
+                 ? "fast-track your verification."
+                 : "continue. Your application will then enter manual review."
+             }</p>`,
+      ctaLabel: "Confirm my email",
+      ctaUrl: verifyUrl,
+      footnote: "This link expires in 24 hours. If you did not request this, you can safely ignore this email.",
+    }),
+    text: `Welcome to UnSwap, ${user.firstName}. Confirm your email: ${verifyUrl}\n\nThis link expires in 24 hours.`,
   })
 }
 

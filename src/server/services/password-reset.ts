@@ -2,7 +2,7 @@ import { randomBytes } from "crypto"
 import bcrypt from "bcryptjs"
 import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
-import { sendEmail } from "@/server/email"
+import { sendEmail, renderEmail } from "@/server/email"
 import { logAudit } from "@/server/services/audit"
 
 const baseUrl = () => process.env.AUTH_URL || "http://localhost:3000"
@@ -34,13 +34,16 @@ export async function requestPasswordReset(rawEmail: string) {
     await sendEmail({
       to: email,
       subject: "Reset your UnSwap password",
-      html: `
-        <h2>Hello ${user.firstName},</h2>
-        <p>We received a request to reset your password.</p>
-        <p><a href="${resetUrl}">Choose a new password</a></p>
-        <p style="color:#6B7689;font-size:12px">This link expires in 1 hour. If you didn't request this, you can safely ignore it.</p>
-      `,
-      text: `Reset your UnSwap password: ${resetUrl}`,
+      html: renderEmail({
+        eyebrow: "Account Security",
+        heading: `Hello ${user.firstName},`,
+        preheader: "Choose a new password for your UnSwap account.",
+        body: `<p style="margin:0">We received a request to reset the password on your UnSwap account.</p>`,
+        ctaLabel: "Choose a new password",
+        ctaUrl: resetUrl,
+        footnote: "This link expires in 1 hour. If you did not request this, you can safely ignore this email and your password will remain unchanged.",
+      }),
+      text: `Reset your UnSwap password: ${resetUrl}\n\nThis link expires in 1 hour.`,
     })
 
     await logAudit({
