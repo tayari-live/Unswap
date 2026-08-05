@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Eye, EyeOff, CheckCircle2 } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
+import { AuthShell, authInputCls, authLabelCls, authBtnCls } from "@/components/auth/auth-shell"
 
 export function ResetForm() {
   const params = useSearchParams()
@@ -48,31 +49,38 @@ export function ResetForm() {
 
   if (done) {
     return (
-      <div className="text-center">
-        <div className="mx-auto w-14 h-14 rounded-2xl bg-[var(--teal-light)] text-[var(--teal)] flex items-center justify-center mb-5">
-          <CheckCircle2 size={26} />
+      <AuthShell eyebrow="All done" title="Password updated">
+        <div className="text-center">
+          <div className="mx-auto w-16 h-16 border border-wl-border text-wl-gold flex items-center justify-center mb-6">
+            <CheckCircle2 size={26} strokeWidth={1.4} />
+          </div>
+          <p className="text-wl-ivory-dim leading-relaxed">Redirecting you to sign in…</p>
+          <Link href="/login" className={`${authBtnCls} mt-7 inline-block text-center`}>
+            Sign in now
+          </Link>
         </div>
-        <h1 className="font-display text-2xl font-bold text-[var(--navy)]">Password updated</h1>
-        <p className="mt-3 text-neutral">Redirecting you to sign in…</p>
-        <Link
-          href="/login"
-          className="mt-6 inline-flex items-center justify-center py-3 px-6 rounded-xl text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] transition-colors"
-        >
-          Sign in now
-        </Link>
-      </div>
+      </AuthShell>
     )
   }
 
   return (
-    <>
-      <h1 className="font-display text-2xl font-bold text-[var(--navy)]">Choose a new password</h1>
-      <p className="mt-2 text-neutral text-sm">Enter a new password for your account.</p>
-
-      <form className="mt-7 space-y-5" onSubmit={handleSubmit}>
+    <AuthShell
+      eyebrow="Account recovery"
+      title="Choose a new password"
+      subtitle="Enter a new password for your account."
+      footer={
+        <Link
+          href="/login"
+          className="text-[12px] tracking-[0.1em] uppercase font-medium text-wl-gold hover:text-wl-gold-light transition-colors"
+        >
+          Back to sign in
+        </Link>
+      }
+    >
+      <form className="space-y-4" onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="password" className="block text-xs font-semibold uppercase tracking-wider text-[var(--navy)] mb-2">
-            New Password
+          <label htmlFor="password" className={authLabelCls}>
+            New password
           </label>
           <div className="relative flex items-center">
             <input
@@ -83,14 +91,14 @@ export function ResetForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="At least 8 characters"
-              className="block w-full pl-4 pr-11 py-3 border border-[var(--border)] rounded-xl bg-white placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] text-sm text-[var(--navy)] transition-all"
+              className={`${authInputCls} pr-11`}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               tabIndex={-1}
               aria-label={showPassword ? "Hide password" : "Show password"}
-              className="absolute right-3 flex items-center text-neutral hover:text-[var(--navy)] transition-colors"
+              className="absolute right-4 text-wl-muted hover:text-wl-ivory transition-colors"
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
@@ -98,8 +106,8 @@ export function ResetForm() {
         </div>
 
         <div>
-          <label htmlFor="confirm" className="block text-xs font-semibold uppercase tracking-wider text-[var(--navy)] mb-2">
-            Confirm Password
+          <label htmlFor="confirm" className={authLabelCls}>
+            Confirm password
           </label>
           <input
             id="confirm"
@@ -108,24 +116,14 @@ export function ResetForm() {
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
             placeholder="Re-enter password"
-            className="block w-full px-4 py-3 border border-[var(--border)] rounded-xl bg-white placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] text-sm text-[var(--navy)] transition-all"
+            className={authInputCls}
           />
         </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full flex items-center justify-center py-3.5 px-4 rounded-xl text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--gold)] disabled:opacity-50 transition-all duration-200 shadow-sm"
-        >
+        <button type="submit" disabled={loading} className={`${authBtnCls} mt-2`}>
           {loading ? "Updating…" : "Update password"}
         </button>
       </form>
-
-      <div className="mt-8 pt-6 border-t border-[var(--border)] text-center">
-        <Link href="/login" className="text-sm font-semibold text-[var(--gold-dark)] hover:text-[var(--gold-hover)] transition-colors">
-          Back to sign in
-        </Link>
-      </div>
-    </>
+    </AuthShell>
   )
 }

@@ -24,7 +24,9 @@ function domainStatus(email: string): "fast" | "manual" | null {
 }
 
 const inputCls =
-  "w-full bg-white border border-wl-border px-5 py-4 text-wl-ivory placeholder-wl-muted focus:outline-none focus:border-wl-gold focus:shadow-[0_0_0_1px_rgba(201,168,76,0.35)] transition-all duration-300 text-[15px]"
+  // --field-bg flips with the theme; a hardcoded white here left ivory text on
+  // a white field (invisible) once dark mode was added.
+  "w-full bg-[var(--field-bg)] border border-wl-border px-5 py-4 text-wl-ivory placeholder-wl-muted focus:outline-none focus:border-wl-gold focus:shadow-[0_0_0_1px_rgba(201,168,76,0.35)] transition-all duration-300 text-[15px]"
 const labelCls = "block text-wl-ivory-dim text-xs tracking-[0.08em] uppercase font-medium mb-2 pl-1"
 
 export default function RegisterPage() {

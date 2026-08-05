@@ -1,22 +1,20 @@
 import { Suspense } from "react"
-import { Logo } from "@/components/brand/logo"
 import { ResetForm } from "./reset-form"
 
 export const metadata = { title: "UnSwap | Reset Password" }
 
 export default function ResetPasswordPage() {
+  // ResetForm renders the full two-pane shell itself, because its title and
+  // eyebrow change once the password has been updated.
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-[var(--background)]">
-      <div className="w-full max-w-md">
-        <div className="flex justify-center mb-8">
-          <Logo underline wordClassName="text-[var(--navy)]" />
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-wl-navy">
+          <p className="text-sm text-wl-muted">Loading…</p>
         </div>
-        <div className="bg-white rounded-3xl shadow-xl border border-[var(--border)] p-8 sm:p-10">
-          <Suspense fallback={<p className="text-center text-sm text-neutral">Loading…</p>}>
-            <ResetForm />
-          </Suspense>
-        </div>
-      </div>
-    </div>
+      }
+    >
+      <ResetForm />
+    </Suspense>
   )
 }

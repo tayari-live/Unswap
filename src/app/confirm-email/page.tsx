@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { MailCheck } from "lucide-react"
-import { Logo } from "@/components/brand/logo"
+import { AuthShell } from "@/components/auth/auth-shell"
 
 const RESEND_COOLDOWN = 45 // seconds between resends
 
@@ -41,65 +41,62 @@ function ConfirmEmailCard() {
   }
 
   return (
-    <div className="w-full max-w-md bg-surface rounded-2xl border border-[var(--border)] shadow-xl p-8 text-center">
-      <div className="mx-auto w-14 h-14 rounded-2xl bg-[var(--gold)]/15 text-[var(--gold-dark)] flex items-center justify-center mb-5">
-        <MailCheck size={26} />
-      </div>
-      <h1 className="font-display text-2xl font-bold text-[var(--navy)]">Verify your email address</h1>
-
-      <div className="mt-5 rounded-xl bg-[var(--teal-light)] border border-[var(--teal)]/30 p-3.5 text-sm text-[var(--navy)]">
-        A verification link has been sent to{" "}
-        <span className="font-semibold break-all">{email || "your email address"}</span>
-      </div>
-
-      <p className="mt-4 text-sm text-neutral leading-relaxed">
-        Check your inbox. The link in this email expires in 24 hours.
-        {fastTrack && " Your institutional email qualifies for fast-track verification."}
-      </p>
-
-      <div className="mt-6 text-left rounded-xl bg-[var(--background)] border border-[var(--border)] p-4">
-        <p className="text-sm font-semibold text-[var(--navy)]">Didn&apos;t receive an email?</p>
-        <p className="mt-1 text-sm text-neutral leading-relaxed">
-          Check your spam folder and the spelling of your email before requesting
-          another verification email.
+    <AuthShell
+      eyebrow="One more step"
+      title="Verify your email"
+      footer={
+        <p className="text-sm text-wl-ivory-dim">
+          Wrong email address?{" "}
+          <Link href="/register" className="text-wl-gold hover:text-wl-gold-light transition-colors">
+            Sign up again
+          </Link>
         </p>
-        <button
-          type="button"
-          onClick={resend}
-          disabled={!email || cooldown > 0 || resending}
-          className="mt-3 text-sm font-semibold text-[var(--gold-dark)] hover:text-[var(--gold-hover)] underline disabled:no-underline disabled:text-neutral disabled:cursor-not-allowed"
-        >
-          {resending
-            ? "Sending…"
-            : cooldown > 0
-            ? `Resend verification email (${cooldown})`
-            : "Resend verification email"}
-        </button>
-      </div>
+      }
+    >
+      <div className="text-center">
+        <div className="mx-auto w-16 h-16 border border-wl-border text-wl-gold flex items-center justify-center mb-6">
+          <MailCheck size={26} strokeWidth={1.4} />
+        </div>
 
-      <p className="mt-5 text-sm text-neutral">
-        Wrong email address?{" "}
-        <Link href="/register" className="font-semibold text-[var(--gold-dark)] hover:text-[var(--gold-hover)] underline">
-          Sign up again
-        </Link>
-      </p>
-    </div>
+        <div className="border-l-2 border-wl-gold bg-wl-gold-dim px-4 py-3.5 text-sm text-wl-ivory text-left">
+          A verification link has been sent to{" "}
+          <span className="font-medium break-all">{email || "your email address"}</span>
+        </div>
+
+        <p className="mt-4 text-sm text-wl-ivory-dim leading-relaxed">
+          Check your inbox. The link expires in 24 hours.
+          {fastTrack && " Your institutional email qualifies for fast-track verification."}
+        </p>
+
+        <div className="mt-7 text-left border border-wl-border p-5">
+          <p className="text-[11px] tracking-[0.18em] uppercase font-medium text-wl-gold">
+            Didn&apos;t receive it?
+          </p>
+          <p className="mt-2 text-sm text-wl-ivory-dim leading-relaxed">
+            Check your spam folder and the spelling of your email before requesting another.
+          </p>
+          <button
+            type="button"
+            onClick={resend}
+            disabled={!email || cooldown > 0 || resending}
+            className="mt-3 text-[12px] tracking-[0.1em] uppercase font-medium text-wl-gold hover:text-wl-gold-light disabled:text-wl-muted disabled:cursor-not-allowed transition-colors"
+          >
+            {resending
+              ? "Sending…"
+              : cooldown > 0
+              ? `Resend verification email (${cooldown})`
+              : "Resend verification email"}
+          </button>
+        </div>
+      </div>
+    </AuthShell>
   )
 }
 
 export default function ConfirmEmailPage() {
   return (
-    <div className="min-h-screen bg-[var(--parchment)] flex flex-col">
-      <div className="p-6">
-        <Link href="/">
-          <Logo underline wordClassName="text-[var(--navy)]" />
-        </Link>
-      </div>
-      <div className="flex-1 flex items-start sm:items-center justify-center p-6 pb-16">
-        <Suspense fallback={null}>
-          <ConfirmEmailCard />
-        </Suspense>
-      </div>
-    </div>
+    <Suspense fallback={null}>
+      <ConfirmEmailCard />
+    </Suspense>
   )
 }
