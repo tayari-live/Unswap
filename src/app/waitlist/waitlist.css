@@ -1,9 +1,57 @@
 /* Scoped luxury theme for the ported waitlist (/waitlist + /waitlist/success).
    Everything lives under .wl-root so it never touches the rest of the app. */
 
+/*
+ * Two themes, one scope. The class names below are positional, not literal:
+ * "navy" is always the page ground and "ivory" always the primary text, so the
+ * light theme simply inverts their values. Both token systems are themed — the
+ * raw vars (used by inline `var(--…)` styles and the .btn-* classes) and the
+ * --color-wl-* tokens behind the `text-wl-*` / `bg-wl-*` Tailwind utilities.
+ */
+
+/* ── LIGHT (default) — cream ground, navy text, deepened gold for contrast ── */
 .wl-root {
-  /* Raw vars so ported inline `var(--…)` styles resolve exactly as in the
-     original app, without leaking to the global light theme. */
+  --navy: #f5f0e8;
+  --deep: #ede8dd;
+  --gold: #9a7c2c;
+  --gold-light: #c9a84c;
+  --gold-dim: rgba(201, 168, 76, 0.20);
+  --ivory: #0a0e1a;
+  --ivory-dim: rgba(10, 14, 26, 0.68);
+  --cream: #0a0e1a;
+  --muted: rgba(10, 14, 26, 0.45);
+  --border: rgba(201, 168, 76, 0.42);
+  --field-bg: rgba(255, 255, 255, 0.75);
+  --panel: rgba(255, 255, 255, 0.72);
+  --panel-strong: rgba(255, 255, 255, 0.94);
+  --grain-opacity: 0.22;
+  --serif: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  --sans: var(--font-dm-sans), "DM Sans", sans-serif;
+
+  /* Tailwind wl-* utilities read these. */
+  --color-wl-navy: #f5f0e8;
+  --color-wl-deep: #ede8dd;
+  --color-wl-gold: #9a7c2c;
+  --color-wl-gold-light: #c9a84c;
+  --color-wl-gold-dim: rgba(201, 168, 76, 0.20);
+  --color-wl-ivory: #0a0e1a;
+  --color-wl-ivory-dim: rgba(10, 14, 26, 0.68);
+  --color-wl-cream: #0a0e1a;
+  --color-wl-muted: rgba(10, 14, 26, 0.45);
+  --color-wl-border: rgba(201, 168, 76, 0.42);
+
+  min-height: 100vh;
+  background-color: var(--navy);
+  color: var(--ivory);
+  font-family: var(--font-dm-sans), "DM Sans", sans-serif;
+  font-size: 17px;
+  line-height: 1.7;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* ── DARK — the original obsidian/gold treatment ── */
+.dark .wl-root {
   --navy: #0a0e1a;
   --deep: #060910;
   --gold: #c9a84c;
@@ -14,17 +62,21 @@
   --cream: #ede8dd;
   --muted: rgba(245, 240, 232, 0.4);
   --border: rgba(201, 168, 76, 0.25);
-  --serif: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
-  --sans: var(--font-dm-sans), "DM Sans", sans-serif;
+  --field-bg: rgba(10, 14, 26, 0.5);
+  --panel: rgba(10, 14, 26, 0.5);
+  --panel-strong: rgba(10, 14, 26, 0.97);
+  --grain-opacity: 0.5;
 
-  min-height: 100vh;
-  background-color: var(--navy);
-  color: var(--ivory);
-  font-family: var(--font-dm-sans), "DM Sans", sans-serif;
-  font-size: 17px;
-  line-height: 1.7;
-  position: relative;
-  overflow-x: hidden;
+  --color-wl-navy: #0a0e1a;
+  --color-wl-deep: #060910;
+  --color-wl-gold: #c9a84c;
+  --color-wl-gold-light: #e4c97a;
+  --color-wl-gold-dim: rgba(201, 168, 76, 0.18);
+  --color-wl-ivory: #f5f0e8;
+  --color-wl-ivory-dim: rgba(245, 240, 232, 0.65);
+  --color-wl-cream: #ede8dd;
+  --color-wl-muted: rgba(245, 240, 232, 0.4);
+  --color-wl-border: rgba(201, 168, 76, 0.25);
 }
 
 /* Cormorant Garamond for the display headings. */
@@ -40,7 +92,7 @@
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
   pointer-events: none;
   z-index: 9999;
-  opacity: 0.5;
+  opacity: var(--grain-opacity, 0.5);
 }
 
 .wl-root .btn-gold {

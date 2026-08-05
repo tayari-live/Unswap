@@ -54,7 +54,7 @@ function Toast({ message, visible }: { message: string; visible: boolean }) {
     <AnimatePresence>
       {visible && (
         <motion.div initial={{ opacity: 0, y: 16, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 16, scale: 0.95 }} transition={{ duration: 0.22 }} role="status" aria-live="polite"
-          style={{ position: "fixed", bottom: "88px", left: "50%", transform: "translateX(-50%)", background: "rgba(201,168,76,0.96)", color: "#0a0e1a", padding: "10px 22px", borderRadius: "999px", fontSize: "13px", fontWeight: 600, letterSpacing: "0.04em", zIndex: 3000, boxShadow: "0 4px 24px rgba(201,168,76,0.4)", whiteSpace: "nowrap", pointerEvents: "none" }}>
+          style={{ position: "fixed", bottom: "88px", left: "50%", transform: "translateX(-50%)", background: "rgba(201,168,76,0.96)", color: "var(--navy)", padding: "10px 22px", borderRadius: "999px", fontSize: "13px", fontWeight: 600, letterSpacing: "0.04em", zIndex: 3000, boxShadow: "0 4px 24px rgba(201,168,76,0.4)", whiteSpace: "nowrap", pointerEvents: "none" }}>
           ✓ {message}
         </motion.div>
       )}
@@ -85,11 +85,11 @@ function TemplateCard({ template, shareUrl, copiedId, onCopy }: { template: (typ
   const text = template.content.replace("[LINK]", shareUrl)
   const isCopied = copiedId === template.id
   return (
-    <div className={`border rounded-[10px] p-4 transition-all duration-200 ${isCopied ? "border-[rgba(201,168,76,0.5)] bg-[rgba(201,168,76,0.06)]" : "border-[rgba(201,168,76,0.15)] bg-[rgba(10,14,26,0.5)]"}`}>
+    <div className={`border rounded-[10px] p-4 transition-all duration-200 ${isCopied ? "border-[rgba(201,168,76,0.5)] bg-[rgba(201,168,76,0.06)]" : "border-[rgba(201,168,76,0.15)] bg-[var(--panel)]"}`}>
       <div className="flex justify-between items-start gap-3 mb-2.5">
         <div>
           <p className="text-[13px] font-semibold text-[var(--gold)] mb-0.5">{template.title}</p>
-          <p className="text-[11px] text-[rgba(245,240,232,0.4)] tracking-[0.04em]">{template.subtitle}</p>
+          <p className="text-[11px] text-[var(--muted)] tracking-[0.04em]">{template.subtitle}</p>
         </div>
         <button onClick={() => onCopy(template.id, text)} aria-label={`Copy ${template.title} message`}
           className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-semibold tracking-[0.08em] uppercase cursor-pointer transition-colors duration-200 border text-[var(--gold)] border-[rgba(201,168,76,0.25)] ${isCopied ? "bg-[rgba(201,168,76,0.25)]" : "bg-[rgba(201,168,76,0.1)] hover:bg-[rgba(201,168,76,0.18)]"}`}>
@@ -97,7 +97,7 @@ function TemplateCard({ template, shareUrl, copiedId, onCopy }: { template: (typ
           {isCopied ? "Copied" : "Copy"}
         </button>
       </div>
-      <p className="text-[13px] leading-relaxed text-[rgba(245,240,232,0.6)] whitespace-pre-line line-clamp-3">{text}</p>
+      <p className="text-[13px] leading-relaxed text-[var(--ivory-dim)] whitespace-pre-line line-clamp-3">{text}</p>
     </div>
   )
 }
@@ -125,7 +125,7 @@ function StatItem({ label, value, gold }: { label: string; value: string; gold?:
   return (
     <div style={{ textAlign: "center" }}>
       <div style={{ fontSize: "28px", fontFamily: "var(--serif)", fontWeight: 400, lineHeight: 1, color: gold ? "var(--gold)" : "var(--ivory)", marginBottom: "5px" }}>{display}</div>
-      <div style={{ fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.15em", color: "rgba(245,240,232,0.4)" }}>{label}</div>
+      <div style={{ fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.15em", color: "var(--muted)" }}>{label}</div>
     </div>
   )
 }
@@ -152,19 +152,19 @@ function ImagesModal({ show, onClose, onDownload }: { show: boolean; onClose: ()
           style={{ position: "fixed", inset: 0, zIndex: 2000, background: "rgba(10,14,26,0.92)", backdropFilter: "blur(10px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
           <motion.div ref={ref} initial={{ scale: 0.95, opacity: 0, y: 10 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 10 }} transition={{ type: "spring", damping: 28, stiffness: 320 }} onClick={(e) => e.stopPropagation()} className="no-scrollbar"
             style={{ maxWidth: "560px", width: "100%", maxHeight: "85vh", overflowY: "auto", background: "var(--navy)", border: "1px solid rgba(201,168,76,0.3)", borderRadius: "14px", padding: "28px", position: "relative", boxShadow: "0 20px 60px rgba(0,0,0,0.6)" }}>
-            <button onClick={onClose} aria-label="Close image gallery" style={{ position: "absolute", top: "14px", right: "14px", background: "rgba(245,240,232,0.06)", border: "1px solid rgba(245,240,232,0.1)", borderRadius: "6px", color: "rgba(245,240,232,0.5)", cursor: "pointer", padding: "6px", lineHeight: 0 }}>
+            <button onClick={onClose} aria-label="Close image gallery" style={{ position: "absolute", top: "14px", right: "14px", background: "var(--panel)", border: "1px solid var(--border)", borderRadius: "6px", color: "var(--ivory-dim)", cursor: "pointer", padding: "6px", lineHeight: 0 }}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
             <h3 style={{ fontSize: "20px", color: "var(--gold)", marginBottom: "6px", fontFamily: "var(--serif)", fontWeight: 400 }}>Shareable Images</h3>
-            <p style={{ fontSize: "13px", color: "rgba(245,240,232,0.55)", marginBottom: "20px", lineHeight: 1.5 }}>Click any image to download it for your post.</p>
+            <p style={{ fontSize: "13px", color: "var(--ivory-dim)", marginBottom: "20px", lineHeight: 1.5 }}>Click any image to download it for your post.</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {SHARE_IMAGES.map((img, i) => (
                 <div key={i} role="button" tabIndex={0} aria-label={`Download ${img.label} image`} onClick={() => onDownload(img.src, img.name)} onKeyDown={(e) => e.key === "Enter" && onDownload(img.src, img.name)}
                   className="relative cursor-pointer rounded-lg overflow-hidden border border-[rgba(201,168,76,0.15)] transition-all duration-200 hover:border-[rgba(201,168,76,0.5)] hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(201,168,76,0.15)] group">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={img.src} alt={img.label} className="w-full block object-cover" style={{ aspectRatio: img.ratio }} />
-                  <div className="absolute bottom-0 left-0 right-0 py-1.5 px-2 bg-gradient-to-t from-[rgba(10,14,26,0.85)] to-transparent text-[10px] font-medium tracking-[0.08em] uppercase text-[rgba(245,240,232,0.7)]">{img.label}</div>
-                  <div className="absolute inset-0 bg-[rgba(10,14,26,0.65)] flex flex-col items-center justify-center gap-1.5 text-[var(--gold)] text-xs font-semibold tracking-[0.08em] uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-200">{Icons.download} Download</div>
+                  <div className="absolute bottom-0 left-0 right-0 py-1.5 px-2 bg-gradient-to-t from-[var(--panel-strong)] to-transparent text-[10px] font-medium tracking-[0.08em] uppercase text-[var(--ivory-dim)]">{img.label}</div>
+                  <div className="absolute inset-0 bg-[var(--panel)] flex flex-col items-center justify-center gap-1.5 text-[var(--gold)] text-xs font-semibold tracking-[0.08em] uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-200">{Icons.download} Download</div>
                 </div>
               ))}
             </div>
@@ -261,18 +261,18 @@ export function ShareCard() {
             <div style={{ display: "inline-flex", alignItems: "center", gap: "10px", padding: "8px 18px", borderRadius: "99px", marginBottom: "24px", background: "rgba(201,168,76,0.07)", border: "1px solid rgba(201,168,76,0.2)" }}>
               <span style={{ fontSize: "14px", color: "var(--ivory)" }}>Unswap</span>
               <span style={{ fontSize: "16px" }}>🤝</span>
-              <span style={{ fontSize: "14px", color: "rgba(245,240,232,0.75)" }}>{email}</span>
+              <span style={{ fontSize: "14px", color: "var(--ivory-dim)" }}>{email}</span>
             </div>
           )}
-          <p style={{ fontSize: "14px", lineHeight: 1.7, color: "rgba(245,240,232,0.65)", maxWidth: "440px", margin: "0 auto 8px" }}>
+          <p style={{ fontSize: "14px", lineHeight: 1.7, color: "var(--ivory-dim)", maxWidth: "440px", margin: "0 auto 8px" }}>
             Share your referral link and earn <strong style={{ color: "var(--gold)" }}>+30 points</strong> per friend who joins. Use a ready-made caption below to make it effortless.
           </p>
           {isPersonal && <p style={{ fontSize: "13px", color: "rgba(201,168,76,0.7)", fontStyle: "italic" }}>Perk: 5% discount on your plan for every referral.</p>}
         </div>
 
-        <div style={{ borderRadius: "12px", padding: "18px 20px", marginBottom: "20px", background: "rgba(10,14,26,0.6)", border: `1px solid ${isPersonal ? "rgba(201,168,76,0.4)" : "rgba(201,168,76,0.15)"}`, boxShadow: isPersonal ? "0 0 32px rgba(201,168,76,0.05)" : "none" }}>
+        <div style={{ borderRadius: "12px", padding: "18px 20px", marginBottom: "20px", background: "var(--panel)", border: `1px solid ${isPersonal ? "rgba(201,168,76,0.4)" : "rgba(201,168,76,0.15)"}`, boxShadow: isPersonal ? "0 0 32px rgba(201,168,76,0.05)" : "none" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-            <p style={{ fontSize: "11px", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, color: "rgba(245,240,232,0.45)" }}>{isPersonal ? "✦ Your Personal Referral Link" : "Share Link"}</p>
+            <p style={{ fontSize: "11px", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, color: "var(--muted)" }}>{isPersonal ? "✦ Your Personal Referral Link" : "Share Link"}</p>
             {loadingRef && <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" style={{ color: "var(--gold)" }}><circle opacity=".25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path opacity=".75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>}
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -287,7 +287,7 @@ export function ShareCard() {
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mb-3">
           {platformButtons.map((btn) => (
             <a key={btn.id} href={btn.href} target="_blank" rel="noopener noreferrer" aria-label={`Share on ${btn.label}`} onClick={() => setHasShared(true)}
-              className="platform-btn flex items-center gap-2.5 p-3 sm:py-3 sm:px-4 rounded-[10px] border border-[rgba(201,168,76,0.15)] bg-[rgba(10,14,26,0.5)] text-[var(--ivory)] text-[13px] font-medium no-underline"
+              className="platform-btn flex items-center gap-2.5 p-3 sm:py-3 sm:px-4 rounded-[10px] border border-[rgba(201,168,76,0.15)] bg-[var(--panel)] text-[var(--ivory)] text-[13px] font-medium no-underline"
               style={{ "--btn-color": btn.color, "--btn-bg": `${btn.color}20`, "--btn-glow": `0 6px 20px ${btn.color}22` } as CSSProperties}>
               <span style={{ color: btn.color, flexShrink: 0 }}>{btn.icon}</span>
               {btn.label}
@@ -318,7 +318,7 @@ export function ShareCard() {
         </div>
 
         <button onClick={() => setShowModal(true)} aria-label="Open shareable images gallery"
-          style={{ width: "100%", marginTop: "10px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "none", border: "1px solid rgba(201,168,76,0.15)", borderRadius: "10px", padding: "13px 18px", cursor: "pointer", color: "rgba(245,240,232,0.6)", fontSize: "13px" }}>
+          style={{ width: "100%", marginTop: "10px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "none", border: "1px solid rgba(201,168,76,0.15)", borderRadius: "10px", padding: "13px 18px", cursor: "pointer", color: "var(--ivory-dim)", fontSize: "13px" }}>
           <span style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></svg>
             Download lifestyle images for your post
@@ -340,7 +340,7 @@ export function ShareCard() {
         </div>
 
         <div style={{ marginTop: "48px", textAlign: "center" }}>
-          <a href="/waitlist" style={{ fontSize: "11px", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, color: "rgba(245,240,232,0.3)", textDecoration: "none" }}>← Back to Waitlist</a>
+          <a href="/waitlist" style={{ fontSize: "11px", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, color: "var(--muted)", textDecoration: "none" }}>← Back to Waitlist</a>
         </div>
       </div>
 
@@ -349,12 +349,12 @@ export function ShareCard() {
       <AnimatePresence>
         {hasShared && (
           <motion.div initial={{ y: 80, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 80, opacity: 0 }} transition={{ type: "spring", damping: 26, stiffness: 280 }}
-            style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 1000, padding: "14px 20px", background: "linear-gradient(135deg, rgba(10,14,26,0.97) 0%, rgba(15,20,35,0.97) 100%)", borderTop: "1px solid rgba(201,168,76,0.25)", backdropFilter: "blur(12px)", display: "flex", alignItems: "center", justifyContent: "center", gap: "16px", flexWrap: "wrap" }}>
-            <span style={{ fontSize: "13px", color: "rgba(245,240,232,0.65)" }}>Want to skip the queue?</span>
+            style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 1000, padding: "14px 20px", background: "linear-gradient(135deg, var(--panel-strong) 0%, var(--panel-strong) 100%)", borderTop: "1px solid rgba(201,168,76,0.25)", backdropFilter: "blur(12px)", display: "flex", alignItems: "center", justifyContent: "center", gap: "16px", flexWrap: "wrap" }}>
+            <span style={{ fontSize: "13px", color: "var(--ivory-dim)" }}>Want to skip the queue?</span>
             <a href="/book" style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "transparent", color: "#c9a84c", fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none", padding: "9px 20px", borderRadius: "4px", border: "1px solid rgba(201,168,76,0.5)" }}>
               Book a call
             </a>
-            <a href={signupHref} style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "#c9a84c", color: "#0a0e1a", fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none", padding: "9px 20px", borderRadius: "4px", boxShadow: "0 2px 16px rgba(201,168,76,0.3)" }}>
+            <a href={signupHref} style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "#c9a84c", color: "var(--navy)", fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none", padding: "9px 20px", borderRadius: "4px", boxShadow: "0 2px 16px rgba(201,168,76,0.3)" }}>
               Get Early Access {Icons.arrow}
             </a>
           </motion.div>

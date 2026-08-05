@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import confetti from "canvas-confetti"
+import { ThemeToggleIcon } from "@/components/theme/theme-toggle"
 
 const ORGS = [
   "United Nations",
@@ -15,7 +16,7 @@ const ORGS = [
 ]
 
 const inputCls =
-  "w-full bg-[rgba(10,14,26,0.5)] border border-wl-border px-[20px] py-[16px] text-wl-ivory placeholder-wl-muted focus:outline-none focus:border-wl-gold focus:shadow-[0_0_0_1px_var(--border)] transition-all duration-300 text-[15px]"
+  "w-full bg-[var(--field-bg)] border border-wl-border px-[20px] py-[16px] text-wl-ivory placeholder-wl-muted focus:outline-none focus:border-wl-gold focus:shadow-[0_0_0_1px_var(--border)] transition-all duration-300 text-[15px]"
 
 type CountData = { count: number; recentJoiners: { initials: string }[] }
 type Initiated = { status: "pending" | "already_confirmed"; email: string; confirmUrl?: string }
@@ -122,12 +123,17 @@ export function WaitlistClient() {
 
   return (
     <div className="min-h-screen bg-wl-navy text-wl-ivory relative">
+      {/* Theme switch — floats above every mode of the page */}
+      <div className="fixed top-5 right-5 z-50">
+        <ThemeToggleIcon />
+      </div>
+
       <AnimatePresence mode="wait">
         {/* ── JOIN ── */}
         {mode === "join" && (
-          <motion.div key="join" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col lg:flex-row w-full min-h-screen relative">
-            {/* FORM */}
-            <div className="w-full lg:w-[65%] order-1 lg:order-2 flex items-center justify-center p-8 sm:p-12 lg:p-16 relative z-10 min-h-[100dvh] overflow-y-auto">
+          <motion.div key="join" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="w-full min-h-screen relative">
+            {/* FORM — scrolls with the page, offset past the fixed image column */}
+            <div className="w-full lg:w-[65%] lg:ml-[35%] flex items-center justify-center p-8 sm:p-12 lg:p-16 relative z-10 min-h-[100dvh]">
               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--gold-dim)_0%,_transparent_60%)] pointer-events-none" />
               <div className="w-full max-w-xl mx-auto relative">
                 <div className="flex justify-center mb-6">
@@ -164,10 +170,10 @@ export function WaitlistClient() {
                       value={organization}
                       onChange={(e) => setOrganization(e.target.value)}
                       required
-                      className={`w-full bg-[rgba(10,14,26,0.5)] border border-wl-border px-[20px] py-[16px] focus:outline-none focus:border-wl-gold focus:shadow-[0_0_0_1px_var(--border)] hover:border-wl-gold transition-all duration-300 appearance-none text-[15px] ${!organization ? "text-wl-muted" : "text-wl-ivory"}`}
-                      style={{ background: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23c9a84c' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e") no-repeat right 0.75rem center/1.5rem 1.5rem` }}
+                      className={`w-full bg-[var(--field-bg)] border border-wl-border px-[20px] py-[16px] focus:outline-none focus:border-wl-gold focus:shadow-[0_0_0_1px_var(--border)] hover:border-wl-gold transition-all duration-300 appearance-none text-[15px] ${!organization ? "text-wl-muted" : "text-wl-ivory"}`}
+                      style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23c9a84c' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 0.75rem center", backgroundSize: "1.5rem 1.5rem" }}
                     >
-                      <option value="" disabled className="bg-wl-deep text-wl-muted">Select your organization / affiliation</option>
+                      <option value="" disabled className="bg-wl-navy text-wl-muted">Select your organization / affiliation</option>
                       {ORGS.map((org) => (
                         <option key={org} value={org} className="bg-wl-navy text-wl-ivory">{org}</option>
                       ))}
@@ -218,8 +224,8 @@ export function WaitlistClient() {
               </div>
             </div>
 
-            {/* IMAGE */}
-            <div className="absolute inset-0 lg:static lg:w-[35%] order-2 lg:order-1 lg:sticky lg:top-0 lg:h-[100dvh] overflow-hidden z-0 bg-wl-deep border-r border-wl-border">
+            {/* IMAGE — a faint backdrop on mobile, a fixed column on desktop */}
+            <div className="absolute inset-0 lg:fixed lg:inset-y-0 lg:left-0 lg:w-[35%] overflow-hidden z-0 bg-wl-deep lg:border-r lg:border-wl-border">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/waitlist/interior.png" alt="Luxury Interior" className="absolute inset-0 w-full h-full object-cover object-center opacity-80" />
               <div className="absolute inset-0 bg-wl-navy/90 lg:hidden" />

@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Eye, EyeOff, Info, ShieldCheck } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
+import { ThemeToggleIcon } from "@/components/theme/theme-toggle"
 
 // Institutional domains that qualify for fast-track verification. Mirrors the
 // admin-editable allowlist; client-side feedback only — server is the source of truth.
@@ -23,8 +24,8 @@ function domainStatus(email: string): "fast" | "manual" | null {
 }
 
 const inputCls =
-  "w-full bg-white border border-[rgba(201,168,76,0.35)] px-5 py-4 text-[#0a0e1a] placeholder-[rgba(10,14,26,0.4)] focus:outline-none focus:border-[#c9a84c] focus:shadow-[0_0_0_1px_rgba(201,168,76,0.35)] transition-all duration-300 text-[15px]"
-const labelCls = "block text-[rgba(10,14,26,0.6)] text-xs tracking-[0.08em] uppercase font-medium mb-2 pl-1"
+  "w-full bg-white border border-wl-border px-5 py-4 text-wl-ivory placeholder-wl-muted focus:outline-none focus:border-wl-gold focus:shadow-[0_0_0_1px_rgba(201,168,76,0.35)] transition-all duration-300 text-[15px]"
+const labelCls = "block text-wl-ivory-dim text-xs tracking-[0.08em] uppercase font-medium mb-2 pl-1"
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -77,24 +78,29 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row w-full relative bg-[#f5f0e8] text-[#0a0e1a] font-sans">
+    <div className="min-h-screen w-full relative bg-wl-navy text-wl-ivory font-sans">
+      {/* Theme switch */}
+      <div className="fixed top-5 right-5 z-50">
+        <ThemeToggleIcon />
+      </div>
+
       {/* IMAGE — background on mobile, left column on desktop (original backdrop, dark overlay) */}
-      <div className="absolute inset-0 lg:static lg:w-[38%] lg:sticky lg:top-0 lg:h-[100dvh] overflow-hidden z-0">
+      <div className="absolute inset-0 lg:fixed lg:inset-y-0 lg:left-0 lg:w-[38%] overflow-hidden z-0">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/images/auth-institution.jpg" alt="" className="absolute inset-0 w-full h-full object-cover object-center" />
         <div className="absolute inset-0 bg-[rgba(10,14,26,0.6)]" />
         {/* lighten on mobile so the overlaid form stays readable */}
-        <div className="absolute inset-0 bg-[#f5f0e8]/92 lg:hidden" />
+        <div className="absolute inset-0 bg-wl-navy/92 lg:hidden" />
         <div className="hidden lg:block absolute bottom-0 left-0 right-0 p-8 lg:p-10">
           <div className="flex items-center gap-3">
-            <div className="w-[60px] h-px bg-[#c9a84c]" />
+            <div className="w-[60px] h-px bg-wl-gold" />
             <p className="text-white/80 text-[11px] tracking-[0.22em] uppercase">Verified access only</p>
           </div>
         </div>
       </div>
 
       {/* FORM */}
-      <div className="w-full lg:w-[62%] lg:ml-auto flex items-center justify-center p-8 sm:p-12 lg:p-16 relative z-10 min-h-[100dvh] overflow-y-auto">
+      <div className="w-full lg:w-[62%] lg:ml-[38%] flex items-center justify-center p-8 sm:p-12 lg:p-16 relative z-10 min-h-[100dvh]">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(201,168,76,0.12)_0%,_transparent_60%)] pointer-events-none" />
 
         <div className="w-full max-w-md mx-auto relative">
@@ -104,15 +110,15 @@ export default function RegisterPage() {
           </div>
 
           <div className="flex items-center justify-center gap-3 mb-5">
-            <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[rgba(201,168,76,0.4)]" />
-            <span className="text-[rgba(10,14,26,0.7)] text-[11px] tracking-[0.22em] uppercase font-medium">Create your account</span>
-            <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[rgba(201,168,76,0.4)]" />
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent to-wl-border" />
+            <span className="text-wl-ivory-dim text-[11px] tracking-[0.22em] uppercase font-medium">Create your account</span>
+            <div className="h-px flex-1 bg-gradient-to-l from-transparent to-wl-border" />
           </div>
 
-          <h1 className="font-display text-[32px] sm:text-[40px] font-light text-[#0a0e1a] text-center leading-tight mb-2">
+          <h1 className="font-display text-[32px] sm:text-[40px] font-light text-wl-ivory text-center leading-tight mb-2">
             Join the network
           </h1>
-          <p className="text-[rgba(10,14,26,0.6)] text-center text-sm leading-relaxed mb-8">
+          <p className="text-wl-ivory-dim text-center text-sm leading-relaxed mb-8">
             Verified home exchange for UN, World Bank, IMF and diplomatic professionals.
           </p>
 
@@ -137,15 +143,15 @@ export default function RegisterPage() {
               <label htmlFor="password" className={labelCls}>Password</label>
               <div className="relative flex items-center">
                 <input id="password" type={showPassword ? "text" : "password"} required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 8 characters" className={`${inputCls} pr-11`} />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-4 flex items-center text-[rgba(10,14,26,0.4)] hover:text-[#c9a84c] transition-colors">
+                <button type="button" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-4 flex items-center text-wl-muted hover:text-wl-gold-light transition-colors">
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
             </div>
 
             {/* Eligibility hint reacts to the email domain */}
-            <div className={`flex gap-2.5 p-3.5 text-sm border ${status === "fast" ? "border-[rgba(201,168,76,0.4)] bg-[rgba(201,168,76,0.1)] text-[#9a7c2c]" : "border-[rgba(201,168,76,0.25)] bg-white text-[rgba(10,14,26,0.6)]"}`}>
-              {status === "fast" ? <ShieldCheck size={18} className="flex-shrink-0 mt-0.5 text-[#c9a84c]" /> : <Info size={18} className="flex-shrink-0 mt-0.5 text-[#c9a84c]" />}
+            <div className={`flex gap-2.5 p-3.5 text-sm border ${status === "fast" ? "border-wl-border bg-[rgba(201,168,76,0.1)] text-wl-gold" : "border-wl-border bg-white text-wl-ivory-dim"}`}>
+              {status === "fast" ? <ShieldCheck size={18} className="flex-shrink-0 mt-0.5 text-wl-gold" /> : <Info size={18} className="flex-shrink-0 mt-0.5 text-wl-gold" />}
               <span>
                 {status === "fast"
                   ? "Recognised institutional email — you qualify for fast-track verification."
@@ -153,19 +159,19 @@ export default function RegisterPage() {
               </span>
             </div>
 
-            <button type="submit" disabled={loading} className="w-full bg-[#c9a84c] hover:bg-[#e4c97a] text-[#0a0e1a] text-sm font-medium tracking-[0.08em] uppercase py-4 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_4px_24px_rgba(201,168,76,0.25)]">
+            <button type="submit" disabled={loading} className="w-full bg-wl-gold hover:bg-wl-gold-light text-wl-navy text-sm font-medium tracking-[0.08em] uppercase py-4 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_4px_24px_rgba(201,168,76,0.25)]">
               {loading ? "Creating account…" : "Create Account"}
             </button>
           </form>
 
-          <div className="mt-8 pt-6 border-t border-[rgba(201,168,76,0.25)] text-center">
-            <p className="text-sm text-[rgba(10,14,26,0.7)]">
+          <div className="mt-8 pt-6 border-t border-wl-border text-center">
+            <p className="text-sm text-wl-ivory-dim">
               Already have an account?{" "}
-              <Link href="/login" className="font-semibold text-[#9a7c2c] hover:text-[#c9a84c] transition-colors">Log in</Link>
+              <Link href="/login" className="font-semibold text-wl-gold hover:text-wl-gold-light transition-colors">Log in</Link>
             </p>
           </div>
 
-          <p className="mt-6 text-center text-[11px] text-[rgba(10,14,26,0.45)]">
+          <p className="mt-6 text-center text-[11px] text-wl-muted">
             UnSwap is an independent, staff-led platform, not affiliated with the United Nations.
           </p>
         </div>

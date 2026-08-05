@@ -52,3 +52,34 @@ export function ThemeToggle({
     </button>
   )
 }
+
+/**
+ * Icon-only toggle for public pages (waitlist, login, register), where there is
+ * no rail to sit in. Borders and icons use gold so it reads on cream + obsidian.
+ */
+export function ThemeToggleIcon({ className }: { className?: string }) {
+  const { resolvedTheme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+
+  const isDark = mounted && resolvedTheme === "dark"
+
+  return (
+    <button
+      type="button"
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+      title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      aria-label="Toggle theme"
+      className={cn(
+        "w-10 h-10 flex items-center justify-center rounded-sm border transition-colors",
+        "border-[rgba(201,168,76,0.35)] text-[#c9a84c] hover:border-[#c9a84c] hover:bg-[rgba(201,168,76,0.12)]",
+        className,
+      )}
+    >
+      <span className="relative w-5 h-5 flex items-center justify-center">
+        <Sun size={18} className={cn("absolute transition-all duration-300", isDark ? "opacity-0 rotate-90 scale-50" : "opacity-100 rotate-0 scale-100")} />
+        <Moon size={17} className={cn("absolute transition-all duration-300", isDark ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-50")} />
+      </span>
+    </button>
+  )
+}

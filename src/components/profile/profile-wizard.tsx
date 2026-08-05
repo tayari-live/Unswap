@@ -15,8 +15,8 @@ const MAX_BYTES = 5 * 1024 * 1024
 const ACCEPT = "image/png,image/jpeg,image/webp"
 
 const input =
-  "block w-full px-4 py-3 border border-[var(--border)] rounded-xl bg-[var(--surface)] placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] text-sm text-[var(--fg)]"
-const label = "block text-xs font-semibold uppercase tracking-wider text-[var(--fg)] mb-2"
+  "block w-full px-4 py-3.5 border border-[var(--hair)] rounded-sm bg-[var(--surface)] placeholder-neutral focus:outline-none focus:border-[var(--gold)] focus:shadow-[0_0_0_1px_var(--hair)] transition-colors text-sm text-[var(--fg)]"
+const label = "block text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--gold-soft)] mb-2.5"
 
 // The eight fields that count toward profile completion — must match the
 // server's computeCompletion() so the live % matches what gets saved.
@@ -35,7 +35,7 @@ function completionOf(v: ProfileValues): number {
 const SCREENS: { key: keyof ProfileValues | "photo" | "review"; optional?: boolean }[] = [
   { key: "photo", optional: true },
   { key: "fullName" },
-  { key: "organisation", optional: true },
+  { key: "organisation" },
   { key: "nationality", optional: true },
   { key: "dutyStation", optional: true },
   { key: "languages", optional: true },
@@ -47,8 +47,8 @@ const SCREENS: { key: keyof ProfileValues | "photo" | "review"; optional?: boole
 function Heading({ title, sub }: { title: string; sub?: string }) {
   return (
     <div className="mb-8">
-      <h2 className="font-display text-2xl sm:text-3xl font-bold text-[var(--fg)] leading-tight">{title}</h2>
-      {sub && <p className="mt-2 text-sm text-neutral leading-relaxed">{sub}</p>}
+      <h2 className="font-display text-2xl sm:text-[2rem] font-light text-[var(--fg)] leading-[1.15]">{title}</h2>
+      {sub && <p className="mt-2.5 text-sm text-neutral leading-relaxed">{sub}</p>}
     </div>
   )
 }
@@ -130,16 +130,16 @@ export function ProfileWizard({ initial, onSaved }: { initial: ProfileValues; on
     <div>
       {/* Progress — live profile completion % + step count */}
       <div className="mb-8">
-        <div className="flex items-baseline justify-between mb-2">
-          <span className="text-sm font-bold text-[var(--fg)]">Profile completion · {completion}%</span>
-          <span className="text-xs text-neutral font-semibold">Step {step + 1}/{SCREENS.length}</span>
+        <div className="flex items-baseline justify-between mb-2.5">
+          <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--gold-soft)]">Profile completion · {completion}%</span>
+          <span className="text-[11px] text-neutral font-medium uppercase tracking-[0.14em]">Step {step + 1}/{SCREENS.length}</span>
         </div>
-        <div className="h-2 rounded-full bg-[var(--border)] overflow-hidden">
+        <div className="h-px bg-[var(--hair)] overflow-hidden">
           <div className="h-full bg-[var(--gold)] transition-all duration-300" style={{ width: `${completion}%` }} />
         </div>
       </div>
 
-      <div className="bg-surface rounded-2xl border border-[var(--border)] shadow-sm p-6 sm:p-10 min-h-[22rem]">
+      <div className="bg-[var(--surface)] rounded-md border border-[var(--hair)] p-6 sm:p-10 min-h-[22rem]">
         {key === "photo" && (
           <div>
             <Heading title="Add a profile photo" sub="A friendly face helps other members recognise and trust you." />
@@ -249,18 +249,18 @@ export function ProfileWizard({ initial, onSaved }: { initial: ProfileValues; on
       {/* Nav */}
       <div className="mt-6 flex items-center justify-between gap-3">
         {step > 0 ? (
-          <button type="button" onClick={() => setStep((s) => s - 1)} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--fg)] px-5 py-2.5 rounded-full border border-[var(--border)] hover:border-[var(--navy)] bg-[var(--surface)]"><ChevronLeft size={16} /> Back</button>
+          <button type="button" onClick={() => setStep((s) => s - 1)} className="inline-flex items-center gap-1.5 text-[12px] font-medium uppercase tracking-[0.12em] text-[var(--fg)] px-5 py-3 rounded-sm border border-[var(--hair)] hover:border-[var(--gold)] bg-[var(--surface)] transition-colors"><ChevronLeft size={15} /> Back</button>
         ) : (
           <span />
         )}
         <div className="flex items-center gap-3">
           {SCREENS[step].optional && step < SCREENS.length - 1 && (
-            <button type="button" onClick={() => next(true)} className="text-sm font-semibold text-[var(--fg)] px-5 py-2.5 rounded-full border border-[var(--gold)] hover:bg-[var(--parchment)] bg-[var(--surface)]">Skip</button>
+            <button type="button" onClick={() => next(true)} className="text-[12px] font-medium uppercase tracking-[0.12em] text-[var(--gold-soft)] px-5 py-3 rounded-sm border border-[var(--hair)] hover:border-[var(--gold)] bg-[var(--surface)] transition-colors">Skip</button>
           )}
           {step < SCREENS.length - 1 ? (
-            <button type="button" onClick={() => next()} disabled={!answered} title={!answered ? "Answer this question or use Skip" : undefined} className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] px-7 py-2.5 rounded-full shadow-sm disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[var(--gold-dark)]">Continue <ChevronRight size={16} /></button>
+            <button type="button" onClick={() => next()} disabled={!answered} title={!answered ? "Answer this question or use Skip" : undefined} className="inline-flex items-center gap-1.5 text-[12px] font-medium uppercase tracking-[0.12em] text-[#0a0e1a] bg-[var(--gold)] hover:bg-[var(--gold-hover)] px-7 py-3 rounded-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[var(--gold)]">Continue <ChevronRight size={15} /></button>
           ) : (
-            <button type="button" onClick={submit} disabled={loading} className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] px-7 py-2.5 rounded-full shadow-sm disabled:opacity-50">{loading ? "Saving…" : (<><Check size={16} /> Save profile</>)}</button>
+            <button type="button" onClick={submit} disabled={loading} className="inline-flex items-center gap-1.5 text-[12px] font-medium uppercase tracking-[0.12em] text-[#0a0e1a] bg-[var(--gold)] hover:bg-[var(--gold-hover)] px-7 py-3 rounded-sm transition-colors disabled:opacity-50">{loading ? "Saving…" : (<><Check size={15} /> Save profile</>)}</button>
           )}
         </div>
       </div>

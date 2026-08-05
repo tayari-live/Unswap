@@ -1,0 +1,7 @@
+import "../waitlist/waitlist.css"
+
+// Login shares the waitlist's scoped luxury theme, so it inherits both the
+// light (cream/navy) and dark (obsidian/gold) palettes from one source.
+export default function LoginLayout({ children }: { children: React.ReactNode }) {
+  return <div className="wl-root">{children}</div>
+}

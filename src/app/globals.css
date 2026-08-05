@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Drive Tailwind's `dark:` variant from the .dark class next-themes puts on
+   <html> (v4 defaults to prefers-color-scheme, which ignores the toggle). */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /*
  * UnSwap brand palette — luxury-institutional.
  * Obsidian Navy + Diplomatic Gold, with Verified Teal for trust and
