@@ -18,10 +18,12 @@ const input =
   "block w-full px-4 py-3.5 border border-[var(--hair)] rounded-sm bg-[var(--surface)] placeholder-neutral focus:outline-none focus:border-[var(--gold)] focus:shadow-[0_0_0_1px_var(--hair)] transition-colors text-sm text-[var(--fg)]"
 const label = "block text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--gold-soft)] mb-2.5"
 
-// The eight fields that count toward profile completion — must match the
-// server's computeCompletion() so the live % matches what gets saved.
+// The fields that count toward profile completion — must match the server's
+// computeCompletion() so the live % matches what gets saved. LinkedIn is
+// deliberately excluded: it is optional, so scoring it would make 100%
+// unreachable for anyone who skips it.
 const COMPLETION_FIELDS: (keyof ProfileValues)[] = [
-  "fullName", "imageUrl", "nationality", "dutyStation", "organisation", "languages", "bio", "linkedinUrl",
+  "fullName", "imageUrl", "nationality", "dutyStation", "organisation", "languages", "bio",
 ]
 function completionOf(v: ProfileValues): number {
   const filled = COMPLETION_FIELDS.filter((k) => {

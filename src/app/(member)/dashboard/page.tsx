@@ -14,7 +14,7 @@ import {
 } from "lucide-react"
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
-import { LuxPageHeader } from "@/components/ui/lux"
+import { LuxPageHeader, SectionLabel } from "@/components/ui/lux"
 import { ResendEmailButton } from "@/components/ui/resend-email-button"
 
 export const dynamic = "force-dynamic"
@@ -149,31 +149,43 @@ export default async function MemberDashboardPage() {
 
       {/* Getting-started checklist — replaces the scattered status cards */}
       {showChecklist && (
-        <div className="rounded-md border border-[var(--hair)] bg-surface p-5 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-display text-lg font-bold text-[var(--fg)]">Getting started</h2>
-            <span className="text-xs font-semibold text-neutral">{checklistDone} of {checklist.length} done</span>
+        <div className="rounded-md border border-[var(--hair)] bg-[var(--surface)] p-6 mb-5">
+          <div className="flex items-end justify-between mb-1">
+            <SectionLabel>First Steps</SectionLabel>
+            <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-neutral tabular-nums">
+              {checklistDone} of {checklist.length}
+            </span>
           </div>
-          <ul className="space-y-3">
+          <h2 className="font-display font-light text-2xl text-[var(--fg)] leading-none">Getting started</h2>
+          {/* Progress as a hairline rule rather than a bar */}
+          <div className="mt-4 mb-5 h-px bg-[var(--hair)] overflow-hidden">
+            <div
+              className="h-full bg-[var(--gold)] transition-all duration-500"
+              style={{ width: `${(checklistDone / checklist.length) * 100}%` }}
+            />
+          </div>
+          <ul className="space-y-3.5">
             {checklist.map((s, i) => (
               <li key={s.title} className="flex items-center gap-3">
                 <span
-                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
- s.done ? "bg-[var(--teal)]/15 text-[var(--teal)]" : "bg-[var(--navy)]/10 text-[var(--fg)]"
- }`}
+                  className={`w-7 h-7 border flex items-center justify-center text-[11px] font-medium flex-shrink-0 transition-colors ${
+                    s.done
+                      ? "border-[var(--gold)] text-[var(--gold-soft)]"
+                      : "border-[var(--hair)] text-neutral"
+                  }`}
                 >
-                  {s.done ? <Check size={14} /> : i + 1}
+                  {s.done ? <Check size={13} strokeWidth={2} /> : i + 1}
                 </span>
                 <div className="flex-1 min-w-0">
-                  <div className={`text-sm font-semibold ${s.done ? "text-neutral line-through" : "text-[var(--fg)]"}`}>
+                  <div className={`text-sm ${s.done ? "text-neutral" : "text-[var(--fg)] font-medium"}`}>
                     {s.title}
                   </div>
-                  {s.sub && <div className="text-xs text-neutral mt-0.5">{s.sub}</div>}
+                  {s.sub && <div className="text-xs text-neutral mt-0.5 leading-relaxed">{s.sub}</div>}
                 </div>
                 {!s.done && s.href && (
                   <Link
                     href={s.href}
-                    className="flex-shrink-0 inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg bg-[var(--gold-dark)] text-white hover:bg-[var(--gold-hover)] transition-colors"
+                    className="flex-shrink-0 inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.12em] px-4 py-2 rounded-sm bg-[var(--gold)] text-[#0a0e1a] hover:bg-[var(--gold-hover)] transition-colors"
                   >
                     {s.action} <ChevronRight size={13} />
                   </Link>

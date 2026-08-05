@@ -15,11 +15,16 @@ type ProfileShape = {
   linkedinUrl: string | null
 }
 
-/** Profile completion as a percentage of filled fields (display name always counts). */
+/**
+ * Profile completion as a percentage of filled fields.
+ * Only fields the wizard treats as expected count toward the total — LinkedIn is
+ * explicitly optional, so including it would put 100% out of reach for anyone
+ * who chooses not to share it. It is still collected, just not scored.
+ */
 export function computeCompletion(u: ProfileShape): number {
   const fields = [
     u.fullName, u.imageUrl, u.nationality, u.dutyStation,
-    u.organisation, u.languages, u.bio, u.linkedinUrl,
+    u.organisation, u.languages, u.bio,
   ]
   const filled = fields.filter((f) => f && String(f).trim().length > 0).length
   return Math.round((filled / fields.length) * 100)
