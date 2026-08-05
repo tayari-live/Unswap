@@ -14,15 +14,15 @@ export function BookClient() {
           <h1 className="font-display" style={{ color: "var(--gold)", fontSize: "clamp(30px,5.5vw,46px)", fontWeight: 300, lineHeight: 1.1, marginBottom: "14px" }}>
             Book Your Assessment Call
           </h1>
-          <p style={{ fontSize: "14px", lineHeight: 1.7, color: "rgba(245,240,232,0.65)", maxWidth: "440px", margin: "0 auto" }}>
+          <p style={{ fontSize: "14px", lineHeight: 1.7, color: "var(--ivory-dim)", maxWidth: "440px", margin: "0 auto" }}>
             Grab 15–20 minutes with our team and we&apos;ll walk you through how UnSwap works, personally.
           </p>
         </div>
-        <div style={{ borderRadius: "12px", padding: "4px", background: "rgba(10,14,26,0.6)", border: "1px solid rgba(201,168,76,0.2)", overflow: "hidden" }}>
+        <div style={{ borderRadius: "12px", padding: "4px", background: "var(--panel)", border: "1px solid rgba(201,168,76,0.2)", overflow: "hidden" }}>
           <BookingWidget />
         </div>
         <div className="mt-16 pt-10 border-t border-[rgba(201,168,76,0.15)]">
-          <p style={{ fontSize: "11px", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, color: "rgba(245,240,232,0.4)", textAlign: "center", marginBottom: "18px" }}>
+          <p style={{ fontSize: "11px", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, color: "var(--muted)", textAlign: "center", marginBottom: "18px" }}>
             Prefer to watch first?
           </p>
           {/* <h2 className="font-display" style={{ color: "var(--gold-light)", fontSize: "22px", fontWeight: 400, textAlign: "center", marginBottom: "16px" }}>
@@ -39,7 +39,7 @@ export function BookClient() {
           </div>
         </div>
         <div style={{ marginTop: "40px", textAlign: "center" }}>
-          <a href="/waitlist" style={{ fontSize: "11px", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, color: "rgba(245,240,232,0.3)", textDecoration: "none" }}>
+          <a href="/waitlist" style={{ fontSize: "11px", letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 500, color: "var(--muted)", textDecoration: "none" }}>
             ← Back to Waitlist
           </a>
         </div>
