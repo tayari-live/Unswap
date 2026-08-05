@@ -19,15 +19,19 @@ export type GrantReason = keyof typeof CREDIT_GRANTS
  */
 export async function grantCreditsOnce(userId: string, reason: GrantReason) {
   const { amount } = CREDIT_GRANTS[reason]
-  const existing = await prisma.creditTransaction.findFirst({
-    where: { userId, reason, type: "earned" },
-    select: { id: true },
-  })
-  if (existing) return { granted: false as const }
-  await prisma.creditTransaction.create({
-    data: { userId, type: "earned", amount, status: "confirmed", reason },
-  })
-  return { granted: true as const, amount }
+  try {
+    await prisma.creditTransaction.create({
+      data: { userId, type: "earned", amount, status: "confirmed", reason },
+    })
+    return { granted: true as const, amount }
+  } catch (err) {
+    // P2002 = unique violation on (userId, reason): the bonus already exists.
+    // Letting the database decide makes this safe under concurrency, which a
+    // read-then-write check was not — publishing a listing reaches this from
+    // three code paths, and a double click could grant twice.
+    if ((err as { code?: string })?.code === "P2002") return { granted: false as const }
+    throw err
+  }
 }
 
 export type PendingGrant = { id: string; amount: number; title: string; reason: GrantReason }

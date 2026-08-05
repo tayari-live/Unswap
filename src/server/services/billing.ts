@@ -3,7 +3,7 @@ import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
 import { logAudit } from "@/server/services/audit"
 import { grantCreditsOnce } from "@/server/services/credits"
-import { sendEmail, renderEmail } from "@/server/email"
+import { sendEmail, renderEmail, esc } from "@/server/email"
 
 // Tier catalogue — the single source of truth for entitlements and pricing.
 export const TIERS = {
@@ -75,7 +75,7 @@ export async function activateSubscription(
       subject: `Your UnSwap ${t.name} membership is active`,
       html: renderEmail({
         eyebrow: "Membership Active",
-        heading: `Welcome aboard, ${user.firstName}.`,
+        heading: `Welcome aboard, ${esc(user.firstName)}.`,
         preheader: `Your ${t.name} membership is now active.`,
         body: `<p style="margin:0 0 14px">Your <strong>${t.name}</strong> membership is now active. You have full access to the network and its verified homes.</p>
                <p style="margin:0">Three credits have been added to your balance as a subscription bonus.</p>`,
@@ -153,7 +153,7 @@ export async function cancelSubscription(userId: string) {
       subject: "Your UnSwap membership is cancelled",
       html: renderEmail({
         heading: "Membership cancelled",
-        body: `<p>Hello ${user.firstName},</p><p>Your membership won't renew. You'll keep access until the end of the current period. You can resubscribe any time.</p>`,
+        body: `<p>Hello ${esc(user.firstName)},</p><p>Your membership won't renew. You'll keep access until the end of the current period. You can resubscribe any time.</p>`,
         ctaLabel: "View membership",
         ctaUrl: `${baseUrl()}/dashboard/subscription`,
       }),
@@ -199,7 +199,7 @@ export async function handleWebhookEvent(event: Stripe.Event) {
             subject: "Action needed: your UnSwap payment didn't go through",
             html: renderEmail({
               heading: "Payment unsuccessful",
-              body: `<p>Hello ${sub.user.firstName},</p><p>We couldn't process your latest membership payment. Please update your payment method to keep your access. Your membership stays active during a short grace period.</p>`,
+              body: `<p>Hello ${esc(sub.user.firstName)},</p><p>We couldn't process your latest membership payment. Please update your payment method to keep your access. Your membership stays active during a short grace period.</p>`,
               ctaLabel: "Update billing",
               ctaUrl: `${baseUrl()}/dashboard/subscription`,
             }),
@@ -222,7 +222,7 @@ export async function handleWebhookEvent(event: Stripe.Event) {
           subject: "Your UnSwap membership has been cancelled",
           html: renderEmail({
             heading: "Membership cancelled",
-            body: `<p>Hello ${sub.user.firstName},</p><p>Your membership has been cancelled and won't renew. You're always welcome back to the network.</p>`,
+            body: `<p>Hello ${esc(sub.user.firstName)},</p><p>Your membership has been cancelled and won't renew. You're always welcome back to the network.</p>`,
             ctaLabel: "Rejoin UnSwap",
             ctaUrl: `${baseUrl()}/dashboard/subscription`,
           }),

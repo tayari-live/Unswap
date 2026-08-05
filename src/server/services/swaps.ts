@@ -1,12 +1,10 @@
 import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
 import { logAudit } from "@/server/services/audit"
-import { sendEmail, renderEmail } from "@/server/email"
+import { sendEmail, renderEmail, esc } from "@/server/email"
 import { notifyAllowed } from "@/server/services/notify"
 
 const APP = () => process.env.AUTH_URL || "http://localhost:3000"
-const esc = (s: string) =>
-  s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c] as string))
 const fmtD = (d: Date) =>
   new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(d)
 

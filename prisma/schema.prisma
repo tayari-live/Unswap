@@ -298,6 +298,11 @@ model CreditTransaction {
   user      User     @relation("CreditUser", fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, status])
+  // One free-credit grant per member per reason, enforced by the database.
+  // The service checked before inserting, but two concurrent calls could both
+  // pass that check. Swap transactions carry reason = NULL, and Postgres treats
+  // NULLs as distinct, so they are unaffected by this constraint.
+  @@unique([userId, reason])
 }
 
 // A gallery photo for a listing. position 0 is the primary card image.

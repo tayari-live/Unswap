@@ -1,10 +1,8 @@
 import { prisma } from "@/server/prisma"
-import { sendEmail, renderEmail } from "@/server/email"
+import { sendEmail, renderEmail, esc } from "@/server/email"
 import { notifyAllowed } from "@/server/services/notify"
 
 const APP = () => process.env.AUTH_URL || "http://localhost:3000"
-const esc = (s: string) =>
-  s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c] as string))
 const fmtD = (d: Date) =>
   new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric" }).format(d)
 

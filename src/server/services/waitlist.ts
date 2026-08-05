@@ -2,7 +2,7 @@ import { randomBytes } from "crypto"
 import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
 import { logAudit } from "@/server/services/audit"
-import { sendEmail, renderEmail } from "@/server/email"
+import { sendEmail, renderEmail, esc } from "@/server/email"
 import { kitSendWaitlistConfirmation, kitAddToForm, kitUpdateReferralCount, kitConfigured } from "@/server/kit"
 
 const baseUrl = () => process.env.AUTH_URL || "http://localhost:3000"
@@ -206,13 +206,15 @@ export async function getWaitlistCountData() {
 /** Admin: CSV of all waitlist entries. */
 export async function waitlistCsv(): Promise<string> {
   const rows = await prisma.waitlistEntry.findMany({ orderBy: { createdAt: "asc" } })
-  const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`
+  // Named distinctly so it cannot be mistaken for (or shadow) the HTML escaper
+  // imported for the email templates above — the two are not interchangeable.
+  const csvCell = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`
   const header = ["First name", "Last name", "Email", "Organisation", "Referral code", "Referred by", "Referrals", "Status", "Joined"]
   const lines = rows.map((r) =>
     [r.firstName, r.lastName, r.email, r.organisation, r.referralCode, r.referredBy, r.referrals, r.status, r.createdAt.toISOString()]
-      .map(esc).join(","),
+      .map(csvCell).join(","),
   )
-  return [header.map(esc).join(","), ...lines].join("\n")
+  return [header.map(csvCell).join(","), ...lines].join("\n")
 }
 
 /** Admin: invite every pending entry (sets status invited + emails them). */
@@ -225,7 +227,7 @@ export async function inviteAllPending(actorId: string) {
       subject: "Your UnSwap early access invitation",
       html: renderEmail({
         eyebrow: "By Invitation",
-        heading: `You're invited, ${e.firstName}.`,
+        heading: `You're invited, ${esc(e.firstName)}.`,
         preheader: "Your early access to UnSwap is ready.",
         body: `<p style="margin:0">Your early access to UnSwap is ready. Sign in to verify your professional status and claim your founding-member incentives.</p>`,
         ctaLabel: "Claim your access",
@@ -348,7 +350,7 @@ export async function setWaitlistStatus(input: { actorId: string; id: string; st
       subject: "Your UnSwap early access invitation",
       html: renderEmail({
         eyebrow: "By Invitation",
-        heading: `You're invited, ${entry.firstName}.`,
+        heading: `You're invited, ${esc(entry.firstName)}.`,
         preheader: "Your early access to UnSwap is ready.",
         body: `<p style="margin:0">Your early access to UnSwap is ready. As a founding waitlist member you qualify for launch incentives. Sign in to verify your professional status and claim your spot.</p>`,
         ctaLabel: "Claim your access",

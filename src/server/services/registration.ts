@@ -2,7 +2,7 @@ import { randomBytes } from "crypto"
 import bcrypt from "bcryptjs"
 import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
-import { sendEmail, renderEmail } from "@/server/email"
+import { sendEmail, renderEmail, esc } from "@/server/email"
 import { logAudit } from "@/server/services/audit"
 import { grantCreditsOnce } from "@/server/services/credits"
 
@@ -61,7 +61,7 @@ async function issueVerificationLink(
     subject: "Confirm your UnSwap email",
     html: renderEmail({
       eyebrow: "Verified Access",
-      heading: `Welcome to UnSwap, ${user.firstName}.`,
+      heading: `Welcome to UnSwap, ${esc(user.firstName)}.`,
       preheader: "Confirm your email to continue your verification.",
       body: `<p style="margin:0 0 14px">You have joined a closed network built exclusively for UN, World Bank, IMF and international organisation professionals.</p>
              <p style="margin:0">Confirm your institutional email to ${

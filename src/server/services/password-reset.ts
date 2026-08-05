@@ -2,7 +2,7 @@ import { randomBytes } from "crypto"
 import bcrypt from "bcryptjs"
 import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
-import { sendEmail, renderEmail } from "@/server/email"
+import { sendEmail, renderEmail, esc } from "@/server/email"
 import { logAudit } from "@/server/services/audit"
 
 const baseUrl = () => process.env.AUTH_URL || "http://localhost:3000"
@@ -36,7 +36,7 @@ export async function requestPasswordReset(rawEmail: string) {
       subject: "Reset your UnSwap password",
       html: renderEmail({
         eyebrow: "Account Security",
-        heading: `Hello ${user.firstName},`,
+        heading: `Hello ${esc(user.firstName)},`,
         preheader: "Choose a new password for your UnSwap account.",
         body: `<p style="margin:0">We received a request to reset the password on your UnSwap account.</p>`,
         ctaLabel: "Choose a new password",

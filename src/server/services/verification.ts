@@ -2,7 +2,7 @@ import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
 import { logAudit } from "@/server/services/audit"
 import { grantCreditsOnce } from "@/server/services/credits"
-import { sendEmail, renderEmail } from "@/server/email"
+import { sendEmail, renderEmail, esc } from "@/server/email"
 
 const baseUrl = () => process.env.AUTH_URL || "http://localhost:3000"
 const loginUrl = () => `${baseUrl()}/login`
@@ -41,7 +41,7 @@ export async function approveSubmission(input: { actorId: string; id: string; no
     subject: "You're verified on UnSwap",
     html: renderEmail({
       eyebrow: "Verification Approved",
-      heading: `Welcome to the network, ${submission.member.firstName}.`,
+      heading: `Welcome to the network, ${esc(submission.member.firstName)}.`,
       preheader: "Your professional status has been verified.",
       body: `<p style="margin:0 0 14px">Your professional status has been verified. You now have full access to browse listings, list your home, and arrange exchanges with vetted peers.</p>
              <p style="margin:0">Two credits have been added to your balance to get you started.</p>`,
@@ -94,13 +94,13 @@ export async function rejectSubmission(input: { actorId: string; id: string; not
     subject: "Your UnSwap verification needs attention",
     html: renderEmail({
       eyebrow: "Verification Update",
-      heading: `Hello ${submission.member.firstName},`,
+      heading: `Hello ${esc(submission.member.firstName)},`,
       preheader: "We could not verify your submission this time.",
       body: `<p style="margin:0 0 16px">We were unable to verify your submission at this time.</p>
              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-left:2px solid #c9a84c;background:#faf7ef;">
                <tr><td style="padding:14px 18px;">
                  <p style="margin:0 0 4px;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#9a7c2c;">Reviewer note</p>
-                 <p style="margin:0;font-size:15px;line-height:1.6;color:#2b3242;">${input.note}</p>
+                 <p style="margin:0;font-size:15px;line-height:1.6;color:#2b3242;">${esc(input.note)}</p>
                </td></tr>
              </table>
              <p style="margin:16px 0 0">You are welcome to resubmit with updated documentation.</p>`,

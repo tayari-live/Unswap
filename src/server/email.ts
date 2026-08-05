@@ -33,6 +33,20 @@ const SERIF = "Georgia,'Times New Roman',Times,serif"
 const SANS = "'Helvetica Neue',Helvetica,Arial,sans-serif"
 
 /**
+ * Escape a value before interpolating it into email HTML.
+ *
+ * Names, organisations and reviewer notes are user-supplied, so anything
+ * inlined into a template has to be escaped or a member could register as
+ * `<a href="…">` and inject markup into mail we send on their behalf.
+ * Lives here so every template reaches for the same helper.
+ */
+export const esc = (s: string | null | undefined) =>
+  String(s ?? "").replace(
+    /[&<>"']/g,
+    (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c] as string),
+  )
+
+/**
  * Wrap content in the branded UnSwap email shell.
  *
  * `preheader` is the grey preview line mail clients show beside the subject —

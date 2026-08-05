@@ -1,11 +1,9 @@
 import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
-import { sendEmail, renderEmail } from "@/server/email"
+import { sendEmail, renderEmail, esc } from "@/server/email"
 import { notifyAllowed } from "@/server/services/notify"
 
 const APP = () => process.env.AUTH_URL || "http://localhost:3000"
-const esc = (s: string) =>
-  s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c] as string))
 
 const ATTACH_MAX_CHARS = 13_000_000 // ~10 MB encoded
 // Chat attachments: images plus common documents (PDF, Office, text/CSV).
