@@ -53,13 +53,27 @@ export default async function MemberDashboardPage() {
   const userId = (session?.user as any)?.id as string | undefined
   if (!userId) redirect("/login")
 
+  // Select only what this page renders. A bare `include` would also pull every
+  // user's imageUrl, which holds a base64 photo (~130 KB each) — once for the
+  // viewer and again for every requester/host in the lists.
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    include: {
+    select: {
+      email: true,
+      firstName: true,
+      profileCompletion: true,
+      trustScore: true,
+      verificationStatus: true,
       listings: true,
       subscription: true,
-      hostedRequests: { include: { requester: true, listing: true }, orderBy: { createdAt: "desc" } },
-      sentRequests: { include: { host: true, listing: true }, orderBy: { createdAt: "desc" } },
+      hostedRequests: {
+        include: { requester: { select: { fullName: true, avatarInitials: true } }, listing: true },
+        orderBy: { createdAt: "desc" },
+      },
+      sentRequests: {
+        include: { host: { select: { fullName: true, avatarInitials: true } }, listing: true },
+        orderBy: { createdAt: "desc" },
+      },
     },
   })
   if (!user) redirect("/login")

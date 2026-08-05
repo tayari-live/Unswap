@@ -76,12 +76,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         // throw here, or NextAuth surfaces it as JWTSessionError and 500s every
         // authed page. On any failure, fall back to the values carried in the JWT.
         try {
-          const dbUser = await prisma.user.findUnique({
-            where: { id: token.id as string }
-          })
+          // Deliberately NOT `findUnique` with no select: that pulls every
+          // column, and imageUrl holds a base64 photo (~130 KB observed), which
+          // this callback would then transfer on every single page render. We
+          // select the few fields we need plus a hash of the photo, and serve
+          // the bytes from /api/avatar so the browser caches them.
+          const rows = await prisma.$queryRaw<
+            { fullName: string; role: string; avatarInitials: string; imgHash: string | null }[]
+          >`
+            SELECT "fullName", "role", "avatarInitials",
+                   CASE WHEN "imageUrl" IS NULL OR "imageUrl" = '' THEN NULL
+                        ELSE md5("imageUrl") END AS "imgHash"
+            FROM "User" WHERE "id" = ${token.id as string}
+          `
+          const dbUser = rows[0]
           if (dbUser) {
             session.user.name = dbUser.fullName
-            session.user.image = dbUser.imageUrl
+            // Short, cacheable URL instead of an inlined base64 data URL.
+            session.user.image = dbUser.imgHash
+              ? `/api/avatar/${token.id}?v=${dbUser.imgHash}`
+              : null
             ;(session.user as any).role = dbUser.role
             ;(session.user as any).initials = dbUser.avatarInitials
           } else {

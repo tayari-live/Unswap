@@ -28,7 +28,13 @@ export default async function OverviewPage() {
   const stats = await getOverviewStats()
   const recentSubmissions = await prisma.verificationSubmission.findMany({
     where: { status: "PENDING" },
-    include: { member: true },
+    // Only the few member fields this list shows — a bare `include` would pull
+    // each member's base64 imageUrl too.
+    include: {
+      member: {
+        select: { fullName: true, avatarInitials: true, organisation: true, dutyStation: true },
+      },
+    },
     orderBy: { createdAt: "desc" },
     take: 5,
   })
