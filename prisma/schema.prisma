@@ -435,3 +435,15 @@ model Review {
   @@index([subjectId])
   @@index([listingId])
 }
+
+/// Fixed-window rate limiting for the public endpoints that send email.
+/// Kept in Postgres rather than an external store so there is no extra service
+/// to run: these routes already query the database, and a rejected request
+/// costs one indexed lookup instead of a lookup plus an email.
+model RateLimit {
+  key       String   @id
+  count     Int      @default(0)
+  expiresAt DateTime
+
+  @@index([expiresAt])
+}

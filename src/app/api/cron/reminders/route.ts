@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { runReminders } from "@/server/services/reminders"
 import { runSwapLifecycle } from "@/server/services/swaps"
+import { pruneRateLimits } from "@/server/rate-limit"
 
 export const dynamic = "force-dynamic"
 
@@ -37,7 +38,9 @@ export async function GET(req: NextRequest) {
   try {
     const reminders = await runReminders()
     const lifecycle = await runSwapLifecycle()
-    return NextResponse.json({ ok: true, ...reminders, ...lifecycle })
+    // Expired rate-limit windows are dead rows; sweep them on the daily run.
+    const pruned = await pruneRateLimits()
+    return NextResponse.json({ ok: true, ...reminders, ...lifecycle, ...pruned })
   } catch (err) {
     console.error("Cron run failed:", err)
     return NextResponse.json({ error: "Cron run failed" }, { status: 500 })
