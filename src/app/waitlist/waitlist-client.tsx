@@ -19,7 +19,9 @@ const inputCls =
   "w-full bg-[var(--field-bg)] border border-wl-border px-[20px] py-[16px] text-wl-ivory placeholder-wl-muted focus:outline-none focus:border-wl-gold focus:shadow-[0_0_0_1px_var(--border)] transition-all duration-300 text-[15px]"
 
 type CountData = { count: number; recentJoiners: { initials: string }[] }
-type Initiated = { status: "pending" | "already_confirmed"; email: string; confirmUrl?: string }
+// The API answers identically for a new address and one already on the list,
+// so this page cannot tell them apart — which is the point.
+type Initiated = { status: "pending"; email: string; confirmUrl?: string }
 
 export function WaitlistClient() {
   const [mode, setMode] = useState<"join" | "status" | "success" | "error">("join")
@@ -28,6 +30,7 @@ export function WaitlistClient() {
   const [name, setName] = useState("")
   const [organization, setOrganization] = useState("")
   const [checkEmail, setCheckEmail] = useState("")
+  const [statusLinkSent, setStatusLinkSent] = useState(false)
 
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle")
   const [errorMessage, setErrorMessage] = useState("")
@@ -79,14 +82,8 @@ export function WaitlistClient() {
       })
       const data = (await res.json()) as Initiated & { error?: string }
       if (!res.ok) throw new Error(data.error || "Failed to initiate signup")
-      if (data.status === "already_confirmed") {
-        setMode("status")
-        setCheckEmail(email)
-        setErrorMessage("")
-      } else {
-        setDevConfirmUrl(data.confirmUrl)
-        setMode("success")
-      }
+      setDevConfirmUrl(data.confirmUrl)
+      setMode("success")
       setStatus("idle")
     } catch (err) {
       setErrorMessage((err as Error).message || "Failed to initiate signup")
@@ -95,20 +92,26 @@ export function WaitlistClient() {
     }
   }
 
+  /**
+   * Ask for the place to be emailed. The reply is the same whether or not the
+   * address is on the list, so this page never reveals who is a member — the
+   * link goes to the inbox instead.
+   */
   async function handleCheckStatus(e: React.FormEvent) {
     e.preventDefault()
     if (!checkEmail) return
     setStatus("loading")
     setErrorMessage("")
     try {
-      const res = await fetch(`/api/waitlist/status?email=${encodeURIComponent(checkEmail)}`)
+      const res = await fetch("/api/waitlist/status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: checkEmail }),
+      })
       const data = await res.json()
-      if (data.found) {
-        window.location.href = `/waitlist/success?ref=${encodeURIComponent(data.referralCode)}`
-      } else {
-        setErrorMessage("We couldn't find a confirmed waitlist entry for that email.")
-        setStatus("error")
-      }
+      if (!res.ok) throw new Error(data.error || "Something went wrong.")
+      setStatusLinkSent(true)
+      setStatus("idle")
     } catch (err) {
       setErrorMessage((err as Error).message || "Something went wrong.")
       setStatus("error")
@@ -287,17 +290,40 @@ export function WaitlistClient() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/waitlist/logo.png" alt="UnSwap Logo" className="w-28 h-28 object-contain" />
             </div>
-            <h1 className="font-display text-[36px] sm:text-[48px] font-light text-wl-ivory mb-8 tracking-tight leading-[1.1]">
-              Check your <em className="text-wl-gold-light italic">waitlist status</em>
-            </h1>
-            <form onSubmit={handleCheckStatus} className="w-full flex flex-col items-center gap-4">
-              <input type="email" value={checkEmail} onChange={(e) => { setCheckEmail(e.target.value); if (errorMessage) setErrorMessage("") }} placeholder="email@example.com" required className={inputCls} />
-              <button type="submit" disabled={status === "loading"} className="btn-gold w-full flex items-center justify-center mt-2 group shadow-[0_4px_24px_var(--gold-dim)]">
-                {status === "loading" ? "Loading..." : "Check Status"}
-              </button>
-            </form>
+            {statusLinkSent ? (
+              <>
+                <h1 className="font-display text-[36px] sm:text-[48px] font-light text-wl-ivory mb-6 tracking-tight leading-[1.1]">
+                  Check your <em className="text-wl-gold-light italic">inbox</em>
+                </h1>
+                {/* Worded so it reveals nothing either way: the same message
+                    appears whether or not the address is on the list. */}
+                <p className="text-wl-ivory-dim text-[15px] leading-relaxed max-w-md">
+                  If <span className="text-wl-ivory font-medium break-all">{checkEmail}</span> is on the
+                  waitlist, we have sent your place and invitation link to that address.
+                </p>
+                <p className="text-wl-muted text-[13px] leading-relaxed mt-4 max-w-md">
+                  It should arrive within a minute. Check your spam folder if you do not see it.
+                </p>
+              </>
+            ) : (
+              <>
+                <h1 className="font-display text-[36px] sm:text-[48px] font-light text-wl-ivory mb-4 tracking-tight leading-[1.1]">
+                  Find your <em className="text-wl-gold-light italic">place in the queue</em>
+                </h1>
+                <p className="text-wl-ivory-dim text-[15px] leading-relaxed mb-8 max-w-md">
+                  Enter your email and we will send your position and invitation link straight to your inbox.
+                </p>
+                <form onSubmit={handleCheckStatus} className="w-full flex flex-col items-center gap-4">
+                  <label htmlFor="wl-check-email" className="sr-only">Email address</label>
+                  <input id="wl-check-email" type="email" value={checkEmail} onChange={(e) => { setCheckEmail(e.target.value); if (errorMessage) setErrorMessage("") }} placeholder="email@example.com" required className={inputCls} />
+                  <button type="submit" disabled={status === "loading"} className="btn-gold w-full flex items-center justify-center mt-2 group shadow-[0_4px_24px_var(--gold-dim)]">
+                    {status === "loading" ? "Sending..." : "Email me my link"}
+                  </button>
+                </form>
+              </>
+            )}
             {errorMessage && <motion.p initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className="text-[#ff6b6b] text-[14.5px] mt-6 mb-2">{errorMessage}</motion.p>}
-            <button onClick={() => { setMode("join"); setErrorMessage("") }} className="mt-8 text-wl-muted hover:text-wl-gold text-[11px] font-medium tracking-[0.18em] uppercase transition-colors">← Back to waitlist</button>
+            <button onClick={() => { setMode("join"); setErrorMessage(""); setStatusLinkSent(false) }} className="mt-8 text-wl-muted hover:text-wl-gold text-[11px] font-medium tracking-[0.18em] uppercase transition-colors">← Back to waitlist</button>
           </motion.div>
         )}
       </AnimatePresence>

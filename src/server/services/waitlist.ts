@@ -72,7 +72,11 @@ export async function initiateWaitlist(input: { name: string; email: string; org
 
   const existing = await prisma.waitlistEntry.findUnique({ where: { email } })
   if (existing?.confirmedAt) {
-    return { status: "already_confirmed" as const, email }
+    // Already on the list. Replying "already confirmed" would let anyone test
+    // an address from this form, so send their place to the inbox and return
+    // exactly what a first-time signup returns.
+    await sendWaitlistStatusLink(email)
+    return { status: "pending" as const, email, emailSent: true, confirmUrl: undefined }
   }
 
   const token = randomBytes(32).toString("hex")
@@ -122,6 +126,25 @@ export async function confirmWaitlist(token: string) {
   const position = await positionOf({ referrals: entry.referrals, confirmedAt })
   await logAudit({ action: "WAITLIST_CONFIRMED", subject: `${entry.firstName} ${entry.lastName}`, metadata: { email: entry.email } })
 
+  // Put the share link in their inbox now. Otherwise the only way back to it is
+  // the status lookup, which makes that lookup load-bearing — the reason it had
+  // to answer anyone who asked in the first place.
+  await sendEmail({
+    to: entry.email,
+    subject: "You're on the UnSwap waitlist",
+    html: renderEmail({
+      eyebrow: "Position Confirmed",
+      heading: `You're in, ${esc(entry.firstName)}.`,
+      preheader: `You are number ${position} on the waitlist. Keep this link to track your place.`,
+      body: `<p style="margin:0 0 14px">Your place is confirmed. You are currently <strong>number ${position}</strong> in the queue.</p>
+             <p style="margin:0">Every peer who joins through your invitation moves you up. Keep this link — it is how you track your position and share your invitation.</p>`,
+      ctaLabel: "View my place",
+      ctaUrl: `${baseUrl()}/waitlist/success?ref=${entry.referralCode}`,
+      footnote: "Save this email so you can return to your invitation link at any time.",
+    }),
+    text: `You're in, ${entry.firstName}. You are number ${position} on the UnSwap waitlist.\n\nTrack your place and share your invitation: ${baseUrl()}/waitlist/success?ref=${entry.referralCode}`,
+  })
+
   return {
     referralCode: entry.referralCode,
     referralUrl: referralUrl(entry.referralCode),
@@ -131,22 +154,41 @@ export async function confirmWaitlist(token: string) {
   }
 }
 
-/** Public: a confirmed member's live status (position, referral count, link). */
-export async function getWaitlistStatus(rawEmail: string) {
+/**
+ * Email a confirmed member their share link.
+ *
+ * Replaces answering "is this address on the waitlist?" to whoever asks: the
+ * response is identical either way, so the only party who learns anything is
+ * whoever controls the inbox. Unknown and unconfirmed addresses are a silent
+ * no-op rather than an error, for the same reason.
+ */
+export async function sendWaitlistStatusLink(rawEmail: string) {
   const email = rawEmail?.trim().toLowerCase()
-  if (!email) throw new ApiError(400, "Email is required.")
+  if (!EMAIL_RE.test(email)) throw new ApiError(400, "Enter a valid email address.")
+
   const e = await prisma.waitlistEntry.findUnique({ where: { email } })
-  if (!e || !e.confirmedAt) return { found: false as const }
+  if (!e?.confirmedAt) return { ok: true as const }
+
   const position = await positionOf({ referrals: e.referrals, confirmedAt: e.confirmedAt })
-  return {
-    found: true as const,
-    referralCode: e.referralCode,
-    referralUrl: referralUrl(e.referralCode),
-    position,
-    referrals: e.referrals,
-    earlyBird: position <= EARLY_BIRD_CAP,
-  }
+  await sendEmail({
+    to: e.email,
+    subject: "Your UnSwap waitlist place",
+    html: renderEmail({
+      eyebrow: "Your Place",
+      heading: `Here's your link, ${esc(e.firstName)}.`,
+      preheader: `You are number ${position} on the waitlist.`,
+      body: `<p style="margin:0 0 14px">You are currently <strong>number ${position}</strong> on the waitlist, with <strong>${e.referrals}</strong> confirmed invitation${e.referrals === 1 ? "" : "s"}.</p>
+             <p style="margin:0">Use the link below to track your position and invite peers. Each one who joins moves you up the queue.</p>`,
+      ctaLabel: "View my place",
+      ctaUrl: `${baseUrl()}/waitlist/success?ref=${e.referralCode}`,
+      footnote: "If you did not request this, you can ignore this email.",
+    }),
+    text: `You are number ${position} on the UnSwap waitlist.\n\nTrack your place: ${baseUrl()}/waitlist/success?ref=${e.referralCode}`,
+  })
+
+  return { ok: true as const }
 }
+
 
 /** Same as above but keyed by referral code — used by the share page. */
 export async function getWaitlistStatusByCode(rawCode: string) {
