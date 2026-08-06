@@ -164,6 +164,59 @@ h1, h2, h3, h4, h5, h6 {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/*
+ * Keyboard focus.
+ *
+ * Custom-styled buttons and links suppressed the browser's default outline, so
+ * tabbing through the app showed nothing at all. :focus-visible applies only to
+ * keyboard (and other non-pointer) focus, so this never adds a ring on click.
+ * Gold reads as intentional here rather than as a browser artefact, and clears
+ * 3:1 contrast against both the cream and obsidian canvases.
+ */
+:where(a, button, [role="button"], input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* On the navy rails the gold ring is low-contrast; use ivory there instead. */
+.bg-gradient-to-b :where(a, button, [tabindex]):focus-visible,
+[data-nav-rail] :where(a, button, [tabindex]):focus-visible {
+  outline-color: var(--wl-ivory, #f5f0e8);
+}
+
+/* Visually hidden, still announced by screen readers. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* A skip link is hidden until focused, then sits above everything. */
+.skip-link:focus {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 300;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 0.75rem 1.25rem;
+  clip: auto;
+  overflow: visible;
+  background: var(--navy);
+  color: #fff;
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

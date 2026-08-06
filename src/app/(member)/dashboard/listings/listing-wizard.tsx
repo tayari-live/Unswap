@@ -334,8 +334,8 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
             <Heading title="What are you listing?" sub="Give your home a short, inviting title and pick its type." />
             <div className="space-y-6">
               <div>
-                <label className={label}>Property title <span className="text-neutral normal-case font-normal">({v.title.length}/80)</span></label>
-                <input className={input} maxLength={80} value={v.title} onChange={(e) => set("title", e.target.value)} placeholder="Sunlit apartment near the lake" />
+                <label className={label} htmlFor="title">Property title <span className="text-neutral normal-case font-normal">({v.title.length}/80)</span></label>
+                <input id="title" className={input} maxLength={80} value={v.title} onChange={(e) => set("title", e.target.value)} placeholder="Sunlit apartment near the lake" />
               </div>
               <div>
                 <label className={label}>Property type</label>
@@ -355,22 +355,22 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
             <Heading title="Where is your home?" sub="Only the city, country, and neighbourhood are shown publicly. The full address stays encrypted until a swap is confirmed." />
             <div className="space-y-5">
               <div>
-                <label className={label}>Full address <span className="text-neutral normal-case font-normal">(private)</span></label>
-                <input className={input} value={v.fullAddress} onChange={(e) => set("fullAddress", e.target.value)} placeholder="12 Rue du Lac, Apt 4B" />
+                <label className={label} htmlFor="fullAddress">Full address <span className="text-neutral normal-case font-normal">(private)</span></label>
+                <input id="fullAddress" className={input} value={v.fullAddress} onChange={(e) => set("fullAddress", e.target.value)} placeholder="12 Rue du Lac, Apt 4B" />
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div><label className={label}>City</label><input className={input} value={v.city} onChange={(e) => set("city", e.target.value)} placeholder="Geneva" /></div>
+                <div><label className={label} htmlFor="city">City</label><input id="city" className={input} value={v.city} onChange={(e) => set("city", e.target.value)} placeholder="Geneva" /></div>
                 <div>
-                  <label className={label}>Country</label>
-                  <select className={input} value={v.country} onChange={(e) => set("country", e.target.value)}>
+                  <label className={label} htmlFor="country">Country</label>
+                  <select id="country" className={input} value={v.country} onChange={(e) => set("country", e.target.value)}>
                     <option value="">Select…</option>
                     {countryOptions.map((c) => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
               </div>
               <div>
-                <label className={label}>Neighbourhood <span className="text-neutral normal-case font-normal">(shown publicly)</span></label>
-                <input className={input} value={v.neighbourhood} onChange={(e) => set("neighbourhood", e.target.value)} placeholder="Eaux-Vives" />
+                <label className={label} htmlFor="neighbourhood">Neighbourhood <span className="text-neutral normal-case font-normal">(shown publicly)</span></label>
+                <input id="neighbourhood" className={input} value={v.neighbourhood} onChange={(e) => set("neighbourhood", e.target.value)} placeholder="Eaux-Vives" />
               </div>
             </div>
           </div>
@@ -541,10 +541,10 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
             <Heading title="Who can guests call if something goes wrong?" sub="Encrypted, and only shared with a confirmed swap partner." />
             <div className="rounded-xl bg-[var(--parchment)] border border-[var(--gold)]/20 p-5 space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div><label className={label}>Contact name</label><input className={input} value={v.emergencyName} onChange={(e) => set("emergencyName", e.target.value)} /></div>
-                <div><label className={label}>Phone</label><input className={input} value={v.emergencyPhone} onChange={(e) => set("emergencyPhone", e.target.value)} placeholder="+41 …" /></div>
+                <div><label className={label} htmlFor="emergencyName">Contact name</label><input id="emergencyName" className={input} value={v.emergencyName} onChange={(e) => set("emergencyName", e.target.value)} /></div>
+                <div><label className={label} htmlFor="emergencyPhone">Phone</label><input id="emergencyPhone" className={input} value={v.emergencyPhone} onChange={(e) => set("emergencyPhone", e.target.value)} placeholder="+41 …" /></div>
               </div>
-              <div><label className={label}>Relationship to property</label><input className={input} value={v.emergencyRelationship} onChange={(e) => set("emergencyRelationship", e.target.value)} placeholder="Building manager, neighbour…" /></div>
+              <div><label className={label} htmlFor="emergencyRelationship">Relationship to property</label><input id="emergencyRelationship" className={input} value={v.emergencyRelationship} onChange={(e) => set("emergencyRelationship", e.target.value)} placeholder="Building manager, neighbour…" /></div>
             </div>
           </div>
         )}

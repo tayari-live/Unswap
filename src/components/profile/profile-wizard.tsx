@@ -191,16 +191,16 @@ export function ProfileWizard({
         {key === "fullName" && (
           <div>
             <Heading title="What's your name?" sub="This is how you'll appear to other members of the network." />
-            <label className={label}>Display name</label>
-            <input className={input} value={v.fullName} onChange={(e) => set("fullName", e.target.value)} placeholder="Amara Okafor" />
+            <label className={label} htmlFor="fullName">Display name</label>
+            <input id="fullName" className={input} value={v.fullName} onChange={(e) => set("fullName", e.target.value)} placeholder="Amara Okafor" />
           </div>
         )}
 
         {key === "organisation" && (
           <div>
             <Heading title="Where do you work?" sub="Your organisation, so members can see you're part of the community." />
-            <label className={label}>Organisation</label>
-            <select className={input} value={v.organisation} onChange={(e) => set("organisation", e.target.value)}>
+            <label className={label} htmlFor="organisation">Organisation</label>
+            <select id="organisation" className={input} value={v.organisation} onChange={(e) => set("organisation", e.target.value)}>
               <option value="">Select…</option>
               {orgOptions.map((o) => <option key={o} value={o}>{o}</option>)}
             </select>
@@ -210,8 +210,8 @@ export function ProfileWizard({
         {key === "nationality" && (
           <div>
             <Heading title="What's your nationality?" sub="Shown on your profile to help build a sense of community." />
-            <label className={label}>Nationality</label>
-            <select className={input} value={v.nationality} onChange={(e) => set("nationality", e.target.value)}>
+            <label className={label} htmlFor="nationality">Nationality</label>
+            <select id="nationality" className={input} value={v.nationality} onChange={(e) => set("nationality", e.target.value)}>
               <option value="">Select…</option>
               {nationalityOptions.map((n) => <option key={n} value={n}>{n}</option>)}
             </select>
@@ -221,24 +221,24 @@ export function ProfileWizard({
         {key === "dutyStation" && (
           <div>
             <Heading title="Where are you based?" sub="Your current duty station." />
-            <label className={label}>Current duty station</label>
-            <input className={input} value={v.dutyStation} onChange={(e) => set("dutyStation", e.target.value)} placeholder="Geneva" />
+            <label className={label} htmlFor="dutyStation">Current duty station</label>
+            <input id="dutyStation" className={input} value={v.dutyStation} onChange={(e) => set("dutyStation", e.target.value)} placeholder="Geneva" />
           </div>
         )}
 
         {key === "languages" && (
           <div>
             <Heading title="Which languages do you speak?" sub="Helpful for members considering an exchange with you." />
-            <label className={label}>Languages</label>
-            <input className={input} value={v.languages} onChange={(e) => set("languages", e.target.value)} placeholder="English, French" />
+            <label className={label} htmlFor="languages">Languages</label>
+            <input id="languages" className={input} value={v.languages} onChange={(e) => set("languages", e.target.value)} placeholder="English, French" />
           </div>
         )}
 
         {key === "bio" && (
           <div>
             <Heading title="Tell members about yourself" sub="A short introduction. Your work, your interests, what you are looking for." />
-            <label className={label}>Bio</label>
-            <textarea rows={5} className={input} value={v.bio} onChange={(e) => set("bio", e.target.value)} placeholder="A short introduction for fellow members." />
+            <label className={label} htmlFor="bio">Bio</label>
+            <textarea rows={5} id="bio" className={input} value={v.bio} onChange={(e) => set("bio", e.target.value)} placeholder="A short introduction for fellow members." />
             <p className="mt-2 text-xs text-neutral">
               {v.bio.trim().length === 0
                 ? `At least ${MIN_BIO} characters, or skip this for now.`
@@ -252,8 +252,8 @@ export function ProfileWizard({
         {key === "linkedinUrl" && (
           <div>
             <Heading title="Add your LinkedIn" sub="Optional — an extra signal of trust for potential swap partners." />
-            <label className={label}>LinkedIn <span className="text-neutral normal-case font-normal">(optional)</span></label>
-            <input className={input} value={v.linkedinUrl} onChange={(e) => set("linkedinUrl", e.target.value)} placeholder="https://linkedin.com/in/…" />
+            <label className={label} htmlFor="linkedinUrl">LinkedIn <span className="text-neutral normal-case font-normal">(optional)</span></label>
+            <input id="linkedinUrl" className={input} value={v.linkedinUrl} onChange={(e) => set("linkedinUrl", e.target.value)} placeholder="https://linkedin.com/in/…" />
           </div>
         )}
 

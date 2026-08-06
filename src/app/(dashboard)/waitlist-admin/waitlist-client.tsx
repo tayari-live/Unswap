@@ -6,6 +6,7 @@ import { Download, Send, CheckCircle2, Trophy, Upload, MailWarning, RefreshCw, X
 import { LuxPageHeader } from "@/components/ui/lux"
 import { StatusBadge } from "@/components/ui/badges"
 import { useToast } from "@/components/ui/toast"
+import { useEscapeKey } from "@/lib/use-escape-key"
 
 type Entry = {
   id: string
@@ -31,6 +32,10 @@ export default function WaitlistClient({ initialEntries }: { initialEntries: Ent
   const [importOpen, setImportOpen] = useState(false)
   const [importText, setImportText] = useState("")
   const [importBusy, setImportBusy] = useState(false)
+
+  // Escape closes the import dialog, matching the backdrop click. Ignored while
+  // an import is running so a stray keypress cannot dismiss it mid-flight.
+  useEscapeKey(importOpen && !importBusy, () => setImportOpen(false))
 
   const pendingCount = entries.filter((e) => e.status === "pending").length
   const unconfirmedCount = entries.filter((e) => !e.confirmedAt).length
@@ -257,9 +262,15 @@ export default function WaitlistClient({ initialEntries }: { initialEntries: Ent
       {/* Import modal */}
       {importOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[var(--navy)]/40" onClick={() => !importBusy && setImportOpen(false)}>
-          <div className="bg-surface rounded-md shadow-2xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="import-leads-title"
+            className="bg-surface rounded-md shadow-2xl w-full max-w-lg"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--hair)]">
-              <h2 className="font-display font-bold text-lg text-[var(--fg)]">Import leads</h2>
+              <h2 id="import-leads-title" className="font-display font-bold text-lg text-[var(--fg)]">Import leads</h2>
               <button onClick={() => setImportOpen(false)} disabled={importBusy} className="text-neutral hover:text-[var(--fg)]"><X size={20} /></button>
             </div>
             <div className="p-6 space-y-4">

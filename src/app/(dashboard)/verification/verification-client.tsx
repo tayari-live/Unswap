@@ -6,6 +6,7 @@ import { ShieldCheck, X, Check, FileText, Mail, MapPin, Building2 } from "lucide
 import { LuxPageHeader } from "@/components/ui/lux"
 import { Badge } from "@/components/ui/badges"
 import { useToast } from "@/components/ui/toast"
+import { useEscapeKey } from "@/lib/use-escape-key"
 
 // A rejection note is emailed to the member as their reason, so require a real
 // sentence — not "no". Kept in sync with the server (rejectSubmission).
@@ -35,6 +36,10 @@ export default function VerificationClient({ initialSubmissions }: { initialSubm
   const [selected, setSelected] = useState<Submission | null>(null)
   const [note, setNote] = useState("")
   const [busy, setBusy] = useState(false)
+
+  // Escape closes the review dialog, matching the backdrop click. Ignored while
+  // a decision is in flight, so a stray keypress cannot dismiss mid-submit.
+  useEscapeKey(!!selected && !busy, () => setSelected(null))
 
   // Keep the queue in sync with the server after router.refresh() — otherwise a
   // submission reviewed elsewhere (another tab/admin) lingers here as a stale
@@ -134,9 +139,15 @@ export default function VerificationClient({ initialSubmissions }: { initialSubm
       {/* Review drawer/modal */}
       {selected && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[var(--navy)]/40" onClick={() => !busy && setSelected(null)}>
-          <div className="bg-surface rounded-md shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="review-submission-title"
+            className="bg-surface rounded-md shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--hair)] sticky top-0 bg-surface">
-              <h2 className="font-display font-bold text-lg text-[var(--fg)]">Review Submission</h2>
+              <h2 id="review-submission-title" className="font-display font-bold text-lg text-[var(--fg)]">Review Submission</h2>
               <button onClick={() => setSelected(null)} disabled={busy} className="text-neutral hover:text-[var(--fg)]">
                 <X size={20} />
               </button>

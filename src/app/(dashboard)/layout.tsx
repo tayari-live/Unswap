@@ -32,7 +32,9 @@ export default async function DashboardLayout({
       <div className="hidden md:block">
         <AdminSidebar name={u.name || ""} initials={initials} image={u.image || null} />
       </div>
-      <main className="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8 bg-[var(--canvas)]">
+      {/* Lets keyboard users jump the nav rail on every navigation. */}
+      <a href="#main" className="sr-only skip-link">Skip to content</a>
+      <main id="main" className="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8 bg-[var(--canvas)]">
         {children}
       </main>
       <MobileNav />
