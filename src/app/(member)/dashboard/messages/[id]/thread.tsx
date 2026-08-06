@@ -336,7 +336,7 @@ export function Thread({
       {/* Middle Pane - Chat Thread */}
       <div className="flex-1 flex flex-col min-w-0 h-full relative">
         {/* Header — who you're talking to, and the swap stage if one is linked */}
-        <div className="flex items-center gap-3 p-4 border-b border-[var(--border)] bg-[var(--surface)] sticky top-0 z-10 text-sm">
+        <div className="flex items-center gap-3 p-4 border-b border-[var(--hair)] bg-[var(--surface)] sticky top-0 z-10 text-sm">
           <Link href="/dashboard/messages" className="md:hidden text-neutral hover:text-[var(--fg)] mr-2">
             <ArrowLeft size={20} />
           </Link>
@@ -386,18 +386,18 @@ export function Thread({
                 <div key={m.id}>
                   {newDay && (
                     <div className="flex justify-center my-4">
-                      <span className="text-[11px] font-semibold text-neutral bg-[var(--surface)] border border-[var(--border)] rounded-full px-3 py-1 shadow-sm">
+                      <span className="text-[11px] font-semibold text-neutral bg-[var(--surface)] border border-[var(--hair)] rounded-full px-3 py-1">
                         {dayLabel(m.createdAt)}
                       </span>
                     </div>
                   )}
                   <div className={`flex items-end gap-2 ${mine ? "justify-end" : "justify-start"}`}>
                   {!mine && (
-                    <div className="w-8 h-8 rounded-full bg-[var(--surface)] border border-[var(--border)] text-[var(--fg)] flex items-center justify-center text-xs font-bold overflow-hidden flex-shrink-0 mb-1">
+                    <div className="w-8 h-8 rounded-full bg-[var(--surface)] border border-[var(--hair)] text-[var(--fg)] flex items-center justify-center text-xs font-bold overflow-hidden flex-shrink-0 mb-1">
                       {other?.avatarInitials ?? "?"}
                     </div>
                   )}
-                  <div className={`max-w-[75%] rounded-2xl px-4 py-3 shadow-sm ${mine ? "bg-[var(--chat-active)] text-[var(--fg)] rounded-br-sm" : "bg-[var(--surface)] border border-[var(--border)] text-[var(--fg)] rounded-bl-sm"}`}>
+                  <div className={`max-w-[75%] rounded-2xl px-4 py-3 ${mine ? "bg-[var(--chat-active)] text-[var(--fg)] rounded-br-sm" : "bg-[var(--surface)] border border-[var(--hair)] text-[var(--fg)] rounded-bl-sm"}`}>
                     {deleted ? (
                       <p className="flex items-center gap-1.5 text-sm italic text-neutral">
                         <Ban size={14} /> This message was deleted
@@ -414,7 +414,7 @@ export function Thread({
                               target="_blank"
                               rel="noreferrer"
                               download
-                              className="flex items-center gap-2.5 mb-2 rounded-lg border border-[var(--border)] bg-white/70 px-3 py-2.5 hover:bg-[var(--surface)] transition-colors"
+                              className="flex items-center gap-2.5 mb-2 rounded-lg border border-[var(--hair)] bg-[var(--surface)]/70 px-3 py-2.5 hover:bg-[var(--surface)] transition-colors"
                             >
                               <span className="w-8 h-8 rounded-lg bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center flex-shrink-0">
                                 <FileText size={16} />
@@ -453,7 +453,7 @@ export function Thread({
                         <MoreVertical size={16} />
                       </button>
                       {menuId === m.id && (
-                        <div className={`absolute bottom-full mb-1 z-40 w-48 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-lg py-1 ${mine ? "right-0" : "left-0"}`}>
+                        <div className={`absolute bottom-full mb-1 z-40 w-48 bg-[var(--surface)] border border-[var(--hair)] rounded-xl py-1 ${mine ? "right-0" : "left-0"}`}>
                           <button onClick={() => doDelete(m.id, "me")} className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--fg)] hover:bg-[var(--background)] text-left">
                             <Trash2 size={15} className="text-neutral" /> Delete for me
                           </button>
@@ -474,10 +474,10 @@ export function Thread({
 
             {otherTyping && (
               <div className="flex items-end gap-2 justify-start">
-                <div className="w-8 h-8 rounded-full bg-[var(--surface)] border border-[var(--border)] text-[var(--fg)] flex items-center justify-center text-xs font-bold overflow-hidden flex-shrink-0 mb-1">
+                <div className="w-8 h-8 rounded-full bg-[var(--surface)] border border-[var(--hair)] text-[var(--fg)] flex items-center justify-center text-xs font-bold overflow-hidden flex-shrink-0 mb-1">
                   {other?.avatarInitials ?? "?"}
                 </div>
-                <div className="bg-[var(--surface)] border border-[var(--border)] rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm">
+                <div className="bg-[var(--surface)] border border-[var(--hair)] rounded-2xl rounded-bl-sm px-4 py-3">
                   <span className="flex items-center gap-1" aria-label={`${other?.fullName?.split(" ")[0] || "Member"} is typing`}>
                     <span className="w-1.5 h-1.5 rounded-full bg-neutral/50 animate-bounce [animation-delay:-0.3s]" />
                     <span className="w-1.5 h-1.5 rounded-full bg-neutral/50 animate-bounce [animation-delay:-0.15s]" />
@@ -498,7 +498,7 @@ export function Thread({
           <button
             type="button"
             onClick={() => scrollToBottom()}
-            className="absolute bottom-24 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 rounded-full bg-[var(--surface)] border border-[var(--border)] shadow-lg pl-3 pr-3.5 py-2 text-xs font-semibold text-[var(--fg)] hover:bg-[var(--background)] transition-colors"
+            className="absolute bottom-24 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 rounded-full bg-[var(--surface)] border border-[var(--hair)] pl-3 pr-3.5 py-2 text-xs font-semibold text-[var(--fg)] hover:bg-[var(--background)] transition-colors"
           >
             <ChevronDown size={16} className="text-[var(--gold-dark)]" />
             {newCount > 0 ? `${newCount} new message${newCount > 1 ? "s" : ""}` : "Jump to latest"}
@@ -506,20 +506,20 @@ export function Thread({
         )}
 
         {/* Composer Area */}
-        <div className="bg-[var(--surface)] border-t border-[var(--border)] p-4 relative z-10 shadow-[0_-4px_10px_rgba(0,0,0,0.02)]">
+        <div className="bg-[var(--surface)] border-t border-[var(--hair)] p-4 relative z-10 shadow-[0_-4px_10px_rgba(0,0,0,0.02)]">
           <form onSubmit={(e) => send(e)}>
             {attachment && (
               <div className="mb-3">
                 {isImageData(attachment) ? (
                   <div className="relative inline-block">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={attachment} alt="preview" className="h-20 rounded-lg border border-[var(--border)]" />
-                    <button type="button" onClick={() => setAttachment(null)} className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-[var(--surface)] border border-[var(--border)] text-[var(--fg)] flex items-center justify-center shadow">
+                    <img src={attachment} alt="preview" className="h-20 rounded-lg border border-[var(--hair)]" />
+                    <button type="button" onClick={() => setAttachment(null)} className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-[var(--surface)] border border-[var(--hair)] text-[var(--fg)] flex items-center justify-center shadow">
                       <X size={13} />
                     </button>
                   </div>
                 ) : (
-                  <div className="inline-flex items-center gap-2.5 rounded-lg border border-[var(--border)] bg-[var(--background)] px-3 py-2 pr-2">
+                  <div className="inline-flex items-center gap-2.5 rounded-lg border border-[var(--hair)] bg-[var(--background)] px-3 py-2 pr-2">
                     <span className="w-8 h-8 rounded-lg bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center flex-shrink-0">
                       <FileText size={16} />
                     </span>
@@ -557,8 +557,8 @@ export function Thread({
       </div>
 
       {/* Right Pane - Trip Details (Hidden on small screens) */}
-      <div className="hidden lg:flex w-80 xl:w-96 flex-col border-l border-[var(--border)] bg-[var(--surface)] flex-shrink-0 h-full overflow-y-auto">
-        <div className="p-4 border-b border-[var(--border)] font-bold text-[var(--fg)] text-center text-sm sticky top-0 bg-[var(--surface)] z-10">
+      <div className="hidden lg:flex w-80 xl:w-96 flex-col border-l border-[var(--hair)] bg-[var(--surface)] flex-shrink-0 h-full overflow-y-auto">
+        <div className="p-4 border-b border-[var(--hair)] font-bold text-[var(--fg)] text-center text-sm sticky top-0 bg-[var(--surface)] z-10">
           {other?.fullName?.split(" ")[0] ? `${other.fullName.split(" ")[0]}'s trip` : "Trip details"}
         </div>
         
@@ -570,7 +570,7 @@ export function Thread({
                 <img src={listing.primaryPhotoUrl} alt="Listing" className="w-full h-full object-cover" />
               </div>
             ) : (
-              <div className="aspect-[4/3] rounded-xl bg-[var(--parchment)] mb-4 flex items-center justify-center border border-[var(--border)]">
+              <div className="aspect-[4/3] rounded-xl bg-[var(--parchment)] mb-4 flex items-center justify-center border border-[var(--hair)]">
                 <span className="text-neutral text-sm font-medium">No image</span>
               </div>
             )}
@@ -595,7 +595,7 @@ export function Thread({
               </div>
             </div>
 
-            <div className="py-3 border-t border-[var(--border)] mb-5 space-y-2.5">
+            <div className="py-3 border-t border-[var(--hair)] mb-5 space-y-2.5">
               <div className="flex items-center justify-between">
                 <span className="text-xs text-neutral">Exchange type</span>
                 <span className="font-bold text-sm text-[var(--fg)]">{exchangeType}</span>
@@ -610,14 +610,14 @@ export function Thread({
 
             <Link
               href="/dashboard/swaps"
-              className="block w-full py-3.5 px-4 rounded-xl text-sm font-bold text-center text-[var(--navy)] bg-[var(--gold)] hover:bg-[var(--gold-hover)] transition-colors shadow-sm"
+              className="block w-full py-3.5 px-4 rounded-xl text-sm font-bold text-center text-[var(--navy)] bg-[var(--gold)] hover:bg-[var(--gold-hover)] transition-colors"
             >
               View swap request
             </Link>
           </div>
         ) : (
           <div className="p-8 text-center text-sm text-neutral flex flex-col items-center">
-            <div className="w-20 h-20 rounded-full bg-[var(--surface)] border border-[var(--border)] shadow-sm text-[var(--fg)] flex items-center justify-center text-2xl font-bold mb-4 overflow-hidden">
+            <div className="w-20 h-20 rounded-full bg-[var(--surface)] border border-[var(--hair)] text-[var(--fg)] flex items-center justify-center text-2xl font-bold mb-4 overflow-hidden">
               {other?.avatarInitials ?? "?"}
             </div>
             <h3 className="font-display font-bold text-[var(--fg)] text-lg mb-1">{other?.fullName || "Member"}</h3>

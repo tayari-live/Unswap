@@ -24,7 +24,7 @@ export type ProfileValues = {
 }
 
 const inputCls =
-  "block w-full px-4 py-3 border border-[var(--border)] rounded-xl bg-[var(--surface)] placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] text-sm text-[var(--fg)] transition-all"
+  "block w-full px-4 py-3 border border-[var(--hair)] rounded-xl bg-[var(--surface)] placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] text-sm text-[var(--fg)] transition-all"
 const labelCls = "block text-xs font-semibold uppercase tracking-wider text-[var(--fg)] mb-2"
 
 export function ProfileForm({
@@ -94,13 +94,13 @@ export function ProfileForm({
         {v.imageUrl ? (
           <div className="relative">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={v.imageUrl} alt="Profile" className="w-20 h-20 rounded-full object-cover border border-[var(--border)]" />
-            <button type="button" onClick={() => set("imageUrl", null)} aria-label="Remove photo" className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-[var(--surface)] border border-[var(--border)] text-[var(--fg)] flex items-center justify-center shadow">
+            <img src={v.imageUrl} alt="Profile" className="w-20 h-20 rounded-full object-cover border border-[var(--hair)]" />
+            <button type="button" onClick={() => set("imageUrl", null)} aria-label="Remove photo" className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-[var(--surface)] border border-[var(--hair)] text-[var(--fg)] flex items-center justify-center shadow">
               <X size={13} />
             </button>
           </div>
         ) : (
-          <label className="w-20 h-20 rounded-full border-2 border-dashed border-[var(--border)] bg-[var(--background)] flex flex-col items-center justify-center cursor-pointer hover:border-[var(--gold)] transition-colors text-neutral">
+          <label className="w-20 h-20 rounded-full border-2 border-dashed border-[var(--hair)] bg-[var(--background)] flex flex-col items-center justify-center cursor-pointer hover:border-[var(--gold)] transition-colors text-neutral">
             <UploadCloud size={18} />
             <input type="file" accept={ACCEPT} className="hidden" onChange={(e) => pickFile(e.target.files?.[0])} />
           </label>
@@ -154,7 +154,7 @@ export function ProfileForm({
         <input id="linkedinUrl" value={v.linkedinUrl} onChange={(e) => set("linkedinUrl", e.target.value)} className={inputCls} placeholder="https://linkedin.com/in/…" />
       </div>
 
-      <button type="submit" disabled={loading} className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] disabled:opacity-50 transition-colors shadow-sm">
+      <button type="submit" disabled={loading} className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] disabled:opacity-50 transition-colors">
         {loading ? "Saving…" : saved ? (<><Check size={16} /> Saved</>) : submitLabel}
       </button>
     </form>

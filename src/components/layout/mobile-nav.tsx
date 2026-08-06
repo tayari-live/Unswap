@@ -85,7 +85,7 @@ export function MobileNav({ variant = "admin" }: { variant?: "admin" | "member" 
             </button>
 
             {moreOpen && (
-              <div className="absolute bottom-full right-0 mb-2 w-44 bg-[var(--surface)] rounded-xl border border-[var(--border)] shadow-lg py-1 overflow-hidden">
+              <div className="absolute bottom-full right-0 mb-2 w-44 bg-[var(--surface)] rounded-xl border border-[var(--hair)] shadow-lg py-1 overflow-hidden">
                 {overflow.map((item) => {
                   const active = isActive(item.href)
                   return (

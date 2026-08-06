@@ -67,7 +67,7 @@ export function AppAssistant() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? "Close the UnSwap Guide" : "Open the UnSwap Guide"}
-        className={`fixed bottom-24 md:bottom-6 right-4 md:right-6 z-[90] w-13 h-13 p-3.5 rounded-full bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] text-white shadow-lg transition-colors ${
+        className={`fixed bottom-24 md:bottom-6 right-4 md:right-6 z-[90] w-13 h-13 p-3.5 rounded-full bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] text-white transition-colors ${
           open ? "hidden md:block" : ""
         }`}
       >
@@ -78,7 +78,7 @@ export function AppAssistant() {
         <div
           role="dialog"
           aria-label="UnSwap Guide"
-          className="fixed z-[95] inset-x-2 top-16 bottom-2 md:inset-auto md:bottom-22 md:right-6 md:top-auto md:w-full md:max-w-sm md:h-[min(28rem,calc(100dvh-7.5rem))] bg-surface border border-[var(--border)] rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+          className="fixed z-[95] inset-x-2 top-16 bottom-2 md:inset-auto md:bottom-22 md:right-6 md:top-auto md:w-full md:max-w-sm md:h-[min(28rem,calc(100dvh-7.5rem))] bg-surface border border-[var(--hair)] rounded-md shadow-2xl flex flex-col overflow-hidden"
         >
           {/* Header */}
           <div className="flex items-center gap-2.5 px-4 py-3 bg-[var(--navy)] text-white">
@@ -113,7 +113,7 @@ export function AppAssistant() {
                       key={s}
                       type="button"
                       onClick={() => ask(s)}
-                      className="text-xs font-semibold text-[var(--fg)] bg-[var(--surface)] border border-[var(--border)] hover:border-[var(--gold)] px-3 py-1.5 rounded-full transition-colors"
+                      className="text-xs font-semibold text-[var(--fg)] bg-[var(--surface)] border border-[var(--hair)] hover:border-[var(--gold)] px-3 py-1.5 rounded-full transition-colors"
                     >
                       {s}
                     </button>
@@ -130,7 +130,7 @@ export function AppAssistant() {
                     className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed whitespace-pre-wrap break-words ${
                       m.role === "user"
                         ? "bg-[var(--navy)] text-white"
-                        : "bg-[var(--background)] border border-[var(--border)] text-[var(--fg)]"
+                        : "bg-[var(--background)] border border-[var(--hair)] text-[var(--fg)]"
                     }`}
                   >
                     {m.content}
@@ -150,7 +150,7 @@ export function AppAssistant() {
             })}
             {busy && (
               <div className="flex justify-start">
-                <div className="rounded-2xl px-3.5 py-2.5 bg-[var(--background)] border border-[var(--border)] text-neutral text-sm">
+                <div className="rounded-2xl px-3.5 py-2.5 bg-[var(--background)] border border-[var(--hair)] text-neutral text-sm">
                   Thinking…
                 </div>
               </div>
@@ -164,13 +164,13 @@ export function AppAssistant() {
               e.preventDefault()
               ask(input)
             }}
-            className="flex items-center gap-2 border-t border-[var(--border)] p-3"
+            className="flex items-center gap-2 border-t border-[var(--hair)] p-3"
           >
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask the guide…"
-              className="flex-1 px-3.5 py-2.5 border border-[var(--border)] rounded-xl bg-[var(--surface)] text-sm text-[var(--fg)] placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)]"
+              className="flex-1 px-3.5 py-2.5 border border-[var(--hair)] rounded-xl bg-[var(--surface)] text-sm text-[var(--fg)] placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)]"
             />
             <button
               type="submit"

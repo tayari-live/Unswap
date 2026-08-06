@@ -5,7 +5,7 @@ import { Eye, EyeOff, Check } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
 
 const inputCls =
-  "block w-full px-4 py-3 border border-[var(--border)] rounded-xl bg-[var(--surface)] placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] text-sm text-[var(--fg)] transition-all"
+  "block w-full px-4 py-3 border border-[var(--hair)] rounded-xl bg-[var(--surface)] placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] text-sm text-[var(--fg)] transition-all"
 const labelCls = "block text-xs font-semibold uppercase tracking-wider text-[var(--fg)] mb-2"
 
 export function ChangePasswordForm() {
@@ -106,7 +106,7 @@ export function ChangePasswordForm() {
       <button
         type="submit"
         disabled={loading}
-        className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] disabled:opacity-50 transition-colors shadow-sm"
+        className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] disabled:opacity-50 transition-colors"
       >
         {loading ? "Saving…" : saved ? (<><Check size={16} /> Updated</>) : "Update password"}
       </button>

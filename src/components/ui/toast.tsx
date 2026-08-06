@@ -19,7 +19,7 @@ export function useToast() {
 const STYLE: Record<ToastType, { icon: typeof Info; cls: string; iconCls: string }> = {
   success: { icon: CheckCircle2, cls: "border-[var(--teal)]/30", iconCls: "text-[var(--teal)]" },
   error: { icon: AlertTriangle, cls: "border-[var(--crimson)]/30", iconCls: "text-[var(--crimson)]" },
-  info: { icon: Info, cls: "border-[var(--border)]", iconCls: "text-[var(--fg)]" },
+  info: { icon: Info, cls: "border-[var(--hair)]", iconCls: "text-[var(--fg)]" },
 }
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {

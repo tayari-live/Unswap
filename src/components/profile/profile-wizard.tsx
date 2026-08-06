@@ -172,13 +172,13 @@ export function ProfileWizard({
               {v.imageUrl ? (
                 <div className="relative">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={v.imageUrl} alt="Profile" className="w-24 h-24 rounded-full object-cover border border-[var(--border)]" />
-                  <button type="button" onClick={() => set("imageUrl", null)} aria-label="Remove photo" className="absolute -top-1 -right-1 w-7 h-7 rounded-full bg-[var(--surface)] border border-[var(--border)] text-[var(--fg)] flex items-center justify-center shadow">
+                  <img src={v.imageUrl} alt="Profile" className="w-24 h-24 rounded-full object-cover border border-[var(--hair)]" />
+                  <button type="button" onClick={() => set("imageUrl", null)} aria-label="Remove photo" className="absolute -top-1 -right-1 w-7 h-7 rounded-full bg-[var(--surface)] border border-[var(--hair)] text-[var(--fg)] flex items-center justify-center shadow">
                     <X size={14} />
                   </button>
                 </div>
               ) : (
-                <label className="w-24 h-24 rounded-full border-2 border-dashed border-[var(--border)] bg-[var(--background)] flex flex-col items-center justify-center cursor-pointer hover:border-[var(--gold)] transition-colors text-neutral">
+                <label className="w-24 h-24 rounded-full border-2 border-dashed border-[var(--hair)] bg-[var(--background)] flex flex-col items-center justify-center cursor-pointer hover:border-[var(--gold)] transition-colors text-neutral">
                   <UploadCloud size={20} />
                   <input type="file" accept={ACCEPT} className="hidden" onChange={(e) => pickFile(e.target.files?.[0])} />
                 </label>
@@ -260,7 +260,7 @@ export function ProfileWizard({
         {key === "review" && (
           <div>
             <Heading title="Review your profile" sub={`Your profile is ${completion}% complete. Save to update it.`} />
-            <dl className="text-sm divide-y divide-[var(--border)] border border-[var(--border)] rounded-xl overflow-hidden">
+            <dl className="text-sm divide-y divide-[var(--hair)] border border-[var(--hair)] rounded-xl overflow-hidden">
               {[
                 ["Photo", v.imageUrl ? "Added" : "—"],
                 ["Display name", v.fullName || "—"],
