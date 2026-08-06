@@ -151,22 +151,23 @@ export function WaitlistClient() {
 
                 <form onSubmit={handleInitiateJoin} className="space-y-4">
                   <div>
-                    <label className="text-wl-ivory-dim text-xs tracking-[0.08em] uppercase font-medium mb-2 pl-1 flex items-center gap-1">
+                    <label htmlFor="wl-name" className="text-wl-ivory-dim text-xs tracking-[0.08em] uppercase font-medium mb-2 pl-1 flex items-center gap-1">
                       Full Name <span className="text-wl-gold">*</span>
                     </label>
-                    <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter your full name" required className={inputCls} />
+                    <input id="wl-name" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter your full name" required className={inputCls} />
                   </div>
                   <div>
-                    <label className="text-wl-ivory-dim text-xs tracking-[0.08em] uppercase font-medium mb-2 pl-1 flex items-center gap-1">
+                    <label htmlFor="wl-email" className="text-wl-ivory-dim text-xs tracking-[0.08em] uppercase font-medium mb-2 pl-1 flex items-center gap-1">
                       Email Address <span className="text-wl-gold">*</span>
                     </label>
-                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your@email.com" required className={inputCls} />
+                    <input id="wl-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your@email.com" required className={inputCls} />
                   </div>
                   <div>
-                    <label className="text-wl-ivory-dim text-xs tracking-[0.08em] uppercase font-medium mb-2 pl-1 flex items-center gap-1">
+                    <label htmlFor="wl-org" className="text-wl-ivory-dim text-xs tracking-[0.08em] uppercase font-medium mb-2 pl-1 flex items-center gap-1">
                       Organization / Affiliation <span className="text-wl-gold">*</span>
                     </label>
                     <select
+                      id="wl-org"
                       value={organization}
                       onChange={(e) => setOrganization(e.target.value)}
                       required

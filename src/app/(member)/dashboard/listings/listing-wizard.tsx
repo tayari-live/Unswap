@@ -121,12 +121,41 @@ function readImage(file: File): Promise<{ url?: string; error?: string }> {
   })
 }
 
-function Stepper({ value, set, min, max }: { value: number; set: (n: number) => void; min: number; max: number }) {
+/**
+ * Numeric stepper. `label` names the quantity ("bedrooms") and is what makes
+ * this usable without sight: the two controls are icon-only, so without it a
+ * screen reader announces nothing but "button, button". The value is a live
+ * region so a change is spoken, and the buttons disable at the bounds rather
+ * than silently doing nothing.
+ */
+function Stepper({
+  value, set, min, max, label,
+}: { value: number; set: (n: number) => void; min: number; max: number; label: string }) {
+  const btn =
+    "w-9 h-9 rounded-lg border border-[var(--hair)] flex items-center justify-center hover:border-[var(--navy)] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-[var(--hair)]"
   return (
-    <div className="flex items-center gap-3">
-      <button type="button" onClick={() => set(Math.max(min, value - 1))} className="w-9 h-9 rounded-lg border border-[var(--hair)] flex items-center justify-center hover:border-[var(--navy)]"><Minus size={15} /></button>
-      <span className="w-8 text-center font-semibold text-[var(--fg)]">{value}{value >= max ? "+" : ""}</span>
-      <button type="button" onClick={() => set(Math.min(max, value + 1))} className="w-9 h-9 rounded-lg border border-[var(--hair)] flex items-center justify-center hover:border-[var(--navy)]"><Plus size={15} /></button>
+    <div className="flex items-center gap-3" role="group" aria-label={label}>
+      <button
+        type="button"
+        onClick={() => set(Math.max(min, value - 1))}
+        disabled={value <= min}
+        aria-label={`Decrease ${label}`}
+        className={btn}
+      >
+        <Minus size={15} />
+      </button>
+      <span aria-live="polite" aria-atomic="true" className="w-8 text-center font-semibold text-[var(--fg)]">
+        {value}{value >= max ? "+" : ""}
+      </span>
+      <button
+        type="button"
+        onClick={() => set(Math.min(max, value + 1))}
+        disabled={value >= max}
+        aria-label={`Increase ${label}`}
+        className={btn}
+      >
+        <Plus size={15} />
+      </button>
     </div>
   )
 }
@@ -338,8 +367,10 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
                 <input id="title" className={input} maxLength={80} value={v.title} onChange={(e) => set("title", e.target.value)} placeholder="Sunlit apartment near the lake" />
               </div>
               <div>
-                <label className={label}>Property type</label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {/* Toggle buttons, not a form control, so this is a labelled
+                    group rather than a <label> pointing at nothing. */}
+                <span id="property-type-label" className={label}>Property type</span>
+                <div role="group" aria-labelledby="property-type-label" className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {PROPERTY_TYPES.map((t) => (
                     <IconCard key={t.v} icon={t.icon} title={t.v} selected={v.propertyType === t.v} onClick={() => set("propertyType", t.v)} />
                   ))}
@@ -381,9 +412,9 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
           <div>
             <Heading title="How much space is there?" sub="Bedrooms, bathrooms, and the most guests your home comfortably sleeps." />
             <div className="flex flex-wrap gap-10">
-              <div><label className={label}>Bedrooms</label><Stepper value={v.bedrooms} set={(n) => set("bedrooms", n)} min={1} max={10} /></div>
-              <div><label className={label}>Bathrooms</label><Stepper value={v.bathrooms} set={(n) => set("bathrooms", n)} min={1} max={6} /></div>
-              <div><label className={label}>Max guests</label><Stepper value={v.maxGuests} set={(n) => set("maxGuests", n)} min={1} max={12} /></div>
+              <div><span className={label}>Bedrooms</span><Stepper label="bedrooms" value={v.bedrooms} set={(n) => set("bedrooms", n)} min={1} max={10} /></div>
+              <div><span className={label}>Bathrooms</span><Stepper label="bathrooms" value={v.bathrooms} set={(n) => set("bathrooms", n)} min={1} max={6} /></div>
+              <div><span className={label}>Max guests</span><Stepper label="max guests" value={v.maxGuests} set={(n) => set("maxGuests", n)} min={1} max={12} /></div>
             </div>
           </div>
         )}

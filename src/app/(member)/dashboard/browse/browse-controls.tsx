@@ -103,29 +103,29 @@ export function BrowseControls({ initial }: { initial: BrowseFilters }) {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             <div className="space-y-2">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral">Property Type</label>
-              <select value={f.propertyType} onChange={(e) => apply({ propertyType: e.target.value })} className={selectCls}>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral" htmlFor="f-type">Property Type</label>
+              <select id="f-type" value={f.propertyType} onChange={(e) => apply({ propertyType: e.target.value })} className={selectCls}>
                 <option value="">Any type</option>
                 {PROPERTY_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
               </select>
             </div>
             <div className="space-y-2">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral">Bedrooms</label>
-              <select value={f.bedrooms} onChange={(e) => apply({ bedrooms: e.target.value })} className={selectCls}>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral" htmlFor="f-beds">Bedrooms</label>
+              <select id="f-beds" value={f.bedrooms} onChange={(e) => apply({ bedrooms: e.target.value })} className={selectCls}>
                 <option value="">Any beds</option>
                 {[1, 2, 3, 4].map((n) => <option key={n} value={n}>{n}+ beds</option>)}
               </select>
             </div>
             <div className="space-y-2">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral">Guests</label>
-              <select value={f.guests} onChange={(e) => apply({ guests: e.target.value })} className={selectCls}>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral" htmlFor="f-guests">Guests</label>
+              <select id="f-guests" value={f.guests} onChange={(e) => apply({ guests: e.target.value })} className={selectCls}>
                 <option value="">Any guests</option>
                 {[1, 2, 4, 6].map((n) => <option key={n} value={n}>{n}+ guests</option>)}
               </select>
             </div>
             <div className="space-y-2">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral">Exchange Type</label>
-              <select value={f.exchangeType} onChange={(e) => apply({ exchangeType: e.target.value })} className={selectCls}>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-neutral" htmlFor="f-exchange">Exchange Type</label>
+              <select id="f-exchange" value={f.exchangeType} onChange={(e) => apply({ exchangeType: e.target.value })} className={selectCls}>
                 <option value="">Any exchange</option>
                 <option value="simultaneous">Simultaneous</option>
                 <option value="credits">Credits</option>

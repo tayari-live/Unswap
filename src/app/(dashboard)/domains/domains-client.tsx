@@ -54,8 +54,9 @@ export default function DomainsClient({ initialDomains }: { initialDomains: Doma
       <form onSubmit={add} className="bg-surface rounded-md border border-[var(--hair)] p-5 mb-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="text-xs font-semibold uppercase tracking-wide text-neutral mb-1.5 block">Domain</label>
+            <label className="text-xs font-semibold uppercase tracking-wide text-neutral mb-1.5 block" htmlFor="d-domain">Domain</label>
             <input
+              id="d-domain"
               value={domain}
               onChange={(e) => setDomain(e.target.value)}
               placeholder="un.org"
@@ -64,8 +65,9 @@ export default function DomainsClient({ initialDomains }: { initialDomains: Doma
             />
           </div>
           <div>
-            <label className="text-xs font-semibold uppercase tracking-wide text-neutral mb-1.5 block">Organisation</label>
+            <label className="text-xs font-semibold uppercase tracking-wide text-neutral mb-1.5 block" htmlFor="d-org">Organisation</label>
             <input
+              id="d-org"
               value={label}
               onChange={(e) => setLabel(e.target.value)}
               placeholder="United Nations"

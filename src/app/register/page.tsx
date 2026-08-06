@@ -152,7 +152,10 @@ export default function RegisterPage() {
             </div>
 
             {/* Eligibility hint reacts to the email domain */}
-            <div className={`flex gap-2.5 p-3.5 text-sm border ${status === "fast" ? "border-wl-border bg-[rgba(201,168,76,0.1)] text-wl-gold" : "border-wl-border bg-white text-wl-ivory-dim"}`}>
+            {/* --panel, not a hardcoded white: the text colour flips with the
+                theme while a fixed white background does not, which left light
+                ivory text on white in dark mode. */}
+            <div className={`flex gap-2.5 p-3.5 text-sm border ${status === "fast" ? "border-wl-border bg-[rgba(201,168,76,0.1)] text-wl-gold" : "border-wl-border bg-[var(--panel)] text-wl-ivory-dim"}`}>
               {status === "fast" ? <ShieldCheck size={18} className="flex-shrink-0 mt-0.5 text-wl-gold" /> : <Info size={18} className="flex-shrink-0 mt-0.5 text-wl-gold" />}
               <span>
                 {status === "fast"
