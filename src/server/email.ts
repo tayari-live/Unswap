@@ -33,7 +33,10 @@ const SERIF = "Georgia,'Times New Roman',Times,serif"
 const SANS = "'Helvetica Neue',Helvetica,Arial,sans-serif"
 
 // Absolute URL — mail clients have no page to resolve a relative path against.
-const logoUrl = () => `${process.env.AUTH_URL || "http://localhost:3000"}/unswap-logo.png`
+// A dedicated 76px asset (2x the 38px display size) rather than the 500px site
+// logo: 2.8 KB instead of 70 KB, which matters on mobile data. Alpha preserved
+// so it sits cleanly on the navy masthead.
+const logoUrl = () => `${process.env.AUTH_URL || "http://localhost:3000"}/email/logo-76.png`
 
 /**
  * Escape a value before interpolating it into email HTML.
