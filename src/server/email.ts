@@ -32,6 +32,9 @@ const MUTED = "#6b7689"
 const SERIF = "Georgia,'Times New Roman',Times,serif"
 const SANS = "'Helvetica Neue',Helvetica,Arial,sans-serif"
 
+// Absolute URL — mail clients have no page to resolve a relative path against.
+const logoUrl = () => `${process.env.AUTH_URL || "http://localhost:3000"}/unswap-logo.png`
+
 /**
  * Escape a value before interpolating it into email HTML.
  *
@@ -97,9 +100,23 @@ export function renderEmail(opts: {
 ${preview}
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;background:#ffffff;margin:0;padding:0;border-collapse:collapse;">
 
-  <!-- Masthead: full-bleed navy -->
-  <tr><td style="background:${NAVY};padding:28px 0;">
-    ${band(`<span style="font-family:${SERIF};font-size:23px;font-weight:normal;letter-spacing:0.16em;color:#ffffff;">UnSwap</span>`)}
+  <!-- Masthead: full-bleed navy. Logo sits beside the wordmark rather than
+       replacing it: most clients block remote images by default, and the
+       wordmark keeps the header branded when the image never loads. -->
+  <tr><td style="background:${NAVY};padding:26px 0;">
+    ${band(`
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td style="padding-right:14px;" valign="middle">
+            <img src="${logoUrl()}" width="38" height="38" alt=""
+                 style="display:block;width:38px;height:38px;border:0;outline:none;text-decoration:none;" />
+          </td>
+          <td valign="middle">
+            <span style="font-family:${SERIF};font-size:23px;font-weight:normal;letter-spacing:0.16em;color:#ffffff;">UnSwap</span>
+          </td>
+        </tr>
+      </table>
+    `)}
   </td></tr>
   <tr><td style="height:2px;background:${GOLD};font-size:0;line-height:0;">&nbsp;</td></tr>
 
