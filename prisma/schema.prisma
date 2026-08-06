@@ -56,6 +56,10 @@ model User {
   // notificationsSeenAt so opening the bell never swallows the celebration.
   creditsCelebratedAt DateTime?
 
+  // Set once the member has been shown the "you are verified" moment. Separate
+  // from creditsCelebratedAt so the two never swallow one another.
+  verifiedCelebratedAt DateTime?
+
   // Presence: bumped on activity; recent value => "online" in chat.
   lastSeenAt         DateTime?
 

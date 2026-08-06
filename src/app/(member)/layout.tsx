@@ -4,6 +4,7 @@ import { MemberSidebar } from "@/components/layout/member-sidebar"
 import { MobileNav } from "@/components/layout/mobile-nav"
 import { AppAssistant } from "@/components/assistant/app-assistant"
 import { CreditCelebration } from "@/components/credits/credit-celebration"
+import { VerificationCelebration } from "@/components/verification/verification-celebration"
 
 export default async function MemberLayout({
   children,
@@ -49,6 +50,7 @@ export default async function MemberLayout({
       </main>
       <MobileNav variant="member" />
       <AppAssistant />
+      <VerificationCelebration />
       <CreditCelebration />
     </div>
   )
