@@ -2,8 +2,8 @@ import { randomBytes } from "crypto"
 import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
 import { logAudit } from "@/server/services/audit"
-import { sendEmail, renderEmail, esc } from "@/server/email"
-import { kitSendWaitlistConfirmation, kitAddToForm, kitUpdateReferralCount, kitConfigured } from "@/server/kit"
+import { sendEmail, renderEmail, esc, emailConfigured } from "@/server/email"
+import { kitAddToForm, kitUpdateReferralCount } from "@/server/kit"
 
 const baseUrl = () => process.env.AUTH_URL || "http://localhost:3000"
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -27,6 +27,32 @@ async function uniqueReferralCode(): Promise<string> {
 
 const referralUrl = (code: string) => `${baseUrl()}/waitlist?ref=${code}`
 const confirmUrl = (token: string) => `${baseUrl()}/api/waitlist/confirm?token=${token}`
+
+/**
+ * The double opt-in email, sent from here rather than triggered as a Kit
+ * automation, so the wording lives with every other transactional email
+ * instead of in a dashboard. Shared by first signup and both admin resends —
+ * three copies of the same letter would drift apart.
+ *
+ * Kit only receives an address once it is confirmed, which is what double
+ * opt-in is for: an unconfirmed address does not belong on a marketing list.
+ */
+function sendConfirmationEmail(email: string, firstName: string, token: string) {
+  return sendEmail({
+    to: email,
+    subject: "Confirm your place on the UnSwap waitlist",
+    html: renderEmail({
+      heading: `Hello ${esc(firstName)},`,
+      preheader: "One click confirms your place on the waitlist.",
+      body: `<p style="margin:0 0 14px">Thank you for your interest in UnSwap, the closed home exchange network for staff of the UN, World Bank, IMF and other international organisations.</p>
+             <p style="margin:0">Confirm your email to claim your place in the queue. Nothing is reserved until you do.</p>`,
+      ctaLabel: "Confirm my place",
+      ctaUrl: confirmUrl(token),
+      footnote: "If you did not request this, you can ignore this email and nothing further will happen.",
+    }),
+    text: `Hello ${firstName},\n\nConfirm your place on the UnSwap waitlist: ${confirmUrl(token)}\n\nIf you did not request this, you can ignore this email.`,
+  })
+}
 
 /**
  * Referral-boosted queue position (confirmed entries only): more referrals =
@@ -94,11 +120,12 @@ export async function initiateWaitlist(input: { name: string; email: string; org
     })
   }
 
-  const { sent } = await kitSendWaitlistConfirmation({ email, firstName, token })
+  const sent = await sendConfirmationEmail(email, firstName, token)
+
   await logAudit({ action: "WAITLIST_INITIATED", subject: `${firstName} ${lastName}`, metadata: { email, referredBy } })
 
-  // Without Kit configured (local dev), hand back the link so the flow is testable.
-  return { status: "pending" as const, email, emailSent: sent, confirmUrl: kitConfigured() ? undefined : confirmUrl(token) }
+  // Without a mail token (local dev), hand back the link so the flow is testable.
+  return { status: "pending" as const, email, emailSent: sent, confirmUrl: emailConfigured() ? undefined : confirmUrl(token) }
 }
 
 /**
@@ -355,9 +382,9 @@ export async function resendConfirmation(actorId: string, id: string) {
   if (entry.confirmedAt) throw new ApiError(409, "This member has already confirmed their spot.")
   const token = randomBytes(32).toString("hex")
   await prisma.waitlistEntry.update({ where: { id }, data: { confirmToken: token } })
-  const { sent } = await kitSendWaitlistConfirmation({ email: entry.email, firstName: entry.firstName, token })
+  const sent = await sendConfirmationEmail(entry.email, entry.firstName, token)
   await logAudit({ actorId, action: "WAITLIST_RESEND", subject: `${entry.firstName} ${entry.lastName}`, metadata: { email: entry.email, sent } })
-  return { sent, confirmUrl: kitConfigured() ? undefined : confirmUrl(token) }
+  return { sent, confirmUrl: emailConfigured() ? undefined : confirmUrl(token) }
 }
 
 /** Admin: re-send the confirmation email to every unconfirmed entry. */
@@ -367,8 +394,7 @@ export async function resendAllUnconfirmed(actorId: string) {
   for (const e of rows) {
     const token = randomBytes(32).toString("hex")
     await prisma.waitlistEntry.update({ where: { id: e.id }, data: { confirmToken: token } })
-    const r = await kitSendWaitlistConfirmation({ email: e.email, firstName: e.firstName, token })
-    if (r.sent) sent++
+    if (await sendConfirmationEmail(e.email, e.firstName, token)) sent++
   }
   await logAudit({ actorId, action: "WAITLIST_RESEND_ALL", subject: `Resent to ${rows.length} unconfirmed`, metadata: { total: rows.length, sent } })
   return { total: rows.length, sent }

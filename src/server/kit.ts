@@ -1,9 +1,9 @@
-// Kit (formerly ConvertKit) integration for the waitlist double-opt-in.
+// Kit (formerly ConvertKit) — marketing only.
 //
-// The confirmation email itself is a Kit *automation* (configured in the Kit
-// dashboard) that fires when a subscriber is tagged. We push the subscriber
-// with a `waitlist_token` custom field; the automation's email template builds
-// the confirm link from it (…/api/waitlist/confirm?token={{waitlist_token}}).
+// Transactional mail, including the waitlist confirmation, is sent directly
+// through Mailtrap in src/server/email.ts. Kit's job is the marketing list: it
+// receives an address only once that address has confirmed, and mirrors
+// referral counts so campaigns can segment on them.
 //
 // If the KIT_* env vars aren't set (e.g. local dev), every call becomes a
 // logged no-op so the waitlist flow still works end-to-end without Kit.
@@ -40,27 +40,6 @@ async function kitFetch(path: string, body: unknown) {
     console.warn(`[Kit] ${path} error:`, (e as Error).message)
     return { ok: false as const }
   }
-}
-
-/**
- * Upsert the subscriber with the confirmation token, then tag them to trigger
- * the Kit automation that emails the confirm link. Best-effort — returns
- * whether Kit actually handled it (false in dev without keys).
- */
-export async function kitSendWaitlistConfirmation(input: { email: string; firstName: string; token: string }) {
-  const { tagId } = creds()
-  if (!kitConfigured()) {
-    console.warn("[Kit] not configured — skipping confirmation email for", input.email)
-    return { sent: false as const }
-  }
-  await kitFetch("/subscribers", {
-    email_address: input.email,
-    first_name: input.firstName,
-    state: "active",
-    fields: { waitlist_token: input.token },
-  })
-  const tagged = await kitFetch(`/tags/${tagId}/subscribers`, { email_address: input.email })
-  return { sent: tagged.ok }
 }
 
 /** After confirmation, add the verified email to the Kit list/form. */

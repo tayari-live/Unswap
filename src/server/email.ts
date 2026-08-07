@@ -1,12 +1,25 @@
-import { Resend } from "resend"
+import { MailtrapClient } from "mailtrap"
 
-const apiKey = process.env.RESEND_API_KEY
-// Resend's shared sandbox sender works without domain verification, but only
-// delivers to the email address that owns the Resend account. For production,
-// set EMAIL_FROM to an address on a domain you've verified in Resend.
-const from = process.env.EMAIL_FROM || "UnSwap <onboarding@resend.dev>"
+const apiToken = process.env.MAILTRAP_TOKEN
+// Sender address. Must be on a domain verified in Mailtrap, otherwise sending
+// is rejected — verification is per-domain, exactly as it was with Resend.
+const fromRaw = process.env.EMAIL_FROM || "UnSwap <noreply@unswap.net>"
 
-const resend = apiKey ? new Resend(apiKey) : null
+const client = apiToken ? new MailtrapClient({ token: apiToken }) : null
+
+/**
+ * Split an RFC-style sender ("UnSwap <noreply@unswap.net>") into the parts the
+ * Mailtrap SDK expects. Kept so EMAIL_FROM stays in one familiar format rather
+ * than becoming two environment variables.
+ */
+function sender(): { email: string; name?: string } {
+  const m = fromRaw.match(/^\s*(.*?)\s*<([^>]+)>\s*$/)
+  if (m) return { email: m[2]!.trim(), name: m[1]!.replace(/^"|"$/g, "").trim() || undefined }
+  return { email: fromRaw.trim() }
+}
+
+/** Whether real sending is wired up. False in local dev without a token. */
+export const emailConfigured = () => !!client
 
 export type SendEmailParams = {
   to: string | string[]
@@ -136,37 +149,38 @@ ${preview}
 }
 
 /**
- * Send an email via Resend. If RESEND_API_KEY isn't configured, the message is
- * logged to the console instead (dev fallback) so flows don't break locally.
+ * Send an email via Mailtrap. Without MAILTRAP_TOKEN the message is logged to
+ * the console instead (dev fallback) so flows stay testable locally.
  * Returns true if the email was actually dispatched.
  */
 export async function sendEmail(params: SendEmailParams): Promise<boolean> {
   const { to, subject, html, text } = params
+  const recipients = (Array.isArray(to) ? to : [to]).filter(Boolean)
+  if (!recipients.length) return false
 
-  if (!resend) {
+  if (!client) {
     console.log(
-      `[EMAIL — not sent, RESEND_API_KEY missing]\nTo: ${Array.isArray(to) ? to.join(", ") : to}\n` +
+      `[EMAIL — not sent, MAILTRAP_TOKEN missing]\nTo: ${recipients.join(", ")}\n` +
       `Subject: ${subject}\n${text || html || ""}`
     )
     return false
   }
 
   try {
-    const { error } = await resend.emails.send({
-      from,
-      to,
+    await client.send({
+      from: sender(),
+      to: recipients.map((email) => ({ email })),
       subject,
-      html: html ?? undefined,
-      text: text ?? (html ? undefined : subject),
-    } as any)
-
-    if (error) {
-      console.error("Resend email error:", error)
-      return false
-    }
+      ...(html ? { html } : {}),
+      // Always include a plain-text part. It is what clients that refuse HTML
+      // fall back to, and its absence is itself a spam signal.
+      text: text ?? (html ? html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim() : subject),
+    })
     return true
   } catch (err) {
-    console.error("Failed to send email:", err)
+    // A failed send must never break the flow that triggered it — callers treat
+    // the boolean as advisory.
+    console.error("Mailtrap email error:", err)
     return false
   }
 }
