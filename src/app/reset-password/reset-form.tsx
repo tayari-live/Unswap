@@ -6,6 +6,8 @@ import { useSearchParams, useRouter } from "next/navigation"
 import { Eye, EyeOff, CheckCircle2 } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
 import { AuthShell, authInputCls, authLabelCls, authBtnCls } from "@/components/auth/auth-shell"
+import { PasswordRequirements } from "@/components/ui/password-requirements"
+import { SuggestPassword } from "@/components/ui/suggest-password"
 
 export function ResetForm() {
   const params = useSearchParams()
@@ -87,10 +89,11 @@ export function ResetForm() {
               id="password"
               type={showPassword ? "text" : "password"}
               required
-              minLength={8}
+              autoComplete="new-password"
+              aria-describedby="password-requirements"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="At least 8 characters"
+              placeholder="Choose a strong password"
               className={`${authInputCls} pr-11`}
             />
             <button
@@ -103,6 +106,15 @@ export function ResetForm() {
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
+          <SuggestPassword
+            value={password}
+            onGenerate={(pw) => {
+              setPassword(pw)
+              setConfirm(pw)
+              setShowPassword(true)
+            }}
+          />
+          <PasswordRequirements id="password-requirements" value={password} />
         </div>
 
         <div>
@@ -113,6 +125,7 @@ export function ResetForm() {
             id="confirm"
             type={showPassword ? "text" : "password"}
             required
+            autoComplete="new-password"
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
             placeholder="Re-enter password"

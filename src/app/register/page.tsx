@@ -1,11 +1,16 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Eye, EyeOff, Info, ShieldCheck } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
 import { ThemeToggleIcon } from "@/components/theme/theme-toggle"
+import { registerSchema, type RegisterInput } from "@/lib/validation/auth"
+import { PasswordRequirements } from "@/components/ui/password-requirements"
+import { SuggestPassword } from "@/components/ui/suggest-password"
 
 // Institutional domains that qualify for fast-track verification. Mirrors the
 // admin-editable allowlist; client-side feedback only — server is the source of truth.
@@ -28,16 +33,30 @@ const inputCls =
   // a white field (invisible) once dark mode was added.
   "w-full bg-[var(--field-bg)] border border-wl-border px-5 py-4 text-wl-ivory placeholder-wl-muted focus:outline-none focus:border-wl-gold focus:shadow-[0_0_0_1px_rgba(201,168,76,0.35)] transition-all duration-300 text-[15px]"
 const labelCls = "block text-wl-ivory-dim text-xs tracking-[0.08em] uppercase font-medium mb-2 pl-1"
+// Validation text sits on a dark ground, so the fixed light red rather than
+// --destructive, which is too dark to read here.
+const errCls = "mt-1.5 text-sm font-medium text-error-light"
 
 export default function RegisterPage() {
   const router = useRouter()
-  const [firstName, setFirstName] = useState("")
-  const [lastName, setLastName] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
   const toast = useToast()
+
+  // The schema is shared with the server, so the rules a member sees while
+  // typing are the rules the endpoint enforces on submit.
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterInput>({
+    resolver: zodResolver(registerSchema),
+    mode: "onBlur",
+    defaultValues: { firstName: "", lastName: "", email: "", password: "" },
+  })
+  const email = watch("email")
+  const password = watch("password")
 
   // Prefill from the waitlist hand-off (?email=&name=) so people who came from
   // the waitlist don't re-enter their details — they only set a password.
@@ -45,37 +64,33 @@ export default function RegisterPage() {
     const params = new URLSearchParams(window.location.search)
     const e = params.get("email")
     const n = params.get("name")
-    if (e) setEmail(e)
+    if (e) setValue("email", e)
     if (n) {
       const [first, ...rest] = n.trim().split(/\s+/)
-      setFirstName(first)
-      if (rest.length) setLastName(rest.join(" "))
+      setValue("firstName", first)
+      if (rest.length) setValue("lastName", rest.join(" "))
     }
-  }, [])
+  }, [setValue])
 
   const status = domainStatus(email)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
+  const onSubmit = async (values: RegisterInput) => {
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ firstName, lastName, email, password }),
+        body: JSON.stringify(values),
       })
       const data = await res.json()
       if (!res.ok) {
         toast(data.error || "Could not create your account.", "error")
-        setLoading(false)
         return
       }
-      const qs = new URLSearchParams({ email })
+      const qs = new URLSearchParams({ email: values.email })
       if (data.fastTrack) qs.set("fast", "1")
       router.push(`/confirm-email?${qs}`)
     } catch {
       toast("Something went wrong. Please try again.", "error")
-      setLoading(false)
     }
   }
 
@@ -124,31 +139,42 @@ export default function RegisterPage() {
             Verified home exchange for UN, World Bank, IMF and diplomatic professionals.
           </p>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label htmlFor="firstName" className={labelCls}>First name</label>
-                <input id="firstName" required value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="John" className={inputCls} />
+                <input id="firstName" {...register("firstName")} aria-invalid={!!errors.firstName} aria-describedby={errors.firstName ? "firstName-error" : undefined} placeholder="John" className={inputCls} />
+                {errors.firstName && <p id="firstName-error" role="alert" className={errCls}>{errors.firstName.message}</p>}
               </div>
               <div>
                 <label htmlFor="lastName" className={labelCls}>Last name</label>
-                <input id="lastName" required value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Doe" className={inputCls} />
+                <input id="lastName" {...register("lastName")} aria-invalid={!!errors.lastName} aria-describedby={errors.lastName ? "lastName-error" : undefined} placeholder="Doe" className={inputCls} />
+                {errors.lastName && <p id="lastName-error" role="alert" className={errCls}>{errors.lastName.message}</p>}
               </div>
             </div>
 
             <div>
               <label htmlFor="email" className={labelCls}>Work email</label>
-              <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="j.doe@un.org" className={inputCls} />
+              <input id="email" type="email" {...register("email")} aria-invalid={!!errors.email} aria-describedby={errors.email ? "email-error" : undefined} placeholder="j.doe@un.org" className={inputCls} />
+              {errors.email && <p id="email-error" role="alert" className={errCls}>{errors.email.message}</p>}
             </div>
 
             <div>
               <label htmlFor="password" className={labelCls}>Password</label>
               <div className="relative flex items-center">
-                <input id="password" type={showPassword ? "text" : "password"} required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 8 characters" className={`${inputCls} pr-11`} />
+                <input id="password" type={showPassword ? "text" : "password"} autoComplete="new-password" {...register("password")} aria-invalid={!!errors.password} aria-describedby="password-requirements" placeholder="Choose a strong password" className={`${inputCls} pr-11`} />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? "Hide password" : "Show password"} className="absolute right-4 flex items-center text-wl-muted hover:text-wl-gold-light transition-colors">
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
+              <SuggestPassword
+                value={password ?? ""}
+                onGenerate={(pw) => {
+                  setValue("password", pw, { shouldValidate: true, shouldDirty: true })
+                  setShowPassword(true)
+                }}
+              />
+              <PasswordRequirements id="password-requirements" value={password ?? ""} />
             </div>
 
             {/* Eligibility hint reacts to the email domain */}
@@ -164,8 +190,8 @@ export default function RegisterPage() {
               </span>
             </div>
 
-            <button type="submit" disabled={loading} className="w-full bg-wl-gold hover:bg-wl-gold-light text-wl-navy text-sm font-medium tracking-[0.08em] uppercase py-4 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_4px_24px_rgba(201,168,76,0.25)]">
-              {loading ? "Creating account…" : "Create Account"}
+            <button type="submit" disabled={isSubmitting} className="w-full bg-wl-gold hover:bg-wl-gold-light text-wl-navy text-sm font-medium tracking-[0.08em] uppercase py-4 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_4px_24px_rgba(201,168,76,0.25)]">
+              {isSubmitting ? "Creating account…" : "Create Account"}
             </button>
           </form>
 

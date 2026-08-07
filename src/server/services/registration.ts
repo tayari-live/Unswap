@@ -5,6 +5,7 @@ import { ApiError } from "@/server/http"
 import { sendEmail, renderEmail, esc } from "@/server/email"
 import { logAudit } from "@/server/services/audit"
 import { grantCreditsOnce } from "@/server/services/credits"
+import { registerSchema, firstError } from "@/lib/validation/auth"
 
 const baseUrl = () => process.env.AUTH_URL || "http://localhost:3000"
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -81,14 +82,12 @@ async function issueVerificationLink(
  * email a verification link. Domain allowlist decides fast-track vs manual.
  */
 export async function registerMember(input: RegisterInput) {
-  const firstName = input.firstName?.trim()
-  const lastName = input.lastName?.trim()
-  const email = input.email?.trim().toLowerCase()
-  const password = input.password ?? ""
-
-  if (!firstName || !lastName) throw new ApiError(400, "First and last name are required.")
-  if (!EMAIL_RE.test(email)) throw new ApiError(400, "Enter a valid email address.")
-  if (password.length < 8) throw new ApiError(400, "Password must be at least 8 characters.")
+  // The same schema the sign-up form uses. Validating here as well is what
+  // makes the client-side check a convenience rather than the only guard —
+  // the endpoint is public and can be called directly.
+  const parsed = registerSchema.safeParse(input)
+  if (!parsed.success) throw new ApiError(400, firstError(parsed.error))
+  const { firstName, lastName, email, password } = parsed.data
 
   const existing = await prisma.user.findUnique({ where: { email } })
   if (existing) throw new ApiError(409, "An account with this email already exists.")

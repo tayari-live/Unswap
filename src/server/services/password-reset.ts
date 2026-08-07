@@ -4,6 +4,7 @@ import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
 import { sendEmail, renderEmail, esc } from "@/server/email"
 import { logAudit } from "@/server/services/audit"
+import { passwordSchema, firstError } from "@/lib/validation/auth"
 
 const baseUrl = () => process.env.AUTH_URL || "http://localhost:3000"
 
@@ -59,9 +60,10 @@ export async function requestPasswordReset(rawEmail: string) {
 
 /** Change the signed-in user's password (verifies their current one first). */
 export async function changePassword(userId: string, currentPassword: string, newPassword: string) {
-  if (!newPassword || newPassword.length < 8) {
-    throw new ApiError(400, "Your new password must be at least 8 characters.")
-  }
+  // Changing a password must not be a way around the sign-up policy either.
+  const parsed = passwordSchema.safeParse(newPassword)
+  if (!parsed.success) throw new ApiError(400, firstError(parsed.error))
+
   const user = await prisma.user.findUnique({ where: { id: userId } })
   if (!user) throw new ApiError(404, "Account not found.")
 
@@ -90,9 +92,9 @@ export async function changePassword(userId: string, currentPassword: string, ne
 /** Complete a password reset using a one-time token. */
 export async function resetPassword(rawToken: string, password: string) {
   if (!rawToken) throw new ApiError(400, "Missing reset token.")
-  if (!password || password.length < 8) {
-    throw new ApiError(400, "Password must be at least 8 characters.")
-  }
+  // Same policy as sign-up: a reset must not be a way around it.
+  const parsed = passwordSchema.safeParse(password)
+  if (!parsed.success) throw new ApiError(400, firstError(parsed.error))
 
   const record = await prisma.passwordResetToken.findUnique({
     where: { token: rawToken },
