@@ -253,7 +253,7 @@ export function WaitlistClient() {
             <div className="w-16 h-16 rounded-full bg-[rgba(201,168,76,0.05)] border border-wl-border flex items-center justify-center mb-6 mt-2 shadow-[0_4px_24px_var(--gold-dim)]">
               <svg className="w-8 h-8 text-wl-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>
             </div>
-            <h2 className="font-display text-[44px] font-light text-wl-gold mb-4 leading-[1.15]">Check your inbox</h2>
+            <h2 className="font-display text-[44px] sm:text-[56px] font-normal text-wl-gold mb-4 leading-[1.15]">Check your inbox</h2>
             <p className="text-wl-ivory-dim text-[16px] mb-1">We sent a confirmation link to</p>
             <p className="text-wl-ivory font-medium text-[16px] mb-3">{email}</p>
             <p className="text-wl-muted text-[14.5px] max-w-xs mx-auto leading-relaxed mb-4">Click the link to confirm your email and be redirected to your waitlist status dashboard.</p>
@@ -276,7 +276,7 @@ export function WaitlistClient() {
             <div className="w-16 h-16 rounded-full bg-[rgba(255,0,0,0.03)] border border-[rgba(255,0,0,0.15)] flex items-center justify-center mb-6 mt-2">
               <svg className="w-8 h-8 text-[#ff6b6b]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
             </div>
-            <h2 className="font-display text-[44px] font-light text-wl-gold mb-4 leading-[1.15]">Unable to connect</h2>
+            <h2 className="font-display text-[44px] sm:text-[56px] font-normal text-wl-gold mb-4 leading-[1.15]">Unable to connect</h2>
             <p className="text-wl-ivory-dim text-[16px] mb-8 leading-relaxed max-w-xs mx-auto">{errorMessage || "Network error or the service is temporarily unavailable. Please try again later."}</p>
             <button onClick={() => { setMode("join"); setEmail(""); setName(""); setOrganization(""); setErrorMessage("") }} className="btn-gold w-full flex items-center justify-center shadow-[0_4px_24px_var(--gold-dim)]">Try Again</button>
           </motion.div>
@@ -292,7 +292,7 @@ export function WaitlistClient() {
             </div>
             {statusLinkSent ? (
               <>
-                <h1 className="font-display text-[36px] sm:text-[48px] font-light text-wl-ivory mb-6 tracking-tight leading-[1.1]">
+                <h1 className="font-display text-[40px] sm:text-[56px] font-normal text-wl-ivory mb-6 tracking-tight leading-[1.1]">
                   Check your <em className="text-wl-gold-light italic">inbox</em>
                 </h1>
                 {/* Worded so it reveals nothing either way: the same message
@@ -307,7 +307,7 @@ export function WaitlistClient() {
               </>
             ) : (
               <>
-                <h1 className="font-display text-[36px] sm:text-[48px] font-light text-wl-ivory mb-4 tracking-tight leading-[1.1]">
+                <h1 className="font-display text-[40px] sm:text-[56px] font-normal text-wl-ivory mb-4 tracking-tight leading-[1.1]">
                   Find your <em className="text-wl-gold-light italic">place in the queue</em>
                 </h1>
                 <p className="text-wl-ivory-dim text-[15px] leading-relaxed mb-8 max-w-md">

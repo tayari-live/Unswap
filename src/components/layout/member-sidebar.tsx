@@ -104,7 +104,7 @@ export function MemberSidebar({
               href={item.href}
               title={collapsed ? item.name : undefined}
               className={cn(
-                "group relative flex items-center gap-3 py-3 px-3 mx-1 rounded-sm text-[11px] font-medium uppercase tracking-[0.13em] transition-all duration-200 overflow-hidden",
+                "group relative flex items-center gap-3 py-3 px-3 mx-1 rounded-sm text-[15px] font-medium tracking-normal transition-all duration-200 overflow-hidden",
                 isActive
                   ? "bg-gradient-to-r from-[var(--gold)]/20 via-[var(--gold)]/8 to-transparent text-white ring-1 ring-inset ring-[var(--gold)]/25"
                   : "text-white/55 hover:bg-white/5 hover:text-white",

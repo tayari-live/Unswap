@@ -97,7 +97,7 @@ export default function LandingPage() {
 
         <div className="relative w-full max-w-[1100px] mx-auto px-6 py-24 flex flex-col items-center text-center mt-8">
           <SectionLabel>By Invitation · Verified Access</SectionLabel>
-          <h1 className="font-display font-light leading-[1.04] tracking-tight text-[clamp(3rem,7vw,5.5rem)] text-balance">
+          <h1 className="font-display font-light leading-[1.04] tracking-[-0.02em] text-[clamp(3rem,7vw,5.5rem)] text-balance">
             Exchange Homes.<br />
             <span className="text-[#e4c97a] italic font-light">Not Money.</span>
           </h1>
@@ -121,7 +121,7 @@ export default function LandingPage() {
         <div className="max-w-[1160px] mx-auto px-6 py-24 lg:py-32">
           <div className="max-w-[640px] mb-16">
             <SectionLabel align="left">The Network</SectionLabel>
-            <h2 className="font-display text-4xl lg:text-[3.5rem] font-light text-[#0a0e1a] leading-[1.1]">The Exclusive Network</h2>
+            <h2 className="font-display text-[40px] lg:text-[48px] font-semibold text-[#0a0e1a] leading-[1.1]">The Exclusive Network</h2>
             <p className="mt-5 text-[15px] text-[rgba(10,14,26,0.6)] leading-relaxed">
               It is not the platform, it is the network. A verified, closed-loop community of diplomatic professionals that mass-market platforms cannot replicate.
             </p>
@@ -145,7 +145,7 @@ export default function LandingPage() {
         <div className="max-w-[1160px] mx-auto px-6 py-24 lg:py-32">
           <div className="text-center mb-16">
             <SectionLabel>The Residences</SectionLabel>
-            <h2 className="font-display text-4xl lg:text-[3.5rem] font-light leading-[1.1]">Curated Portfolio</h2>
+            <h2 className="font-display text-[40px] lg:text-[48px] font-semibold leading-[1.1]">Curated Portfolio</h2>
           </div>
           <div className="grid md:grid-cols-3 gap-5">
             {residences.map((r) => (
@@ -180,7 +180,7 @@ export default function LandingPage() {
         <div className="max-w-[1160px] mx-auto px-6 py-24 lg:py-32">
           <div className="text-center mb-16">
             <SectionLabel>The Process</SectionLabel>
-            <h2 className="font-display text-4xl lg:text-[3.5rem] font-light text-[#0a0e1a] leading-[1.1]">How does it work?</h2>
+            <h2 className="font-display text-[40px] lg:text-[48px] font-semibold text-[#0a0e1a] leading-[1.1]">How does it work?</h2>
           </div>
           <div className="grid md:grid-cols-3 gap-px bg-[rgba(201,168,76,0.25)] border border-[rgba(201,168,76,0.25)]">
             {steps.map((s) => (
@@ -211,7 +211,7 @@ export default function LandingPage() {
           <div className="grid lg:grid-cols-2 gap-16 lg:gap-20 items-center">
             <div>
               <SectionLabel align="left">Protected by Design</SectionLabel>
-              <h2 className="font-display text-4xl lg:text-[3.25rem] font-light leading-[1.12]">Built on Institutional Trust.</h2>
+              <h2 className="font-display text-[40px] lg:text-[48px] font-semibold leading-[1.12]">Built on Institutional Trust.</h2>
               <p className="mt-6 text-[17px] text-white/60 leading-[1.8] max-w-[480px] font-light">
                 The person staying in your home is not a stranger with a five-star review. They are a vetted diplomatic professional with as much to lose from a poor exchange as you do. That is the closed loop.
               </p>
@@ -250,7 +250,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-[rgba(201,168,76,0.25)] border border-[rgba(201,168,76,0.25)]">
             {stats.map((s) => (
               <div key={s.label} className="bg-white p-12 text-center">
-                <div className="font-display text-5xl lg:text-6xl font-light text-[#0a0e1a]">{s.stat}</div>
+                <div className="font-display text-5xl lg:text-6xl font-bold text-[#0a0e1a]">{s.stat}</div>
                 <div className="text-[11px] font-medium uppercase tracking-[0.22em] text-[rgba(10,14,26,0.55)] mt-4">{s.label}</div>
               </div>
             ))}
@@ -263,7 +263,7 @@ export default function LandingPage() {
         <div className="max-w-[1160px] mx-auto px-6 py-24 lg:py-32">
           <div className="text-center max-w-[560px] mx-auto mb-16">
             <SectionLabel>Membership</SectionLabel>
-            <h2 className="font-display text-4xl lg:text-[3.5rem] font-light text-[#0a0e1a] leading-[1.1]">Choose Your Tier</h2>
+            <h2 className="font-display text-[40px] lg:text-[48px] font-semibold text-[#0a0e1a] leading-[1.1]">Choose Your Tier</h2>
             <p className="mt-5 text-[15px] text-[rgba(10,14,26,0.6)]">
               One annual membership. Exchanges scaled to how often you rotate. Every tier includes verified peer access and property protection.
             </p>
@@ -276,7 +276,7 @@ export default function LandingPage() {
                 )}
                 <h3 className="font-display text-xl font-light text-[#0a0e1a]">{t.name}</h3>
                 <div className="mt-4 flex items-baseline gap-1">
-                  <span className="font-display text-4xl font-light text-[#0a0e1a]">{t.price}</span>
+                  <span className="font-display text-4xl font-bold text-[#0a0e1a]">{t.price}</span>
                   <span className="text-sm text-[rgba(10,14,26,0.5)]">{t.per}</span>
                 </div>
                 <ul className="mt-6 space-y-3 text-[14px] text-[rgba(10,14,26,0.65)] flex-1">
@@ -305,7 +305,7 @@ export default function LandingPage() {
             </div>
             <div className="flex items-center gap-5">
               <div className="text-right">
-                <div className="font-display text-2xl font-light">$3,143</div>
+                <div className="font-display text-2xl font-bold">$3,143</div>
                 <div className="text-[11px] text-white/45">one-time</div>
               </div>
               <Link href="/register" className="text-[12px] font-medium uppercase tracking-[0.1em] text-[#0a0e1a] bg-[#c9a84c] hover:bg-[#e4c97a] px-6 py-3.5 transition-colors duration-200 whitespace-nowrap">Claim Lifetime</Link>
@@ -320,7 +320,7 @@ export default function LandingPage() {
         <div className="relative max-w-[820px] mx-auto px-6 py-28 text-center flex flex-col items-center">
           <div className="w-16 h-16 border border-[rgba(201,168,76,0.4)] flex items-center justify-center mb-8"><ShieldCheck size={32} className="text-[#c9a84c]" /></div>
           <SectionLabel>Begin Verification</SectionLabel>
-          <h2 className="font-display text-4xl lg:text-[3.5rem] font-light leading-[1.1]">Join the Network</h2>
+          <h2 className="font-display text-[40px] lg:text-[48px] font-semibold leading-[1.1]">Join the Network</h2>
           <p className="mt-6 text-[17px] text-white/60 leading-[1.7] max-w-[520px] font-light">
             Begin your verification today. Turn an empty home into your most valuable asset on rotation. Stop paying $110 a day for accommodation your peers could provide for free.
           </p>
