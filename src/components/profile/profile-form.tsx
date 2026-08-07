@@ -4,6 +4,11 @@ import { useState } from "react"
 import { UploadCloud, X, Check } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
 import { NATIONALITIES } from "@/lib/geo"
+import { FIELD, LABEL, TEXTAREA } from "@/components/ui/form"
+
+// Field styling lives in components/ui/form so all forms stay in step.
+const inputCls = FIELD
+const labelCls = LABEL
 
 const ORGANISATIONS = [
   "United Nations", "UNDP", "UNICEF", "WHO", "UNHCR", "IMF", "World Bank Group",
@@ -23,9 +28,6 @@ export type ProfileValues = {
   linkedinUrl: string
 }
 
-const inputCls =
-  "block w-full px-4 py-3 border border-[var(--hair)] rounded-xl bg-[var(--surface)] placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] text-sm text-[var(--fg)] transition-all"
-const labelCls = "block text-xs font-semibold uppercase tracking-wider text-[var(--fg)] mb-2"
 
 export function ProfileForm({
   initial,
@@ -146,7 +148,7 @@ export function ProfileForm({
 
       <div>
         <label htmlFor="bio" className={labelCls}>Bio</label>
-        <textarea id="bio" rows={3} value={v.bio} onChange={(e) => set("bio", e.target.value)} className={inputCls} placeholder="A short introduction for fellow members." />
+        <textarea id="bio" value={v.bio} onChange={(e) => set("bio", e.target.value)} className={TEXTAREA} placeholder="A short introduction for fellow members." />
       </div>
 
       <div>

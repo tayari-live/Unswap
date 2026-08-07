@@ -3,10 +3,12 @@
 import { useState } from "react"
 import { Eye, EyeOff, Check } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
+import { FIELD, LABEL } from "@/components/ui/form"
 
-const inputCls =
-  "block w-full px-4 py-3 border border-[var(--hair)] rounded-xl bg-[var(--surface)] placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] text-sm text-[var(--fg)] transition-all"
-const labelCls = "block text-xs font-semibold uppercase tracking-wider text-[var(--fg)] mb-2"
+// Field styling lives in components/ui/form so all forms stay in step.
+const inputCls = FIELD
+const labelCls = LABEL
+
 
 export function ChangePasswordForm() {
   const toast = useToast()

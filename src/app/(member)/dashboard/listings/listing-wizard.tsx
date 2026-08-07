@@ -12,6 +12,11 @@ import {
 } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
 import { COUNTRIES } from "@/lib/geo"
+import { FIELD, LABEL, TEXTAREA } from "@/components/ui/form"
+
+// Field styling lives in components/ui/form so all forms stay in step.
+const input = FIELD
+const label = LABEL
 
 const PROPERTY_TYPES: { v: string; icon: LucideIcon }[] = [
   { v: "Apartment", icon: Building2 },
@@ -71,8 +76,6 @@ const EMPTY: WizardValues = {
   houseRules: "", emergencyName: "", emergencyPhone: "", emergencyRelationship: "",
 }
 
-const input = "block w-full px-4 py-3 border border-[var(--hair)] rounded-xl bg-[var(--surface)] placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] text-sm text-[var(--fg)]"
-const label = "block text-xs font-semibold uppercase tracking-wider text-[var(--fg)] mb-2"
 
 // One question per screen, HomeExchange-style. Screens are grouped into
 // sections for the segmented progress bar; `optional` screens get a Skip.
@@ -434,7 +437,7 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
                 <Sparkles size={13} /> {aiBusy ? "Drafting…" : "Write with AI"}
               </button>
             </div>
-            <textarea rows={8} className={input} value={v.description} onChange={(e) => set("description", e.target.value)} placeholder="Bright two-bed five minutes from the lake, quiet street, weekly market around the corner…" />
+            <textarea className={TEXTAREA} value={v.description} onChange={(e) => set("description", e.target.value)} placeholder="Bright two-bed five minutes from the lake, quiet street, weekly market around the corner…" />
             <p className="mt-2 text-xs text-neutral">
               Write a few rough notes and “Write with AI” will polish them — it only uses the details you&apos;ve entered.
             </p>
@@ -562,7 +565,7 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
         {step === 9 && (
           <div>
             <Heading title="Any house rules?" sub="Shown to guests before they send a request — set expectations early." />
-            <textarea rows={6} maxLength={1000} className={input} value={v.houseRules} onChange={(e) => set("houseRules", e.target.value)} placeholder="No smoking, no shoes indoors, please water the plants." />
+            <textarea maxLength={1000} className={TEXTAREA} value={v.houseRules} onChange={(e) => set("houseRules", e.target.value)} placeholder="No smoking, no shoes indoors, please water the plants." />
           </div>
         )}
 

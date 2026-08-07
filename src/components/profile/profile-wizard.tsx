@@ -6,6 +6,11 @@ import { UploadCloud, X, Check, ChevronLeft, ChevronRight } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
 import { NATIONALITIES } from "@/lib/geo"
 import type { ProfileValues } from "@/components/profile/profile-form"
+import { FIELD, LABEL, TEXTAREA } from "@/components/ui/form"
+
+// Field styling lives in components/ui/form so all forms stay in step.
+const input = FIELD
+const label = LABEL
 
 const ORGANISATIONS = [
   "United Nations", "UNDP", "UNICEF", "WHO", "UNHCR", "IMF", "World Bank Group",
@@ -18,9 +23,6 @@ const MIN_BIO = 40
 const MAX_BYTES = 5 * 1024 * 1024
 const ACCEPT = "image/png,image/jpeg,image/webp"
 
-const input =
-  "block w-full px-4 py-3.5 border border-[var(--hair)] rounded-sm bg-[var(--surface)] placeholder-neutral focus:outline-none focus:border-[var(--gold)] focus:shadow-[0_0_0_1px_var(--hair)] transition-colors text-sm text-[var(--fg)]"
-const label = "block text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--gold-soft)] mb-2.5"
 
 // The fields that count toward profile completion — must match the server's
 // computeCompletion() so the live % matches what gets saved. LinkedIn is
@@ -238,7 +240,7 @@ export function ProfileWizard({
           <div>
             <Heading title="Tell members about yourself" sub="A short introduction. Your work, your interests, what you are looking for." />
             <label className={label} htmlFor="bio">Bio</label>
-            <textarea rows={5} id="bio" className={input} value={v.bio} onChange={(e) => set("bio", e.target.value)} placeholder="A short introduction for fellow members." />
+            <textarea id="bio" className={TEXTAREA} value={v.bio} onChange={(e) => set("bio", e.target.value)} placeholder="A short introduction for fellow members." />
             <p className="mt-2 text-xs text-neutral">
               {v.bio.trim().length === 0
                 ? `At least ${MIN_BIO} characters, or skip this for now.`

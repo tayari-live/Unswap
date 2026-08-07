@@ -4,6 +4,11 @@ import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { CalendarCheck, CheckCircle2, CalendarX2 } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
+import { FIELD, LABEL, TEXTAREA } from "@/components/ui/form"
+
+// Field styling lives in components/ui/form so all forms stay in step.
+const inputCls = FIELD
+const labelCls = LABEL
 
 const MODE_OPTIONS: Record<string, { value: string; label: string }[]> = {
   either: [
@@ -24,9 +29,6 @@ const DURATION_BANDS: Record<string, { label: string; min: number; max: number }
 
 type Blackout = { start: string; end: string }
 
-const inputCls =
-  "block w-full px-4 py-3 border border-[var(--hair)] rounded-xl bg-[var(--surface)] text-sm text-[var(--fg)] focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)]"
-const labelCls = "block text-xs font-semibold uppercase tracking-wider text-[var(--fg)] mb-2"
 
 /** Whole nights between two YYYY-MM-DD dates (end exclusive of start). */
 function nightsBetween(start: string, end: string) {
@@ -214,7 +216,7 @@ export function SwapRequestForm({
 
       <div>
         <label htmlFor="message" className={labelCls}>Message <span className="text-neutral normal-case font-normal">(optional)</span></label>
-        <textarea id="message" rows={3} value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Introduce yourself and your plans." className={inputCls} />
+        <textarea id="message" value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Introduce yourself and your plans." className={TEXTAREA} />
       </div>
 
       <div className="flex gap-3">
