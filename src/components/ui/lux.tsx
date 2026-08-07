@@ -30,7 +30,13 @@ export function SectionLabel({
   )
 }
 
-/** Hairline card: warm surface, thin gold border, minimal radius, no heavy shadow. */
+/**
+ * Product card: white surface, 10px radius, light shadow.
+ *
+ * Elevation rather than a hairline separates surfaces in the product, per the
+ * brand system. A faint border is kept so cards still read on the parchment
+ * ground, where the shadow alone is too subtle to register.
+ */
 export function LuxCard({
   children,
   className,
@@ -39,13 +45,24 @@ export function LuxCard({
   className?: string
 }) {
   return (
-    <div className={cn("bg-[var(--surface)] border border-[var(--hair)] rounded-md", className)}>
+    <div
+      className={cn(
+        "bg-[var(--card)] border border-[var(--border)] rounded-[10px] shadow-[0_2px_8px_rgba(0,0,0,0.06)]",
+        className,
+      )}
+    >
       {children}
     </div>
   )
 }
 
-/** Editorial page header: gold eyebrow + large light-weight Cormorant title. */
+/**
+ * Product page header.
+ *
+ * Inter, not Cormorant: the display face is reserved for marketing, on the
+ * reasoning that a serif at UI sizes costs legibility for no gain. Sized to
+ * the H3/H2 steps of the scale, stepped down on narrow viewports.
+ */
 export function LuxPageHeader({
   eyebrow,
   title,
@@ -61,10 +78,10 @@ export function LuxPageHeader({
     <div className="flex items-end justify-between gap-4 mb-8">
       <div>
         <SectionLabel>{eyebrow}</SectionLabel>
-        <h1 className="font-display font-light leading-[1.1] tracking-tight text-[var(--fg)] text-[clamp(1.9rem,3.5vw,2.75rem)]">
+        <h1 className="font-sans font-bold leading-tight tracking-tight text-[var(--foreground)] text-[32px] lg:text-[40px]">
           {title}
         </h1>
-        {subtitle && <p className="text-neutral mt-2 text-sm max-w-xl leading-relaxed">{subtitle}</p>}
+        {subtitle && <p className="text-[var(--muted)] mt-2 text-base max-w-xl leading-relaxed">{subtitle}</p>}
       </div>
       {action && <div className="flex-shrink-0">{action}</div>}
     </div>

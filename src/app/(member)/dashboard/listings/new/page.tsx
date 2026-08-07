@@ -32,7 +32,7 @@ export default async function NewListingPage() {
         <div className="bg-surface rounded-md border border-[var(--hair)] p-8">
           <div className="flex items-center gap-3 mb-5">
             <ShieldAlert size={22} className="text-[var(--gold-dark)]" />
-            <h2 className="font-display text-xl font-bold text-[var(--fg)]">A few steps before you can list</h2>
+            <h2 className="font-sans text-xl font-bold text-[var(--fg)]">A few steps before you can list</h2>
           </div>
           <ul className="space-y-3">
             {checks.map((c) => (

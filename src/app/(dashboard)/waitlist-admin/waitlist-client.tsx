@@ -174,7 +174,7 @@ export default function WaitlistClient({ initialEntries }: { initialEntries: Ent
         <div className="bg-[var(--navy)] rounded-md p-5 mb-6 text-white">
           <div className="flex items-center gap-2 mb-3">
             <Trophy size={18} className="text-[var(--gold)]" />
-            <h2 className="font-display font-bold">Top Referrers · 6 months Unlimited Pro free</h2>
+            <h2 className="font-sans font-bold">Top Referrers · 6 months Unlimited Pro free</h2>
           </div>
           <div className="flex flex-wrap gap-3">
             {topReferrers.map((e) => (
@@ -270,7 +270,7 @@ export default function WaitlistClient({ initialEntries }: { initialEntries: Ent
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--hair)]">
-              <h2 id="import-leads-title" className="font-display font-bold text-lg text-[var(--fg)]">Import leads</h2>
+              <h2 id="import-leads-title" className="font-sans font-bold text-lg text-[var(--fg)]">Import leads</h2>
               <button onClick={() => setImportOpen(false)} disabled={importBusy} className="text-neutral hover:text-[var(--fg)]"><X size={20} /></button>
             </div>
             <div className="p-6 space-y-4">

@@ -190,7 +190,7 @@ function IconCard({
 function Heading({ title, sub }: { title: string; sub?: string }) {
   return (
     <div className="mb-8">
-      <h2 className="font-display text-2xl sm:text-3xl font-bold text-[var(--fg)] leading-tight">{title}</h2>
+      <h2 className="font-sans text-2xl sm:text-3xl font-bold text-[var(--fg)] leading-tight">{title}</h2>
       {sub && <p className="mt-2 text-sm text-neutral leading-relaxed">{sub}</p>}
     </div>
   )

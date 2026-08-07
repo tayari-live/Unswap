@@ -125,7 +125,7 @@ export function VerificationCelebration() {
 
         <h2
           id="verified-celebration-title"
-          className="font-display font-light text-[2.75rem] leading-[1.05] text-[var(--fg)]"
+          className="font-sans font-semibold text-[2.75rem] leading-[1.05] text-[var(--fg)]"
         >
           Welcome to the network,
           <br />
@@ -150,7 +150,7 @@ export function VerificationCelebration() {
           <div className="mt-5 flex items-center justify-center gap-2.5 text-sm text-neutral">
             <Coins size={16} strokeWidth={1.5} className="text-[var(--gold)]" />
             <span>
-              <span className="font-display text-lg font-light text-[var(--gold)]">+{pending.credits}</span>{" "}
+              <span className="font-sans text-lg font-light text-[var(--gold)]">+{pending.credits}</span>{" "}
               credit{pending.credits === 1 ? "" : "s"} added to get you started
             </span>
           </div>

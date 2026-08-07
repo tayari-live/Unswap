@@ -130,7 +130,7 @@ export function CreditCelebration() {
           <span className="h-px w-10 bg-gradient-to-l from-transparent to-[var(--gold-soft)]/50" />
         </div>
 
-        <h2 id="credit-celebration-title" className="font-display font-light text-[2.5rem] leading-none text-[var(--fg)]">
+        <h2 id="credit-celebration-title" className="font-sans font-semibold text-[2.5rem] leading-none text-[var(--fg)]">
           +{total} <span className="text-[var(--gold)]">{total === 1 ? "credit" : "credits"}</span>
         </h2>
 
@@ -147,7 +147,7 @@ export function CreditCelebration() {
               className="flex items-center justify-between gap-3 border border-[var(--hair)] rounded-sm px-4 py-2.5"
             >
               <span className="text-sm text-[var(--fg)]">{g.title}</span>
-              <span className="font-display font-light text-xl text-[var(--gold)] tabular-nums">+{g.amount}</span>
+              <span className="font-sans font-semibold text-xl text-[var(--gold)] tabular-nums">+{g.amount}</span>
             </li>
           ))}
         </ul>

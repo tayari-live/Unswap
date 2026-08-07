@@ -65,7 +65,7 @@ export default async function NotificationsPage() {
           <div className="mx-auto w-14 h-14 rounded-md bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center mb-4">
             <Bell size={26} />
           </div>
-          <h2 className="font-display text-xl font-bold text-[var(--fg)]">You&apos;re all caught up</h2>
+          <h2 className="font-sans text-xl font-bold text-[var(--fg)]">You&apos;re all caught up</h2>
           <p className="mt-2 text-sm text-neutral">No new activity right now.</p>
         </div>
       ) : (

@@ -8,8 +8,8 @@ export default function NotFound() {
         <div className="flex justify-center mb-8">
           <Logo underline wordClassName="text-[var(--navy)]" />
         </div>
-        <p className="font-display text-6xl font-bold text-[var(--gold)]">404</p>
-        <h1 className="mt-3 font-display text-2xl font-bold text-[var(--navy)]">Page not found</h1>
+        <p className="font-sans text-6xl font-bold text-[var(--gold)]">404</p>
+        <h1 className="mt-3 font-sans text-2xl font-bold text-[var(--navy)]">Page not found</h1>
         <p className="mt-3 text-neutral">
           The page you&apos;re looking for has moved or never existed.
         </p>

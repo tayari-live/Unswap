@@ -77,7 +77,7 @@ export default async function SettingsPage() {
       </div>
 
       <div className="bg-surface rounded-md border border-[var(--hair)] p-6 sm:p-8 mt-6">
-        <h2 className="font-display font-bold text-lg text-[var(--fg)] mb-1.5">Password</h2>
+        <h2 className="font-sans font-bold text-lg text-[var(--fg)] mb-1.5">Password</h2>
         <p className="text-sm text-neutral mb-5">Change the password you use to sign in.</p>
         <ChangePasswordForm />
       </div>

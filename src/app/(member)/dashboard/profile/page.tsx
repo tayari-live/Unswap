@@ -44,7 +44,7 @@ export default async function ProfilePage() {
 
       {/* Reviews received */}
       <div className="bg-surface rounded-md border border-[var(--hair)] p-6 sm:p-8 mt-6">
-        <h2 className="font-display font-bold text-lg text-[var(--fg)] mb-4">Reviews received</h2>
+        <h2 className="font-sans font-bold text-lg text-[var(--fg)] mb-4">Reviews received</h2>
         {reviews.length === 0 ? (
           <p className="text-sm text-neutral">No reviews yet. Complete an exchange to start building your reputation.</p>
         ) : (

@@ -101,7 +101,7 @@ export default function VerificationClient({ initialSubmissions }: { initialSubm
       {submissions.length === 0 ? (
         <div className="bg-surface rounded-md border border-[var(--hair)] p-12 text-center">
           <ShieldCheck className="mx-auto text-[var(--teal)] mb-3" size={40} />
-          <p className="font-display font-bold text-lg text-[var(--fg)]">Queue is clear</p>
+          <p className="font-sans font-bold text-lg text-[var(--fg)]">Queue is clear</p>
           <p className="text-sm text-neutral mt-1">No submissions are awaiting review.</p>
         </div>
       ) : (
@@ -147,7 +147,7 @@ export default function VerificationClient({ initialSubmissions }: { initialSubm
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--hair)] sticky top-0 bg-surface">
-              <h2 id="review-submission-title" className="font-display font-bold text-lg text-[var(--fg)]">Review Submission</h2>
+              <h2 id="review-submission-title" className="font-sans font-bold text-lg text-[var(--fg)]">Review Submission</h2>
               <button onClick={() => setSelected(null)} disabled={busy} className="text-neutral hover:text-[var(--fg)]">
                 <X size={20} />
               </button>

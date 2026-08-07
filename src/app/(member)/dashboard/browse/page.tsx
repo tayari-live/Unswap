@@ -48,7 +48,7 @@ export default async function BrowsePage({
           <div className="mx-auto w-14 h-14 rounded-md bg-[var(--parchment)] text-[var(--gold-dark)] flex items-center justify-center mb-5">
             <MailWarning size={26} />
           </div>
-          <h2 className="font-display text-2xl font-bold text-[var(--fg)]">Confirm your email to browse</h2>
+          <h2 className="font-sans text-2xl font-bold text-[var(--fg)]">Confirm your email to browse</h2>
           <p className="mt-3 text-neutral leading-relaxed max-w-md mx-auto">
             Member homes are only visible inside the verified network. Open the
             confirmation link we sent to{" "}
@@ -111,7 +111,7 @@ export default async function BrowsePage({
           <div className="mx-auto w-14 h-14 rounded-md bg-neutral-light text-neutral flex items-center justify-center mb-4">
             <SearchX size={26} />
           </div>
-          <h2 className="font-display text-xl font-bold text-[var(--fg)]">No homes match</h2>
+          <h2 className="font-sans text-xl font-bold text-[var(--fg)]">No homes match</h2>
           <p className="mt-2 text-sm text-neutral">Try a different city or relax your filters.</p>
         </div>
       ) : (
@@ -144,7 +144,7 @@ export default async function BrowsePage({
                 <div className="flex items-center gap-1.5 text-xs text-neutral">
                   <MapPin size={13} /> {l.city}, {l.country}
                 </div>
-                <h3 className="mt-1 font-display font-bold text-[var(--fg)] leading-snug">{l.title}</h3>
+                <h3 className="mt-1 font-sans font-bold text-[var(--fg)] leading-snug">{l.title}</h3>
                 <div className="mt-1 text-xs text-neutral">
                   {l.propertyType} · {l.bedrooms} {l.bedrooms === 1 ? "bed" : "beds"} · up to {l.maxGuests} guests
                 </div>

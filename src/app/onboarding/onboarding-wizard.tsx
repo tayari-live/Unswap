@@ -82,7 +82,7 @@ export function OnboardingWizard({
               className="mx-auto mb-5 w-16 h-16 object-contain rounded-2xl"
             />
             <SectionLabel align="center">Welcome</SectionLabel>
-            <h1 className="font-display text-4xl font-light leading-[1.1] text-[var(--fg)]">Welcome to UnSwap, {firstName}</h1>
+            <h1 className="font-sans text-4xl font-light leading-[1.1] text-[var(--fg)]">Welcome to UnSwap, {firstName}</h1>
             <p className="mt-5 text-neutral leading-[1.8] max-w-md mx-auto">
               You have joined a closed, verified network built exclusively for UN and
               international organisation professionals. Exchange homes, not money,
@@ -98,7 +98,7 @@ export function OnboardingWizard({
         {step === 2 && (
           <div>
             <SectionLabel>Your Profile</SectionLabel>
-            <h1 className="font-display text-3xl font-light leading-[1.15] text-[var(--fg)]">Complete your profile</h1>
+            <h1 className="font-sans text-3xl font-light leading-[1.15] text-[var(--fg)]">Complete your profile</h1>
             <p className="mt-2 mb-6 text-sm text-neutral leading-relaxed">
               Members exchange with people, not listings. One question at a time. Reach {MIN_TO_CONTINUE}% to continue.
             </p>
@@ -124,7 +124,7 @@ export function OnboardingWizard({
               <PartyPopper size={26} strokeWidth={1.4} />
             </div>
             <SectionLabel align="center">Ready</SectionLabel>
-            <h1 className="font-display text-3xl font-light leading-[1.15] text-[var(--fg)]">You are all set, {firstName}</h1>
+            <h1 className="font-sans text-3xl font-light leading-[1.15] text-[var(--fg)]">You are all set, {firstName}</h1>
             <p className="mt-4 text-neutral leading-[1.8] max-w-md mx-auto">
               Offer your home for exchange, or start with the homes your peers have
               already listed across duty stations worldwide.

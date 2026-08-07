@@ -53,7 +53,7 @@ const SCREENS: { key: keyof ProfileValues | "photo" | "review"; optional?: boole
 function Heading({ title, sub }: { title: string; sub?: string }) {
   return (
     <div className="mb-8">
-      <h2 className="font-display text-2xl sm:text-[2rem] font-light text-[var(--fg)] leading-[1.15]">{title}</h2>
+      <h2 className="font-sans text-2xl sm:text-[2rem] font-light text-[var(--fg)] leading-[1.15]">{title}</h2>
       {sub && <p className="mt-2.5 text-sm text-neutral leading-relaxed">{sub}</p>}
     </div>
   )

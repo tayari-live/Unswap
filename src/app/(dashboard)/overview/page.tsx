@@ -72,7 +72,7 @@ export default async function OverviewPage() {
               </span>
               <ChevronRight size={16} className="text-neutral group-hover:text-[var(--gold-soft)] transition-colors" />
             </div>
-            <div className={`mt-5 font-display font-light text-4xl leading-none ${"alert" in c && c.alert ? "text-[var(--crimson)]" : "text-[var(--fg)]"}`}>
+            <div className={`mt-5 font-sans font-semibold text-4xl leading-none ${"alert" in c && c.alert ? "text-[var(--crimson)]" : "text-[var(--fg)]"}`}>
               {c.value}
             </div>
             <div className="text-[11px] text-neutral uppercase tracking-[0.18em] mt-2 font-medium">{c.label}</div>
@@ -86,7 +86,7 @@ export default async function OverviewPage() {
           <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-[var(--hair)]">
             <div>
               <SectionLabel>Queue</SectionLabel>
-              <h2 className="font-display font-light text-2xl text-[var(--fg)] leading-none">Awaiting Verification</h2>
+              <h2 className="font-sans font-semibold text-2xl text-[var(--fg)] leading-none">Awaiting Verification</h2>
             </div>
             <Link href="/verification" className="text-[11px] font-medium uppercase tracking-[0.14em] text-[var(--gold-soft)] hover:text-[var(--gold)] transition-colors whitespace-nowrap">
               View queue
@@ -121,7 +121,7 @@ export default async function OverviewPage() {
         {/* Tier distribution */}
         <LuxCard className="p-6">
           <SectionLabel>Revenue</SectionLabel>
-          <h2 className="font-display font-light text-2xl text-[var(--fg)] leading-none mb-5">Subscription Mix</h2>
+          <h2 className="font-sans font-semibold text-2xl text-[var(--fg)] leading-none mb-5">Subscription Mix</h2>
           {stats.tierDistribution.length === 0 && (
             <p className="text-sm text-neutral">No active subscriptions yet.</p>
           )}

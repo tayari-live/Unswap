@@ -45,7 +45,7 @@ export default function AnalyticsClient({ data }: { data: Data }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-surface rounded-md border border-[var(--hair)] p-5">
-          <h2 className="font-display font-bold text-[var(--fg)] mb-4">Signups &amp; Swaps · last 6 months</h2>
+          <h2 className="font-sans font-bold text-[var(--fg)] mb-4">Signups &amp; Swaps · last 6 months</h2>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={data.series} margin={{ left: -20, right: 8, top: 8 }}>
@@ -71,7 +71,7 @@ export default function AnalyticsClient({ data }: { data: Data }) {
         </div>
 
         <div className="bg-surface rounded-md border border-[var(--hair)] p-5">
-          <h2 className="font-display font-bold text-[var(--fg)] mb-4">Tier Distribution</h2>
+          <h2 className="font-sans font-bold text-[var(--fg)] mb-4">Tier Distribution</h2>
           {pieData.length === 0 ? (
             <p className="text-sm text-neutral">No active subscriptions yet.</p>
           ) : (
@@ -91,7 +91,7 @@ export default function AnalyticsClient({ data }: { data: Data }) {
         </div>
 
         <div className="bg-surface rounded-md border border-[var(--hair)] p-5">
-          <h2 className="font-display font-bold text-[var(--fg)] mb-4">Verifications · last 6 months</h2>
+          <h2 className="font-sans font-bold text-[var(--fg)] mb-4">Verifications · last 6 months</h2>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data.series} margin={{ left: -20, right: 8, top: 8 }}>
@@ -106,7 +106,7 @@ export default function AnalyticsClient({ data }: { data: Data }) {
         </div>
 
         <div className="lg:col-span-2 bg-surface rounded-md border border-[var(--hair)] p-5">
-          <h2 className="font-display font-bold text-[var(--fg)] mb-4">Popular Duty Stations</h2>
+          <h2 className="font-sans font-bold text-[var(--fg)] mb-4">Popular Duty Stations</h2>
           {data.topStations.length === 0 ? (
             <p className="text-sm text-neutral">No listings yet.</p>
           ) : (

@@ -171,7 +171,7 @@ export default async function MemberDashboardPage() {
               {checklistDone} of {checklist.length}
             </span>
           </div>
-          <h2 className="font-display font-light text-2xl text-[var(--fg)] leading-none">Getting started</h2>
+          <h2 className="font-sans font-semibold text-2xl text-[var(--fg)] leading-none">Getting started</h2>
           {/* Progress as a hairline rule rather than a bar */}
           <div className="mt-4 mb-5 h-px bg-[var(--hair)] overflow-hidden">
             <div
@@ -224,7 +224,7 @@ export default async function MemberDashboardPage() {
             <span className="w-11 h-11 border border-[var(--hair)] flex items-center justify-center text-[var(--gold-soft)]">
               <c.icon size={20} strokeWidth={1.4} />
             </span>
-            <div className="mt-5 font-display font-light text-4xl leading-none text-[var(--fg)]">{c.value}</div>
+            <div className="mt-5 font-sans font-semibold text-4xl leading-none text-[var(--fg)]">{c.value}</div>
             <div className="text-[11px] text-neutral uppercase tracking-[0.18em] mt-2 font-medium">{c.label}</div>
           </div>
         ))}
@@ -234,7 +234,7 @@ export default async function MemberDashboardPage() {
         {/* Incoming swap requests */}
         <div className="lg:col-span-2 bg-surface rounded-md border border-[var(--hair)] overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--hair)]">
-            <h2 className="font-display font-bold text-lg text-[var(--fg)]">Incoming Swap Requests</h2>
+            <h2 className="font-sans font-bold text-lg text-[var(--fg)]">Incoming Swap Requests</h2>
           </div>
           <div className="divide-y divide-[var(--hair)]">
             {incoming.length === 0 && (
@@ -271,7 +271,7 @@ export default async function MemberDashboardPage() {
               ) : (
                 <ShieldAlert size={18} className="text-[var(--gold-dark)]" />
               )}
-              <h2 className="font-display font-bold text-base text-[var(--fg)]">Verification</h2>
+              <h2 className="font-sans font-bold text-base text-[var(--fg)]">Verification</h2>
             </div>
             <p className="text-sm text-neutral-dark">
               {VERIFICATION_LABELS[user.verificationStatus] ?? user.verificationStatus}
@@ -287,7 +287,7 @@ export default async function MemberDashboardPage() {
 
           {/* Subscription */}
           <div className="bg-surface rounded-md border border-[var(--hair)] p-6">
-            <h2 className="font-display font-bold text-base text-[var(--fg)] mb-3">Subscription</h2>
+            <h2 className="font-sans font-bold text-base text-[var(--fg)] mb-3">Subscription</h2>
             {user.subscription ? (
               <>
                 <div className="inline-flex items-center text-sm font-bold px-3 py-1 rounded-full bg-[var(--navy)] text-[var(--gold)]">
@@ -315,7 +315,7 @@ export default async function MemberDashboardPage() {
       {/* Upcoming exchanges */}
       <div className="bg-surface rounded-md border border-[var(--hair)] overflow-hidden mt-6">
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--hair)]">
-          <h2 className="font-display font-bold text-lg text-[var(--fg)]">Upcoming Exchanges</h2>
+          <h2 className="font-sans font-bold text-lg text-[var(--fg)]">Upcoming Exchanges</h2>
         </div>
         <div className="divide-y divide-[var(--hair)]">
           {upcoming.length === 0 && (

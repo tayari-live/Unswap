@@ -108,7 +108,7 @@ export function ReviewAction({
 
   return (
     <form onSubmit={submit} className="mt-2 w-full bg-[var(--background)] border border-[var(--hair)] rounded-xl p-4 space-y-3">
-      <h4 className="font-display font-bold text-[var(--fg)]">Review {otherName}</h4>
+      <h4 className="font-sans font-bold text-[var(--fg)]">Review {otherName}</h4>
       <StarRating label="Overall" value={overall} onChange={setOverall} />
       <StarRating label="Communication" value={communication} onChange={setCommunication} />
       {aboutHost && (

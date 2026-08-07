@@ -60,7 +60,7 @@ export default async function SubscriptionPage({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="text-xs uppercase tracking-wide text-white/50 font-semibold">Current plan</div>
-            <div className="mt-1 font-display text-2xl font-bold">
+            <div className="mt-1 font-sans text-2xl font-bold">
               {currentKey ? TIER_LABELS[currentKey] ?? currentKey : "No active plan"}
             </div>
             {sub && (
@@ -92,7 +92,7 @@ export default async function SubscriptionPage({
       </div>
 
       {/* Tier ladder */}
-      <h2 className="font-display font-bold text-lg text-[var(--fg)] mb-3">Membership tiers</h2>
+      <h2 className="font-sans font-bold text-lg text-[var(--fg)] mb-3">Membership tiers</h2>
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {TIERS.map((t) => {
           const current = t.key === currentKey
@@ -106,9 +106,9 @@ export default async function SubscriptionPage({
                   <BadgeCheck size={12} className="text-[var(--gold)]" /> Current
                 </span>
               )}
-              <h3 className="font-display text-base font-bold text-[var(--fg)]">{t.name}</h3>
+              <h3 className="font-sans text-base font-bold text-[var(--fg)]">{t.name}</h3>
               <div className="mt-2 flex items-baseline gap-1">
-                <span className="font-display text-2xl font-bold text-[var(--fg)]">{t.price}</span>
+                <span className="font-sans text-2xl font-bold text-[var(--fg)]">{t.price}</span>
                 <span className="text-xs text-neutral">{t.per}</span>
               </div>
               <ul className="mt-4 space-y-2 text-xs text-neutral-dark flex-1">
@@ -134,7 +134,7 @@ export default async function SubscriptionPage({
             <span className="w-12 h-12 rounded-xl bg-[var(--gold)]/15 text-[var(--gold)] flex items-center justify-center"><BadgeCheck size={24} /></span>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-display text-lg font-bold">Lifetime Access</h3>
+                <h3 className="font-sans text-lg font-bold">Lifetime Access</h3>
                 <span className="text-[10px] font-bold uppercase tracking-wide bg-[var(--gold)] text-[var(--navy)] px-2.5 py-1 rounded-full">Best value</span>
               </div>
               <p className="text-sm text-white/60 mt-1">Unlimited exchanges forever, $2,000,000 protection, priority support.</p>
@@ -142,7 +142,7 @@ export default async function SubscriptionPage({
           </div>
           <div className="flex items-center gap-5">
             <div className="text-right">
-              <div className="font-display text-2xl font-bold">$3,143</div>
+              <div className="font-sans text-2xl font-bold">$3,143</div>
               <div className="text-xs text-white/50">one-time</div>
             </div>
             <div className="w-32"><CheckoutButton tier="lifetime" label="Claim" variant="gold" /></div>
