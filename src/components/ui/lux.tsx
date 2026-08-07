@@ -47,13 +47,49 @@ export function LuxCard({
   return (
     <div
       className={cn(
-        "bg-[var(--card)] border border-[var(--border)] rounded-[10px] shadow-[0_2px_8px_rgba(0,0,0,0.06)]",
+        "bg-[var(--card)] border border-[var(--border)] rounded-[10px] shadow-card",
         className,
       )}
     >
       {children}
     </div>
   )
+}
+
+/*
+ * Card typography.
+ *
+ * Card headings were inline <h2>/<h3> at whatever size each page happened to
+ * use. These give the three roles the spec defines a single definition, so a
+ * card title reads the same wherever it appears.
+ */
+
+/** Card title — 20/600. */
+export function CardTitle({
+  children,
+  className,
+  as: Tag = "h3",
+}: {
+  children: React.ReactNode
+  className?: string
+  /** Choose the level that fits the page outline; the styling is unaffected. */
+  as?: "h2" | "h3" | "h4"
+}) {
+  return (
+    <Tag className={cn("text-xl font-semibold text-[var(--foreground)] leading-snug", className)}>
+      {children}
+    </Tag>
+  )
+}
+
+/** Supporting line beneath a card title — 16/400. */
+export function CardSubtitle({ children, className }: { children: React.ReactNode; className?: string }) {
+  return <p className={cn("text-base text-[var(--muted)] leading-relaxed", className)}>{children}</p>
+}
+
+/** Dates, counts, statuses — 14/400. */
+export function CardMeta({ children, className }: { children: React.ReactNode; className?: string }) {
+  return <p className={cn("text-sm text-[var(--muted)]", className)}>{children}</p>
 }
 
 /**

@@ -67,7 +67,7 @@ export function AppAssistant() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? "Close the UnSwap Guide" : "Open the UnSwap Guide"}
-        className={`fixed bottom-24 md:bottom-6 right-4 md:right-6 z-[90] w-13 h-13 p-3.5 rounded-full bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] text-white transition-colors ${
+        className={`fixed bottom-24 md:bottom-6 right-4 md:right-6 z-drawer w-13 h-13 p-3.5 rounded-full bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] text-white transition-colors ${
           open ? "hidden md:block" : ""
         }`}
       >
@@ -78,7 +78,7 @@ export function AppAssistant() {
         <div
           role="dialog"
           aria-label="UnSwap Guide"
-          className="fixed z-[95] inset-x-2 top-16 bottom-2 md:inset-auto md:bottom-22 md:right-6 md:top-auto md:w-full md:max-w-sm md:h-[min(28rem,calc(100dvh-7.5rem))] bg-surface border border-[var(--hair)] rounded-md shadow-2xl flex flex-col overflow-hidden"
+          className="fixed z-drawer inset-x-2 top-16 bottom-2 md:inset-auto md:bottom-22 md:right-6 md:top-auto md:w-full md:max-w-sm md:h-[min(28rem,calc(100dvh-7.5rem))] bg-surface border border-[var(--hair)] rounded-md shadow-2xl flex flex-col overflow-hidden"
         >
           {/* Header */}
           <div className="flex items-center gap-2.5 px-4 py-3 bg-[var(--navy)] text-white">

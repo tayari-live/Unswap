@@ -70,7 +70,7 @@ export function NotificationBell({
       </button>
 
       {open && (
-        <div className={panelClassName ?? "fixed top-[72px] left-4 right-4 sm:absolute sm:top-full sm:left-auto sm:right-0 sm:mt-2 sm:w-80 bg-surface rounded-xl shadow-lg border border-[var(--hair)] z-50 overflow-hidden"}>
+        <div className={panelClassName ?? "fixed top-[72px] left-4 right-4 sm:absolute sm:top-full sm:left-auto sm:right-0 sm:mt-2 sm:w-80 bg-surface rounded-xl shadow-lg border border-[var(--hair)] z-dropdown overflow-hidden"}>
           <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--hair)]">
             <span className="text-sm font-semibold text-[var(--fg)]">Notifications</span>
             {unread > 0 && (

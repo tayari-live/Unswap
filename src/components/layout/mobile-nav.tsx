@@ -60,7 +60,7 @@ export function MobileNav({ variant = "admin" }: { variant?: "admin" | "member" 
     )
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--navy)] border-t border-white/10 pb-safe z-50 shadow-[0_-4px_24px_rgba(0,0,0,0.25)]">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--navy)] border-t border-white/10 pb-safe z-sticky shadow-[0_-4px_24px_rgba(0,0,0,0.25)]">
       <nav className="flex justify-around items-center px-2 py-3">
         {inline.map((item) => {
           const active = isActive(item.href)

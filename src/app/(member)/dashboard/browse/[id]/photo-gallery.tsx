@@ -109,7 +109,7 @@ export function PhotoGallery({ photos, title }: { photos: Photo[]; title: string
           role="dialog"
           aria-modal="true"
           aria-label={`${title} photos`}
-          className="fixed inset-0 z-[100] bg-[var(--navy-dark)]/95 flex flex-col"
+          className="fixed inset-0 z-modal bg-[var(--navy-dark)]/95 flex flex-col"
           onClick={() => setOpen(false)}
         >
           <div className="flex items-center justify-between px-4 sm:px-6 py-4 text-white">

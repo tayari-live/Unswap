@@ -13,7 +13,7 @@ const GOLD = ["#c9a84c", "#e4c97a", "#f5f0e8"]
 // A short, celebratory burst — two side cannons so it reads as a moment, not a
 // notification. Respects prefers-reduced-motion.
 //
-// zIndex must clear the dialog's z-[200]: canvas-confetti mounts its canvas at
+// zIndex must clear the modal layer (400): canvas-confetti mounts its canvas at
 // z-index 100 by default, which puts the particles *behind* the backdrop, where
 // the dim and blur swallow them.
 function burst() {
@@ -22,7 +22,7 @@ function burst() {
     particleCount: 70,
     spread: 68,
     colors: GOLD,
-    zIndex: 260,
+    zIndex: 450,
     disableForReducedMotion: true,
   }
   // Fired from the lower corners so the arcs cross the open space beside the
@@ -102,7 +102,7 @@ export function CreditCelebration() {
       role="dialog"
       aria-modal="true"
       aria-labelledby="credit-celebration-title"
-      className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-[rgba(10,14,26,0.72)] backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]"
+      className="fixed inset-0 z-modal flex items-center justify-center p-6 bg-[rgba(10,14,26,0.72)] backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]"
       onClick={dismiss}
     >
       <div

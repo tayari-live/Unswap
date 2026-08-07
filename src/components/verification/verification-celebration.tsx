@@ -18,7 +18,7 @@ const GOLD = ["#c9a84c", "#e4c97a", "#f5f0e8"]
  */
 function celebrate() {
   if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return
-  const base = { colors: GOLD, zIndex: 260, disableForReducedMotion: true }
+  const base = { colors: GOLD, zIndex: 450, disableForReducedMotion: true }
   const end = Date.now() + 1400
   ;(function frame() {
     confetti({ ...base, particleCount: 4, angle: 60, spread: 60, origin: { x: 0, y: 0.75 } })
@@ -95,7 +95,7 @@ export function VerificationCelebration() {
       role="dialog"
       aria-modal="true"
       aria-labelledby="verified-celebration-title"
-      className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-[rgba(10,14,26,0.78)] backdrop-blur-sm animate-[fadeIn_0.25s_ease-out]"
+      className="fixed inset-0 z-modal flex items-center justify-center p-6 bg-[rgba(10,14,26,0.78)] backdrop-blur-sm animate-[fadeIn_0.25s_ease-out]"
       onClick={dismiss}
     >
       <div

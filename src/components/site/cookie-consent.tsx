@@ -40,7 +40,7 @@ export function CookieConsent() {
   if (!show) return null
 
   return (
-    <div className="fixed bottom-4 inset-x-4 sm:inset-x-auto sm:right-6 sm:max-w-md z-[60]">
+    <div className="fixed bottom-4 inset-x-4 sm:inset-x-auto sm:right-6 sm:max-w-md z-sticky">
       <div className="bg-[var(--navy)] text-white rounded-2xl shadow-xl border border-white/10 p-5">
         <div className="flex items-start gap-3">
           <span className="w-9 h-9 rounded-xl bg-white/10 text-[var(--gold)] flex items-center justify-center flex-shrink-0">

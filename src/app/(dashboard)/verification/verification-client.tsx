@@ -138,7 +138,7 @@ export default function VerificationClient({ initialSubmissions }: { initialSubm
 
       {/* Review drawer/modal */}
       {selected && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[var(--navy)]/40" onClick={() => !busy && setSelected(null)}>
+        <div className="fixed inset-0 z-modal flex items-center justify-center p-4 bg-[var(--navy)]/40" onClick={() => !busy && setSelected(null)}>
           <div
             role="dialog"
             aria-modal="true"

@@ -85,6 +85,16 @@
   --shadow-dropdown: 0 8px 24px rgba(0, 0, 0, 0.08);
   --shadow-modal: 0 18px 50px rgba(0, 0, 0, 0.12);
 
+  /* ── Layering ──────────────────────────────────────────────────────── */
+  /* A named scale, so a new overlay cannot be dropped in at whatever number
+     looked free. Confetti once fired at 100 behind a dialog at 200 and was
+     invisible; with names that mistake is visible in the diff. */
+  --z-index-dropdown: 100;
+  --z-index-sticky: 200;
+  --z-index-drawer: 300;
+  --z-index-modal: 400;
+  --z-index-toast: 500;
+
   /* ── Type ──────────────────────────────────────────────────────────── */
   /* Inter for the product, Cormorant reserved for marketing display. */
   --font-sans: var(--font-inter), "Helvetica Neue", Arial, sans-serif;

@@ -261,7 +261,7 @@ export default function WaitlistClient({ initialEntries }: { initialEntries: Ent
 
       {/* Import modal */}
       {importOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[var(--navy)]/40" onClick={() => !importBusy && setImportOpen(false)}>
+        <div className="fixed inset-0 z-modal flex items-center justify-center p-4 bg-[var(--navy)]/40" onClick={() => !importBusy && setImportOpen(false)}>
           <div
             role="dialog"
             aria-modal="true"
