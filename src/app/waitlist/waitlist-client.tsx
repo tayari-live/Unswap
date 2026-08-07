@@ -184,7 +184,7 @@ export function WaitlistClient() {
                     </select>
                   </div>
 
-                  {errorMessage && <p className="text-[#ff6b6b] text-[14.5px]">{errorMessage}</p>}
+                  {errorMessage && <p className="text-error-light text-[14.5px]">{errorMessage}</p>}
 
                   <button type="submit" disabled={status === "loading"} className="btn-gold w-full flex items-center justify-center mt-2 group shadow-[0_4px_24px_var(--gold-dim)]">
                     {status === "loading" ? (
@@ -274,7 +274,7 @@ export function WaitlistClient() {
               Back
             </button>
             <div className="w-16 h-16 rounded-full bg-[rgba(255,0,0,0.03)] border border-[rgba(255,0,0,0.15)] flex items-center justify-center mb-6 mt-2">
-              <svg className="w-8 h-8 text-[#ff6b6b]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+              <svg className="w-8 h-8 text-error-light" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
             </div>
             <h2 className="font-display text-[44px] sm:text-[56px] font-normal text-wl-gold mb-4 leading-[1.15]">Unable to connect</h2>
             <p className="text-wl-ivory-dim text-[16px] mb-8 leading-relaxed max-w-xs mx-auto">{errorMessage || "Network error or the service is temporarily unavailable. Please try again later."}</p>
@@ -322,7 +322,7 @@ export function WaitlistClient() {
                 </form>
               </>
             )}
-            {errorMessage && <motion.p initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className="text-[#ff6b6b] text-[14.5px] mt-6 mb-2">{errorMessage}</motion.p>}
+            {errorMessage && <motion.p initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className="text-error-light text-[14.5px] mt-6 mb-2">{errorMessage}</motion.p>}
             <button onClick={() => { setMode("join"); setErrorMessage(""); setStatusLinkSent(false) }} className="mt-8 text-wl-muted hover:text-wl-gold text-[11px] font-medium tracking-[0.18em] uppercase transition-colors">← Back to waitlist</button>
           </motion.div>
         )}

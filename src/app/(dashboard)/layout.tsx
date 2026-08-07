@@ -14,10 +14,11 @@ export default async function DashboardLayout({
     redirect("/login")
   }
 
-  // The console is admin-only. Non-admin accounts are signed out at the door.
+  // The console is admin-only. A signed-in member is already authenticated,
+  // so this is a permissions problem, not a login one.
   const u = session.user as any
   if (u.role !== "admin") {
-    redirect("/login?error=forbidden")
+    redirect("/forbidden")
   }
 
   const initials = (u.name || "U")

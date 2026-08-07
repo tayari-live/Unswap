@@ -131,7 +131,7 @@ export function LuxDivider({ className }: { className?: string }) {
 
 // Gold CTA: dark text on gold in both themes; uppercase, letter-spaced, near-sharp.
 export const LUX_GOLD_BTN =
-  "inline-flex justify-center items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.12em] text-[#0a0e1a] bg-[var(--gold)] hover:bg-[var(--gold-hover)] px-6 py-3 rounded-sm transition-colors duration-200"
+  "inline-flex justify-center items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.12em] text-ink bg-[var(--gold)] hover:bg-[var(--gold-hover)] px-6 py-3 rounded-sm transition-colors duration-200"
 
 // Ghost CTA: foreground text, gold hairline that warms on hover.
 export const LUX_GHOST_BTN =

@@ -16,7 +16,7 @@ export default async function AdminSettingsPage() {
   const session = await auth()
   const u = session?.user as any
   if (!u?.id) redirect("/login")
-  if (u.role !== "admin") redirect("/login?error=forbidden")
+  if (u.role !== "admin") redirect("/forbidden")
 
   const user = await prisma.user.findUnique({
     where: { id: u.id as string },

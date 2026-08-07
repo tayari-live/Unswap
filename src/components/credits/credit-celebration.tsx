@@ -156,7 +156,7 @@ export function CreditCelebration() {
           <Link
             href="/dashboard/credits"
             onClick={dismiss}
-            className="inline-flex justify-center items-center gap-2 text-[12px] font-medium uppercase tracking-[0.12em] text-[#0a0e1a] bg-[var(--gold)] hover:bg-[var(--gold-hover)] px-6 py-3 rounded-sm transition-colors"
+            className="inline-flex justify-center items-center gap-2 text-[12px] font-medium uppercase tracking-[0.12em] text-ink bg-[var(--gold)] hover:bg-[var(--gold-hover)] px-6 py-3 rounded-sm transition-colors"
           >
             View my credits
           </Link>

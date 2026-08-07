@@ -72,7 +72,7 @@ export function ThemeToggleIcon({ className }: { className?: string }) {
       aria-label="Toggle theme"
       className={cn(
         "w-10 h-10 flex items-center justify-center rounded-sm border transition-colors",
-        "border-[rgba(201,168,76,0.35)] text-[#c9a84c] hover:border-[#c9a84c] hover:bg-[rgba(201,168,76,0.12)]",
+        "border-[rgba(201,168,76,0.35)] text-gold hover:border-gold hover:bg-[rgba(201,168,76,0.12)]",
         className,
       )}
     >

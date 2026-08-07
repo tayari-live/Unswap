@@ -26,6 +26,14 @@
 
   --color-parchment: #F5EFE0;
 
+  /* Fixed marketing values. Unlike --navy and --foreground these never flip
+     with the theme: --ink is the obsidian of the marketing ground and the dark
+     text that sits on gold, which must stay legible in both themes. */
+  --color-ink: #0a0e1a;
+  --color-gold-light: #e4c97a;
+  /* Error text on dark grounds, where --destructive is too dark to read. */
+  --color-error-light: #ff6b6b;
+
   /* ── Neutral ramp ──────────────────────────────────────────────────── */
   --color-gray-50: #F9FAFB;
   --color-gray-100: #F3F4F6;
@@ -84,6 +92,18 @@
   --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
   --shadow-dropdown: 0 8px 24px rgba(0, 0, 0, 0.08);
   --shadow-modal: 0 18px 50px rgba(0, 0, 0, 0.12);
+
+  /* ── Motion ────────────────────────────────────────────────────────── */
+  /* Three curves and three durations, so timing is chosen by intent rather
+     than by taste. Entrances decelerate, exits accelerate, and anything that
+     moves between two states uses the symmetric curve. */
+  --ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-exit: cubic-bezier(0.32, 0, 0.67, 0);
+  --ease-standard: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
 
   /* ── Layering ──────────────────────────────────────────────────────── */
   /* A named scale, so a new overlay cannot be dropped in at whatever number

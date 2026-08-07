@@ -298,9 +298,9 @@ export function ProfileWizard({
             <button type="button" onClick={() => next(true)} className="text-[12px] font-medium uppercase tracking-[0.12em] text-[var(--gold-soft)] px-5 py-3 rounded-sm border border-[var(--hair)] hover:border-[var(--gold)] bg-[var(--surface)] transition-colors">Skip</button>
           )}
           {step < SCREENS.length - 1 ? (
-            <button type="button" onClick={() => next()} disabled={!answered} title={!answered ? "Answer this question or use Skip" : undefined} className="inline-flex items-center gap-1.5 text-[12px] font-medium uppercase tracking-[0.12em] text-[#0a0e1a] bg-[var(--gold)] hover:bg-[var(--gold-hover)] px-7 py-3 rounded-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[var(--gold)]">Continue <ChevronRight size={15} /></button>
+            <button type="button" onClick={() => next()} disabled={!answered} title={!answered ? "Answer this question or use Skip" : undefined} className="inline-flex items-center gap-1.5 text-[12px] font-medium uppercase tracking-[0.12em] text-ink bg-[var(--gold)] hover:bg-[var(--gold-hover)] px-7 py-3 rounded-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[var(--gold)]">Continue <ChevronRight size={15} /></button>
           ) : (
-            <button type="button" onClick={submit} disabled={loading} className="inline-flex items-center gap-1.5 text-[12px] font-medium uppercase tracking-[0.12em] text-[#0a0e1a] bg-[var(--gold)] hover:bg-[var(--gold-hover)] px-7 py-3 rounded-sm transition-colors disabled:opacity-50">{loading ? "Saving…" : (<><Check size={15} /> Save profile</>)}</button>
+            <button type="button" onClick={submit} disabled={loading} className="inline-flex items-center gap-1.5 text-[12px] font-medium uppercase tracking-[0.12em] text-ink bg-[var(--gold)] hover:bg-[var(--gold-hover)] px-7 py-3 rounded-sm transition-colors disabled:opacity-50">{loading ? "Saving…" : (<><Check size={15} /> Save profile</>)}</button>
           )}
         </div>
       </div>

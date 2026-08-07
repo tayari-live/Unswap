@@ -160,7 +160,7 @@ export function VerificationCelebration() {
           <Link
             href="/dashboard/browse"
             onClick={dismiss}
-            className="inline-flex justify-center items-center gap-2 text-[12px] font-medium uppercase tracking-[0.12em] text-[#0a0e1a] bg-[var(--gold)] hover:bg-[var(--gold-hover)] px-7 py-3.5 rounded-sm transition-colors"
+            className="inline-flex justify-center items-center gap-2 text-[12px] font-medium uppercase tracking-[0.12em] text-ink bg-[var(--gold)] hover:bg-[var(--gold-hover)] px-7 py-3.5 rounded-sm transition-colors"
           >
             Explore homes
           </Link>

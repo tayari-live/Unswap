@@ -200,7 +200,7 @@ export default async function MemberDashboardPage() {
                 {!s.done && s.href && (
                   <Link
                     href={s.href}
-                    className="flex-shrink-0 inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.12em] px-4 py-2 rounded-sm bg-[var(--gold)] text-[#0a0e1a] hover:bg-[var(--gold-hover)] transition-colors"
+                    className="flex-shrink-0 inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.12em] px-4 py-2 rounded-sm bg-[var(--gold)] text-ink hover:bg-[var(--gold-hover)] transition-colors"
                   >
                     {s.action} <ChevronRight size={13} />
                   </Link>

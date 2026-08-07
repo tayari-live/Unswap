@@ -32,7 +32,7 @@ export function ResendEmailButton({ email }: { email: string }) {
       type="button"
       onClick={handleResend}
       disabled={state !== "idle"}
-      className="flex-shrink-0 inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.12em] px-4 py-2 rounded-sm bg-[var(--gold)] text-[#0a0e1a] hover:bg-[var(--gold-hover)] transition-colors disabled:opacity-50"
+      className="flex-shrink-0 inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.12em] px-4 py-2 rounded-sm bg-[var(--gold)] text-ink hover:bg-[var(--gold-hover)] transition-colors disabled:opacity-50"
     >
       {state === "sending" ? "Sending…" : state === "sent" ? "Sent" : "Resend email"}
     </button>

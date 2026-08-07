@@ -109,7 +109,7 @@ export default async function OverviewPage() {
                 </div>
                 <Link
                   href="/verification"
-                  className="text-[11px] font-medium uppercase tracking-[0.12em] px-4 py-2 rounded-sm bg-[var(--gold)] text-[#0a0e1a] hover:bg-[var(--gold-hover)] transition-colors"
+                  className="text-[11px] font-medium uppercase tracking-[0.12em] px-4 py-2 rounded-sm bg-[var(--gold)] text-ink hover:bg-[var(--gold-hover)] transition-colors"
                 >
                   Review
                 </Link>

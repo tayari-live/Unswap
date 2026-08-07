@@ -39,7 +39,7 @@ export function ResendVerification() {
       <button
         type="submit"
         disabled={state !== "idle"}
-        className="py-2.5 px-5 text-[12px] font-medium uppercase tracking-[0.1em] text-[#0a0e1a] bg-wl-gold hover:bg-wl-gold-light disabled:opacity-50 transition-colors whitespace-nowrap"
+        className="py-2.5 px-5 text-[12px] font-medium uppercase tracking-[0.1em] text-ink bg-wl-gold hover:bg-wl-gold-light disabled:opacity-50 transition-colors whitespace-nowrap"
       >
         {state === "sending" ? "Sending…" : state === "sent" ? "Sent" : "Resend link"}
       </button>
