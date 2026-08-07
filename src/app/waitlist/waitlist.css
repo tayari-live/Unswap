@@ -11,7 +11,7 @@
 
 /* ── LIGHT (default) — cream ground, navy text, deepened gold for contrast ── */
 .wl-root {
-  --navy: #f5f0e8;
+  --navy: #F5EFE0;
   --deep: #ede8dd;
   --gold: #9a7c2c;
   --gold-light: #c9a84c;
@@ -26,10 +26,10 @@
   --panel-strong: rgba(255, 255, 255, 0.94);
   --grain-opacity: 0.22;
   --serif: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
-  --sans: var(--font-dm-sans), "DM Sans", sans-serif;
+  --sans: var(--font-inter), "Inter", sans-serif;
 
   /* Tailwind wl-* utilities read these. */
-  --color-wl-navy: #f5f0e8;
+  --color-wl-navy: #F5EFE0;
   --color-wl-deep: #ede8dd;
   --color-wl-gold: #9a7c2c;
   --color-wl-gold-light: #c9a84c;
@@ -43,7 +43,7 @@
   min-height: 100vh;
   background-color: var(--navy);
   color: var(--ivory);
-  font-family: var(--font-dm-sans), "DM Sans", sans-serif;
+  font-family: var(--font-inter), "Inter", sans-serif;
   font-size: 17px;
   line-height: 1.7;
   position: relative;

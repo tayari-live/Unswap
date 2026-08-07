@@ -1,17 +1,19 @@
 import type { Metadata } from "next";
-import { DM_Sans, Cormorant_Garamond } from "next/font/google";
+import { Inter, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/toast";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 
-// Body / UI — DM Sans (300, 400, 500)
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
+// Product UI — Inter. Carries every interface surface: dashboards, forms,
+// tables, navigation.
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["300", "400", "500"],
+  weight: ["400", "500", "600", "700"],
 });
 
-// Display / headings — Cormorant Garamond (300, 400, 600, 700 + italics)
+// Display — Cormorant Garamond. Marketing and hero use only; the brand guide
+// keeps it out of dashboards and forms, where Inter reads better at UI sizes.
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
   subsets: ["latin"],
@@ -56,7 +58,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${dmSans.variable} ${cormorant.variable} h-full antialiased`}
+      className={`${inter.variable} ${cormorant.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans bg-background text-foreground">
         <ThemeProvider>

@@ -5,11 +5,17 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
- * UnSwap brand palette — luxury-institutional.
- * Obsidian Navy + Diplomatic Gold, with Verified Teal for trust and
- * Alert Crimson for warnings. Parchment/Stark White surfaces.
+ * UnSwap design tokens.
+ *
+ * Two layers, deliberately separate:
+ *   1. Brand — the fixed identity (Navy, Gold, Parchment). These never change
+ *      meaning, and never flip with the theme.
+ *   2. Semantic — what a colour *does* in the product (background, border,
+ *      muted text, success). Components reference these, so a brand change is
+ *      a one-line edit here rather than a search across the codebase.
  */
 @theme {
+  /* ── Brand ─────────────────────────────────────────────────────────── */
   --color-navy: #0B1F3A;
   --color-navy-light: #13355f;
   --color-navy-dark: #07172b;
@@ -18,38 +24,70 @@
   --color-gold-hover: #b8973d;
   --color-gold-dark: #9a7c2c;
 
-  --color-teal: #2A9D8F;
-  --color-teal-light: #d7efeb;
+  --color-parchment: #F5EFE0;
 
-  --color-crimson: #C1121F;
+  /* ── Neutral ramp ──────────────────────────────────────────────────── */
+  --color-gray-50: #F9FAFB;
+  --color-gray-100: #F3F4F6;
+  --color-gray-200: #E5E7EB;
+  --color-gray-300: #D1D5DB;
+  --color-gray-400: #9CA3AF;
+  --color-gray-500: #6B7280;
+  --color-gray-600: #4B5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1F2937;
+  --color-gray-900: #111827;
 
+  /* ── Status ────────────────────────────────────────────────────────── */
+  /* Status colours carry meaning and are never decorative. Green reads as
+     "succeeded" to everyone; the old teal was brand-adjacent and ambiguous. */
+  --color-success: #22C55E;
+  --color-warning: #F59E0B;
+  --color-destructive: #C1121F;
+  /* Kept as an alias so existing `danger` usages stay valid. */
+  --color-danger: #C1121F;
+
+  /* ── Semantic (what components reference) ──────────────────────────── */
   --color-primary: #0B1F3A;
   --color-primary-hover: #13355f;
   --color-primary-dark: #07172b;
-
   --color-tertiary: #0B1F3A;
 
-  --color-neutral: #6B7689;
-  --color-neutral-light: #F1F3F7;
-  --color-neutral-dark: #3A4357;
-
+  --color-background: #ffffff;
+  --color-card: #ffffff;
   --color-surface: #ffffff;
-  --color-parchment: #F7F3E8;
-
-  --color-success: #2A9D8F;
-  --color-warning: #C9A84C;
-  --color-danger: #C1121F;
-
-  --color-border: #E3E7EE;
-  --color-background: #F5F6F8;
-  --color-foreground: #0B1F3A;
+  --color-foreground: #111827;
+  --color-muted: #6B7280;
+  --color-border: #E5E7EB;
   --color-ring: #C9A84C;
 
+  /* Legacy neutral names, mapped onto the ramp so older markup keeps working. */
+  --color-neutral: #6B7280;
+  --color-neutral-light: #F3F4F6;
+  --color-neutral-dark: #374151;
+
+  /* Retained: teal is still used for a few trust accents, but no longer
+     carries "success" — that is green now. */
+  --color-teal: #2A9D8F;
+  --color-teal-light: #d7efeb;
+  --color-crimson: #C1121F;
+
+  /* ── Radius ────────────────────────────────────────────────────────── */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
   --radius-xl: 1rem;
   --radius-2xl: 1.5rem;
   --radius-3xl: 2rem;
 
-  --font-sans: var(--font-dm-sans), "Helvetica Neue", Arial, sans-serif;
+  /* ── Elevation ─────────────────────────────────────────────────────── */
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-dropdown: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --shadow-modal: 0 18px 50px rgba(0, 0, 0, 0.12);
+
+  /* ── Type ──────────────────────────────────────────────────────────── */
+  /* Inter for the product, Cormorant reserved for marketing display. */
+  --font-sans: var(--font-inter), "Helvetica Neue", Arial, sans-serif;
   --font-display: var(--font-cormorant), Georgia, "Times New Roman", serif;
 
   /* Waitlist — ported dark/gold luxury palette (namespaced, scoped to /waitlist). */
@@ -231,4 +269,21 @@ h1, h2, h3, h4, h5, h6 {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #9aa3b2;
+}
+
+/*
+ * Reduced motion. Motion in this product signals feedback, hierarchy and state
+ * change rather than decoration, so honouring the preference costs nothing:
+ * transitions collapse to near-instant and every state remains reachable.
+ * Confetti checks the same preference in JS, since it paints to a canvas.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

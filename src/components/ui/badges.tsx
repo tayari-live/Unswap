@@ -1,13 +1,22 @@
 import { cn } from "@/lib/utils"
 
-type Tone = "navy" | "gold" | "teal" | "crimson" | "neutral"
+/*
+ * Status tones. Named for meaning rather than colour, so the palette can move
+ * without every call site having to. `teal` is retained as an alias for
+ * `success` because older markup still asks for it by name.
+ */
+type Tone = "navy" | "gold" | "success" | "warning" | "destructive" | "neutral" | "teal" | "crimson"
 
 const toneClasses: Record<Tone, string> = {
   navy: "bg-[var(--navy)]/10 text-[var(--fg)]",
   gold: "bg-[var(--gold)]/15 text-[var(--gold-dark)]",
-  teal: "bg-[var(--teal)]/15 text-[var(--teal)]",
-  crimson: "bg-[var(--crimson)]/10 text-[var(--crimson)]",
+  success: "bg-[var(--color-success)]/12 text-[var(--color-success)]",
+  warning: "bg-[var(--color-warning)]/15 text-[var(--color-warning)]",
+  destructive: "bg-[var(--color-destructive)]/10 text-[var(--color-destructive)]",
   neutral: "bg-neutral-light text-neutral-dark",
+  // Aliases.
+  teal: "bg-[var(--color-success)]/12 text-[var(--color-success)]",
+  crimson: "bg-[var(--color-destructive)]/10 text-[var(--color-destructive)]",
 }
 
 export function Badge({

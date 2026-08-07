@@ -84,7 +84,7 @@ const GHOST_BTN =
 
 export default function LandingPage() {
   return (
-    <div className="bg-[#f5f0e8] text-[#0a0e1a] font-sans">
+    <div className="bg-[#F5EFE0] text-[#0a0e1a] font-sans">
       <LandingNavbar />
 
       {/* ── HERO — deep navy, video ── */}
@@ -117,7 +117,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── THE EXCLUSIVE NETWORK — cream ── */}
-      <section id="network" className="bg-[#f5f0e8]">
+      <section id="network" className="bg-[#F5EFE0]">
         <div className="max-w-[1160px] mx-auto px-6 py-24 lg:py-32">
           <div className="max-w-[640px] mb-16">
             <SectionLabel align="left">The Network</SectionLabel>
@@ -130,7 +130,7 @@ export default function LandingPage() {
             {pillars.map((p) => (
               <div key={p.title} className="bg-white p-9 lg:p-10 flex flex-col h-full">
                 <div className="w-16 h-16 border border-[rgba(201,168,76,0.4)] flex items-center justify-center mb-8">
-                  <p.icon size={28} strokeWidth={1.4} className="text-[#9a7c2c]" />
+                  <p.icon size={28} strokeWidth={2} className="text-[#9a7c2c]" />
                 </div>
                 <h3 className="font-display text-2xl font-light text-[#0a0e1a] leading-snug">{p.title}</h3>
                 <p className="mt-4 text-[15px] text-[rgba(10,14,26,0.6)] leading-[1.7]">{p.body}</p>
@@ -150,7 +150,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-5">
             {residences.map((r) => (
               <Link key={r.name} href="/register" className="group relative h-[420px] overflow-hidden border border-white/10 hover:border-[rgba(201,168,76,0.5)] transition-colors duration-300">
-                <Image src={r.img} alt={`${r.name} — ${r.location}`} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                <Image src={r.img} alt={`${r.name} — ${r.location}`} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0a0e1a] via-[#0a0e1a]/30 to-transparent" />
                 <span className="absolute top-5 left-5 inline-flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-[0.15em] bg-[#0a0e1a]/70 text-[#e4c97a] px-3 py-1.5 border border-[rgba(201,168,76,0.3)] backdrop-blur-sm">
                   <BadgeCheck size={13} /> Verified
@@ -176,7 +176,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── HOW IT WORKS — cream ── */}
-      <section id="how" className="bg-[#f5f0e8]">
+      <section id="how" className="bg-[#F5EFE0]">
         <div className="max-w-[1160px] mx-auto px-6 py-24 lg:py-32">
           <div className="text-center mb-16">
             <SectionLabel>The Process</SectionLabel>
@@ -191,7 +191,7 @@ export default function LandingPage() {
                 </div>
                 <div className="flex items-center justify-center py-12">
                   <div className="w-28 h-28 rounded-full border border-[rgba(201,168,76,0.35)] flex items-center justify-center">
-                    <s.icon size={52} strokeWidth={1.2} className="text-[#9a7c2c]" />
+                    <s.icon size={52} strokeWidth={2} className="text-[#9a7c2c]" />
                   </div>
                 </div>
                 <div className="mt-auto">
@@ -219,7 +219,7 @@ export default function LandingPage() {
                 {trustFeatures.map((f) => (
                   <div key={f.title} className="flex gap-5 items-start">
                     <div className="w-12 h-12 flex-shrink-0 border border-[rgba(201,168,76,0.3)] text-[#c9a84c] flex items-center justify-center">
-                      <f.icon size={22} strokeWidth={1.4} />
+                      <f.icon size={22} strokeWidth={2} />
                     </div>
                     <div>
                       <h3 className="font-display font-light text-[21px] text-white">{f.title}</h3>
@@ -245,7 +245,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── BY THE NUMBERS — cream ── */}
-      <section className="bg-[#f5f0e8]">
+      <section className="bg-[#F5EFE0]">
         <div className="max-w-[1160px] mx-auto px-6 py-20 lg:py-24">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-[rgba(201,168,76,0.25)] border border-[rgba(201,168,76,0.25)]">
             {stats.map((s) => (
@@ -259,7 +259,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── MEMBERSHIP TIERS — cream ── */}
-      <section id="pricing" className="bg-[#f5f0e8]">
+      <section id="pricing" className="bg-[#F5EFE0]">
         <div className="max-w-[1160px] mx-auto px-6 py-24 lg:py-32">
           <div className="text-center max-w-[560px] mx-auto mb-16">
             <SectionLabel>Membership</SectionLabel>
@@ -331,7 +331,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Disclaimer ── */}
-      <section className="bg-[#f5f0e8] py-16">
+      <section className="bg-[#F5EFE0] py-16">
         <div className="max-w-[900px] mx-auto px-6 text-center">
           <p className="text-[13px] text-[rgba(10,14,26,0.5)] leading-[1.9]">
             UnSwap is an independent, staff-led platform. It is not affiliated with, endorsed by, or formally connected to the United Nations, the World Bank Group, the International Monetary Fund, or any international organisation. All trademarks and organisation names are the property of their respective owners.
