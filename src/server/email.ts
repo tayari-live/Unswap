@@ -16,13 +16,12 @@ export type SendEmailParams = {
 }
 
 /*
- * Branded email shell — the editorial-luxury language of the app, rendered for
- * email clients: tables (Outlook ignores flex/grid), inline styles (no <style>
- * support in Gmail), a Georgia serif stack standing in for Cormorant (webfonts
- * are unreliable in mail), and a bulletproof table-based CTA button.
+ * Email rendering constraints, which differ from the app's: tables rather than
+ * flex or grid (Outlook ignores both), inline styles (Gmail strips <style>),
+ * and a Georgia stack standing in for Cormorant, since webfonts are unreliable
+ * in mail.
  */
 const NAVY = "#0a0e1a"
-const CREAM = "#f5f0e8"
 const GOLD = "#c9a84c"
 const GOLD_DEEP = "#9a7c2c"
 const HAIR = "#e3d8b8"
@@ -34,8 +33,7 @@ const SANS = "'Helvetica Neue',Helvetica,Arial,sans-serif"
 
 // Absolute URL — mail clients have no page to resolve a relative path against.
 // A dedicated 76px asset (2x the 38px display size) rather than the 500px site
-// logo: 2.8 KB instead of 70 KB, which matters on mobile data. Alpha preserved
-// so it sits cleanly on the navy masthead.
+// logo: 2.8 KB instead of 70 KB, which matters on mobile data.
 const logoUrl = () => `${process.env.AUTH_URL || "http://localhost:3000"}/email/logo-76.png`
 
 /**
@@ -53,101 +51,87 @@ export const esc = (s: string | null | undefined) =>
   )
 
 /**
- * Wrap content in the branded UnSwap email shell.
+ * Wrap content in the UnSwap email shell.
  *
- * `preheader` is the grey preview line mail clients show beside the subject —
- * without it they scrape the first visible text, which is usually the wordmark.
+ * Deliberately close to a plain letter: a small logo, ordinary paragraphs, and
+ * a single branded button. Heavily designed transactional mail reads as a
+ * broadcast rather than a message, and dense table markup scores worse with
+ * spam filters — which this domain can least afford. Only the call to action
+ * and the sign-off carry the brand.
+ *
+ * `preheader` is the grey preview line clients show beside the subject; without
+ * it they scrape the first visible text.
  */
 export function renderEmail(opts: {
   heading: string
   body: string // HTML (paragraphs)
   ctaLabel?: string
   ctaUrl?: string
-  eyebrow?: string
   preheader?: string
   footnote?: string
 }): string {
-  const { heading, body, ctaLabel, ctaUrl, eyebrow, preheader, footnote } = opts
+  const { heading, body, ctaLabel, ctaUrl, preheader, footnote } = opts
 
-  // Bulletproof button: a single-cell table renders reliably everywhere.
+  // Bulletproof button: a single-cell table renders reliably everywhere. This
+  // is the one piece of the message that is unmistakably UnSwap.
   const cta =
     ctaLabel && ctaUrl
-      ? `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:30px 0 6px">
-           <tr><td align="center" bgcolor="${GOLD}" style="background:${GOLD};">
-             <a href="${ctaUrl}" style="display:inline-block;padding:15px 34px;font-family:${SANS};font-size:12px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:${NAVY};text-decoration:none;">${ctaLabel}</a>
+      ? `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0 4px;">
+           <tr><td bgcolor="${GOLD}" style="background:${GOLD};">
+             <a href="${ctaUrl}" style="display:inline-block;padding:14px 30px;font-family:${SANS};font-size:12px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:${NAVY};text-decoration:none;">${ctaLabel}</a>
            </td></tr>
-         </table>`
+         </table>
+         <p style="margin:14px 0 0;font-family:${SANS};font-size:12px;line-height:1.6;color:${MUTED};">
+           If the button does not work, paste this into your browser:<br/>
+           <a href="${ctaUrl}" style="color:${GOLD_DEEP};text-decoration:underline;word-break:break-all;">${ctaUrl}</a>
+         </p>`
       : ""
 
-  const eyebrowRow = eyebrow
-    ? `<p style="margin:0 0 14px;font-family:${SANS};font-size:11px;letter-spacing:0.26em;text-transform:uppercase;color:${GOLD_DEEP};">${eyebrow}</p>`
-    : ""
-
   const footnoteRow = footnote
-    ? `<p style="margin:22px 0 0;font-family:${SANS};font-size:12px;line-height:1.7;color:${MUTED};">${footnote}</p>`
+    ? `<p style="margin:24px 0 0;font-family:${SANS};font-size:12px;line-height:1.7;color:${MUTED};">${footnote}</p>`
     : ""
 
-  // Hidden preview text, padded so clients don't pull body copy in after it.
   const preview = preheader
     ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all;">${preheader}${"&#8199;&#65279;&#847; ".repeat(60)}</div>`
     : ""
 
-  // Each band spans the full width of the mail client's viewport; only the text
-  // inside is constrained, so nothing reads as a card floating on a backdrop.
-  const band = (inner: string) =>
-    `<table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" width="640" style="width:640px;max-width:100%;">
-       <tr><td style="padding:0 32px;">${inner}</td></tr>
-     </table>`
-
   return `<!--[if mso]><style>body,table,td{font-family:Arial,sans-serif !important}</style><![endif]-->
 ${preview}
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;background:#ffffff;margin:0;padding:0;border-collapse:collapse;">
+  <tr><td align="center" style="padding:36px 20px 48px;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="560" style="width:560px;max-width:100%;text-align:left;">
 
-  <!-- Masthead: full-bleed navy. Logo sits beside the wordmark rather than
-       replacing it: most clients block remote images by default, and the
-       wordmark keeps the header branded when the image never loads. -->
-  <tr><td style="background:${NAVY};padding:26px 0;">
-    ${band(`
-      <table role="presentation" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-          <td style="padding-right:14px;" valign="middle">
-            <img src="${logoUrl()}" width="38" height="38" alt=""
-                 style="display:block;width:38px;height:38px;border:0;outline:none;text-decoration:none;" />
-          </td>
-          <td valign="middle">
-            <span style="font-family:${SERIF};font-size:23px;font-weight:normal;letter-spacing:0.16em;color:#ffffff;">UnSwap</span>
-          </td>
-        </tr>
-      </table>
-    `)}
+      <!-- Logo only. Most clients block remote images, so nothing here is
+           load-bearing: the message reads perfectly without it. -->
+      <tr><td style="padding-bottom:26px;">
+        <img src="${logoUrl()}" width="38" height="38" alt="UnSwap"
+             style="display:block;width:38px;height:38px;border:0;outline:none;text-decoration:none;" />
+      </td></tr>
+
+      <tr><td>
+        <p style="margin:0 0 18px;font-family:${SERIF};font-size:20px;font-weight:normal;line-height:1.35;color:${NAVY};">${heading}</p>
+        <div style="font-family:${SANS};font-size:15px;line-height:1.75;color:${INK};">${body}</div>
+        ${cta}
+        ${footnoteRow}
+      </td></tr>
+
+      <!-- Sign-off: the second and last place the brand appears. -->
+      <tr><td style="padding-top:34px;">
+        <div style="border-top:1px solid ${HAIR};padding-top:18px;">
+          <p style="margin:0 0 6px;font-family:${SERIF};font-size:15px;letter-spacing:0.14em;color:${NAVY};">UnSwap</p>
+          <p style="margin:0 0 10px;font-family:${SANS};font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:${GOLD_DEEP};">
+            Enabling Mobility &middot; Empowering Community
+          </p>
+          <p style="margin:0;font-family:${SANS};font-size:11px;line-height:1.7;color:${MUTED};">
+            An independent, staff-led platform. Not affiliated with, endorsed by, or formally
+            connected to the United Nations, the World Bank Group, the International Monetary
+            Fund, or any international organisation.
+          </p>
+        </div>
+      </td></tr>
+
+    </table>
   </td></tr>
-  <tr><td style="height:2px;background:${GOLD};font-size:0;line-height:0;">&nbsp;</td></tr>
-
-  <!-- Body -->
-  <tr><td style="padding:44px 0 40px;background:#ffffff;">
-    ${band(`
-      ${eyebrowRow}
-      <h1 style="margin:0 0 16px;font-family:${SERIF};font-size:30px;font-weight:normal;line-height:1.2;color:${NAVY};">${heading}</h1>
-      <div style="font-family:${SANS};font-size:15px;line-height:1.75;color:${INK};">${body}</div>
-      ${cta}
-      ${footnoteRow}
-    `)}
-  </td></tr>
-
-  <!-- Footer: full-bleed cream -->
-  <tr><td style="background:${CREAM};border-top:1px solid ${HAIR};padding:26px 0 32px;">
-    ${band(`
-      <p style="margin:0 0 8px;font-family:${SANS};font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:${GOLD_DEEP};">
-        Enabling Mobility &middot; Empowering Community
-      </p>
-      <p style="margin:0;font-family:${SANS};font-size:11px;line-height:1.7;color:${MUTED};">
-        UnSwap is an independent, staff-led platform. It is not affiliated with, endorsed by, or formally
-        connected to the United Nations, the World Bank Group, the International Monetary Fund, or any
-        international organisation.
-      </p>
-    `)}
-  </td></tr>
-
 </table>`
 }
 

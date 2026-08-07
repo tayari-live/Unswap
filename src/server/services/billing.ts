@@ -74,7 +74,6 @@ export async function activateSubscription(
       to: user.email,
       subject: `Your UnSwap ${t.name} membership is active`,
       html: renderEmail({
-        eyebrow: "Membership Active",
         heading: `Welcome aboard, ${esc(user.firstName)}.`,
         preheader: `Your ${t.name} membership is now active.`,
         body: `<p style="margin:0 0 14px">Your <strong>${t.name}</strong> membership is now active. You have full access to the network and its verified homes.</p>

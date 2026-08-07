@@ -133,7 +133,6 @@ export async function confirmWaitlist(token: string) {
     to: entry.email,
     subject: "You're on the UnSwap waitlist",
     html: renderEmail({
-      eyebrow: "Position Confirmed",
       heading: `You're in, ${esc(entry.firstName)}.`,
       preheader: `You are number ${position} on the waitlist. Keep this link to track your place.`,
       body: `<p style="margin:0 0 14px">Your place is confirmed. You are currently <strong>number ${position}</strong> in the queue.</p>
@@ -174,7 +173,6 @@ export async function sendWaitlistStatusLink(rawEmail: string) {
     to: e.email,
     subject: "Your UnSwap waitlist place",
     html: renderEmail({
-      eyebrow: "Your Place",
       heading: `Here's your link, ${esc(e.firstName)}.`,
       preheader: `You are number ${position} on the waitlist.`,
       body: `<p style="margin:0 0 14px">You are currently <strong>number ${position}</strong> on the waitlist, with <strong>${e.referrals}</strong> confirmed invitation${e.referrals === 1 ? "" : "s"}.</p>
@@ -268,7 +266,6 @@ export async function inviteAllPending(actorId: string) {
       to: e.email,
       subject: "Your UnSwap early access invitation",
       html: renderEmail({
-        eyebrow: "By Invitation",
         heading: `You're invited, ${esc(e.firstName)}.`,
         preheader: "Your early access to UnSwap is ready.",
         body: `<p style="margin:0">Your early access to UnSwap is ready. Sign in to verify your professional status and claim your founding-member incentives.</p>`,
@@ -391,7 +388,6 @@ export async function setWaitlistStatus(input: { actorId: string; id: string; st
       to: entry.email,
       subject: "Your UnSwap early access invitation",
       html: renderEmail({
-        eyebrow: "By Invitation",
         heading: `You're invited, ${esc(entry.firstName)}.`,
         preheader: "Your early access to UnSwap is ready.",
         body: `<p style="margin:0">Your early access to UnSwap is ready. As a founding waitlist member you qualify for launch incentives. Sign in to verify your professional status and claim your spot.</p>`,

@@ -60,7 +60,6 @@ async function issueVerificationLink(
     to: user.email,
     subject: "Confirm your UnSwap email",
     html: renderEmail({
-      eyebrow: "Verified Access",
       heading: `Welcome to UnSwap, ${esc(user.firstName)}.`,
       preheader: "Confirm your email to continue your verification.",
       body: `<p style="margin:0 0 14px">You have joined a closed network built exclusively for UN, World Bank, IMF and international organisation professionals.</p>

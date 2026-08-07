@@ -35,7 +35,6 @@ export async function requestPasswordReset(rawEmail: string) {
       to: email,
       subject: "Reset your UnSwap password",
       html: renderEmail({
-        eyebrow: "Account Security",
         heading: `Hello ${esc(user.firstName)},`,
         preheader: "Choose a new password for your UnSwap account.",
         body: `<p style="margin:0">We received a request to reset the password on your UnSwap account.</p>`,

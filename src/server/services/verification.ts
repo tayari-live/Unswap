@@ -40,7 +40,6 @@ export async function approveSubmission(input: { actorId: string; id: string; no
     to: submission.member.email,
     subject: "You're verified on UnSwap",
     html: renderEmail({
-      eyebrow: "Verification Approved",
       heading: `Welcome to the network, ${esc(submission.member.firstName)}.`,
       preheader: "Your professional status has been verified.",
       body: `<p style="margin:0 0 14px">Your professional status has been verified. You now have full access to browse listings, list your home, and arrange exchanges with vetted peers.</p>
@@ -93,17 +92,13 @@ export async function rejectSubmission(input: { actorId: string; id: string; not
     to: submission.member.email,
     subject: "Your UnSwap verification needs attention",
     html: renderEmail({
-      eyebrow: "Verification Update",
       heading: `Hello ${esc(submission.member.firstName)},`,
       preheader: "We could not verify your submission this time.",
-      body: `<p style="margin:0 0 16px">We were unable to verify your submission at this time.</p>
-             <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-left:2px solid #c9a84c;background:#faf7ef;">
-               <tr><td style="padding:14px 18px;">
-                 <p style="margin:0 0 4px;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#9a7c2c;">Reviewer note</p>
-                 <p style="margin:0;font-size:15px;line-height:1.6;color:#2b3242;">${esc(input.note)}</p>
-               </td></tr>
-             </table>
-             <p style="margin:16px 0 0">You are welcome to resubmit with updated documentation.</p>`,
+      // Quoted plainly rather than boxed: a rejection should read as a note
+      // from a person, not a system notice.
+      body: `<p style="margin:0 0 16px">We were unable to verify your submission this time.</p>
+             <p style="margin:0 0 16px;padding-left:16px;border-left:2px solid #e3d8b8;color:#2b3242;">${esc(input.note)}</p>
+             <p style="margin:0">You are welcome to resubmit with updated documentation whenever you are ready.</p>`,
       ctaLabel: "Resubmit documents",
       ctaUrl: `${baseUrl()}/verify-identity`,
     }),
