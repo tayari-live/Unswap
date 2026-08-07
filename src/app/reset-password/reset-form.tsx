@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import Link from "next/link"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Eye, EyeOff, CheckCircle2 } from "lucide-react"
@@ -8,6 +10,7 @@ import { useToast } from "@/components/ui/toast"
 import { AuthShell, authInputCls, authLabelCls, authBtnCls } from "@/components/auth/auth-shell"
 import { PasswordRequirements } from "@/components/ui/password-requirements"
 import { SuggestPassword } from "@/components/ui/suggest-password"
+import { resetPasswordSchema, type ResetPasswordInput } from "@/lib/validation/auth"
 
 export function ResetForm() {
   const params = useSearchParams()
@@ -15,29 +18,34 @@ export function ResetForm() {
   const toast = useToast()
   const token = params.get("token") || ""
 
-  const [password, setPassword] = useState("")
-  const [confirm, setConfirm] = useState("")
   const [showPassword, setShowPassword] = useState(false)
-  const [loading, setLoading] = useState(false)
   const [done, setDone] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (password.length < 8) return toast("Password must be at least 8 characters.", "error")
-    if (password !== confirm) return toast("Passwords do not match.", "error")
-    if (!token) return toast("This reset link is missing its token.", "error")
+  // Shared with the server, so a reset cannot bypass the sign-up policy.
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm<ResetPasswordInput>({
+    resolver: zodResolver(resetPasswordSchema),
+    mode: "onBlur",
+    defaultValues: { password: "", confirm: "" },
+  })
+  const password = watch("password")
 
-    setLoading(true)
+  const onSubmit = async (values: ResetPasswordInput) => {
+    if (!token) return toast("This reset link is missing its token.", "error")
     try {
       const res = await fetch("/api/auth/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, password }),
+        body: JSON.stringify({ token, password: values.password }),
       })
       const data = await res.json()
       if (!res.ok) {
         toast(data.error || "Could not reset your password.", "error")
-        setLoading(false)
         return
       }
       setDone(true)
@@ -45,7 +53,6 @@ export function ResetForm() {
       setTimeout(() => router.push("/login"), 2500)
     } catch {
       toast("Something went wrong. Please try again.", "error")
-      setLoading(false)
     }
   }
 
@@ -79,7 +86,7 @@ export function ResetForm() {
         </Link>
       }
     >
-      <form className="space-y-4" onSubmit={handleSubmit}>
+      <form className="space-y-4" noValidate onSubmit={handleSubmit(onSubmit)}>
         <div>
           <label htmlFor="password" className={authLabelCls}>
             New password
@@ -88,11 +95,9 @@ export function ResetForm() {
             <input
               id="password"
               type={showPassword ? "text" : "password"}
-              required
               autoComplete="new-password"
               aria-describedby="password-requirements"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              {...register("password")}
               placeholder="Choose a strong password"
               className={`${authInputCls} pr-11`}
             />
@@ -107,14 +112,14 @@ export function ResetForm() {
             </button>
           </div>
           <SuggestPassword
-            value={password}
+            value={password ?? ""}
             onGenerate={(pw) => {
-              setPassword(pw)
-              setConfirm(pw)
+              setValue("password", pw, { shouldValidate: true, shouldDirty: true })
+              setValue("confirm", pw, { shouldValidate: true, shouldDirty: true })
               setShowPassword(true)
             }}
           />
-          <PasswordRequirements id="password-requirements" value={password} />
+          <PasswordRequirements id="password-requirements" value={password ?? ""} />
         </div>
 
         <div>
@@ -124,17 +129,22 @@ export function ResetForm() {
           <input
             id="confirm"
             type={showPassword ? "text" : "password"}
-            required
             autoComplete="new-password"
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
+            {...register("confirm")}
+            aria-invalid={!!errors.confirm}
+            aria-describedby={errors.confirm ? "confirm-error" : undefined}
             placeholder="Re-enter password"
             className={authInputCls}
           />
+          {errors.confirm && (
+            <p id="confirm-error" role="alert" className="mt-1.5 text-sm font-medium text-error-light">
+              {errors.confirm.message}
+            </p>
+          )}
         </div>
 
-        <button type="submit" disabled={loading} className={`${authBtnCls} mt-2`}>
-          {loading ? "Updating…" : "Update password"}
+        <button type="submit" disabled={isSubmitting} className={`${authBtnCls} mt-2`}>
+          {isSubmitting ? "Updating…" : "Update password"}
         </button>
       </form>
     </AuthShell>
