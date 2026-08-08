@@ -67,7 +67,7 @@ function SectionLabel({ children, align = "center" }: { children: React.ReactNod
   return (
     <div className={`flex items-center gap-3 mb-5 ${align === "center" ? "justify-center" : ""}`}>
       {align === "center" && <div className="h-px w-14 bg-gradient-to-r from-transparent to-[rgba(201,168,76,0.45)]" />}
-      <span className="text-[11px] tracking-[0.28em] uppercase font-medium text-gold-dark">{children}</span>
+      <span className="text-[11px] tracking-[0.28em] uppercase font-medium text-gold-ink">{children}</span>
       <div className="h-px w-14 bg-gradient-to-l from-transparent to-[rgba(201,168,76,0.45)]" />
     </div>
   )
@@ -84,7 +84,7 @@ const GHOST_BTN =
 
 export default function LandingPage() {
   return (
-    <div className="bg-parchment text-ink font-sans">
+    <div className="bg-cream text-ink font-sans">
       <LandingNavbar />
 
       {/* ── HERO — deep navy, video ── */}
@@ -117,7 +117,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── THE EXCLUSIVE NETWORK — cream ── */}
-      <section id="network" className="bg-parchment">
+      <section id="network" className="bg-cream">
         <div className="max-w-[1160px] mx-auto px-6 py-24 lg:py-32">
           <div className="max-w-[640px] mb-16">
             <SectionLabel align="left">The Network</SectionLabel>
@@ -130,7 +130,7 @@ export default function LandingPage() {
             {pillars.map((p) => (
               <div key={p.title} className="bg-white p-9 lg:p-10 flex flex-col h-full">
                 <div className="w-16 h-16 border border-[rgba(201,168,76,0.4)] flex items-center justify-center mb-8">
-                  <p.icon size={28} strokeWidth={2} className="text-gold-dark" />
+                  <p.icon size={28} strokeWidth={2} className="text-gold-ink" />
                 </div>
                 <h3 className="font-display text-2xl font-light text-ink leading-snug">{p.title}</h3>
                 <p className="mt-4 text-[15px] text-[rgba(10,14,26,0.6)] leading-[1.7]">{p.body}</p>
@@ -176,7 +176,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── HOW IT WORKS — cream ── */}
-      <section id="how" className="bg-parchment">
+      <section id="how" className="bg-cream">
         <div className="max-w-[1160px] mx-auto px-6 py-24 lg:py-32">
           <div className="text-center mb-16">
             <SectionLabel>The Process</SectionLabel>
@@ -191,7 +191,7 @@ export default function LandingPage() {
                 </div>
                 <div className="flex items-center justify-center py-12">
                   <div className="w-28 h-28 rounded-full border border-[rgba(201,168,76,0.35)] flex items-center justify-center">
-                    <s.icon size={52} strokeWidth={2} className="text-gold-dark" />
+                    <s.icon size={52} strokeWidth={2} className="text-gold-ink" />
                   </div>
                 </div>
                 <div className="mt-auto">
@@ -245,7 +245,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── BY THE NUMBERS — cream ── */}
-      <section className="bg-parchment">
+      <section className="bg-cream">
         <div className="max-w-[1160px] mx-auto px-6 py-20 lg:py-24">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-[rgba(201,168,76,0.25)] border border-[rgba(201,168,76,0.25)]">
             {stats.map((s) => (
@@ -259,7 +259,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── MEMBERSHIP TIERS — cream ── */}
-      <section id="pricing" className="bg-parchment">
+      <section id="pricing" className="bg-cream">
         <div className="max-w-[1160px] mx-auto px-6 py-24 lg:py-32">
           <div className="text-center max-w-[560px] mx-auto mb-16">
             <SectionLabel>Membership</SectionLabel>
@@ -331,7 +331,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Disclaimer ── */}
-      <section className="bg-parchment py-16">
+      <section className="bg-cream py-16">
         <div className="max-w-[900px] mx-auto px-6 text-center">
           <p className="text-[13px] text-[rgba(10,14,26,0.5)] leading-[1.9]">
             UnSwap is an independent, staff-led platform. It is not affiliated with, endorsed by, or formally connected to the United Nations, the World Bank Group, the International Monetary Fund, or any international organisation. All trademarks and organisation names are the property of their respective owners.

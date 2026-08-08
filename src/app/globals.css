@@ -30,7 +30,11 @@
      with the theme: --ink is the obsidian of the marketing ground and the dark
      text that sits on gold, which must stay legible in both themes. */
   --color-ink: #0a0e1a;
+  --color-cream: #F5EFE0;
   --color-gold-light: #e4c97a;
+  /* Eyebrow gold for the cream ground. --gold-dark manages only 3.46:1 there,
+     which fails AA at the 11px these labels are set in. */
+  --color-gold-ink: #7d6423;
   /* Error text on dark grounds, where --destructive is too dark to read. */
   --color-error-light: #ff6b6b;
 
