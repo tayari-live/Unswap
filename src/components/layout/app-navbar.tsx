@@ -87,12 +87,12 @@ function NavDropdown({
         aria-expanded={open}
         aria-haspopup="true"
         className={cn(
-          "inline-flex items-center gap-1.5 text-sm font-medium transition-colors duration-150 px-2 py-1.5 rounded-md",
-          open ? "text-[var(--gold-dark)] bg-[var(--parchment)]" : "text-navy hover:bg-[var(--parchment)]",
+          "inline-flex items-center gap-1.5 text-sm font-medium transition-colors duration-150 px-2.5 py-1.5 rounded-lg group",
+          open ? "bg-[var(--parchment-dark)] text-navy" : "text-navy hover:bg-[var(--parchment-dark)] bg-transparent",
         )}
       >
         {label}
-        <ChevronDown size={15} className={cn("transition-transform duration-150 text-navy/40", open && "rotate-180")} />
+        <ChevronDown size={15} className={cn("transition-transform duration-150", open ? "text-[var(--gold)] rotate-180" : "text-navy/55 group-hover:text-[var(--gold)]")} />
       </button>
 
       {open && (
@@ -115,9 +115,9 @@ function MenuRow({ item, onClick }: { item: Item; onClick: () => void }) {
     <Link
       href={item.href}
       onClick={onClick}
-      className="flex items-start gap-3 px-4 py-3 hover:bg-[var(--parchment)] transition-colors group"
+      className="flex items-start gap-3 px-4 py-3 bg-white hover:bg-[var(--parchment)] transition-colors group"
     >
-      <item.icon size={18} strokeWidth={1.75} className="mt-0.5 flex-shrink-0 text-navy/60 group-hover:text-[var(--gold-dark)] transition-colors" />
+      <item.icon size={18} strokeWidth={1.75} className="mt-0.5 flex-shrink-0 text-navy/45 group-hover:text-[var(--gold)] transition-colors" />
       <span className="flex-1 min-w-0">
         <span className="flex items-center gap-2">
           <span className="text-sm font-medium text-navy">{item.name}</span>
@@ -125,7 +125,7 @@ function MenuRow({ item, onClick }: { item: Item; onClick: () => void }) {
             <span className="w-1.5 h-1.5 rounded-full bg-[var(--gold)] inline-block flex-shrink-0" title={`${item.badge} unread`} />
           )}
         </span>
-        {item.desc && <span className="block text-xs text-navy/50 mt-0.5 leading-snug">{item.desc}</span>}
+        {item.desc && <span className="block text-xs text-navy/50 group-hover:text-navy/60 mt-0.5 leading-snug transition-colors">{item.desc}</span>}
       </span>
     </Link>
   )
@@ -227,7 +227,7 @@ export function AppNavbar({
               already knows what they want, which is the more common case. */}
           <form onSubmit={submitSearch} className="hidden md:block flex-shrink min-w-0 w-[300px] lg:w-[400px]">
             <label htmlFor="app-search" className="sr-only">Search homes, cities or duty stations</label>
-            <div className="relative">
+            <div className="relative group">
               <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/45 pointer-events-none" />
               <input
                 id="app-search"
@@ -235,7 +235,7 @@ export function AppNavbar({
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="Search homes, cities or duty stations"
-                className="w-full h-[44px] pl-10 pr-4 rounded-lg bg-[var(--navy)] border border-transparent text-sm text-white placeholder:text-white/45 focus:outline-none focus:border-[var(--gold)] focus:ring-1 focus:ring-[var(--gold)] transition-colors"
+                className="w-full h-[44px] pl-10 pr-4 rounded-lg bg-[var(--navy)] border-2 border-transparent text-sm text-white placeholder:text-white/45 hover:placeholder:text-white/60 focus:outline-none focus:border-[var(--gold)] focus:ring-0 transition-colors"
               />
             </div>
           </form>
@@ -284,11 +284,11 @@ export function AppNavbar({
                 aria-expanded={profileOpen}
                 aria-haspopup="true"
                 className={cn(
-                  "inline-flex items-center gap-2 pl-1 pr-1.5 sm:pr-2.5 py-1 rounded-lg transition-colors",
-                  profileOpen ? "bg-[var(--parchment)]" : "hover:bg-[var(--parchment)] bg-transparent",
+                  "inline-flex items-center gap-2 pl-1 pr-1.5 sm:pr-2.5 py-1 rounded-lg transition-colors group",
+                  profileOpen ? "bg-[var(--parchment-dark)]" : "hover:bg-[var(--parchment-dark)] bg-transparent",
                 )}
               >
-                <span className="w-8 h-8 rounded-full bg-navy/5 flex items-center justify-center overflow-hidden flex-shrink-0">
+                <span className="w-8 h-8 rounded-full bg-transparent flex items-center justify-center overflow-hidden flex-shrink-0">
                   {image ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={image} alt="" className="w-full h-full object-cover" />
@@ -299,7 +299,7 @@ export function AppNavbar({
                 <span className="hidden lg:block text-sm font-medium text-navy max-w-[110px] truncate">
                   {name?.split(" ")[0] || "Member"}
                 </span>
-                <ChevronDown size={14} className={cn("text-navy/60 transition-transform", profileOpen && "rotate-180")} />
+                <ChevronDown size={14} className={cn("transition-transform", profileOpen ? "text-[var(--gold)] rotate-180" : "text-navy/55 group-hover:text-[var(--gold)]")} />
               </button>
 
               {profileOpen && (
@@ -334,9 +334,9 @@ export function AppNavbar({
                         key={i.name}
                         href={i.href}
                         onClick={() => setProfileOpen(false)}
-                        className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-navy hover:bg-parchment transition-colors"
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-navy bg-white hover:bg-[var(--parchment)] transition-colors group"
                       >
-                        <i.icon size={17} className="text-navy/40" />
+                        <i.icon size={17} className="text-navy/45 group-hover:text-[var(--gold)] transition-colors" />
                         {i.name}
                       </Link>
                     ))}
@@ -345,9 +345,9 @@ export function AppNavbar({
                     <button
                       type="button"
                       onClick={() => signOut({ callbackUrl: "/login" })}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-[var(--destructive)] hover:bg-[var(--destructive)]/5 transition-colors"
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-navy bg-white hover:bg-[var(--parchment)] transition-colors group"
                     >
-                      <LogOut size={17} />
+                      <LogOut size={17} className="text-navy/45 group-hover:text-[var(--gold)] transition-colors" />
                       Sign out
                     </button>
                   </div>
