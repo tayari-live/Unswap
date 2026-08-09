@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Menu, X, BadgeCheck } from "lucide-react"
 
 /*
@@ -66,8 +67,16 @@ export function LandingNavbar({ forceLight = false }: { forceLight?: boolean }) 
       >
         {/* Capped so the bar does not stretch across very wide monitors. */}
         <div className="max-w-[1320px] mx-auto flex items-center justify-between px-6 lg:px-12 h-[68px] md:h-20 xl:h-[88px]">
-          <Link href="/" className={wordmark}>
-            UNSWAP
+          <Link href="/" className="inline-flex items-center gap-2.5 group">
+            <Image
+              src="/unswap-logo.png"
+              alt=""
+              width={68}
+              height={68}
+              priority
+              className="w-[34px] h-[34px] object-contain"
+            />
+            <span className={wordmark}>UNSWAP</span>
           </Link>
 
           {/* Sentence case, not caps: caps are the wordmark's job. */}
@@ -134,8 +143,9 @@ export function LandingNavbar({ forceLight = false }: { forceLight?: boolean }) 
       {menuOpen && (
         <div className="fixed inset-0 z-modal md:hidden bg-ink text-white flex flex-col">
           <div className="flex items-center justify-between px-6 h-[68px]">
-            <Link href="/" onClick={() => setMenuOpen(false)} className="font-sans text-base font-bold tracking-[0.10em] text-gold">
-              UNSWAP
+            <Link href="/" onClick={() => setMenuOpen(false)} className="inline-flex items-center gap-2.5">
+              <Image src="/unswap-logo.png" alt="" width={68} height={68} className="w-[34px] h-[34px] object-contain" />
+              <span className="font-sans text-base font-bold tracking-[0.10em] text-gold">UNSWAP</span>
             </Link>
             <button
               type="button"
