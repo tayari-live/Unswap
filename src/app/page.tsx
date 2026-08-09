@@ -325,7 +325,7 @@ export default function LandingPage() {
             Begin your verification today. Turn an empty home into your most valuable asset on rotation. Stop paying $110 a day for accommodation your peers could provide for free.
           </p>
           <div className="mt-12">
-            <Link href="/register" className={`${GOLD_BTN} shadow-[0_4px_28px_rgba(201,168,76,0.3)]`}>Access the Network</Link>
+            <Link href="/register" className={`${GOLD_BTN} shadow-[0_4px_28px_rgba(201,168,76,0.3)]`}>Request Access</Link>
           </div>
         </div>
       </section>
