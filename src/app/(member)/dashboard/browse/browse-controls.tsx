@@ -83,7 +83,7 @@ export function BrowseControls({ initial }: { initial: BrowseFilters }) {
       {showFilters && (
         <div className="p-5 sm:p-6 bg-[var(--surface)] border border-[var(--hair)] rounded-md space-y-6 animate-in slide-in-from-top-2 fade-in duration-200">
           <div>
-            <h4 className="text-[11px] font-bold uppercase tracking-wider text-neutral mb-3">Popular Duty Stations</h4>
+            <h4 className="text-[11px] font-semibold uppercase tracking-wider text-neutral mb-3">Popular Duty Stations</h4>
             <div className="flex flex-wrap gap-2">
               {DUTY_STATIONS.map((c) => (
                 <button

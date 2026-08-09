@@ -25,7 +25,7 @@ export default async function MessagesLayout({
           <div className="mx-auto w-14 h-14 rounded-md bg-[var(--surface)] border border-[var(--hair)] text-[var(--gold-dark)] flex items-center justify-center mb-5">
             <ShieldAlert size={26} />
           </div>
-          <h2 className="font-sans text-2xl font-bold text-[var(--fg)]">Verification required</h2>
+          <h2 className="font-sans text-2xl font-semibold text-[var(--fg)]">Verification required</h2>
           <p className="mt-3 text-neutral leading-relaxed">Messaging is reserved for verified members. Complete verification to start conversations.</p>
           <Link href="/verify-identity" className="mt-7 inline-flex items-center justify-center py-3 px-6 rounded-sm text-[12px] font-medium uppercase tracking-[0.12em] text-ink bg-[var(--gold)] hover:bg-[var(--gold-hover)] transition-colors w-full">
             Get verified

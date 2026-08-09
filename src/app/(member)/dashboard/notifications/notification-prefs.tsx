@@ -57,7 +57,7 @@ export function NotificationPrefs({ initial }: { initial: Prefs }) {
   return (
     <div className="bg-surface rounded-md border border-[var(--hair)] overflow-hidden mb-6">
       <div className="px-6 py-4 border-b border-[var(--hair)]">
-        <h2 className="font-sans font-bold text-lg text-[var(--fg)]">Email preferences</h2>
+        <h2 className="font-sans font-semibold text-xl text-[var(--fg)]">Email preferences</h2>
         <p className="text-xs text-neutral mt-0.5">Choose which emails you receive. Security and billing emails are always sent.</p>
       </div>
       <div className="divide-y divide-[var(--hair)]">

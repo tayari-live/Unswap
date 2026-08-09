@@ -173,7 +173,7 @@ export function MemberSidebar({
             {collapsed && notifs > 0 && <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[var(--gold)] border border-[var(--navy-dark)]" />}
           </span>
           <span className={cn("flex-1 min-w-0 text-left", label(!collapsed))}>
-            <span className="block text-[13px] font-bold text-white truncate">{name || "Member"}</span>
+            <span className="block text-[13px] font-medium text-white truncate">{name || "Member"}</span>
             {v ? (
               <span className={cn("flex items-center gap-1 text-[11px] font-semibold", v.tone)}>
                 <v.icon size={11} /> {v.label}

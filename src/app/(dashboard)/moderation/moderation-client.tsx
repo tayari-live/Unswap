@@ -50,7 +50,7 @@ export default function ModerationClient({ initial }: { initial: ModReport[] }) 
           <div className="mx-auto w-14 h-14 rounded-md bg-[var(--teal)]/15 text-[var(--teal)] flex items-center justify-center mb-4">
             <ShieldX size={26} />
           </div>
-          <h2 className="font-sans text-xl font-bold text-[var(--fg)]">Queue is clear</h2>
+          <h2 className="font-sans text-xl font-semibold text-[var(--fg)]">Queue is clear</h2>
           <p className="mt-2 text-sm text-neutral">No open reports to review.</p>
         </div>
       ) : (

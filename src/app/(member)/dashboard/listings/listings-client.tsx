@@ -112,7 +112,7 @@ export function ListingsClient({
               </div>
 
               <div className="p-4 flex-1 flex flex-col">
-                <h3 className="font-sans font-bold text-[var(--fg)] leading-snug">{l.title}</h3>
+                <h3 className="font-sans font-semibold text-[var(--fg)] leading-snug">{l.title}</h3>
                 <div className="flex items-center gap-1.5 text-xs text-neutral mt-1">
                   <MapPin size={13} /> {l.city}, {l.country}
                 </div>

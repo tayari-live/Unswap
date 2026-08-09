@@ -52,7 +52,7 @@ export default async function CreditsPage() {
       {/* Ledger */}
       <div className="bg-surface rounded-md border border-[var(--hair)] overflow-hidden">
         <div className="px-6 py-4 border-b border-[var(--hair)]">
-          <h2 className="font-sans font-bold text-lg text-[var(--fg)]">Earn & spend history</h2>
+          <h2 className="font-sans font-semibold text-xl text-[var(--fg)]">Earn & spend history</h2>
         </div>
         {transactions.length === 0 ? (
           <p className="px-6 py-10 text-center text-sm text-neutral">No credit activity yet. Host a member to start earning.</p>

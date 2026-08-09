@@ -138,7 +138,7 @@ export function AdminSidebar({
             )}
           </span>
           <span className={cn("flex-1 min-w-0 text-left", label(!collapsed))}>
-            <span className="block text-[13px] font-bold text-white truncate">{name || "Administrator"}</span>
+            <span className="block text-[13px] font-medium text-white truncate">{name || "Administrator"}</span>
             <span className="block text-[11px] font-semibold text-white/50 uppercase tracking-wide">Administrator</span>
           </span>
           <ChevronDown size={16} className={cn("text-white/40 flex-shrink-0 transition-transform", label(!collapsed), accountOpen && "rotate-180")} />

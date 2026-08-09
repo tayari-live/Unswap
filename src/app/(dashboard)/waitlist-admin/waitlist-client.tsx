@@ -174,7 +174,7 @@ export default function WaitlistClient({ initialEntries }: { initialEntries: Ent
         <div className="bg-[var(--navy)] rounded-md p-5 mb-6 text-white">
           <div className="flex items-center gap-2 mb-3">
             <Trophy size={18} className="text-[var(--gold)]" />
-            <h2 className="font-sans font-bold">Top Referrers · 6 months Unlimited Pro free</h2>
+            <h2 className="font-sans font-semibold">Top Referrers · 6 months Unlimited Pro free</h2>
           </div>
           <div className="flex flex-wrap gap-3">
             {topReferrers.map((e) => (

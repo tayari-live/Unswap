@@ -125,7 +125,7 @@ export function SwapRequestForm({
     return (
       <div className="bg-[var(--teal-light)] border border-[var(--teal)]/30 rounded-md p-6 text-center">
         <CheckCircle2 size={28} className="mx-auto text-[var(--teal)]" />
-        <h3 className="mt-3 font-sans text-lg font-bold text-[var(--fg)]">Request sent</h3>
+        <h3 className="mt-3 font-sans text-xl font-semibold text-[var(--fg)]">Request sent</h3>
         <p className="mt-1 text-sm text-neutral-dark">The host has been notified and will respond shortly.</p>
         <button
           onClick={() => router.push("/dashboard/swaps")}
@@ -156,7 +156,7 @@ export function SwapRequestForm({
 
   return (
     <form onSubmit={handleSubmit} className="bg-surface border border-[var(--hair)] rounded-md p-5 space-y-4">
-      <h3 className="font-sans text-lg font-bold text-[var(--fg)]">Request a swap</h3>
+      <h3 className="font-sans text-xl font-semibold text-[var(--fg)]">Request a swap</h3>
 
       {blackouts.length > 0 && (
         <div className="flex items-start gap-2 rounded-lg bg-[var(--parchment)] border border-[var(--gold)]/20 p-3">

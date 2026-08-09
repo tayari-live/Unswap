@@ -575,7 +575,7 @@ export function Thread({
               </div>
             )}
 
-            <h3 className="font-sans font-bold text-[var(--fg)] text-lg leading-tight truncate">
+            <h3 className="font-sans font-semibold text-[var(--fg)] text-xl leading-tight truncate">
               {listing?.title || "Listing"}
             </h3>
             <p className="text-xs text-neutral mt-1 mb-5 truncate">{listing?.city ? `${listing.city}, ${listing.country}` : "Location unknown"}</p>
@@ -620,7 +620,7 @@ export function Thread({
             <div className="w-20 h-20 rounded-full bg-[var(--surface)] border border-[var(--hair)] text-[var(--fg)] flex items-center justify-center text-2xl font-bold mb-4 overflow-hidden">
               {other?.avatarInitials ?? "?"}
             </div>
-            <h3 className="font-sans font-bold text-[var(--fg)] text-lg mb-1">{other?.fullName || "Member"}</h3>
+            <h3 className="font-sans font-semibold text-[var(--fg)] text-xl mb-1">{other?.fullName || "Member"}</h3>
             <p className="text-xs text-neutral/80 uppercase tracking-wider font-semibold mb-6">
               {other?.organisation ? `${other.organisation} member` : "Verified member"}
             </p>

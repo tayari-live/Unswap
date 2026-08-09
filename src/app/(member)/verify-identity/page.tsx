@@ -138,7 +138,7 @@ function StateCard({
       <div className={`mx-auto w-14 h-14 rounded-md flex items-center justify-center mb-5 ${toneClass}`}>
         {icon}
       </div>
-      <h2 className="font-sans text-2xl font-bold text-[var(--fg)]">{title}</h2>
+      <h2 className="font-sans text-2xl font-semibold text-[var(--fg)]">{title}</h2>
       <p className="mt-3 text-neutral leading-relaxed">{body}</p>
       <Link
         href={cta.href}

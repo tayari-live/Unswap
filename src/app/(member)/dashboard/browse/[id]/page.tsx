@@ -83,7 +83,7 @@ export default async function ListingDetailPage({
             <div className="flex items-center gap-1.5 text-sm text-neutral">
               <MapPin size={15} /> {listing.neighbourhood ? `${listing.neighbourhood}, ` : ""}{listing.city}, {listing.country}
             </div>
-            <h1 className="mt-1 font-sans text-3xl font-bold text-[var(--fg)]">{listing.title}</h1>
+            <h1 className="mt-1 font-sans text-[40px] font-bold text-[var(--fg)]">{listing.title}</h1>
             <div className="mt-4 flex flex-wrap gap-5 text-sm text-neutral-dark">
               <span className="inline-flex items-center gap-1.5"><BedDouble size={16} className="text-neutral" /> {listing.bedrooms} {listing.bedrooms === 1 ? "bedroom" : "bedrooms"}</span>
               <span className="inline-flex items-center gap-1.5"><Bath size={16} className="text-neutral" /> {listing.bathrooms} {listing.bathrooms === 1 ? "bathroom" : "bathrooms"}</span>
@@ -93,14 +93,14 @@ export default async function ListingDetailPage({
 
           {listing.description && (
             <div className="bg-surface rounded-md border border-[var(--hair)] p-6">
-              <h2 className="font-sans font-bold text-lg text-[var(--fg)] mb-2">About this home</h2>
+              <h2 className="font-sans font-semibold text-xl text-[var(--fg)] mb-2">About this home</h2>
               <p className="text-sm text-neutral-dark leading-relaxed whitespace-pre-line">{listing.description}</p>
             </div>
           )}
 
           <div className="bg-surface rounded-md border border-[var(--hair)] p-6 space-y-4">
             <div>
-              <h2 className="font-sans font-bold text-lg text-[var(--fg)] mb-1">{listing.propertyType}</h2>
+              <h2 className="font-sans font-semibold text-xl text-[var(--fg)] mb-1">{listing.propertyType}</h2>
               <p className="text-sm text-neutral">Exchange preference: {EXCHANGE_LABEL[listing.exchangeType] ?? listing.exchangeType}</p>
             </div>
             {listing.swapDurations.length > 0 && (
@@ -131,7 +131,7 @@ export default async function ListingDetailPage({
           {/* Reviews */}
           <div className="bg-surface rounded-md border border-[var(--hair)] p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-sans font-bold text-lg text-[var(--fg)]">Reviews</h2>
+              <h2 className="font-sans font-semibold text-xl text-[var(--fg)]">Reviews</h2>
               {listing.rating != null && (
                 <span className="flex items-center gap-1 text-sm font-bold text-[var(--fg)]">
                   <Star size={15} className="text-[var(--gold)]" fill="currentColor" />

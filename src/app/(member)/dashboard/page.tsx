@@ -234,7 +234,7 @@ export default async function MemberDashboardPage() {
         {/* Incoming swap requests */}
         <div className="lg:col-span-2 bg-surface rounded-md border border-[var(--hair)] overflow-hidden">
           <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--hair)]">
-            <h2 className="font-sans font-bold text-lg text-[var(--fg)]">Incoming Swap Requests</h2>
+            <h2 className="font-sans font-semibold text-xl text-[var(--fg)]">Incoming Swap Requests</h2>
           </div>
           <div className="divide-y divide-[var(--hair)]">
             {incoming.length === 0 && (
@@ -271,7 +271,7 @@ export default async function MemberDashboardPage() {
               ) : (
                 <ShieldAlert size={18} className="text-[var(--gold-dark)]" />
               )}
-              <h2 className="font-sans font-bold text-base text-[var(--fg)]">Verification</h2>
+              <h2 className="font-sans font-semibold text-xl text-[var(--fg)]">Verification</h2>
             </div>
             <p className="text-sm text-neutral-dark">
               {VERIFICATION_LABELS[user.verificationStatus] ?? user.verificationStatus}
@@ -287,7 +287,7 @@ export default async function MemberDashboardPage() {
 
           {/* Subscription */}
           <div className="bg-surface rounded-md border border-[var(--hair)] p-6">
-            <h2 className="font-sans font-bold text-base text-[var(--fg)] mb-3">Subscription</h2>
+            <h2 className="font-sans font-semibold text-xl text-[var(--fg)] mb-3">Subscription</h2>
             {user.subscription ? (
               <>
                 <div className="inline-flex items-center text-sm font-bold px-3 py-1 rounded-full bg-[var(--navy)] text-[var(--gold)]">
@@ -315,7 +315,7 @@ export default async function MemberDashboardPage() {
       {/* Upcoming exchanges */}
       <div className="bg-surface rounded-md border border-[var(--hair)] overflow-hidden mt-6">
         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--hair)]">
-          <h2 className="font-sans font-bold text-lg text-[var(--fg)]">Upcoming Exchanges</h2>
+          <h2 className="font-sans font-semibold text-xl text-[var(--fg)]">Upcoming Exchanges</h2>
         </div>
         <div className="divide-y divide-[var(--hair)]">
           {upcoming.length === 0 && (

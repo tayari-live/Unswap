@@ -43,7 +43,7 @@ function ExchangeCard({ r, review }: { r: Row; review?: { aboutHost: boolean } }
             <span className="text-[10px] font-bold uppercase tracking-wide text-[var(--gold-dark)]">
               {r.role === "host" ? "You're hosting" : "You're staying"}
             </span>
-            <h3 className="font-sans text-lg font-bold text-[var(--fg)] leading-snug">{r.listing.title}</h3>
+            <h3 className="font-sans text-xl font-semibold text-[var(--fg)] leading-snug">{r.listing.title}</h3>
             <div className="flex items-center gap-1.5 text-xs text-neutral mt-0.5">
               <MapPin size={13} /> {r.listing.city}, {r.listing.country}
             </div>
@@ -101,20 +101,20 @@ export default async function ExchangesPage() {
           <div className="mx-auto w-14 h-14 rounded-md bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center mb-4">
             <CalendarCheck size={26} />
           </div>
-          <h2 className="font-sans text-xl font-bold text-[var(--fg)]">No exchanges yet</h2>
+          <h2 className="font-sans text-xl font-semibold text-[var(--fg)]">No exchanges yet</h2>
           <p className="mt-2 text-sm text-neutral">Once a swap request is accepted, it appears here with its agreement.</p>
         </div>
       ) : (
         <div className="space-y-8">
           {upcoming.length > 0 && (
             <section>
-              <h2 className="font-sans font-bold text-lg text-[var(--fg)] mb-3">Upcoming & ongoing</h2>
+              <h2 className="font-sans font-semibold text-xl text-[var(--fg)] mb-3">Upcoming & ongoing</h2>
               <div className="space-y-4">{upcoming.map((r) => <ExchangeCard key={r.id} r={r} />)}</div>
             </section>
           )}
           {past.length > 0 && (
             <section>
-              <h2 className="font-sans font-bold text-lg text-[var(--fg)] mb-3">Past exchanges</h2>
+              <h2 className="font-sans font-semibold text-xl text-[var(--fg)] mb-3">Past exchanges</h2>
               <div className="space-y-4">{past.map((r) => (
                 <ExchangeCard
                   key={r.id}

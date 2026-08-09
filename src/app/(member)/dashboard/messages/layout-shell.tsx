@@ -45,7 +45,7 @@ export function MessagesLayoutShell({
  }`}
       >
         <div className="p-4 border-b border-[var(--hair)] bg-[var(--surface)] flex items-center justify-between">
-          <h2 className="font-bold text-[var(--fg)]">All messages</h2>
+          <h2 className="font-semibold text-[var(--fg)]">All messages</h2>
         </div>
 
         <div className="p-3">

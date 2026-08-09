@@ -36,7 +36,7 @@ export default async function AdminSettingsPage() {
       <LuxPageHeader eyebrow="Account" title="Settings" subtitle="Your administrator account." />
 
       <div className="bg-surface rounded-md border border-[var(--hair)] p-6 sm:p-8">
-        <h2 className="font-sans font-bold text-lg text-[var(--fg)] mb-5">Account</h2>
+        <h2 className="font-sans font-semibold text-xl text-[var(--fg)] mb-5">Account</h2>
         <dl className="divide-y divide-[var(--hair)] border border-[var(--hair)] rounded-xl overflow-hidden">
           {rows.map((r) => (
             <div key={r.label} className="flex items-center justify-between gap-4 px-4 py-3.5">
@@ -51,13 +51,13 @@ export default async function AdminSettingsPage() {
       </div>
 
       <div className="bg-surface rounded-md border border-[var(--hair)] p-6 sm:p-8 mt-6">
-        <h2 className="font-sans font-bold text-lg text-[var(--fg)] mb-1.5">Password</h2>
+        <h2 className="font-sans font-semibold text-xl text-[var(--fg)] mb-1.5">Password</h2>
         <p className="text-sm text-neutral mb-5">Change the password for your admin account.</p>
         <ChangePasswordForm />
       </div>
 
       <div className="bg-surface rounded-md border border-[var(--hair)] p-6 sm:p-8 mt-6">
-        <h2 className="font-sans font-bold text-lg text-[var(--fg)] mb-1.5">Session</h2>
+        <h2 className="font-sans font-semibold text-xl text-[var(--fg)] mb-1.5">Session</h2>
         <p className="text-sm text-neutral mb-5">Sign out of the admin console on this device.</p>
         <SignOutButton />
       </div>
