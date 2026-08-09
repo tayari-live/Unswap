@@ -25,6 +25,7 @@
   --color-gold-dark: #9a7c2c;
 
   --color-parchment: #F5EFE0;
+  --color-parchment-dark: #EDE7D4;
 
   /* Fixed marketing values. Unlike --navy and --foreground these never flip
      with the theme: --ink is the obsidian of the marketing ground and the dark
@@ -94,7 +95,7 @@
 
   /* ── Elevation ─────────────────────────────────────────────────────── */
   --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
-  --shadow-dropdown: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --shadow-dropdown: 0 12px 32px rgba(11, 31, 58, 0.10);
   --shadow-modal: 0 18px 50px rgba(0, 0, 0, 0.12);
 
   /* ── Motion ────────────────────────────────────────────────────────── */
@@ -173,6 +174,9 @@
   --canvas: #f5f0e8;
   --hair: rgba(201, 168, 76, 0.30);
   --gold-soft: #9a7c2c;
+  
+  --parchment: #F5EFE0;
+  --parchment-dark: #EDE7D4;
 }
 
 /*

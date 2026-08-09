@@ -11,6 +11,7 @@ import {
   Star,
   ChevronRight,
   PlusCircle,
+  Search,
 } from "lucide-react"
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
@@ -148,198 +149,251 @@ export default async function MemberDashboardPage() {
   const checklistDone = checklist.filter((s) => s.done).length
   const showChecklist = checklistDone < checklist.length
 
-  const cards = [
-    { label: "Active Listings", value: activeListings, icon: Home },
-    { label: "Incoming Requests", value: incoming.length, icon: ArrowLeftRight },
-    { label: "Upcoming Exchanges", value: upcoming.length, icon: CalendarCheck },
-    { label: "UnSwap Credits", value: credits, icon: Coins },
-  ] as const
+  // Determine welcome subtext based on state
+  let subtext = "Ready to find your next home?"
+  if (upcoming.length > 0) subtext = "Your next stay is coming up."
+  else if (activeListings > 0) subtext = "Your home is ready to welcome another member."
+
+  // Mock recommended homes
+  const recommendedHomes = [
+    { city: "Geneva", country: "Switzerland", image: "/residence_geneva.jpg", nights: 7, credits: 7 },
+    { city: "Nairobi", country: "Kenya", image: "/residence_nairobi.jpg", nights: 5, credits: 5 },
+    { city: "Washington, DC", country: "United States", image: "/residence_washington.jpg", nights: 10, credits: 10 }
+  ];
 
   return (
-    <div className="max-w-6xl mx-auto pb-12">
-      <LuxPageHeader eyebrow="Your Network"
-        title={`Welcome back, ${user.firstName}`}
-        subtitle="Your activity across the UnSwap exchange network."
-      />
-
-      {/* Getting-started checklist — replaces the scattered status cards */}
-      {showChecklist && (
-        <div className="rounded-md border border-[var(--hair)] bg-[var(--surface)] p-6 mb-5">
-          <div className="flex items-end justify-between mb-1">
-            <SectionLabel>First Steps</SectionLabel>
-            <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-neutral tabular-nums">
-              {checklistDone} of {checklist.length}
-            </span>
-          </div>
-          <h2 className="font-sans font-semibold text-2xl text-[var(--fg)] leading-none">Getting started</h2>
-          {/* Progress as a hairline rule rather than a bar */}
-          <div className="mt-4 mb-5 h-px bg-[var(--hair)] overflow-hidden">
-            <div
-              className="h-full bg-[var(--gold)] transition-all duration-500"
-              style={{ width: `${(checklistDone / checklist.length) * 100}%` }}
-            />
-          </div>
-          <ul className="space-y-3.5">
-            {checklist.map((s, i) => (
-              <li key={s.title} className="flex items-center gap-3">
-                <span
-                  className={`w-7 h-7 border flex items-center justify-center text-[11px] font-medium flex-shrink-0 transition-colors ${
-                    s.done
-                      ? "border-[var(--gold)] text-[var(--gold-soft)]"
-                      : "border-[var(--hair)] text-neutral"
-                  }`}
-                >
-                  {s.done ? <Check size={13} strokeWidth={2} /> : i + 1}
-                </span>
-                <div className="flex-1 min-w-0">
-                  <div className={`text-sm ${s.done ? "text-neutral" : "text-[var(--fg)] font-medium"}`}>
-                    {s.title}
-                  </div>
-                  {s.sub && <div className="text-xs text-neutral mt-0.5 leading-relaxed">{s.sub}</div>}
-                </div>
-                {!s.done && s.href && (
-                  <Link
-                    href={s.href}
-                    className="flex-shrink-0 inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.12em] px-4 py-2 rounded-sm bg-[var(--gold)] text-ink hover:bg-[var(--gold-hover)] transition-colors"
-                  >
-                    {s.action} <ChevronRight size={13} />
-                  </Link>
-                )}
-                {!s.done && s.resendEmail && (
-                  <ResendEmailButton email={s.resendEmail} />
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {cards.map((c) => (
-          <div
-            key={c.label}
-            className="bg-[var(--surface)] rounded-md p-6 border border-[var(--hair)]"
-          >
-            <span className="w-11 h-11 border border-[var(--hair)] flex items-center justify-center text-[var(--gold-soft)]">
-              <c.icon size={20} strokeWidth={1.4} />
-            </span>
-            <div className="mt-5 font-sans font-semibold text-4xl leading-none text-[var(--fg)]">{c.value}</div>
-            <div className="text-[11px] text-neutral uppercase tracking-[0.18em] mt-2 font-medium">{c.label}</div>
-          </div>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
-        {/* Incoming swap requests */}
-        <div className="lg:col-span-2 bg-surface rounded-md border border-[var(--hair)] overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--hair)]">
-            <h2 className="font-sans font-semibold text-xl text-[var(--fg)]">Incoming Swap Requests</h2>
-          </div>
-          <div className="divide-y divide-[var(--hair)]">
-            {incoming.length === 0 && (
-              <p className="px-6 py-8 text-center text-sm text-neutral">No pending requests right now.</p>
-            )}
-            {incoming.slice(0, 5).map((r) => (
-              <div key={r.id} className="flex items-center justify-between px-6 py-3">
-                <div className="flex items-center gap-3">
-                  <span className="w-9 h-9 rounded-xl bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center text-xs font-bold">
-                    {r.requester.avatarInitials}
-                  </span>
-                  <div>
-                    <div className="text-sm font-semibold text-[var(--fg)]">{r.requester.fullName}</div>
-                    <div className="text-xs text-neutral">
-                      {r.listing.title} · {fmtDate(r.startDate)} – {fmtDate(r.endDate)}
-                    </div>
-                  </div>
-                </div>
-                <span className="text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full bg-[var(--gold)]/15 text-[var(--gold-dark)]">
-                  {r.status === "COUNTER_OFFERED" ? "Counter" : "New"}
-                </span>
-              </div>
-            ))}
-          </div>
+    <div className="min-h-[calc(100vh-76px)] bg-[var(--parchment)]">
+      <div className="max-w-[1440px] mx-auto px-6 lg:px-10 pt-12 pb-20">
+        
+        {/* 1. Welcome Header */}
+        <div className="mb-10">
+          <h1 className="font-display text-4xl md:text-[48px] font-bold text-navy tracking-tight leading-none mb-3">
+            Good morning, {user.firstName || "Member"}.
+          </h1>
+          <p className="font-sans text-sm md:text-[15px] text-navy/65">
+            {subtext}
+          </p>
+          <div className="w-8 h-[2px] bg-[var(--gold)] mt-6" />
         </div>
 
-        {/* Right column */}
-        <div className="space-y-6">
-          {/* Verification + trust */}
-          <div className="bg-surface rounded-md border border-[var(--hair)] p-6">
-            <div className="flex items-center gap-2 mb-3">
-              {isVerified ? (
-                <ShieldCheck size={18} className="text-[var(--teal)]" />
-              ) : (
-                <ShieldAlert size={18} className="text-[var(--gold-dark)]" />
-              )}
-              <h2 className="font-sans font-semibold text-xl text-[var(--fg)]">Verification</h2>
+        {/* 2. Member Status / Summary Strip */}
+        <div className="flex flex-wrap lg:flex-nowrap gap-y-8 mb-12">
+          {/* Credits */}
+          <Link href="/dashboard/credits" className="w-1/2 lg:w-1/4 group lg:pr-8">
+            <div className="font-display text-[32px] md:text-[40px] font-bold text-navy leading-none mb-1 group-hover:text-[var(--gold-dark)] transition-colors">
+              {credits}
             </div>
-            <p className="text-sm text-neutral-dark">
-              {VERIFICATION_LABELS[user.verificationStatus] ?? user.verificationStatus}
+            <div className="flex flex-col">
+              <span className="font-sans text-[11px] font-medium text-[var(--gold)] uppercase tracking-[0.12em]">Credits</span>
+              <span className="font-sans text-[13px] text-navy/60">available</span>
+            </div>
+          </Link>
+          
+          {/* Homes */}
+          <Link href="/dashboard/listings" className="w-1/2 lg:w-1/4 group lg:px-8 lg:border-l border-[var(--hair)]">
+            <div className="font-display text-[32px] md:text-[40px] font-bold text-navy leading-none mb-1 group-hover:text-[var(--gold-dark)] transition-colors">
+              {activeListings}
+            </div>
+            <div className="flex flex-col">
+              <span className="font-sans text-[11px] font-medium text-[var(--gold)] uppercase tracking-[0.12em]">My Homes</span>
+              <span className="font-sans text-[13px] text-navy/60">listed</span>
+            </div>
+          </Link>
+          
+          {/* Swaps */}
+          <Link href="/dashboard/swaps" className="w-1/2 lg:w-1/4 group lg:px-8 lg:border-l border-[var(--hair)]">
+            <div className="font-display text-[32px] md:text-[40px] font-bold text-navy leading-none mb-1 group-hover:text-[var(--gold-dark)] transition-colors">
+              {upcoming.length}
+            </div>
+            <div className="flex flex-col">
+              <span className="font-sans text-[11px] font-medium text-[var(--gold)] uppercase tracking-[0.12em]">Active Swaps</span>
+              <span className="font-sans text-[13px] text-navy/60">active</span>
+            </div>
+          </Link>
+          
+          {/* Messages */}
+          <Link href="/dashboard/messages" className="w-1/2 lg:w-1/4 group lg:pl-8 lg:border-l border-[var(--hair)]">
+            <div className="font-display text-[32px] md:text-[40px] font-bold text-navy leading-none mb-1 group-hover:text-[var(--gold-dark)] transition-colors">
+              0 {/* Note: Client-side unread count lives in navbar, server-side count requires query */}
+            </div>
+            <div className="flex flex-col">
+              <span className="font-sans text-[11px] font-medium text-[var(--gold)] uppercase tracking-[0.12em]">Messages</span>
+              <span className="font-sans text-[13px] text-navy/60">unread</span>
+            </div>
+          </Link>
+        </div>
+
+        {/* 3. Primary Discovery Module */}
+        <div className="bg-[var(--navy)] rounded-lg p-10 md:p-14 mb-16 shadow-md overflow-hidden relative">
+          <div className="relative z-10 max-w-2xl">
+            <h2 className="font-display text-[36px] md:text-[44px] text-[var(--gold)] font-bold mb-3 leading-none">
+              FIND YOUR NEXT STAY
+            </h2>
+            <p className="font-sans text-white/80 text-[15px] mb-10">
+              Where will your work take you next?
             </p>
-            <div className="mt-4 pt-4 border-t border-[var(--hair)] flex items-center justify-between">
-              <span className="text-xs text-neutral uppercase tracking-wide font-semibold">Trust Score</span>
-              <span className="flex items-center gap-1 text-sm font-bold text-[var(--fg)]">
-                <Star size={14} className="text-[var(--gold)]" />
-                {user.trustScore != null ? user.trustScore.toFixed(1) : "—"}
-              </span>
+            
+            {/* Native HTML form works perfectly in server components for GET requests */}
+            <form action="/dashboard/browse" method="GET" className="relative mb-8 max-w-xl">
+              <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-navy/40 pointer-events-none" />
+              <input
+                type="search"
+                name="q"
+                placeholder="Search a city, country or duty station..."
+                className="w-full h-14 pl-12 pr-4 rounded-lg bg-white border border-transparent text-[15px] text-navy placeholder:text-navy/50 focus:outline-none focus:border-[var(--gold)] focus:ring-2 focus:ring-[var(--gold)] transition-colors shadow-sm"
+              />
+            </form>
+
+            <div className="flex flex-wrap items-center gap-6">
+              <Link
+                href="/dashboard/browse"
+                className="inline-flex items-center justify-center px-7 py-3 rounded-md bg-[var(--gold)] text-navy font-sans font-bold text-[13px] uppercase tracking-[0.08em] hover:bg-white transition-colors"
+              >
+                Explore Homes
+              </Link>
+              <Link
+                href="/dashboard/browse?view=map"
+                className="inline-flex items-center gap-2 text-[13px] font-sans font-semibold text-white/80 hover:text-white transition-colors"
+              >
+                Explore Map <ChevronRight size={14} />
+              </Link>
             </div>
           </div>
-
-          {/* Subscription */}
-          <div className="bg-surface rounded-md border border-[var(--hair)] p-6">
-            <h2 className="font-sans font-semibold text-xl text-[var(--fg)] mb-3">Subscription</h2>
-            {user.subscription ? (
-              <>
-                <div className="inline-flex items-center text-sm font-bold px-3 py-1 rounded-full bg-[var(--navy)] text-[var(--gold)]">
-                  {TIER_LABELS[user.subscription.tier] ?? user.subscription.tier}
-                </div>
-                <div className="mt-3 text-xs text-neutral space-y-1">
-                  <div>
-                    Guarantee: ${user.subscription.propertyGuarantee.toLocaleString()}
-                  </div>
-                  <div>
-                    Exchanges/year:{" "}
-                    {user.subscription.exchangesPerYear === -1
-                      ? "Unlimited"
-                      : user.subscription.exchangesPerYear}
-                  </div>
-                </div>
-              </>
-            ) : (
-              <p className="text-sm text-neutral">No active subscription.</p>
-            )}
-          </div>
+          
+          {/* Subtle decorative background element for the navy block */}
+          <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-gradient-to-l from-white/5 to-transparent pointer-events-none" />
         </div>
-      </div>
 
-      {/* Upcoming exchanges */}
-      <div className="bg-surface rounded-md border border-[var(--hair)] overflow-hidden mt-6">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--hair)]">
-          <h2 className="font-sans font-semibold text-xl text-[var(--fg)]">Upcoming Exchanges</h2>
-        </div>
-        <div className="divide-y divide-[var(--hair)]">
-          {upcoming.length === 0 && (
-            <div className="px-6 py-10 text-center">
-              <p className="text-sm text-neutral">No upcoming exchanges yet.</p>
-              <span className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-neutral/60">
-                <PlusCircle size={15} /> List a home to start exchanging
-              </span>
+        {/* Layout Grid for Next Steps & Upcoming */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-16">
+          
+          {/* 4. Next Steps */}
+          {showChecklist && (
+            <div className="lg:col-span-5">
+              <h3 className="font-sans text-xs font-bold text-navy uppercase tracking-[0.14em] mb-4">
+                Your Next Steps
+              </h3>
+              <div className="border-t border-[var(--hair)]">
+                {checklist.map((s, i) => (
+                  <div key={i} className="flex items-center justify-between py-4 border-b border-[var(--hair)] group">
+                    <div className="flex items-center gap-4">
+                      <span className={`flex-shrink-0 ${s.done ? "text-[var(--gold)]" : "text-navy/30"}`}>
+                        {s.done ? <Check size={18} strokeWidth={2.5} /> : <div className="w-[18px] h-[18px] rounded-full border-2 border-current" />}
+                      </span>
+                      <span className={`font-sans text-[15px] ${s.done ? "text-navy/60" : "text-navy font-medium"}`}>
+                        {s.title}
+                      </span>
+                    </div>
+                    {!s.done && s.href && (
+                      <Link href={s.href} className="text-[13px] font-medium text-[var(--gold-dark)] hover:text-navy transition-colors flex items-center gap-1 opacity-0 group-hover:opacity-100 focus:opacity-100">
+                        {s.action} <ChevronRight size={14} />
+                      </Link>
+                    )}
+                    {s.done && (
+                      <span className="text-[13px] text-navy/40">Complete</span>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
-          {upcoming.slice(0, 5).map((r) => (
-            <div key={r.id} className="flex items-center justify-between px-6 py-3">
-              <div>
-                <div className="text-sm font-semibold text-[var(--fg)]">{r.listing.title}</div>
-                <div className="text-xs text-neutral">
-                  {fmtDate(r.startDate)} – {fmtDate(r.endDate)} · {nights(r.startDate, r.endDate)} nights
+
+          {/* 5. Upcoming Swap */}
+          {upcoming.length > 0 && (
+            <div className={showChecklist ? "lg:col-span-7" : "lg:col-span-12"}>
+              <h3 className="font-sans text-xs font-bold text-navy uppercase tracking-[0.14em] mb-4">
+                Your Upcoming Stay
+              </h3>
+              {upcoming.slice(0, 1).map((r) => (
+                <div key={r.id} className="bg-[var(--navy)] rounded-lg p-8 relative overflow-hidden flex flex-col justify-between h-[220px]">
+                  <div>
+                    <h4 className="font-display text-[32px] text-[var(--gold)] font-bold leading-none mb-2">{r.listing.title}</h4>
+                    <div className="font-sans text-white/80 text-[14px]">
+                      {fmtDate(r.startDate)} — {fmtDate(r.endDate)}
+                    </div>
+                    <div className="font-sans text-white/60 text-[13px] mt-1">
+                      {nights(r.startDate, r.endDate)} nights · {r.mode === "credits" ? `${nights(r.startDate, r.endDate)} credits` : "Direct Swap"}
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between mt-6">
+                    <Link
+                      href={`/dashboard/swaps`}
+                      className="inline-flex items-center px-4 py-2 rounded border border-white/20 text-white font-sans text-[11px] font-bold uppercase tracking-[0.1em] hover:bg-white hover:text-navy transition-colors"
+                    >
+                      View Swap
+                    </Link>
+                    <span className="font-sans text-[11px] font-bold text-[var(--gold)] uppercase tracking-[0.1em]">
+                      {Math.max(0, Math.ceil((r.startDate.getTime() - Date.now()) / 86400000))} Days to go
+                    </span>
+                  </div>
                 </div>
-              </div>
-              <span className="text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full bg-[var(--teal)]/15 text-[var(--teal)]">
-                {r.status.replace("_", " ")}
-              </span>
+              ))}
             </div>
-          ))}
+          )}
         </div>
+
+        {/* 6. Recommended Homes */}
+        <div className="mb-16">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="font-sans text-xs font-bold text-navy uppercase tracking-[0.14em]">
+              Recommended For You
+            </h3>
+            <Link href="/dashboard/browse" className="text-[13px] font-medium text-navy/70 hover:text-navy flex items-center gap-1 transition-colors">
+              View all <ChevronRight size={14} />
+            </Link>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {recommendedHomes.map((home, idx) => (
+              <Link key={idx} href={`/dashboard/browse?q=${home.city}`} className="group flex flex-col bg-[var(--parchment-dark)] rounded-[10px] overflow-hidden border border-transparent hover:border-[var(--hair)] transition-colors">
+                <div className="aspect-[4/3] bg-navy/5 relative overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={home.image} alt={home.city} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" />
+                </div>
+                <div className="p-5">
+                  <h4 className="font-display text-[24px] font-bold text-navy leading-none mb-1">{home.city}</h4>
+                  <div className="font-sans text-[13px] text-navy/70 mb-3">{home.country}</div>
+                  <div className="font-sans text-[13px] text-navy font-medium">
+                    {home.nights} nights · {home.credits} credits
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* 7. Recent Activity */}
+        <div>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="font-sans text-xs font-bold text-navy uppercase tracking-[0.14em]">
+              Recent Activity
+            </h3>
+            <Link href="/dashboard/notifications" className="text-[13px] font-medium text-navy/70 hover:text-navy flex items-center gap-1 transition-colors">
+              View all <ChevronRight size={14} />
+            </Link>
+          </div>
+          
+          <div className="border-t border-[var(--hair)] max-w-3xl">
+            {incoming.slice(0, 3).map((r) => (
+              <div key={r.id} className="flex items-center justify-between py-4 border-b border-[var(--hair)]">
+                <div className="flex items-center gap-3">
+                  <span className="text-[var(--gold)]"><Check size={18} /></span>
+                  <span className="font-sans text-[15px] text-navy">
+                    Swap request {r.status === "COUNTER_OFFERED" ? "countered" : "received"} from {r.requester.fullName}
+                  </span>
+                </div>
+                <span className="font-sans text-[13px] text-navy/50">{fmtDate(r.createdAt)}</span>
+              </div>
+            ))}
+            {incoming.length === 0 && (
+              <div className="py-8 text-[14px] text-navy/60 font-sans italic">
+                No recent activity.
+              </div>
+            )}
+          </div>
+        </div>
+
       </div>
     </div>
   )

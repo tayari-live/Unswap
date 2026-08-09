@@ -87,12 +87,12 @@ function NavDropdown({
         aria-expanded={open}
         aria-haspopup="true"
         className={cn(
-          "inline-flex items-center gap-1.5 text-sm font-medium transition-colors duration-150 py-2",
-          open ? "text-[var(--gold-dark)]" : "text-navy/75 hover:text-[var(--gold-dark)]",
+          "inline-flex items-center gap-1.5 text-sm font-medium transition-colors duration-150 px-2 py-1.5 rounded-md",
+          open ? "text-[var(--gold-dark)] bg-[var(--parchment)]" : "text-navy hover:bg-[var(--parchment)]",
         )}
       >
         {label}
-        <ChevronDown size={15} className={cn("transition-transform duration-150", open && "rotate-180")} />
+        <ChevronDown size={15} className={cn("transition-transform duration-150 text-navy/40", open && "rotate-180")} />
       </button>
 
       {open && (
@@ -115,16 +115,14 @@ function MenuRow({ item, onClick }: { item: Item; onClick: () => void }) {
     <Link
       href={item.href}
       onClick={onClick}
-      className="flex items-start gap-3 px-4 py-3 hover:bg-parchment transition-colors group"
+      className="flex items-start gap-3 px-4 py-3 hover:bg-[var(--parchment)] transition-colors group"
     >
-      <item.icon size={18} strokeWidth={2} className="mt-0.5 flex-shrink-0 text-navy/40 group-hover:text-[var(--gold-dark)] transition-colors" />
+      <item.icon size={18} strokeWidth={1.75} className="mt-0.5 flex-shrink-0 text-navy/60 group-hover:text-[var(--gold-dark)] transition-colors" />
       <span className="flex-1 min-w-0">
         <span className="flex items-center gap-2">
           <span className="text-sm font-medium text-navy">{item.name}</span>
           {!!item.badge && item.badge > 0 && (
-            <span className="min-w-[18px] h-[18px] px-1.5 rounded-full bg-gold text-navy text-[11px] font-bold inline-flex items-center justify-center">
-              {item.badge}
-            </span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--gold)] inline-block flex-shrink-0" title={`${item.badge} unread`} />
           )}
         </span>
         {item.desc && <span className="block text-xs text-navy/50 mt-0.5 leading-snug">{item.desc}</span>}
@@ -207,51 +205,51 @@ export function AppNavbar({
   return (
     <>
       <header className="sticky top-0 z-sticky bg-white border-b border-navy/10">
-        <div className="max-w-[1440px] mx-auto flex items-center gap-6 lg:gap-8 px-6 lg:px-10 h-16 md:h-[72px]">
+        <div className="max-w-[1440px] mx-auto flex items-center gap-6 lg:gap-8 px-6 lg:px-10 h-[72px] md:h-[76px]">
           <button
             type="button"
             onClick={() => setDrawer(true)}
             aria-label="Open menu"
             className="md:hidden -ml-1 p-2 text-navy"
           >
-            <Menu size={22} strokeWidth={2} />
+            <Menu size={22} strokeWidth={1.75} />
           </button>
 
           {/* Permanent brand anchor; returns to the dashboard, not the marketing site. */}
           <Link
             href="/dashboard"
-            className="font-sans text-base font-bold tracking-[0.10em] text-navy hover:text-[var(--gold-dark)] transition-colors whitespace-nowrap"
+            className="font-sans text-base font-bold tracking-[0.10em] text-navy hover:text-[var(--gold-dark)] transition-colors w-[92px] flex-shrink-0"
           >
             UNSWAP
           </Link>
 
           {/* Search sits before Explore on purpose: it serves the visitor who
               already knows what they want, which is the more common case. */}
-          <form onSubmit={submitSearch} className="hidden md:block flex-shrink min-w-0 w-[300px] lg:w-[380px]">
+          <form onSubmit={submitSearch} className="hidden md:block flex-shrink min-w-0 w-[300px] lg:w-[400px]">
             <label htmlFor="app-search" className="sr-only">Search homes, cities or duty stations</label>
             <div className="relative">
-              <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-navy/40 pointer-events-none" />
+              <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/45 pointer-events-none" />
               <input
                 id="app-search"
                 type="search"
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="Search homes, cities or duty stations"
-                className="w-full h-11 pl-10 pr-4 rounded-lg bg-parchment border border-navy/10 text-sm text-navy placeholder:text-navy/40 focus:outline-none focus:border-[var(--gold)] focus:ring-2 focus:ring-[var(--gold)]/25 transition-colors"
+                className="w-full h-[44px] pl-10 pr-4 rounded-lg bg-[var(--navy)] border border-transparent text-sm text-white placeholder:text-white/45 focus:outline-none focus:border-[var(--gold)] focus:ring-1 focus:ring-[var(--gold)] transition-colors"
               />
             </div>
           </form>
 
-          <nav className="hidden md:flex items-center gap-7">
-            <NavDropdown label="Explore" width="w-[320px]">
+          <nav className="hidden md:flex items-center gap-5 lg:gap-7">
+            <NavDropdown label="Explore" width="w-[340px]">
               {(close) => (
                 <div className="py-1.5">
                   {EXPLORE.map((i) => <MenuRow key={i.name} item={i} onClick={close} />)}
                 </div>
               )}
             </NavDropdown>
-
-            <NavDropdown label="My UnSwap" width="w-[300px]">
+            
+            <NavDropdown label="My UnSwap" width="w-[340px]">
               {(close) => (
                 <div className="py-1.5">
                   {MINE.map((i) => <MenuRow key={i.name} item={i} onClick={close} />)}
@@ -264,17 +262,18 @@ export function AppNavbar({
 
           <div className="flex items-center gap-1 sm:gap-2 ml-auto">
             <NotificationBell
-              buttonClassName="relative w-10 h-10 rounded-lg text-navy/60 hover:text-[var(--gold-dark)] hover:bg-parchment flex items-center justify-center transition-colors"
-              panelClassName="absolute right-0 top-full mt-1 w-80 bg-white rounded-[10px] shadow-dropdown border border-navy/10 z-dropdown overflow-hidden"
+              buttonClassName="relative w-10 h-10 rounded-lg text-navy/60 hover:text-[var(--gold-dark)] hover:bg-[var(--parchment)] flex items-center justify-center transition-colors"
+              panelClassName="absolute right-0 top-full mt-1 w-80 bg-white rounded-[12px] shadow-dropdown border border-navy/10 z-dropdown overflow-hidden"
+              dotClassName="absolute top-2.5 right-2.5 w-1.5 h-1.5 rounded-full bg-[var(--gold)]"
             />
 
             <Link
               href="/dashboard/settings"
               aria-label="Help and support"
               title="Help and support"
-              className="hidden sm:inline-flex w-10 h-10 rounded-lg text-navy/60 hover:text-[var(--gold-dark)] hover:bg-parchment items-center justify-center transition-colors"
+              className="hidden sm:inline-flex w-10 h-10 rounded-lg text-navy/60 hover:text-[var(--gold-dark)] hover:bg-[var(--parchment)] items-center justify-center transition-colors"
             >
-              <HelpCircle size={19} strokeWidth={2} />
+              <HelpCircle size={19} strokeWidth={1.75} />
             </Link>
 
             {/* Profile */}
@@ -286,10 +285,10 @@ export function AppNavbar({
                 aria-haspopup="true"
                 className={cn(
                   "inline-flex items-center gap-2 pl-1 pr-1.5 sm:pr-2.5 py-1 rounded-lg transition-colors",
-                  profileOpen ? "bg-parchment" : "hover:bg-parchment",
+                  profileOpen ? "bg-[var(--parchment)]" : "hover:bg-[var(--parchment)] bg-transparent",
                 )}
               >
-                <span className="w-8 h-8 rounded-full bg-navy/5 border border-navy/10 flex items-center justify-center overflow-hidden flex-shrink-0">
+                <span className="w-8 h-8 rounded-full bg-navy/5 flex items-center justify-center overflow-hidden flex-shrink-0">
                   {image ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={image} alt="" className="w-full h-full object-cover" />
@@ -300,11 +299,11 @@ export function AppNavbar({
                 <span className="hidden lg:block text-sm font-medium text-navy max-w-[110px] truncate">
                   {name?.split(" ")[0] || "Member"}
                 </span>
-                <ChevronDown size={14} className={cn("text-navy/40 transition-transform", profileOpen && "rotate-180")} />
+                <ChevronDown size={14} className={cn("text-navy/60 transition-transform", profileOpen && "rotate-180")} />
               </button>
 
               {profileOpen && (
-                <div className="absolute right-0 top-full mt-1 w-[260px] bg-white border border-navy/10 rounded-[10px] shadow-dropdown overflow-hidden z-dropdown">
+                <div className="absolute right-0 top-full mt-1 w-[260px] bg-white border border-navy/10 rounded-[12px] shadow-dropdown overflow-hidden z-dropdown">
                   <div className="px-4 py-3.5 border-b border-navy/10">
                     <div className="text-sm font-semibold text-navy truncate">{name || "Member"}</div>
                     {/* Verification is the network's premise, so it is stated

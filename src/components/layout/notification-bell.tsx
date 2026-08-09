@@ -17,10 +17,11 @@ type Notification = {
 export function NotificationBell({
   panelClassName,
   buttonClassName,
+  dotClassName,
 }: {
-  // Override the dropdown position (e.g. open upward from a sidebar footer).
   panelClassName?: string
   buttonClassName?: string
+  dotClassName?: string
 } = {}) {
   const [open, setOpen] = useState(false)
   const [items, setItems] = useState<Notification[]>([])
@@ -63,9 +64,13 @@ export function NotificationBell({
       >
         <Bell size={20} />
         {unread > 0 && (
-          <span className="absolute -top-1.5 -right-1.5 min-w-4 h-4 px-1 rounded-full bg-[var(--crimson)] text-white text-[10px] font-bold flex items-center justify-center">
-            {unread}
-          </span>
+          dotClassName ? (
+            <span className={dotClassName} title={`${unread} unread`} />
+          ) : (
+            <span className="absolute -top-1.5 -right-1.5 min-w-4 h-4 px-1 rounded-full bg-[var(--crimson)] text-white text-[10px] font-bold flex items-center justify-center">
+              {unread}
+            </span>
+          )
         )}
       </button>
 
