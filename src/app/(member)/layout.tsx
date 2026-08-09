@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation"
 import { auth } from "@/server/auth"
-import { MemberSidebar } from "@/components/layout/member-sidebar"
-import { MobileNav } from "@/components/layout/mobile-nav"
+import { AppNavbar } from "@/components/layout/app-navbar"
 import { AppAssistant } from "@/components/assistant/app-assistant"
 import { CreditCelebration } from "@/components/credits/credit-celebration"
 import { VerificationCelebration } from "@/components/verification/verification-celebration"
@@ -38,17 +37,14 @@ export default async function MemberLayout({
     .toUpperCase()
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[var(--canvas)]">
-      <div className="hidden md:block">
-        <MemberSidebar name={u.name || ""} initials={initials} image={u.image || null} verificationStatus={u.verificationStatus} />
-      </div>
-      {/* Lets keyboard users jump the nav rail, which is otherwise ~11 stops
-          before the page content on every single navigation. */}
+    <div className="min-h-screen bg-[var(--canvas)]">
+      {/* Two dropdowns rather than eleven rail items, so this is a short hop —
+         but still worth offering on every navigation. */}
       <a href="#main" className="sr-only skip-link">Skip to content</a>
-      <main id="main" className="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8 bg-[var(--canvas)]">
+      <AppNavbar name={u.name || ""} initials={initials} image={u.image || null} verificationStatus={u.verificationStatus} />
+      <main id="main" className="max-w-[1440px] mx-auto p-4 md:p-8">
         {children}
       </main>
-      <MobileNav variant="member" />
       <AppAssistant />
       <VerificationCelebration />
       <CreditCelebration />

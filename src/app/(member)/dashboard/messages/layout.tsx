@@ -20,7 +20,7 @@ export default async function MessagesLayout({
   const user = await prisma.user.findUnique({ where: { id: userId } })
   if (user?.verificationStatus !== "FULLY_VERIFIED") {
     return (
-      <div className="flex h-[calc(100vh-10rem)] md:h-[calc(100vh-5.5rem)] -mt-6 -mx-4 md:-mx-8 bg-[var(--surface)] border-t border-[var(--hair)] items-center justify-center p-6">
+      <div className="flex h-[calc(100vh-4rem)] md:h-[calc(100vh-4.5rem)] -m-4 md:-m-8 bg-[var(--surface)] border-t border-[var(--hair)] items-center justify-center p-6">
         <div className="max-w-md w-full bg-[var(--surface)] rounded-md border border-[var(--hair)] p-10 text-center">
           <div className="mx-auto w-14 h-14 rounded-md bg-[var(--surface)] border border-[var(--hair)] text-[var(--gold-dark)] flex items-center justify-center mb-5">
             <ShieldAlert size={26} />

@@ -37,7 +37,7 @@ export function MessagesLayoutShell({
   }, [conversations, query])
 
   return (
-    <div className="flex h-[calc(100vh-10rem)] md:h-[calc(100vh-5.5rem)] -mt-6 -mx-4 md:-mx-8 bg-[var(--surface)] border-t border-[var(--hair)] overflow-hidden relative">
+    <div className="flex h-[calc(100vh-4rem)] md:h-[calc(100vh-4.5rem)] -m-4 md:-m-8 bg-[var(--surface)] border-t border-[var(--hair)] overflow-hidden relative">
       {/* Left Pane - List of Conversations */}
       <div 
         className={`w-full md:w-[320px] lg:w-[340px] flex-shrink-0 border-r border-[var(--hair)] flex flex-col bg-[var(--chat-bg)] z-10 ${
