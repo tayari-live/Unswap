@@ -1,11 +1,10 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { PlusCircle, Home, ShieldAlert } from "lucide-react"
+import { Home, ShieldAlert } from "lucide-react"
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
 import { listMemberListings } from "@/server/services/listings"
-import { LuxPageHeader } from "@/components/ui/lux"
-import { PageTip } from "@/components/ui/page-tip"
+
 import { ListingsClient } from "./listings-client"
 
 export const dynamic = "force-dynamic"
@@ -24,39 +23,80 @@ export default async function MyListingsPage() {
   const canPublish = user?.verificationStatus !== "PENDING_EMAIL"
 
   return (
-    <div className="max-w-6xl mx-auto pb-12">
-      <div className="flex items-center justify-between gap-4">
-        <LuxPageHeader eyebrow="Your Homes" title="My Listings" subtitle="Create and manage the homes you offer for exchange." />
-      <PageTip id="listings">Add the homes you are willing to offer. You can prepare a listing at any time and publish it once you are fully verified.</PageTip>
+    <div className="max-w-[1440px] mx-auto px-6 lg:px-10 pt-12 pb-20">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+        <div>
+          <h1 className="font-display text-4xl md:text-[48px] font-bold text-navy tracking-tight leading-none mb-3">
+            My Homes
+          </h1>
+          <p className="font-sans text-sm md:text-[15px] text-navy/65 max-w-xl">
+            Manage the homes you've made available to the UnSwap network.
+          </p>
+        </div>
         <Link
           href="/dashboard/listings/new"
-          className="flex-shrink-0 inline-flex items-center gap-2 text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] px-4 py-2.5 rounded-xl transition-colors"
+          className="flex-shrink-0 inline-flex items-center justify-center gap-2 text-[13px] font-bold uppercase tracking-[0.08em] text-navy bg-[var(--gold)] hover:bg-white px-6 py-3 rounded-md transition-colors shadow-sm"
         >
-          <PlusCircle size={17} /> Add listing
+          + List a Home
         </Link>
       </div>
 
+      {/* Stats Strip */}
+      <div className="flex flex-wrap lg:flex-nowrap gap-y-8 mb-16">
+        <div className="w-1/2 lg:w-1/4 group lg:pr-8">
+          <div className="font-display text-[32px] md:text-[40px] font-bold text-navy leading-none mb-1">
+            {listings.length}
+          </div>
+          <div className="flex flex-col">
+            <span className="font-sans text-[11px] font-medium text-[var(--gold)] uppercase tracking-[0.12em]">Listed</span>
+            <span className="font-sans text-[13px] text-navy/60 mt-1">homes</span>
+          </div>
+        </div>
+        
+        <div className="w-1/2 lg:w-1/4 group lg:px-8 lg:border-l border-[var(--hair)]">
+          <div className="font-display text-[32px] md:text-[40px] font-bold text-navy leading-none mb-1">
+            {listings.filter(l => l.status === "ACTIVE").length}
+          </div>
+          <div className="flex flex-col">
+            <span className="font-sans text-[11px] font-medium text-[var(--gold)] uppercase tracking-[0.12em]">Active</span>
+            <span className="font-sans text-[13px] text-navy/60 mt-1">listings</span>
+          </div>
+        </div>
+        
+        <div className="w-1/2 lg:w-1/4 group lg:px-8 lg:border-l border-[var(--hair)]">
+          <div className="font-display text-[32px] md:text-[40px] font-bold text-navy leading-none mb-1">
+            {listings.filter(l => l.status === "DRAFT" || l.status === "PAUSED").length}
+          </div>
+          <div className="flex flex-col">
+            <span className="font-sans text-[11px] font-medium text-[var(--gold)] uppercase tracking-[0.12em]">Pending</span>
+            <span className="font-sans text-[13px] text-navy/60 mt-1">review</span>
+          </div>
+        </div>
+      </div>
+
       {!canPublish && (
-        <div className="flex items-center gap-3 rounded-md border border-[var(--gold)]/40 bg-[var(--parchment)] p-4 mb-6">
+        <div className="flex items-center gap-4 bg-[var(--gold)]/10 border border-transparent px-6 py-4 rounded-lg mb-12">
           <ShieldAlert size={20} className="text-[var(--gold-dark)] flex-shrink-0" />
-          <p className="text-sm text-neutral-dark">
+          <p className="font-sans text-[14px] text-navy/80 leading-snug">
             Confirm your email address to publish your listings to the network. You can create and edit drafts in the meantime.
           </p>
         </div>
       )}
 
       {listings.length === 0 ? (
-        <div className="bg-surface rounded-md border border-[var(--hair)] p-12 text-center">
-          <div className="mx-auto w-14 h-14 rounded-md bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center mb-4">
-            <Home size={26} />
+        <div className="bg-white rounded-lg border border-[var(--hair)] p-12 text-center max-w-2xl mx-auto mt-8 shadow-sm">
+          <div className="mx-auto w-16 h-16 rounded-full bg-[var(--parchment)] text-[var(--gold-dark)] flex items-center justify-center mb-6">
+            <Home size={28} strokeWidth={1.5} />
           </div>
-          <h2 className="font-sans text-xl font-semibold text-[var(--fg)]">No listings yet</h2>
-          <p className="mt-2 text-sm text-neutral">Add your first home to start exchanging with vetted peers.</p>
+          <h2 className="font-display text-[32px] font-bold text-navy mb-3 leading-tight">Your home can open a door for someone else.</h2>
+          <p className="font-sans text-[15px] text-navy/65 mb-8 max-w-md mx-auto">
+            List a home and earn credits that you can use to stay in another member's home across the UnSwap network.
+          </p>
           <Link
             href="/dashboard/listings/new"
-            className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] px-5 py-3 rounded-xl transition-colors"
+            className="inline-flex items-center justify-center text-[13px] font-bold uppercase tracking-[0.08em] text-navy bg-[var(--gold)] hover:bg-navy hover:text-white px-8 py-3.5 rounded-md transition-colors shadow-sm"
           >
-            <PlusCircle size={17} /> Add listing
+            List Your First Home
           </Link>
         </div>
       ) : (

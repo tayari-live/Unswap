@@ -5,12 +5,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
   Home,
-  MapPin,
-  Pencil,
   Trash2,
-  PlayCircle,
-  PauseCircle,
-  Archive,
 } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
 
@@ -33,10 +28,10 @@ type Listing = {
 }
 
 const STATUS_STYLE: Record<string, string> = {
-  DRAFT: "bg-neutral-light text-neutral-dark",
-  ACTIVE: "bg-[var(--teal)]/15 text-[var(--teal)]",
-  PAUSED: "bg-[var(--gold)]/15 text-[var(--gold-dark)]",
-  ARCHIVED: "bg-neutral-light text-neutral",
+  ACTIVE: "bg-[var(--gold)] text-navy", // Gold/soft gold treatment
+  DRAFT: "bg-[var(--parchment-dark)] text-navy", // Parchment/neutral
+  PAUSED: "bg-navy/10 text-navy/70", // Muted Navy/grey
+  ARCHIVED: "bg-navy/10 text-navy/70",
 }
 
 export function ListingsClient({
@@ -87,73 +82,77 @@ export function ListingsClient({
     }
   }
 
-  const btn =
-    "inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
-
   return (
-    <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {listings.map((l) => {
-          const busy = busyId === l.id
-          return (
-            <div key={l.id} className="bg-surface rounded-md border border-[var(--hair)] overflow-hidden flex flex-col">
-              <div className="relative h-40 bg-[var(--background)]">
-                {l.photos[0] ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={`/api/photos/${l.photos[0].id}`} alt={l.title} loading="lazy" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-neutral/40">
-                    <Home size={32} />
-                  </div>
-                )}
-                <span className={`absolute top-3 left-3 text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full ${STATUS_STYLE[l.status] ?? STATUS_STYLE.DRAFT}`}>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {listings.map((l) => {
+        const busy = busyId === l.id
+        return (
+          <div key={l.id} className="bg-white rounded-[10px] overflow-hidden border border-[var(--hair)] shadow-sm flex flex-col group">
+            {/* Image Header */}
+            <div className="relative aspect-[4/3] bg-navy/5 overflow-hidden">
+              {l.photos[0] ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={`/api/photos/${l.photos[0].id}`} alt={l.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-navy/20">
+                  <Home size={32} />
+                </div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
+              <div className="absolute top-4 left-4">
+                <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.1em] px-3 py-1.5 rounded-full ${STATUS_STYLE[l.status] ?? STATUS_STYLE.DRAFT}`}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-current opacity-70" />
                   {l.status}
                 </span>
               </div>
+            </div>
 
-              <div className="p-4 flex-1 flex flex-col">
-                <h3 className="font-sans font-semibold text-[var(--fg)] leading-snug">{l.title}</h3>
-                <div className="flex items-center gap-1.5 text-xs text-neutral mt-1">
-                  <MapPin size={13} /> {l.city}, {l.country}
-                </div>
-                <div className="text-xs text-neutral mt-1">
-                  {l.propertyType} · {l.bedrooms} {l.bedrooms === 1 ? "bedroom" : "bedrooms"}
-                </div>
+            {/* Body */}
+            <div className="p-6 flex-1 flex flex-col">
+              <h3 className="font-display text-[26px] font-bold text-navy leading-none mb-2">{l.title}</h3>
+              <div className="font-sans text-[15px] text-navy/70 mb-5">
+                {l.city}, {l.country}
+              </div>
+              
+              <div className="flex flex-wrap items-center gap-4 font-sans text-[13px] text-navy font-medium mb-6">
+                <span>{l.bedrooms} {l.bedrooms === 1 ? "bedroom" : "bedrooms"}</span>
+                <span className="w-1 h-1 rounded-full bg-navy/20" />
+                <span>{l.propertyType}</span>
+              </div>
 
-                <div className="mt-4 pt-3 border-t border-[var(--hair)] flex flex-wrap items-center gap-2">
-                  <Link href={`/dashboard/listings/${l.id}/edit`} className={`${btn} text-[var(--fg)] bg-neutral-light hover:bg-[var(--border)]`}>
-                    <Pencil size={13} /> Edit
+              {/* Actions Footer */}
+              <div className="mt-auto pt-5 border-t border-[var(--hair)] flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <Link href={`/dashboard/listings/${l.id}/edit`} className="inline-flex items-center justify-center text-[12px] font-bold uppercase tracking-[0.08em] text-navy bg-white border border-navy/10 hover:bg-[var(--parchment)] px-5 py-2.5 rounded transition-colors shadow-sm">
+                    Edit
                   </Link>
+                  <button disabled={busy} onClick={() => remove(l.id)} className="inline-flex items-center justify-center text-navy/40 hover:text-[var(--crimson)] px-3 py-2.5 rounded transition-colors" title="Delete">
+                    <Trash2 size={16} />
+                  </button>
+                </div>
 
+                <div className="flex items-center gap-2">
                   {(l.status === "DRAFT" || l.status === "PAUSED" || l.status === "ARCHIVED") && (
                     <button
                       disabled={busy || !canPublish}
                       onClick={() => setStatus(l.id, "ACTIVE")}
-                      title={canPublish ? "Publish" : "Confirm your email to publish"}
-                      className={`${btn} text-white bg-[var(--teal)] hover:opacity-90`}
+                      title={canPublish ? "Publish to network" : "Confirm your email to publish"}
+                      className="inline-flex items-center justify-center text-[12px] font-bold uppercase tracking-[0.08em] text-navy bg-[var(--gold)] hover:bg-[var(--gold-dark)] disabled:opacity-50 px-5 py-2.5 rounded transition-colors shadow-sm"
                     >
-                      <PlayCircle size={13} /> Publish
+                      Publish
                     </button>
                   )}
                   {l.status === "ACTIVE" && (
-                    <button disabled={busy} onClick={() => setStatus(l.id, "PAUSED")} className={`${btn} text-[var(--gold-dark)] bg-[var(--gold)]/15 hover:bg-[var(--gold)]/25`}>
-                      <PauseCircle size={13} /> Pause
+                    <button disabled={busy} onClick={() => setStatus(l.id, "PAUSED")} className="inline-flex items-center justify-center text-[12px] font-bold uppercase tracking-[0.08em] text-navy bg-[var(--parchment-dark)] hover:bg-navy/10 px-5 py-2.5 rounded transition-colors shadow-sm">
+                      Pause
                     </button>
                   )}
-                  {l.status !== "ARCHIVED" && (
-                    <button disabled={busy} onClick={() => setStatus(l.id, "ARCHIVED")} className={`${btn} text-neutral-dark bg-neutral-light hover:bg-[var(--border)]`}>
-                      <Archive size={13} /> Archive
-                    </button>
-                  )}
-                  <button disabled={busy} onClick={() => remove(l.id)} className={`${btn} text-[var(--crimson)] bg-[var(--crimson)]/10 hover:bg-[var(--crimson)]/20 ml-auto`}>
-                    <Trash2 size={13} />
-                  </button>
                 </div>
               </div>
             </div>
-          )
-        })}
-      </div>
-    </>
+          </div>
+        )
+      })}
+    </div>
   )
 }

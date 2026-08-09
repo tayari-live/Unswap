@@ -1,131 +1,44 @@
 import { redirect } from "next/navigation"
-import {
-  MapPin, Calendar, Users, FileDown, Home as HomeIcon, CalendarCheck,
-} from "lucide-react"
 import { auth } from "@/server/auth"
 import { listMemberExchanges } from "@/server/services/swaps"
-import { pendingReviewsFor } from "@/server/services/reviews"
-import { LuxPageHeader } from "@/components/ui/lux"
-import { PageTip } from "@/components/ui/page-tip"
-import { ReviewAction } from "./review-action"
+import { ExchangesClient } from "./exchanges-client"
 
 export const dynamic = "force-dynamic"
-
-const STATUS_STYLE: Record<string, string> = {
-  CONFIRMED: "bg-[var(--teal)]/15 text-[var(--teal)]",
-  IN_PROGRESS: "bg-[var(--teal)]/15 text-[var(--teal)]",
-  COMPLETED: "bg-neutral-light text-neutral-dark",
-}
-
-function fmt(d: Date) {
-  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(d)
-}
-function nights(a: Date, b: Date) {
-  return Math.max(0, Math.round((b.getTime() - a.getTime()) / 86_400_000))
-}
-
-type Row = Awaited<ReturnType<typeof listMemberExchanges>>["upcoming"][number]
-
-function ExchangeCard({ r, review }: { r: Row; review?: { aboutHost: boolean } }) {
-  return (
-    <div className="bg-surface rounded-md border border-[var(--hair)] overflow-hidden flex flex-col sm:flex-row">
-      <div className="relative sm:w-48 h-40 sm:h-auto flex-shrink-0 bg-[var(--background)]">
-        {r.listing.photos[0] ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={`/api/photos/${r.listing.photos[0].id}`} alt={r.listing.title} loading="lazy" className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-neutral/30"><HomeIcon size={28} /></div>
-        )}
-      </div>
-      <div className="flex-1 p-5">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <span className="text-[10px] font-bold uppercase tracking-wide text-[var(--gold-dark)]">
-              {r.role === "host" ? "You're hosting" : "You're staying"}
-            </span>
-            <h3 className="font-sans text-xl font-semibold text-[var(--fg)] leading-snug">{r.listing.title}</h3>
-            <div className="flex items-center gap-1.5 text-xs text-neutral mt-0.5">
-              <MapPin size={13} /> {r.listing.city}, {r.listing.country}
-            </div>
-          </div>
-          <span className={`text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full flex-shrink-0 ${STATUS_STYLE[r.status] ?? STATUS_STYLE.CONFIRMED}`}>
-            {r.status.replace("_", " ")}
-          </span>
-        </div>
-
-        <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-xs text-neutral">
-          <span className="inline-flex items-center gap-1.5">
-            <span className="w-6 h-6 rounded-full bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center text-[10px] font-bold">{r.other.avatarInitials}</span>
-            {r.role === "host" ? "Guest" : "Host"}: {r.other.fullName}
-          </span>
-          <span className="inline-flex items-center gap-1.5"><Calendar size={13} /> {fmt(r.startDate)} – {fmt(r.endDate)} · {nights(r.startDate, r.endDate)} nights</span>
-          <span className="inline-flex items-center gap-1.5"><Users size={13} /> {r.guests} {r.guests === 1 ? "guest" : "guests"}</span>
-        </div>
-
-        <div className="mt-4 pt-3 border-t border-[var(--hair)] flex flex-wrap items-center gap-2">
-          <a
-            href={`/api/swaps/${r.id}/agreement`}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--fg)] bg-neutral-light hover:bg-[var(--border)] px-3 py-2 rounded-lg transition-colors"
-          >
-            <FileDown size={14} /> Download Swap Agreement
-          </a>
-          {review && (
-            <ReviewAction swapId={r.id} aboutHost={review.aboutHost} otherName={r.other.fullName} />
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
 
 export default async function ExchangesPage() {
   const session = await auth()
   const userId = (session?.user as any)?.id as string | undefined
   if (!userId) redirect("/login")
 
-  const [{ upcoming, past }, pending] = await Promise.all([
-    listMemberExchanges(userId),
-    pendingReviewsFor(userId),
-  ])
-  const reviewable = new Map(pending.map((p) => [p.swapId, p.aboutHost]))
+  const { upcoming, past } = await listMemberExchanges(userId)
+
+  // Serialize dates for client
+  const toRow = (s: any) => ({
+    id: s.id,
+    status: s.status,
+    role: s.role,
+    startDate: s.startDate.toISOString(),
+    endDate: s.endDate.toISOString(),
+    guests: s.guests,
+    listing: { title: s.listing.title, city: s.listing.city, country: s.listing.country, photos: s.listing.photos },
+    other: { id: s.other.id, fullName: s.other.fullName, avatarInitials: s.other.avatarInitials, organisation: s.other.organisation },
+  })
 
   return (
-    <div className="max-w-4xl mx-auto pb-12">
-      <LuxPageHeader eyebrow="Exchanges" title="My Exchanges" subtitle="Your confirmed and completed home exchanges." />
-      <PageTip id="exchanges">Confirmed and completed exchanges appear here. After a stay, leave a review to build your trust score.</PageTip>
+    <div className="max-w-[1000px] mx-auto px-6 lg:px-10 pt-12 pb-20">
+      <div className="mb-12">
+        <h1 className="font-display text-4xl md:text-[48px] font-bold text-navy tracking-tight leading-none mb-3">
+          My Exchanges
+        </h1>
+        <p className="font-sans text-sm md:text-[15px] text-navy/65 max-w-xl">
+          Your confirmed and completed home exchanges.
+        </p>
+      </div>
 
-      {upcoming.length === 0 && past.length === 0 ? (
-        <div className="bg-surface rounded-md border border-[var(--hair)] p-12 text-center">
-          <div className="mx-auto w-14 h-14 rounded-md bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center mb-4">
-            <CalendarCheck size={26} />
-          </div>
-          <h2 className="font-sans text-xl font-semibold text-[var(--fg)]">No exchanges yet</h2>
-          <p className="mt-2 text-sm text-neutral">Once a swap request is accepted, it appears here with its agreement.</p>
-        </div>
-      ) : (
-        <div className="space-y-8">
-          {upcoming.length > 0 && (
-            <section>
-              <h2 className="font-sans font-semibold text-xl text-[var(--fg)] mb-3">Upcoming & ongoing</h2>
-              <div className="space-y-4">{upcoming.map((r) => <ExchangeCard key={r.id} r={r} />)}</div>
-            </section>
-          )}
-          {past.length > 0 && (
-            <section>
-              <h2 className="font-sans font-semibold text-xl text-[var(--fg)] mb-3">Past exchanges</h2>
-              <div className="space-y-4">{past.map((r) => (
-                <ExchangeCard
-                  key={r.id}
-                  r={r}
-                  review={reviewable.has(r.id) ? { aboutHost: reviewable.get(r.id)! } : undefined}
-                />
-              ))}</div>
-            </section>
-          )}
-        </div>
-      )}
+      <ExchangesClient
+        upcoming={upcoming.map(toRow)}
+        past={past.map(toRow)}
+      />
     </div>
   )
 }

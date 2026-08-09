@@ -1,0 +1,140 @@
+import { notFound, redirect } from "next/navigation"
+import Link from "next/link"
+import { Calendar, Users, ChevronLeft, MapPin } from "lucide-react"
+import { auth } from "@/server/auth"
+import { prisma } from "@/server/prisma"
+import { SwapDetailClient } from "./swap-detail-client"
+
+export const dynamic = "force-dynamic"
+
+function fmt(d: Date) {
+  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(d)
+}
+function nights(a: Date, b: Date) {
+  return Math.max(0, Math.round((b.getTime() - a.getTime()) / 86_400_000))
+}
+
+export default async function SwapDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const session = await auth()
+  const userId = (session?.user as any)?.id as string | undefined
+  if (!userId) redirect("/login")
+
+  const swap = await prisma.swapRequest.findUnique({
+    where: { id },
+    include: {
+      listing: {
+        include: { photos: { take: 1 } }
+      },
+      requester: true,
+      host: true,
+    }
+  })
+
+  if (!swap) return notFound()
+  if (swap.hostId !== userId && swap.requesterId !== userId) return notFound()
+
+  const isIncoming = swap.hostId === userId
+  const other = isIncoming ? swap.requester : swap.host
+  
+  // Serialize for client
+  const sData = {
+    id: swap.id,
+    status: swap.status,
+    startDate: swap.startDate.toISOString(),
+    endDate: swap.endDate.toISOString(),
+  }
+
+  return (
+    <div className="max-w-[800px] mx-auto px-6 lg:px-10 pt-12 pb-32">
+      <div className="mb-8">
+        <Link href="/dashboard/swaps" className="inline-flex items-center gap-2 font-sans text-[13px] font-bold uppercase tracking-[0.08em] text-[var(--gold-dark)] hover:text-navy transition-colors">
+          <ChevronLeft size={16} /> Back to Requests
+        </Link>
+      </div>
+
+      <div className="mb-10">
+        <div className="text-[10px] font-bold uppercase tracking-[0.1em] text-navy/40 mb-3">
+          {isIncoming ? "Incoming Request" : "Outgoing Request"}
+        </div>
+        <h1 className="font-display text-[40px] md:text-[48px] font-bold text-navy leading-none mb-4">
+          {isIncoming ? (
+            <>{other.firstName} wants to stay at your home</>
+          ) : (
+            <>{swap.listing.city || swap.listing.title}</>
+          )}
+        </h1>
+        {!isIncoming && (
+          <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.1em] px-3 py-1.5 rounded-full bg-[var(--gold)]/10 text-[var(--gold-dark)] mt-2">
+            Awaiting host response
+          </div>
+        )}
+      </div>
+
+      {/* Property Hero */}
+      <div className="w-full aspect-[21/9] bg-navy/5 rounded-[12px] overflow-hidden relative mb-12 shadow-sm">
+        {swap.listing.photos[0] ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={`/api/photos/${swap.listing.photos[0].id}`} alt={swap.listing.title} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-navy/20">
+            <MapPin size={48} />
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        <div className="absolute bottom-6 left-6 text-white">
+          <div className="font-display text-[32px] font-bold leading-none mb-1">{isIncoming ? "YOUR HOME" : swap.listing.title}</div>
+          <div className="font-sans text-[15px] text-white/80">{swap.listing.city}, {swap.listing.country}</div>
+        </div>
+      </div>
+
+      {/* Member Profile */}
+      <div className="mb-12 border-b border-[var(--hair)] pb-12">
+        <h3 className="font-sans text-xs font-bold text-navy uppercase tracking-[0.14em] mb-6">
+          {isIncoming ? "Requester" : "Host"}
+        </h3>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <span className="w-14 h-14 rounded-full bg-[var(--parchment-dark)] text-[var(--gold-dark)] flex items-center justify-center text-xl font-bold">
+              {other.firstName?.[0]}{other.lastName?.[0]}
+            </span>
+            <div className="flex flex-col">
+              <span className="font-display text-[24px] font-bold text-navy leading-none mb-1">{other.firstName}</span>
+              <span className="font-sans text-[14px] text-navy/60">{other.organisation || "Verified Member"}</span>
+            </div>
+          </div>
+          <Link href={`/dashboard/browse`} className="inline-flex items-center justify-center text-[12px] font-bold uppercase tracking-[0.08em] text-navy bg-[var(--parchment)] hover:bg-[var(--parchment-dark)] px-5 py-2.5 rounded transition-colors">
+            View Profile &rarr;
+          </Link>
+        </div>
+      </div>
+
+      {/* Request Details */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12 border-b border-[var(--hair)] pb-12">
+        <div>
+          <h3 className="font-sans text-xs font-bold text-navy uppercase tracking-[0.14em] mb-6">
+            Request Details
+          </h3>
+          <div className="flex flex-col gap-3 font-sans text-[16px] text-navy font-medium">
+            <span className="flex items-center gap-3"><Calendar size={18} className="text-[var(--gold-dark)]" /> {fmt(swap.startDate)} — {fmt(swap.endDate)}</span>
+            <span className="flex items-center gap-3"><Users size={18} className="text-[var(--gold-dark)]" /> {swap.guests} guests</span>
+            <span className="flex items-center gap-3 ml-[30px]">{nights(swap.startDate, swap.endDate)} nights · {swap.mode === "credits" ? `${nights(swap.startDate, swap.endDate)} credits` : "Direct Swap"}</span>
+          </div>
+        </div>
+
+        {swap.message && (
+          <div>
+            <h3 className="font-sans text-xs font-bold text-navy uppercase tracking-[0.14em] mb-6">
+              Message from {other.firstName}
+            </h3>
+            <p className="font-sans text-[15px] text-navy/80 leading-relaxed italic border-l-2 border-[var(--gold)] pl-4">
+              "{swap.message}"
+            </p>
+          </div>
+        )}
+      </div>
+
+      <SwapDetailClient swap={sData} isIncoming={isIncoming} />
+    </div>
+  )
+}
