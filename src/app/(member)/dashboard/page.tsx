@@ -10,11 +10,11 @@ import {
   Check,
   Star,
   ChevronRight,
-  PlusCircle,
   Search,
 } from "lucide-react"
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
+import { cn } from "@/lib/utils"
 import { LuxPageHeader, SectionLabel } from "@/components/ui/lux"
 import { ResendEmailButton } from "@/components/ui/resend-email-button"
 import { PROFILE_COMPLETE_AT } from "@/server/services/profile"
@@ -185,7 +185,9 @@ export default async function MemberDashboardPage() {
             </div>
             <div className="flex flex-col">
               <span className="font-sans text-[11px] font-medium text-[var(--gold)] uppercase tracking-[0.12em]">Credits</span>
-              <span className="font-sans text-[13px] text-navy/60">available</span>
+              <span className="font-sans text-[13px] text-navy/60 mt-1 pr-2">
+                {credits === 0 ? "Earn credits by hosting homes." : `Enough for up to ${credits} nights.`}
+              </span>
             </div>
           </Link>
           
@@ -196,7 +198,9 @@ export default async function MemberDashboardPage() {
             </div>
             <div className="flex flex-col">
               <span className="font-sans text-[11px] font-medium text-[var(--gold)] uppercase tracking-[0.12em]">My Homes</span>
-              <span className="font-sans text-[13px] text-navy/60">listed</span>
+              <span className="font-sans text-[13px] text-navy/60 mt-1 pr-2">
+                {activeListings === 0 ? "List a home to start." : `${activeListings} listed propert${activeListings === 1 ? "y" : "ies"}.`}
+              </span>
             </div>
           </Link>
           
@@ -207,7 +211,9 @@ export default async function MemberDashboardPage() {
             </div>
             <div className="flex flex-col">
               <span className="font-sans text-[11px] font-medium text-[var(--gold)] uppercase tracking-[0.12em]">Active Swaps</span>
-              <span className="font-sans text-[13px] text-navy/60">active</span>
+              <span className="font-sans text-[13px] text-navy/60 mt-1 pr-2">
+                {upcoming.length === 0 ? "No active stays." : `${upcoming.length} upcoming or in-progress.`}
+              </span>
             </div>
           </Link>
           
@@ -218,7 +224,7 @@ export default async function MemberDashboardPage() {
             </div>
             <div className="flex flex-col">
               <span className="font-sans text-[11px] font-medium text-[var(--gold)] uppercase tracking-[0.12em]">Messages</span>
-              <span className="font-sans text-[13px] text-navy/60">unread</span>
+              <span className="font-sans text-[13px] text-navy/60 mt-1 pr-2">Check your inbox.</span>
             </div>
           </Link>
         </div>
@@ -264,74 +270,115 @@ export default async function MemberDashboardPage() {
           <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-gradient-to-l from-white/5 to-transparent pointer-events-none" />
         </div>
 
-        {/* Layout Grid for Next Steps & Upcoming */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-16">
-          
-          {/* 4. Next Steps */}
-          {showChecklist && (
-            <div className="lg:col-span-5">
-              <h3 className="font-sans text-xs font-bold text-navy uppercase tracking-[0.14em] mb-4">
-                Your Next Steps
-              </h3>
-              <div className="border-t border-[var(--hair)]">
-                {checklist.map((s, i) => (
-                  <div key={i} className="flex items-center justify-between py-4 border-b border-[var(--hair)] group">
-                    <div className="flex items-center gap-4">
-                      <span className={`flex-shrink-0 ${s.done ? "text-[var(--gold)]" : "text-navy/30"}`}>
-                        {s.done ? <Check size={18} strokeWidth={2.5} /> : <div className="w-[18px] h-[18px] rounded-full border-2 border-current" />}
-                      </span>
-                      <span className={`font-sans text-[15px] ${s.done ? "text-navy/60" : "text-navy font-medium"}`}>
-                        {s.title}
-                      </span>
+        {/* 4. Upcoming Exchanges (Conditional) */}
+        {upcoming.length > 0 ? (
+          <div className="mb-16">
+            <h3 className="font-sans text-xs font-bold text-navy uppercase tracking-[0.14em] mb-4">
+              Upcoming Exchanges
+            </h3>
+            <div className="border-t border-[var(--hair)] pt-6">
+              {upcoming.map((r) => (
+                <div key={r.id} className="flex flex-col md:flex-row md:items-center justify-between pb-6 mb-6 border-b border-[var(--hair)] group last:border-0 last:mb-0 last:pb-0">
+                  <div className="flex flex-col mb-4 md:mb-0">
+                    <div className="font-display text-[26px] md:text-[32px] text-navy font-bold leading-none mb-2">
+                      {r.listing.city || r.listing.title} <span className="font-sans text-[18px] text-navy/60 font-normal">· {r.listing.country || "UnSwap"}</span>
                     </div>
-                    {!s.done && s.href && (
-                      <Link href={s.href} className="text-[13px] font-medium text-[var(--gold-dark)] hover:text-navy transition-colors flex items-center gap-1 opacity-0 group-hover:opacity-100 focus:opacity-100">
-                        {s.action} <ChevronRight size={14} />
-                      </Link>
-                    )}
-                    {s.done && (
-                      <span className="text-[13px] text-navy/40">Complete</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 5. Upcoming Swap */}
-          {upcoming.length > 0 && (
-            <div className={showChecklist ? "lg:col-span-7" : "lg:col-span-12"}>
-              <h3 className="font-sans text-xs font-bold text-navy uppercase tracking-[0.14em] mb-4">
-                Your Upcoming Stay
-              </h3>
-              {upcoming.slice(0, 1).map((r) => (
-                <div key={r.id} className="bg-[var(--navy)] rounded-lg p-8 relative overflow-hidden flex flex-col justify-between h-[220px]">
-                  <div>
-                    <h4 className="font-display text-[32px] text-[var(--gold)] font-bold leading-none mb-2">{r.listing.title}</h4>
-                    <div className="font-sans text-white/80 text-[14px]">
-                      {fmtDate(r.startDate)} — {fmtDate(r.endDate)}
-                    </div>
-                    <div className="font-sans text-white/60 text-[13px] mt-1">
-                      {nights(r.startDate, r.endDate)} nights · {r.mode === "credits" ? `${nights(r.startDate, r.endDate)} credits` : "Direct Swap"}
+                    <div className="font-sans text-[15px] text-navy/80">
+                      {fmtDate(r.startDate)} – {fmtDate(r.endDate)} · {nights(r.startDate, r.endDate)} nights
                     </div>
                   </div>
-                  
-                  <div className="flex items-center justify-between mt-6">
-                    <Link
-                      href={`/dashboard/swaps`}
-                      className="inline-flex items-center px-4 py-2 rounded border border-white/20 text-white font-sans text-[11px] font-bold uppercase tracking-[0.1em] hover:bg-white hover:text-navy transition-colors"
-                    >
-                      View Swap
-                    </Link>
-                    <span className="font-sans text-[11px] font-bold text-[var(--gold)] uppercase tracking-[0.1em]">
-                      {Math.max(0, Math.ceil((r.startDate.getTime() - Date.now()) / 86400000))} Days to go
+                  <div className="flex items-center gap-6">
+                    <span className="font-sans text-[11px] font-bold uppercase tracking-[0.12em] px-3 py-1.5 bg-[var(--parchment-dark)] text-navy rounded-full">
+                      Confirmed
                     </span>
+                    <Link href="/dashboard/swaps" className="text-[13px] font-medium text-[var(--gold-dark)] hover:text-navy transition-colors flex items-center gap-1">
+                      View exchange <ChevronRight size={14} />
+                    </Link>
                   </div>
                 </div>
               ))}
             </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div className="mb-16">
+            <h3 className="font-sans text-xs font-bold text-navy uppercase tracking-[0.14em] mb-4">
+              Upcoming Exchanges
+            </h3>
+            <div className="border-t border-[var(--hair)] py-8">
+              <p className="font-sans text-[15px] text-navy/70 mb-2">No upcoming exchanges yet.</p>
+              <Link href="/dashboard/browse" className="text-[14px] font-medium text-[var(--gold-dark)] hover:text-navy transition-colors">
+                Explore homes to find your next stay &rarr;
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {/* 5. Swap Requests (Conditional) */}
+        {incoming.length > 0 && (
+          <div className="mb-16">
+            <h3 className="font-sans text-xs font-bold text-navy uppercase tracking-[0.14em] mb-4">
+              Swap Requests
+            </h3>
+            <div className="border-t border-[var(--hair)] pt-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between">
+                <div className="flex flex-col mb-4 md:mb-0">
+                  <div className="font-display text-[24px] text-navy font-bold leading-none mb-2">
+                    {incoming.length} incoming request{incoming.length > 1 ? "s" : ""}
+                  </div>
+                  <div className="font-sans text-[15px] text-navy/80">
+                    {incoming.length === 1 
+                      ? `Someone wants to stay at your home in ${incoming[0].listing.city || incoming[0].listing.title}.`
+                      : "Multiple members have requested to stay at your homes."}
+                  </div>
+                </div>
+                <Link href="/dashboard/swaps" className="inline-flex items-center justify-center px-6 py-2.5 rounded-md bg-[var(--navy)] text-white font-sans font-bold text-[12px] uppercase tracking-[0.08em] hover:bg-navy/90 transition-colors shadow-sm">
+                  Review requests <ChevronRight size={14} className="ml-1" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 6. Your Next Steps (Conditional) */}
+        {showChecklist && !isVerified && (
+          <div className="mb-16">
+            <h3 className="font-sans text-xs font-bold text-navy uppercase tracking-[0.14em] mb-4">
+              Your Next Steps
+            </h3>
+            <div className="border-t border-[var(--hair)] max-w-3xl">
+              {checklist.map((s, i) => {
+                const isVerify = s.title === "Verify your identity";
+                return (
+                  <div key={i} className={cn("flex items-start sm:items-center justify-between py-5 border-b border-[var(--hair)] group", isVerify && !s.done && "bg-[var(--gold)]/10 -mx-4 px-4 sm:-mx-6 sm:px-6 rounded-lg mt-2 border-transparent")}>
+                    <div className="flex items-start sm:items-center gap-4">
+                      <span className={`flex-shrink-0 mt-0.5 sm:mt-0 ${s.done ? "text-[var(--gold)]" : (isVerify ? "text-[var(--gold-dark)]" : "text-navy/30")}`}>
+                        {s.done ? <Check size={18} strokeWidth={2.5} /> : (isVerify ? <Star size={18} fill="currentColor" /> : <div className="w-[18px] h-[18px] rounded-full border-2 border-current" />)}
+                      </span>
+                      <div className="flex flex-col">
+                        <span className={`font-sans text-[15px] ${s.done ? "text-navy/60" : "text-navy font-bold"}`}>
+                          {s.title}
+                        </span>
+                        {isVerify && !s.done && (
+                          <span className="font-sans text-[14px] text-navy/70 mt-1 leading-snug">
+                            Required to access the full UnSwap network.
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    {!s.done && s.href && (
+                      <Link href={s.href} className="flex-shrink-0 text-[13px] font-bold text-[var(--gold-dark)] hover:text-navy transition-colors flex items-center gap-1 mt-1 sm:mt-0">
+                        {s.action} <ChevronRight size={14} />
+                      </Link>
+                    )}
+                    {s.done && (
+                      <span className="flex-shrink-0 text-[13px] font-medium text-navy/40 mt-1 sm:mt-0">Complete</span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* 6. Recommended Homes */}
         <div className="mb-16">
@@ -363,7 +410,7 @@ export default async function MemberDashboardPage() {
           </div>
         </div>
 
-        {/* 7. Recent Activity */}
+        {/* 8. Recent Activity */}
         <div>
           <div className="flex items-center justify-between mb-6">
             <h3 className="font-sans text-xs font-bold text-navy uppercase tracking-[0.14em]">
@@ -376,19 +423,24 @@ export default async function MemberDashboardPage() {
           
           <div className="border-t border-[var(--hair)] max-w-3xl">
             {incoming.slice(0, 3).map((r) => (
-              <div key={r.id} className="flex items-center justify-between py-4 border-b border-[var(--hair)]">
-                <div className="flex items-center gap-3">
-                  <span className="text-[var(--gold)]"><Check size={18} /></span>
-                  <span className="font-sans text-[15px] text-navy">
-                    Swap request {r.status === "COUNTER_OFFERED" ? "countered" : "received"} from {r.requester.fullName}
-                  </span>
+              <div key={r.id} className="flex items-start justify-between py-4 border-b border-[var(--hair)]">
+                <div className="flex items-start gap-3">
+                  <span className="text-[var(--gold)] mt-0.5"><Check size={18} /></span>
+                  <div className="flex flex-col">
+                    <span className="font-sans text-[15px] text-navy font-medium">
+                      Swap request {r.status === "COUNTER_OFFERED" ? "countered" : "received"}
+                    </span>
+                    <span className="font-sans text-[13px] text-navy/70 mt-0.5">
+                      From {r.requester.fullName} for {r.listing.title}
+                    </span>
+                  </div>
                 </div>
-                <span className="font-sans text-[13px] text-navy/50">{fmtDate(r.createdAt)}</span>
+                <span className="flex-shrink-0 font-sans text-[13px] text-navy/50">{fmtDate(r.createdAt)}</span>
               </div>
             ))}
             {incoming.length === 0 && (
               <div className="py-8 text-[14px] text-navy/60 font-sans italic">
-                No recent activity.
+                No recent activity. Actions like received swap requests will appear here.
               </div>
             )}
           </div>
