@@ -156,9 +156,9 @@ export default async function MemberDashboardPage() {
 
   // Mock recommended homes
   const recommendedHomes = [
-    { city: "Geneva", country: "Switzerland", image: "/residence_geneva.jpg", nights: 7, credits: 7 },
-    { city: "Nairobi", country: "Kenya", image: "/residence_nairobi.jpg", nights: 5, credits: 5 },
-    { city: "Washington, DC", country: "United States", image: "/residence_washington.jpg", nights: 10, credits: 10 }
+    { city: "Geneva", country: "Switzerland", image: "/images/residence-geneva.png", nights: 7, credits: 7 },
+    { city: "Mayfair, London", country: "United Kingdom", image: "/images/residence-mayfair.png", nights: 5, credits: 5 },
+    { city: "Singapore", country: "Singapore", image: "/images/residence-singapore.png", nights: 10, credits: 10 }
   ];
 
   return (
