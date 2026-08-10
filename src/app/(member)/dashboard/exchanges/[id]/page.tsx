@@ -1,10 +1,12 @@
 import { notFound, redirect } from "next/navigation"
 import Link from "next/link"
-import { Calendar, Users, ChevronLeft, MapPin, FileText, Download, ShieldCheck, MessageCircle } from "lucide-react"
+import { Calendar, Users, ChevronLeft, MapPin, FileText, Download, ShieldCheck, Star } from "lucide-react"
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
 import { pendingReviewsFor } from "@/server/services/reviews"
 import { ReviewAction } from "../review-action" // Assume this is generic enough to pull from parent
+import { VerificationBadge } from "@/components/ui/badges"
+import { MessageButton } from "../../messages/message-button"
 
 export const dynamic = "force-dynamic"
 
@@ -101,9 +103,16 @@ export default async function ExchangeDetailPage({ params }: { params: Promise<{
             <span className="w-14 h-14 rounded-full bg-[var(--parchment-dark)] text-[var(--gold-dark)] flex items-center justify-center text-xl font-bold">
               {other.firstName?.[0]}{other.lastName?.[0]}
             </span>
-            <div className="flex flex-col">
-              <span className="font-display text-[24px] font-bold text-navy leading-none mb-1">{other.firstName}</span>
-              <span className="font-sans text-[14px] text-navy/60">{other.organisation || "Verified Member"}</span>
+            <div className="flex flex-col gap-1.5">
+              <span className="font-display text-[24px] font-bold text-navy leading-none">{other.firstName}</span>
+              <div className="flex items-center gap-2">
+                <span className="font-sans text-[14px] text-navy/60">{other.organisation || "UnSwap Member"}</span>
+                <VerificationBadge status={other.verificationStatus} />
+              </div>
+              <span className="flex items-center gap-1 font-sans text-[13px] text-navy/70">
+                <Star size={13} className="text-[var(--gold)] fill-[var(--gold)]" />
+                {other.trustScore != null ? `${other.trustScore.toFixed(1)} trust score` : "New member"}
+              </span>
             </div>
           </div>
           <Link href={`/dashboard/browse`} className="inline-flex items-center justify-center text-[12px] font-bold uppercase tracking-[0.08em] text-navy bg-[var(--parchment)] hover:bg-[var(--parchment-dark)] px-5 py-2.5 rounded transition-colors">
@@ -178,10 +187,13 @@ export default async function ExchangeDetailPage({ params }: { params: Promise<{
 
       {/* Actions */}
       <div className="flex flex-col sm:flex-row items-center gap-4">
-        <Link href={`/dashboard/messages?user=${other.id}`} className="w-full sm:w-auto inline-flex items-center justify-center gap-2 text-[13px] font-bold uppercase tracking-[0.08em] text-navy bg-white border border-[var(--hair)] hover:bg-[var(--parchment)] px-8 py-4 rounded-md transition-colors shadow-sm">
-          <MessageCircle size={18} /> Message {other.firstName}
-        </Link>
-        
+        <MessageButton
+          otherUserId={other.id}
+          swapRequestId={swap.id}
+          label={`Message ${other.firstName}`}
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 text-[13px] font-bold uppercase tracking-[0.08em] text-navy bg-white border border-[var(--hair)] hover:bg-[var(--parchment)] px-8 py-4 rounded-md transition-colors shadow-sm"
+        />
+
         {reviewable && (
           <div className="w-full sm:w-auto">
             <ReviewAction swapId={swap.id} aboutHost={reviewable.aboutHost} otherName={other.fullName} />

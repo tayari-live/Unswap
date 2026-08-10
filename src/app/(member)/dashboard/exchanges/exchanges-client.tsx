@@ -126,8 +126,11 @@ function PastExchangeCard({ r }: { r: Row }) {
 }
 
 export function ExchangesClient({ upcoming, past }: { upcoming: Row[], past: Row[] }) {
-  const [tab, setTab] = useState<"upcoming" | "past">("upcoming")
-  const data = tab === "upcoming" ? upcoming : past
+  const [tab, setTab] = useState<"upcoming" | "active" | "past">("upcoming")
+
+  const upcomingOnly = upcoming.filter((r) => r.status === "CONFIRMED")
+  const active = upcoming.filter((r) => r.status === "IN_PROGRESS")
+  const data = tab === "upcoming" ? upcomingOnly : tab === "active" ? active : past
 
   const tabBtn = (key: typeof tab, label: string, count: number) => (
     <button
@@ -140,10 +143,17 @@ export function ExchangesClient({ upcoming, past }: { upcoming: Row[], past: Row
     </button>
   )
 
+  const emptyCopy: Record<typeof tab, string> = {
+    upcoming: "Once a swap request is accepted, it will appear here with all the details for your stay.",
+    active: "You don't have any exchanges in progress right now.",
+    past: "You haven't completed any exchanges yet.",
+  }
+
   return (
     <>
       <div className="flex gap-6 mb-8 border-b border-[var(--hair)]">
-        {tabBtn("upcoming", "Upcoming & Active", upcoming.length)}
+        {tabBtn("upcoming", "Upcoming", upcomingOnly.length)}
+        {tabBtn("active", "Active", active.length)}
         {tabBtn("past", "Completed", past.length)}
       </div>
 
@@ -154,7 +164,7 @@ export function ExchangesClient({ upcoming, past }: { upcoming: Row[], past: Row
           </div>
           <h2 className="font-display text-[32px] font-bold text-navy mb-3 leading-tight">Your first exchange is waiting.</h2>
           <p className="font-sans text-[15px] text-navy/65 mb-8 max-w-md mx-auto">
-            {tab === "upcoming" ? "Once a swap request is accepted, it will appear here with all the details for your stay." : "You haven't completed any exchanges yet."}
+            {emptyCopy[tab]}
           </p>
           <Link
             href="/dashboard/browse"
@@ -165,9 +175,9 @@ export function ExchangesClient({ upcoming, past }: { upcoming: Row[], past: Row
         </div>
       ) : (
         <div className="space-y-6">
-          {tab === "upcoming"
-            ? data.map((r) => <UpcomingExchangeCard key={r.id} r={r} />)
-            : data.map((r) => <PastExchangeCard key={r.id} r={r} />)
+          {tab === "past"
+            ? data.map((r) => <PastExchangeCard key={r.id} r={r} />)
+            : data.map((r) => <UpcomingExchangeCard key={r.id} r={r} />)
           }
         </div>
       )}

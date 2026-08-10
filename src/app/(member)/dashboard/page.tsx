@@ -21,6 +21,13 @@ import { PROFILE_COMPLETE_AT } from "@/server/services/profile"
 
 export const dynamic = "force-dynamic"
 
+function greeting(): string {
+  const hour = new Date().getHours()
+  if (hour < 12) return "Good morning"
+  if (hour < 18) return "Good afternoon"
+  return "Good evening"
+}
+
 const TIER_LABELS: Record<string, string> = {
   limited_1x: "Limited 1X",
   standard_2x: "Standard 2X",
@@ -168,7 +175,7 @@ export default async function MemberDashboardPage() {
         {/* 1. Welcome Header */}
         <div className="mb-10">
           <h1 className="font-display text-4xl md:text-[48px] font-bold text-navy tracking-tight leading-none mb-3">
-            Good morning, {user.firstName || "Member"}.
+            {greeting()}, {user.firstName || "Member"}.
           </h1>
           <p className="font-sans text-sm md:text-[15px] text-navy/65">
             {subtext}

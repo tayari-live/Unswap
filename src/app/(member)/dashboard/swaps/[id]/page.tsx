@@ -1,9 +1,11 @@
 import { notFound, redirect } from "next/navigation"
 import Link from "next/link"
-import { Calendar, Users, ChevronLeft, MapPin } from "lucide-react"
+import { Calendar, Users, ChevronLeft, MapPin, Star, Check, Clock } from "lucide-react"
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
 import { SwapDetailClient } from "./swap-detail-client"
+import { VerificationBadge } from "@/components/ui/badges"
+import { MessageButton } from "../../messages/message-button"
 
 export const dynamic = "force-dynamic"
 
@@ -34,9 +36,32 @@ export default async function SwapDetailPage({ params }: { params: Promise<{ id:
   if (!swap) return notFound()
   if (swap.hostId !== userId && swap.requesterId !== userId) return notFound()
 
+  // Once a request moves past negotiation it's an exchange — that page has the
+  // agreement, property guarantee, and other confirmed-only content this one lacks.
+  if (["CONFIRMED", "IN_PROGRESS", "COMPLETED"].includes(swap.status)) {
+    redirect(`/dashboard/exchanges/${swap.id}`)
+  }
+
   const isIncoming = swap.hostId === userId
   const other = isIncoming ? swap.requester : swap.host
-  
+
+  const timeline: { label: string; date: Date; done: boolean }[] = [
+    { label: "Request received", date: swap.createdAt, done: true },
+    ...(swap.counteredAt
+      ? [{ label: "Counter-offer proposed", date: swap.counteredAt, done: true }]
+      : []),
+  ]
+  const currentStep =
+    swap.status === "CANCELLED"
+      ? "Request cancelled"
+      : swap.status === "COUNTER_OFFERED"
+        ? isIncoming
+          ? "Awaiting requester's response"
+          : "Awaiting your response"
+        : isIncoming
+          ? "Awaiting your response"
+          : "Awaiting host response"
+
   // Serialize for client
   const sData = {
     id: swap.id,
@@ -98,9 +123,16 @@ export default async function SwapDetailPage({ params }: { params: Promise<{ id:
             <span className="w-14 h-14 rounded-full bg-[var(--parchment-dark)] text-[var(--gold-dark)] flex items-center justify-center text-xl font-bold">
               {other.firstName?.[0]}{other.lastName?.[0]}
             </span>
-            <div className="flex flex-col">
-              <span className="font-display text-[24px] font-bold text-navy leading-none mb-1">{other.firstName}</span>
-              <span className="font-sans text-[14px] text-navy/60">{other.organisation || "Verified Member"}</span>
+            <div className="flex flex-col gap-1.5">
+              <span className="font-display text-[24px] font-bold text-navy leading-none">{other.firstName}</span>
+              <div className="flex items-center gap-2">
+                <span className="font-sans text-[14px] text-navy/60">{other.organisation || "UnSwap Member"}</span>
+                <VerificationBadge status={other.verificationStatus} />
+              </div>
+              <span className="flex items-center gap-1 font-sans text-[13px] text-navy/70">
+                <Star size={13} className="text-[var(--gold)] fill-[var(--gold)]" />
+                {other.trustScore != null ? `${other.trustScore.toFixed(1)} trust score` : "New member"}
+              </span>
             </div>
           </div>
           <Link href={`/dashboard/browse`} className="inline-flex items-center justify-center text-[12px] font-bold uppercase tracking-[0.08em] text-navy bg-[var(--parchment)] hover:bg-[var(--parchment-dark)] px-5 py-2.5 rounded transition-colors">
@@ -132,6 +164,39 @@ export default async function SwapDetailPage({ params }: { params: Promise<{ id:
             </p>
           </div>
         )}
+      </div>
+
+      {/* Request Timeline */}
+      <div className="mb-12 border-b border-[var(--hair)] pb-12">
+        <h3 className="font-sans text-xs font-bold text-navy uppercase tracking-[0.14em] mb-6">
+          Request Timeline
+        </h3>
+        <div className="flex flex-col gap-4">
+          {timeline.map((step, i) => (
+            <div key={i} className="flex items-center gap-3 font-sans text-[14px]">
+              <span className="flex items-center justify-center w-5 h-5 rounded-full bg-[var(--gold)]/15 text-[var(--gold-dark)] flex-shrink-0">
+                <Check size={12} strokeWidth={3} />
+              </span>
+              <span className="text-navy font-medium">{step.label}</span>
+              <span className="text-navy/40">· {fmt(step.date)}</span>
+            </div>
+          ))}
+          <div className="flex items-center gap-3 font-sans text-[14px]">
+            <span className={`flex items-center justify-center w-5 h-5 rounded-full flex-shrink-0 ${swap.status === "CANCELLED" ? "bg-[var(--crimson)]/15 text-[var(--crimson)]" : "bg-navy/10 text-navy/50"}`}>
+              <Clock size={12} />
+            </span>
+            <span className={swap.status === "CANCELLED" ? "text-[var(--crimson)] font-medium" : "text-navy/60 font-medium"}>{currentStep}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="mb-8">
+        <MessageButton
+          otherUserId={other.id}
+          swapRequestId={swap.id}
+          label={`Message ${other.firstName}`}
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 text-[13px] font-bold uppercase tracking-[0.08em] text-navy bg-white border border-[var(--hair)] hover:bg-[var(--parchment)] px-8 py-4 rounded-md transition-colors shadow-sm"
+        />
       </div>
 
       <SwapDetailClient swap={sData} isIncoming={isIncoming} />
