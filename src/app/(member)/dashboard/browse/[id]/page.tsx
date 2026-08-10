@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import {
-  MapPin, Star, BadgeCheck, BedDouble, Bath, Users, ShieldAlert, ChevronRight,
+  MapPin, Star, BadgeCheck, BedDouble, Bath, Users, ShieldAlert, ChevronRight, ArrowRight,
 } from "lucide-react"
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
@@ -221,6 +221,15 @@ export default async function ListingDetailPage({
             </div>
 
             {listing.owner.bio && <p className="mt-3 text-xs text-neutral-dark leading-relaxed">{listing.owner.bio}</p>}
+
+            {!isOwner && (
+              <Link
+                href={`/dashboard/members/${listing.owner.id}`}
+                className="inline-flex items-center gap-1.5 mt-4 text-sm font-medium text-[var(--gold-soft)] hover:text-[var(--gold)] transition-colors"
+              >
+                View profile <ArrowRight size={13} />
+              </Link>
+            )}
           </div>
 
           {/* Request action */}

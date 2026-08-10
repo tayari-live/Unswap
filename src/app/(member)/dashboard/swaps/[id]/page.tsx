@@ -135,7 +135,7 @@ export default async function SwapDetailPage({ params }: { params: Promise<{ id:
               </span>
             </div>
           </div>
-          <Link href={`/dashboard/browse`} className="inline-flex items-center justify-center text-[12px] font-bold uppercase tracking-[0.08em] text-navy bg-[var(--parchment)] hover:bg-[var(--parchment-dark)] px-5 py-2.5 rounded transition-colors">
+          <Link href={`/dashboard/members/${other.id}`} className="inline-flex items-center justify-center text-[12px] font-bold uppercase tracking-[0.08em] text-navy bg-[var(--parchment)] hover:bg-[var(--parchment-dark)] px-5 py-2.5 rounded transition-colors">
             View Profile &rarr;
           </Link>
         </div>
