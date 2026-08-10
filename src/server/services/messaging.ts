@@ -148,15 +148,29 @@ export async function listConversations(userId: string) {
 }
 
 /** Total unread messages across all conversations (for the nav badge). */
-export async function getUnreadTotal(userId: string) {
+/**
+ * Unread counts per conversation (only those with unread messages).
+ *
+ * Callers that just need the number use `getUnreadTotal`; the breakdown exists
+ * so a notification can deep-link to the one unread thread when there is only
+ * one, instead of dropping the member on the inbox to find it again.
+ */
+export async function getUnreadByConversation(userId: string) {
   const parts = await prisma.conversationParticipant.findMany({ where: { userId } })
-  let total = 0
-  for (const p of parts) {
-    total += await prisma.message.count({
-      where: { conversationId: p.conversationId, senderId: { not: userId }, createdAt: { gt: p.lastReadAt } },
-    })
-  }
-  return total
+  const rows = await Promise.all(
+    parts.map(async (p) => ({
+      conversationId: p.conversationId,
+      unread: await prisma.message.count({
+        where: { conversationId: p.conversationId, senderId: { not: userId }, createdAt: { gt: p.lastReadAt } },
+      }),
+    })),
+  )
+  return rows.filter((r) => r.unread > 0)
+}
+
+export async function getUnreadTotal(userId: string) {
+  const rows = await getUnreadByConversation(userId)
+  return rows.reduce((sum, r) => sum + r.unread, 0)
 }
 
 /** Fetch a conversation's messages (authorized) and mark it read for the viewer. */

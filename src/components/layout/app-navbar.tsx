@@ -11,7 +11,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useVisiblePolling } from "@/lib/use-visible-polling"
-import { NotificationBell } from "./notification-bell"
+import { MemberNotificationBell } from "./member-notification-bell"
 
 /*
  * The logged-in application navbar.
@@ -261,9 +261,8 @@ export function AppNavbar({
           </nav>
 
           <div className="flex items-center gap-1 sm:gap-2 ml-auto">
-            <NotificationBell
+            <MemberNotificationBell
               buttonClassName="relative w-10 h-10 rounded-lg text-navy/60 hover:text-[var(--gold-dark)] hover:bg-[var(--parchment)] flex items-center justify-center transition-colors"
-              panelClassName="absolute right-0 top-full mt-1 w-80 bg-white rounded-[12px] shadow-dropdown border border-navy/10 z-dropdown overflow-hidden"
               dotClassName="absolute top-2.5 right-2.5 w-1.5 h-1.5 rounded-full bg-[var(--gold)]"
             />
 

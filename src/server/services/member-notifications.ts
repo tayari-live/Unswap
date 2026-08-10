@@ -1,12 +1,14 @@
 import { prisma } from "@/server/prisma"
-import { getUnreadTotal } from "@/server/services/messaging"
+import { getUnreadByConversation } from "@/server/services/messaging"
 import { pendingReviewsFor } from "@/server/services/reviews"
 import { CREDIT_GRANTS, type GrantReason } from "@/server/services/credits"
 import { PROFILE_COMPLETE_AT } from "@/server/services/profile"
 
+import type { NotificationKind } from "@/lib/notification-categories"
+
 export type MemberNotification = {
   id: string
-  kind: "swap" | "counter" | "confirmed" | "message" | "review" | "verification" | "verified" | "rejected" | "credit" | "profile"
+  kind: NotificationKind
   title: string
   body: string
   date: Date
@@ -17,12 +19,18 @@ export type MemberNotification = {
 // credits already get context from their swap notification.
 const CREDIT_WINDOW_MS = 30 * 24 * 60 * 60 * 1000
 
+// How far ahead a renewal starts being worth mentioning.
+const RENEWAL_SOON_MS = 14 * 24 * 60 * 60 * 1000
+
+const fmtDay = (d: Date) =>
+  new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(d)
+
 /**
  * A derived activity feed for the member: actionable items assembled from swaps,
  * messages, reviews, and account state. (No stored per-user notification table.)
  */
 export async function getMemberNotifications(userId: string): Promise<MemberNotification[]> {
-  const [user, swaps, unread, pending, submission, grants] = await Promise.all([
+  const [user, swaps, unreadRows, pending, submission, grants, subscription] = await Promise.all([
     prisma.user.findUnique({ where: { id: userId } }),
     prisma.swapRequest.findMany({
       where: { OR: [{ hostId: userId }, { requesterId: userId }] },
@@ -34,7 +42,7 @@ export async function getMemberNotifications(userId: string): Promise<MemberNoti
       orderBy: { createdAt: "desc" },
       take: 40,
     }),
-    getUnreadTotal(userId),
+    getUnreadByConversation(userId),
     pendingReviewsFor(userId),
     prisma.verificationSubmission.findFirst({
       where: { memberId: userId },
@@ -46,6 +54,7 @@ export async function getMemberNotifications(userId: string): Promise<MemberNoti
       orderBy: { createdAt: "desc" },
       take: 20,
     }),
+    prisma.subscription.findUnique({ where: { userId } }),
   ])
 
   const items: MemberNotification[] = []
@@ -64,25 +73,39 @@ export async function getMemberNotifications(userId: string): Promise<MemberNoti
     })
   }
 
+  // Links point at the specific record, not the section: a notification about
+  // one request shouldn't leave the member hunting for it in a list. Note the
+  // swaps/exchanges split — /dashboard/swaps/:id and /dashboard/exchanges/:id
+  // redirect to each other by status, so a CONFIRMED swap belongs on the
+  // exchanges route.
   for (const s of swaps) {
     if (s.hostId === userId && s.status === "REQUESTED") {
-      items.push({ id: `req-${s.id}`, kind: "swap", title: "New swap request", body: `${s.requester.fullName} requested ${s.listing.title}`, date: s.createdAt, link: "/dashboard/swaps" })
+      items.push({ id: `req-${s.id}`, kind: "swap", title: "New swap request", body: `${s.requester.fullName} requested ${s.listing.title}`, date: s.createdAt, link: `/dashboard/swaps/${s.id}` })
     }
     if (s.requesterId === userId && s.status === "COUNTER_OFFERED") {
-      items.push({ id: `cnt-${s.id}`, kind: "counter", title: "Counter-offer received", body: `${s.host.fullName} proposed new dates for ${s.listing.title}`, date: s.createdAt, link: "/dashboard/swaps" })
+      items.push({ id: `cnt-${s.id}`, kind: "counter", title: "Counter-offer received", body: `${s.host.fullName} proposed new dates for ${s.listing.title}`, date: s.createdAt, link: `/dashboard/swaps/${s.id}` })
     }
     if (s.status === "CONFIRMED") {
       const other = s.hostId === userId ? s.requester : s.host
-      items.push({ id: `cnf-${s.id}`, kind: "confirmed", title: "Exchange confirmed", body: `Your exchange with ${other.fullName} is confirmed`, date: s.createdAt, link: "/dashboard/exchanges" })
+      items.push({ id: `cnf-${s.id}`, kind: "confirmed", title: "Exchange confirmed", body: `Your exchange with ${other.fullName} is confirmed`, date: s.createdAt, link: `/dashboard/exchanges/${s.id}` })
     }
   }
 
+  const unread = unreadRows.reduce((sum, r) => sum + r.unread, 0)
   if (unread > 0) {
-    items.push({ id: "msg", kind: "message", title: "Unread messages", body: `You have ${unread} unread message${unread === 1 ? "" : "s"}`, date: new Date(), link: "/dashboard/messages" })
+    // One unread thread → open it. Several → the inbox is the right landing place.
+    items.push({
+      id: "msg",
+      kind: "message",
+      title: "Unread messages",
+      body: `You have ${unread} unread message${unread === 1 ? "" : "s"}`,
+      date: new Date(),
+      link: unreadRows.length === 1 ? `/dashboard/messages/${unreadRows[0].conversationId}` : "/dashboard/messages",
+    })
   }
 
   for (const p of pending) {
-    items.push({ id: `rev-${p.swapId}`, kind: "review", title: "Leave a review", body: `Review your exchange with ${p.other.fullName}`, date: new Date(), link: "/dashboard/exchanges" })
+    items.push({ id: `rev-${p.swapId}`, kind: "review", title: "Leave a review", body: `Review your exchange with ${p.other.fullName}`, date: new Date(), link: `/dashboard/exchanges/${p.swapId}` })
   }
 
   // Verification: surface the actual outcome, not a generic nag. Rejection and
@@ -116,6 +139,42 @@ export async function getMemberNotifications(userId: string): Promise<MemberNoti
   }
   if (user && user.profileCompletion < PROFILE_COMPLETE_AT) {
     items.push({ id: "prof", kind: "profile", title: "Complete your profile", body: `Your profile is ${user.profileCompletion}% complete`, date: new Date(), link: "/dashboard/profile/edit" })
+  }
+
+  // Membership state. These are standing prompts derived from the current
+  // subscription row rather than dated events (there's no billing-event log to
+  // read), so they carry `date: new Date()` and stay out of ACTIVITY_KINDS —
+  // otherwise they'd keep the bell badge lit permanently.
+  if (subscription) {
+    const renews = subscription.renewsAt
+    if (subscription.status === "past_due") {
+      items.push({
+        id: "sub-pastdue",
+        kind: "membership",
+        title: "Payment unsuccessful",
+        body: "We couldn't process your membership payment. Update your billing to keep your access.",
+        date: new Date(),
+        link: "/dashboard/subscription",
+      })
+    } else if (subscription.status === "cancelled") {
+      items.push({
+        id: "sub-cancelled",
+        kind: "membership",
+        title: "Membership cancelled",
+        body: "Your membership won't renew. You can resubscribe at any time.",
+        date: new Date(),
+        link: "/dashboard/subscription",
+      })
+    } else if (subscription.status === "active" && renews && renews.getTime() - Date.now() < RENEWAL_SOON_MS) {
+      items.push({
+        id: "sub-renewing",
+        kind: "membership",
+        title: "Membership renews soon",
+        body: `Your membership renews on ${fmtDay(renews)}.`,
+        date: new Date(),
+        link: "/dashboard/subscription",
+      })
+    }
   }
 
   items.sort((a, b) => b.date.getTime() - a.date.getTime())
