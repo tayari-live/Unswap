@@ -129,7 +129,7 @@ export default async function MemberDashboardPage() {
       title: "Complete your profile",
       sub: profileIncomplete ? `${user.profileCompletion}% done — members exchange with people, not just listings.` : null,
       done: !profileIncomplete,
-      href: "/dashboard/profile",
+      href: "/dashboard/profile/edit",
       action: "Complete",
     },
     {

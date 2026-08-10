@@ -65,11 +65,14 @@ export function ProfileWizard({
   initial,
   onSaved,
   onExit,
+  redirectTo = "/dashboard",
 }: {
   initial: ProfileValues
   onSaved?: (completion: number) => void
   /** Back pressed on the first question — lets a host flow reclaim the screen. */
   onExit?: () => void
+  /** Where to land after a standalone save (ignored when `onSaved` is passed — that's the onboarding flow, which advances in place instead of navigating). */
+  redirectTo?: string
 }) {
   const router = useRouter()
   const toast = useToast()
@@ -125,8 +128,8 @@ export function ProfileWizard({
         onSaved(data.completion ?? completion)
         router.refresh()
       } else {
-        // Standalone profile page: return to the dashboard after saving.
-        router.push("/dashboard")
+        // Standalone profile page: return to the display view after saving.
+        router.push(redirectTo)
         router.refresh()
       }
     } catch {

@@ -115,7 +115,7 @@ export async function getMemberNotifications(userId: string): Promise<MemberNoti
     }
   }
   if (user && user.profileCompletion < PROFILE_COMPLETE_AT) {
-    items.push({ id: "prof", kind: "profile", title: "Complete your profile", body: `Your profile is ${user.profileCompletion}% complete`, date: new Date(), link: "/dashboard/profile" })
+    items.push({ id: "prof", kind: "profile", title: "Complete your profile", body: `Your profile is ${user.profileCompletion}% complete`, date: new Date(), link: "/dashboard/profile/edit" })
   }
 
   items.sort((a, b) => b.date.getTime() - a.date.getTime())
