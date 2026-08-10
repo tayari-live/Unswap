@@ -18,15 +18,9 @@ import { cn } from "@/lib/utils"
 import { LuxPageHeader, SectionLabel } from "@/components/ui/lux"
 import { ResendEmailButton } from "@/components/ui/resend-email-button"
 import { PROFILE_COMPLETE_AT } from "@/server/services/profile"
+import { Greeting } from "./greeting"
 
 export const dynamic = "force-dynamic"
-
-function greeting(): string {
-  const hour = new Date().getHours()
-  if (hour < 12) return "Good morning"
-  if (hour < 18) return "Good afternoon"
-  return "Good evening"
-}
 
 const TIER_LABELS: Record<string, string> = {
   limited_1x: "Limited 1X",
@@ -156,10 +150,25 @@ export default async function MemberDashboardPage() {
   const checklistDone = checklist.filter((s) => s.done).length
   const showChecklist = checklistDone < checklist.length
 
-  // Determine welcome subtext based on state
+  /*
+   * The greeting itself is just personalisation — this line carries the
+   * meaning, so it's ordered by what the member can act on soonest: a request
+   * awaiting their answer outranks their own upcoming trip, which outranks a
+   * standing invitation to host, which outranks generic encouragement.
+   */
   let subtext = "Ready to find your next home?"
-  if (upcoming.length > 0) subtext = "Your next stay is coming up."
-  else if (activeListings > 0) subtext = "Your home is ready to welcome another member."
+  if (incoming.length > 0) {
+    subtext =
+      incoming.length === 1
+        ? "You have one exchange request waiting for your review."
+        : `You have ${incoming.length} exchange requests waiting for your review.`
+  } else if (upcoming.length > 0) {
+    subtext = "Your next stay is coming up."
+  } else if (activeListings > 0) {
+    subtext = "Your home is ready to welcome another member."
+  } else if (!isVerified || profileIncomplete) {
+    subtext = "Complete your profile and start exploring the UnSwap network."
+  }
 
   // Mock recommended homes
   const recommendedHomes = [
@@ -174,9 +183,7 @@ export default async function MemberDashboardPage() {
         
         {/* 1. Welcome Header */}
         <div className="mb-10">
-          <h1 className="font-display text-4xl md:text-[48px] font-bold text-navy tracking-tight leading-none mb-3">
-            {greeting()}, {user.firstName || "Member"}.
-          </h1>
+          <Greeting firstName={user.firstName || ""} />
           <p className="font-sans text-sm md:text-[15px] text-navy/65">
             {subtext}
           </p>

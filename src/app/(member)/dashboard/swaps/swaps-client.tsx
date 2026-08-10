@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Calendar, Users } from "lucide-react"
+import { Calendar, Users, Inbox, Send } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
 
 const STATUS_MSG: Record<string, string> = {
@@ -168,15 +168,23 @@ export function SwapsClient({
 
       {data.length === 0 ? (
         <div className="bg-white rounded-lg border border-[var(--hair)] p-12 text-center max-w-2xl mx-auto shadow-sm">
-          <p className="font-sans text-[15px] text-navy/70">
-            {tab === "incoming" && "You have no pending incoming requests right now."}
-            {tab === "outgoing" && "You haven't sent any swap requests yet."}
+          <div className="mx-auto w-16 h-16 rounded-full bg-[var(--parchment)] text-[var(--gold-dark)] flex items-center justify-center mb-6">
+            {tab === "incoming" ? <Inbox size={28} strokeWidth={1.5} /> : <Send size={26} strokeWidth={1.5} />}
+          </div>
+          <h2 className="font-display text-[32px] font-bold text-navy mb-3 leading-tight">
+            {tab === "incoming" ? "You're all caught up." : "No requests sent yet."}
+          </h2>
+          <p className="font-sans text-[15px] text-navy/65 mb-8 max-w-md mx-auto">
+            {tab === "incoming"
+              ? "When another member requests a stay at one of your homes, you'll see it here."
+              : "Find a home in your next duty station and send the host a request."}
           </p>
-          {tab === "outgoing" && (
-            <Link href="/dashboard/browse" className="inline-block mt-4 text-[14px] font-medium text-[var(--gold-dark)] hover:text-navy transition-colors">
-              Explore homes to find your next stay &rarr;
-            </Link>
-          )}
+          <Link
+            href={tab === "incoming" ? "/dashboard/listings" : "/dashboard/browse"}
+            className="inline-flex items-center justify-center text-[13px] font-bold uppercase tracking-[0.08em] text-navy bg-[var(--gold)] hover:bg-[var(--gold-dark)] px-8 py-3.5 rounded-md transition-colors shadow-sm"
+          >
+            {tab === "incoming" ? "View My Homes" : "Explore Homes"}
+          </Link>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
