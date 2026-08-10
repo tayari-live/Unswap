@@ -54,7 +54,3 @@ export const adminNavigation: NavGroup[] = [
     ],
   },
 ]
-
-// Flat view — kept for call sites that just need "is this route in the admin
-// console" without caring about grouping (active-state checks, search, etc).
-export const adminNavigationFlat: NavItem[] = adminNavigation.flatMap((g) => g.items)
