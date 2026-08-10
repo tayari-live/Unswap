@@ -6,7 +6,9 @@ import { ShieldCheck, X, Check, FileText, Mail, MapPin, Building2 } from "lucide
 import { LuxPageHeader } from "@/components/ui/lux"
 import { Badge } from "@/components/ui/badges"
 import { useToast } from "@/components/ui/toast"
-import { useEscapeKey } from "@/lib/use-escape-key"
+import { AvatarInitials } from "@/components/ui/avatar"
+import { EmptyState } from "@/components/ui/empty-state"
+import { Modal } from "@/components/ui/modal"
 
 // A rejection note is emailed to the member as their reason, so require a real
 // sentence — not "no". Kept in sync with the server (rejectSubmission).
@@ -36,10 +38,6 @@ export default function VerificationClient({ initialSubmissions }: { initialSubm
   const [selected, setSelected] = useState<Submission | null>(null)
   const [note, setNote] = useState("")
   const [busy, setBusy] = useState(false)
-
-  // Escape closes the review dialog, matching the backdrop click. Ignored while
-  // a decision is in flight, so a stray keypress cannot dismiss mid-submit.
-  useEscapeKey(!!selected && !busy, () => setSelected(null))
 
   // Keep the queue in sync with the server after router.refresh() — otherwise a
   // submission reviewed elsewhere (another tab/admin) lingers here as a stale
@@ -99,24 +97,18 @@ export default function VerificationClient({ initialSubmissions }: { initialSubm
       />
 
       {submissions.length === 0 ? (
-        <div className="bg-surface rounded-md border border-[var(--hair)] p-12 text-center">
-          <ShieldCheck className="mx-auto text-[var(--teal)] mb-3" size={40} />
-          <p className="font-sans font-bold text-lg text-[var(--fg)]">Queue is clear</p>
-          <p className="text-sm text-neutral mt-1">No submissions are awaiting review.</p>
-        </div>
+        <EmptyState icon={ShieldCheck} iconVariant="bare" tone="success" title="Queue is clear" description="No submissions are awaiting review." />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {submissions.map((s) => (
             <button
               key={s.id}
               onClick={() => open(s)}
-              className="text-left bg-surface rounded-md border border-[var(--hair)] p-5 hover:border-[var(--gold)] transition"
+              className="text-left bg-surface rounded-md border border-[var(--navy)]/10 p-5 hover:border-[var(--gold)] hover:bg-[var(--parchment)] transition"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <span className="w-11 h-11 rounded-xl bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center font-bold">
-                    {s.member.avatarInitials}
-                  </span>
+                  <AvatarInitials initials={s.member.avatarInitials} size="lg" />
                   <div>
                     <div className="font-semibold text-[var(--fg)]">{s.member.fullName}</div>
                     <div className="text-xs text-neutral">{s.member.email}</div>
@@ -136,89 +128,72 @@ export default function VerificationClient({ initialSubmissions }: { initialSubm
         </div>
       )}
 
-      {/* Review drawer/modal */}
-      {selected && (
-        <div className="fixed inset-0 z-modal flex items-center justify-center p-4 bg-[var(--navy)]/40" onClick={() => !busy && setSelected(null)}>
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="review-submission-title"
-            className="bg-surface rounded-md shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--hair)] sticky top-0 bg-surface">
-              <h2 id="review-submission-title" className="font-sans font-bold text-lg text-[var(--fg)]">Review Submission</h2>
-              <button onClick={() => setSelected(null)} disabled={busy} className="text-neutral hover:text-[var(--fg)]">
-                <X size={20} />
+      {/* Review dialog */}
+      <Modal open={!!selected} onClose={() => setSelected(null)} busy={busy} title="Review Submission" titleId="review-submission-title">
+        {selected && (
+          <div className="space-y-5">
+            <div className="flex items-center gap-3">
+              <AvatarInitials initials={selected.member.avatarInitials} size="lg" />
+              <div>
+                <div className="font-semibold text-[var(--fg)] text-lg">{selected.member.fullName}</div>
+                <div className="text-sm text-neutral flex items-center gap-1"><Mail size={13} /> {selected.member.email}</div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <Field label="Organisation" value={selected.member.organisation} />
+              <Field label="Duty Station" value={selected.member.dutyStation} />
+              <Field label="Nationality" value={selected.member.nationality} />
+              <Field label="Profile" value={`${selected.member.profileCompletion}% complete`} />
+            </div>
+
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-wide text-neutral mb-2">Documents</div>
+              <div className="grid grid-cols-2 gap-3">
+                <DocPreview label="Staff ID" url={selected.idCardUrl} />
+                <DocPreview label="Proof of employment" url={selected.proofUrl} />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-baseline justify-between mb-1.5">
+                <label className="text-xs font-semibold uppercase tracking-wide text-neutral">
+                  Reviewer note <span className="normal-case font-normal">(required to reject · min {MIN_NOTE} characters)</span>
+                </label>
+                <span className={`text-[11px] font-semibold ${note.trim().length >= MIN_NOTE ? "text-[var(--teal)]" : "text-neutral"}`}>
+                  {note.trim().length}/{MIN_NOTE}
+                </span>
+              </div>
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                rows={3}
+                placeholder="Explain why — the member receives this as the reason (e.g. “Staff ID photo was blurry, please re-upload a clear scan”)."
+                className="w-full px-3 py-2 rounded-xl border border-[var(--hair)] bg-[var(--background)] text-sm text-[var(--fg)] focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)]"
+              />
+              <p className="mt-1.5 text-xs text-neutral">Approving needs no note. A note is only required to reject.</p>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => review("reject")}
+                disabled={busy || note.trim().length < MIN_NOTE}
+                title={note.trim().length < MIN_NOTE ? `Add a reason of at least ${MIN_NOTE} characters to reject` : undefined}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[var(--crimson)] text-[var(--crimson)] text-sm font-semibold hover:bg-[var(--crimson)]/10 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <X size={16} /> Reject
+              </button>
+              <button
+                onClick={() => review("approve")}
+                disabled={busy}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--teal)] text-white text-sm font-semibold hover:opacity-90 transition disabled:opacity-50"
+              >
+                <Check size={16} /> Approve
               </button>
             </div>
-
-            <div className="p-6 space-y-5">
-              <div className="flex items-center gap-3">
-                <span className="w-12 h-12 rounded-xl bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center font-bold text-lg">
-                  {selected.member.avatarInitials}
-                </span>
-                <div>
-                  <div className="font-semibold text-[var(--fg)] text-lg">{selected.member.fullName}</div>
-                  <div className="text-sm text-neutral flex items-center gap-1"><Mail size={13} /> {selected.member.email}</div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <Field label="Organisation" value={selected.member.organisation} />
-                <Field label="Duty Station" value={selected.member.dutyStation} />
-                <Field label="Nationality" value={selected.member.nationality} />
-                <Field label="Profile" value={`${selected.member.profileCompletion}% complete`} />
-              </div>
-
-              <div>
-                <div className="text-xs font-semibold uppercase tracking-wide text-neutral mb-2">Documents</div>
-                <div className="grid grid-cols-2 gap-3">
-                  <DocPreview label="Staff ID" url={selected.idCardUrl} />
-                  <DocPreview label="Proof of employment" url={selected.proofUrl} />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex items-baseline justify-between mb-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-wide text-neutral">
-                    Reviewer note <span className="normal-case font-normal">(required to reject · min {MIN_NOTE} characters)</span>
-                  </label>
-                  <span className={`text-[11px] font-semibold ${note.trim().length >= MIN_NOTE ? "text-[var(--teal)]" : "text-neutral"}`}>
-                    {note.trim().length}/{MIN_NOTE}
-                  </span>
-                </div>
-                <textarea
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                  rows={3}
-                  placeholder="Explain why — the member receives this as the reason (e.g. “Staff ID photo was blurry, please re-upload a clear scan”)."
-                  className="w-full px-3 py-2 rounded-xl border border-[var(--hair)] bg-[var(--background)] text-sm text-[var(--fg)] focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)]"
-                />
-                <p className="mt-1.5 text-xs text-neutral">Approving needs no note. A note is only required to reject.</p>
-              </div>
-
-              <div className="flex gap-3">
-                <button
-                  onClick={() => review("reject")}
-                  disabled={busy || note.trim().length < MIN_NOTE}
-                  title={note.trim().length < MIN_NOTE ? `Add a reason of at least ${MIN_NOTE} characters to reject` : undefined}
-                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[var(--crimson)] text-[var(--crimson)] text-sm font-semibold hover:bg-[var(--crimson)]/10 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <X size={16} /> Reject
-                </button>
-                <button
-                  onClick={() => review("approve")}
-                  disabled={busy}
-                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--teal)] text-white text-sm font-semibold hover:opacity-90 transition disabled:opacity-50"
-                >
-                  <Check size={16} /> Approve
-                </button>
-              </div>
-            </div>
           </div>
-        </div>
-      )}
+        )}
+      </Modal>
     </div>
   )
 }

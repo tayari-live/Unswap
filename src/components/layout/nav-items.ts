@@ -13,16 +13,48 @@ import {
 } from "lucide-react"
 
 export type NavItem = { name: string; href: string; icon: LucideIcon }
+export type NavGroup = { label: string; items: NavItem[] }
 
-// Shared navigation for the admin console, used by the sidebar and mobile nav.
-export const adminNavigation: NavItem[] = [
-  { name: "Overview", href: "/overview", icon: LayoutDashboard },
-  { name: "Verification", href: "/verification", icon: ShieldCheck },
-  { name: "Members", href: "/members", icon: Users },
-  { name: "Listings", href: "/listings", icon: Home },
-  { name: "Swaps", href: "/swaps", icon: ArrowLeftRight },
-  { name: "Moderation", href: "/moderation", icon: Flag },
-  { name: "Waitlist", href: "/waitlist-admin", icon: ListChecks },
-  { name: "Domains", href: "/domains", icon: Globe },
-  { name: "Analytics", href: "/analytics", icon: LineChart },
+// Grouped navigation for the admin console, used by the sidebar and the
+// mobile drawer. Labels are operational vocabulary (Properties, Swap
+// Requests, Reports) — the underlying routes are unchanged so nothing else
+// in the app needs to know about the rename.
+export const adminNavigation: NavGroup[] = [
+  {
+    label: "Overview",
+    items: [{ name: "Dashboard", href: "/overview", icon: LayoutDashboard }],
+  },
+  {
+    label: "Members",
+    items: [
+      { name: "Members", href: "/members", icon: Users },
+      { name: "Verification", href: "/verification", icon: ShieldCheck },
+      { name: "Waitlist", href: "/waitlist-admin", icon: ListChecks },
+    ],
+  },
+  {
+    label: "Marketplace",
+    items: [
+      { name: "Properties", href: "/listings", icon: Home },
+      { name: "Swap Requests", href: "/swaps", icon: ArrowLeftRight },
+    ],
+  },
+  {
+    label: "Operations",
+    items: [
+      { name: "Reports", href: "/moderation", icon: Flag },
+      { name: "Analytics", href: "/analytics", icon: LineChart },
+    ],
+  },
+  {
+    label: "System",
+    items: [
+      { name: "Domains", href: "/domains", icon: Globe },
+      { name: "Settings", href: "/settings", icon: Settings },
+    ],
+  },
 ]
+
+// Flat view — kept for call sites that just need "is this route in the admin
+// console" without caring about grouping (active-state checks, search, etc).
+export const adminNavigationFlat: NavItem[] = adminNavigation.flatMap((g) => g.items)

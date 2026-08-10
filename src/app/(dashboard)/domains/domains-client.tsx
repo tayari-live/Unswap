@@ -5,6 +5,8 @@ import { Plus, Trash2, Globe, Zap } from "lucide-react"
 import { LuxPageHeader } from "@/components/ui/lux"
 import { Badge } from "@/components/ui/badges"
 import { useToast } from "@/components/ui/toast"
+import { AvatarInitials } from "@/components/ui/avatar"
+import { EmptyState } from "@/components/ui/empty-state"
 
 type Domain = { id: string; domain: string; label: string; fastTrack: boolean }
 
@@ -51,7 +53,7 @@ export default function DomainsClient({ initialDomains }: { initialDomains: Doma
         subtitle="Institutional email domains that gate sign-up. Fast-track domains skip manual review."
       />
 
-      <form onSubmit={add} className="bg-surface rounded-md border border-[var(--hair)] p-5 mb-6">
+      <form onSubmit={add} className="bg-surface rounded-md border border-[var(--navy)]/10 p-5 mb-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="text-xs font-semibold uppercase tracking-wide text-neutral mb-1.5 block" htmlFor="d-domain">Domain</label>
@@ -91,13 +93,11 @@ export default function DomainsClient({ initialDomains }: { initialDomains: Doma
         </div>
       </form>
 
-      <div className="bg-surface rounded-md border border-[var(--hair)] divide-y divide-[var(--hair)]">
+      <div className="bg-surface rounded-md border border-[var(--navy)]/10 divide-y divide-[var(--hair)]">
         {domains.map((d) => (
-          <div key={d.id} className="flex items-center justify-between px-5 py-3">
+          <div key={d.id} className="flex items-center justify-between px-5 py-3.5 hover:bg-[var(--parchment)] transition-colors">
             <div className="flex items-center gap-3">
-              <span className="w-9 h-9 rounded-xl bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center">
-                <Globe size={16} />
-              </span>
+              <AvatarInitials icon={Globe} />
               <div>
                 <div className="font-semibold text-[var(--fg)]">@{d.domain}</div>
                 <div className="text-xs text-neutral">{d.label}</div>

@@ -6,7 +6,7 @@ import { useState, useRef, useEffect, useCallback } from "react"
 import { MoreHorizontal } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useVisiblePolling } from "@/lib/use-visible-polling"
-import { adminNavigation } from "./nav-items"
+import { adminNavigationFlat } from "./nav-items"
 import { memberMobileNavigation } from "./member-nav-items"
 
 // Keep the bottom bar uncramped: show this many tabs inline, the rest go under "More".
@@ -18,7 +18,7 @@ export function MobileNav({ variant = "admin" }: { variant?: "admin" | "member" 
   const [unread, setUnread] = useState(0)
   const moreRef = useRef<HTMLDivElement>(null)
 
-  const navigation = variant === "member" ? memberMobileNavigation : adminNavigation
+  const navigation = variant === "member" ? memberMobileNavigation : adminNavigationFlat
 
   useEffect(() => {
     function onClick(e: MouseEvent) {

@@ -16,11 +16,7 @@ import {
   Legend,
 } from "recharts"
 import { LuxPageHeader } from "@/components/ui/lux"
-
-const NAVY = "#0B1F3A"
-const GOLD = "#C9A84C"
-const TEAL = "#2A9D8F"
-const PIE_COLORS = [NAVY, GOLD, TEAL, "#13355f", "#9a7c2c", "#6B7689"]
+import { useChartColors } from "@/lib/use-chart-colors"
 
 const TIER_LABELS: Record<string, string> = {
   limited_1x: "Limited 1X",
@@ -37,6 +33,9 @@ type Data = {
 }
 
 export default function AnalyticsClient({ data }: { data: Data }) {
+  const colors = useChartColors()
+  const PIE_COLORS = [colors.navy, colors.gold, colors.teal, colors.navyLight, colors.goldDark, colors.axis]
+  const tooltipStyle = { borderRadius: 12, border: `1px solid ${colors.hair}`, backgroundColor: colors.surface, color: colors.fg }
   const pieData = data.tierDistribution.map((t) => ({ name: TIER_LABELS[t.tier] ?? t.tier, value: t.count }))
 
   return (
@@ -44,33 +43,33 @@ export default function AnalyticsClient({ data }: { data: Data }) {
       <LuxPageHeader eyebrow="Metrics" title="Analytics" subtitle="Growth, verification throughput, and where the network is concentrated." />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-surface rounded-md border border-[var(--hair)] p-5">
+        <div className="lg:col-span-2 bg-surface rounded-md border border-[var(--navy)]/10 p-5">
           <h2 className="font-sans font-semibold text-[var(--fg)] mb-4">Signups &amp; Swaps · last 6 months</h2>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={data.series} margin={{ left: -20, right: 8, top: 8 }}>
                 <defs>
                   <linearGradient id="gNavy" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={NAVY} stopOpacity={0.3} />
-                    <stop offset="95%" stopColor={NAVY} stopOpacity={0} />
+                    <stop offset="5%" stopColor={colors.navy} stopOpacity={0.3} />
+                    <stop offset="95%" stopColor={colors.navy} stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="gGold" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={GOLD} stopOpacity={0.4} />
-                    <stop offset="95%" stopColor={GOLD} stopOpacity={0} />
+                    <stop offset="5%" stopColor={colors.gold} stopOpacity={0.4} />
+                    <stop offset="95%" stopColor={colors.gold} stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E3E7EE" />
-                <XAxis dataKey="month" stroke="#6B7689" fontSize={12} />
-                <YAxis stroke="#6B7689" fontSize={12} allowDecimals={false} />
-                <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid #E3E7EE" }} />
-                <Area type="monotone" dataKey="signups" name="Signups" stroke={NAVY} fill="url(#gNavy)" strokeWidth={2} />
-                <Area type="monotone" dataKey="swaps" name="Swaps" stroke={GOLD} fill="url(#gGold)" strokeWidth={2} />
+                <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
+                <XAxis dataKey="month" stroke={colors.axis} fontSize={12} />
+                <YAxis stroke={colors.axis} fontSize={12} allowDecimals={false} />
+                <Tooltip contentStyle={tooltipStyle} />
+                <Area type="monotone" dataKey="signups" name="Signups" stroke={colors.navy} fill="url(#gNavy)" strokeWidth={2} />
+                <Area type="monotone" dataKey="swaps" name="Swaps" stroke={colors.gold} fill="url(#gGold)" strokeWidth={2} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="bg-surface rounded-md border border-[var(--hair)] p-5">
+        <div className="bg-surface rounded-md border border-[var(--navy)]/10 p-5">
           <h2 className="font-sans font-semibold text-[var(--fg)] mb-4">Tier Distribution</h2>
           {pieData.length === 0 ? (
             <p className="text-sm text-neutral">No active subscriptions yet.</p>
@@ -83,29 +82,29 @@ export default function AnalyticsClient({ data }: { data: Data }) {
                       <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
                     ))}
                   </Pie>
-                  <Legend wrapperStyle={{ fontSize: 11 }} />
+                  <Legend wrapperStyle={{ fontSize: 11, color: colors.fg }} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
           )}
         </div>
 
-        <div className="bg-surface rounded-md border border-[var(--hair)] p-5">
+        <div className="bg-surface rounded-md border border-[var(--navy)]/10 p-5">
           <h2 className="font-sans font-semibold text-[var(--fg)] mb-4">Verifications · last 6 months</h2>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data.series} margin={{ left: -20, right: 8, top: 8 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E3E7EE" vertical={false} />
-                <XAxis dataKey="month" stroke="#6B7689" fontSize={12} />
-                <YAxis stroke="#6B7689" fontSize={12} allowDecimals={false} />
-                <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid #E3E7EE" }} />
-                <Bar dataKey="verifications" name="Verified" fill={TEAL} radius={[6, 6, 0, 0]} />
+                <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} vertical={false} />
+                <XAxis dataKey="month" stroke={colors.axis} fontSize={12} />
+                <YAxis stroke={colors.axis} fontSize={12} allowDecimals={false} />
+                <Tooltip contentStyle={tooltipStyle} />
+                <Bar dataKey="verifications" name="Verified" fill={colors.teal} radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="lg:col-span-2 bg-surface rounded-md border border-[var(--hair)] p-5">
+        <div className="lg:col-span-2 bg-surface rounded-md border border-[var(--navy)]/10 p-5">
           <h2 className="font-sans font-semibold text-[var(--fg)] mb-4">Popular Duty Stations</h2>
           {data.topStations.length === 0 ? (
             <p className="text-sm text-neutral">No listings yet.</p>

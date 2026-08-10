@@ -4,11 +4,11 @@ import {
   Users,
   Home,
   ArrowLeftRight,
-  CheckCircle2,
   AlertTriangle,
-  ListChecks,
+  Flag,
   DollarSign,
   ChevronRight,
+  Activity,
 } from "lucide-react"
 import { getOverviewStats } from "@/server/services/dashboard"
 import { prisma } from "@/server/prisma"
@@ -24,104 +24,149 @@ const TIER_LABELS: Record<string, string> = {
   lifetime: "Lifetime",
 }
 
+function timeAgo(d: Date): string {
+  const s = Math.floor((Date.now() - d.getTime()) / 1000)
+  if (s < 60) return "just now"
+  const m = Math.floor(s / 60)
+  if (m < 60) return `${m} minute${m === 1 ? "" : "s"} ago`
+  const h = Math.floor(m / 60)
+  if (h < 24) return `${h} hour${h === 1 ? "" : "s"} ago`
+  const dy = Math.floor(h / 24)
+  return `${dy} day${dy === 1 ? "" : "s"} ago`
+}
+
+function prettifyAction(action: string): string {
+  return action.replace(/_/g, " ").toLowerCase().replace(/^./, (c) => c.toUpperCase())
+}
+
 export default async function OverviewPage() {
-  const stats = await getOverviewStats()
-  const recentSubmissions = await prisma.verificationSubmission.findMany({
-    where: { status: "PENDING" },
-    // Only the few member fields this list shows — a bare `include` would pull
-    // each member's base64 imageUrl too.
-    include: {
-      member: {
-        select: { fullName: true, avatarInitials: true, organisation: true, dutyStation: true },
-      },
-    },
-    orderBy: { createdAt: "desc" },
-    take: 5,
-  })
+  const [stats, openReports, recentActivity] = await Promise.all([
+    getOverviewStats(),
+    prisma.report.count({ where: { status: "open" } }),
+    prisma.auditLog.findMany({ orderBy: { createdAt: "desc" }, take: 8 }),
+  ])
 
   const cards = [
     { label: "Verified Members", value: stats.verifiedMembers, icon: Users, href: "/members" },
-    { label: "Pending Verification", value: stats.pendingVerifications, icon: ShieldCheck, href: "/verification" },
-    { label: "Active Listings", value: stats.activeListings, icon: Home, href: "/listings" },
-    { label: "Swaps In Progress", value: stats.swapsInProgress, icon: ArrowLeftRight, href: "/swaps" },
-    { label: "Swaps Completed", value: stats.swapsCompleted, icon: CheckCircle2, href: "/swaps" },
+    { label: "Active Properties", value: stats.activeListings, icon: Home, href: "/listings" },
+    { label: "Active Exchanges", value: stats.swapsInProgress, icon: ArrowLeftRight, href: "/swaps" },
+    { label: "Pending Verification", value: stats.pendingVerifications, icon: ShieldCheck, href: "/verification", alert: stats.pendingVerifications > 0 },
     { label: "Open Disputes", value: stats.openDisputes, icon: AlertTriangle, href: "/swaps", alert: stats.openDisputes > 0 },
-    { label: "Waitlist", value: stats.waitlistCount, icon: ListChecks, href: "/waitlist-admin" },
-    { label: "Est. MRR", value: `$${stats.mrr.toLocaleString()}`, icon: DollarSign, href: "/analytics" },
+    { label: "Est. Revenue", value: `$${stats.mrr.toLocaleString()}`, icon: DollarSign, href: "/analytics" },
   ] as const
+
+  const attention = [
+    stats.pendingVerifications > 0 && {
+      icon: ShieldCheck,
+      count: stats.pendingVerifications,
+      label: `identity verification${stats.pendingVerifications === 1 ? "" : "s"} pending`,
+      href: "/verification",
+      urgent: false,
+    },
+    openReports > 0 && {
+      icon: Flag,
+      count: openReports,
+      label: `report${openReports === 1 ? "" : "s"} requiring investigation`,
+      href: "/moderation",
+      urgent: openReports >= 3,
+    },
+    stats.openDisputes > 0 && {
+      icon: AlertTriangle,
+      count: stats.openDisputes,
+      label: `swap${stats.openDisputes === 1 ? "" : "s"} escalated`,
+      href: "/swaps",
+      urgent: true,
+    },
+  ].filter(Boolean) as { icon: typeof ShieldCheck; count: number; label: string; href: string; urgent: boolean }[]
 
   return (
     <div className="max-w-6xl mx-auto pb-12">
       <LuxPageHeader
         eyebrow="The Console"
-        title="Network Overview"
+        title="Dashboard"
         subtitle="An operational snapshot of the UnSwap verified exchange network."
       />
 
-      {/* KPI cards — hairline tiles, gold monochrome icons, Cormorant figures */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* KPI cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 mb-5">
         {cards.map((c) => (
           <Link
             key={c.label}
             href={c.href}
-            className="group bg-[var(--surface)] rounded-md p-6 border border-[var(--hair)] hover:border-[var(--gold)] transition-colors"
+            className="group bg-[var(--surface)] rounded-md p-5 border border-[var(--navy)]/10 hover:border-[var(--gold)] hover:bg-[var(--parchment)] transition-colors"
           >
             <div className="flex items-center justify-between">
-              <span className="w-11 h-11 border border-[var(--hair)] flex items-center justify-center text-[var(--gold-soft)] group-hover:border-[var(--gold)] transition-colors">
-                <c.icon size={20} strokeWidth={1.4} />
+              <span className="w-9 h-9 border border-[var(--hair)] flex items-center justify-center text-[var(--gold-soft)] group-hover:border-[var(--gold)] transition-colors">
+                <c.icon size={17} strokeWidth={1.4} />
               </span>
-              <ChevronRight size={16} className="text-neutral group-hover:text-[var(--gold-soft)] transition-colors" />
+              <ChevronRight size={15} className="text-neutral group-hover:text-[var(--gold-soft)] transition-colors" />
             </div>
-            <div className={`mt-5 font-sans font-semibold text-4xl leading-none ${"alert" in c && c.alert ? "text-[var(--crimson)]" : "text-[var(--fg)]"}`}>
+            <div className={`mt-4 font-display font-light text-3xl leading-none ${"alert" in c && c.alert ? "text-[var(--crimson)]" : "text-[var(--fg)]"}`}>
               {c.value}
             </div>
-            <div className="text-[11px] text-neutral uppercase tracking-[0.18em] mt-2 font-medium">{c.label}</div>
+            <div className="text-[10px] text-neutral uppercase tracking-[0.16em] mt-2 font-medium">{c.label}</div>
           </Link>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mt-5">
-        {/* Verification queue preview */}
+      {/* Attention required — the single most important section on this page:
+          every admin page should answer "what needs my attention?" first. */}
+      {attention.length > 0 && (
+        <LuxCard className="mb-5 overflow-hidden">
+          <div className="px-6 pt-5 pb-4 border-b border-[var(--hair)]">
+            <SectionLabel>Attention Required</SectionLabel>
+          </div>
+          <div className="divide-y divide-[var(--hair)]">
+            {attention.map((a, i) => (
+              <Link
+                key={i}
+                href={a.href}
+                className="flex items-center justify-between gap-4 px-6 py-4 hover:bg-[var(--parchment)] transition-colors"
+              >
+                <div className="flex items-center gap-3.5">
+                  <span className={`w-9 h-9 rounded-md flex items-center justify-center flex-shrink-0 ${a.urgent ? "bg-[var(--crimson)]/10 text-[var(--crimson)]" : "bg-[var(--gold)]/15 text-[var(--gold-dark)]"}`}>
+                    <a.icon size={16} />
+                  </span>
+                  <div className="text-sm text-[var(--fg)]">
+                    <span className="font-semibold">{a.count}</span> {a.label}
+                  </div>
+                </div>
+                <span className="text-[11px] font-medium uppercase tracking-[0.1em] text-[var(--gold-soft)] whitespace-nowrap">Review &rarr;</span>
+              </Link>
+            ))}
+          </div>
+        </LuxCard>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        {/* Recent activity — real audit-log entries, not a decorative feed. */}
         <LuxCard className="lg:col-span-2 overflow-hidden">
           <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-[var(--hair)]">
-            <div>
-              <SectionLabel>Queue</SectionLabel>
-              <h2 className="font-sans font-semibold text-2xl text-[var(--fg)] leading-none">Awaiting Verification</h2>
-            </div>
-            <Link href="/verification" className="text-[11px] font-medium uppercase tracking-[0.14em] text-[var(--gold-soft)] hover:text-[var(--gold)] transition-colors whitespace-nowrap">
-              View queue
+            <SectionLabel>Recent Activity</SectionLabel>
+            <Link href="/analytics" className="text-[11px] font-medium uppercase tracking-[0.14em] text-[var(--gold-soft)] hover:text-[var(--gold)] transition-colors whitespace-nowrap flex items-center gap-1">
+              <Activity size={12} /> Full analytics
             </Link>
           </div>
           <div className="divide-y divide-[var(--hair)]">
-            {recentSubmissions.length === 0 && (
-              <p className="px-6 py-10 text-center text-sm text-neutral">The verification queue is clear.</p>
+            {recentActivity.length === 0 && (
+              <p className="px-6 py-10 text-center text-sm text-neutral">No activity recorded yet.</p>
             )}
-            {recentSubmissions.map((s) => (
-              <div key={s.id} className="flex items-center justify-between px-6 py-4">
-                <div className="flex items-center gap-3.5">
-                  <span className="w-10 h-10 border border-[var(--hair)] text-[var(--gold-soft)] flex items-center justify-center text-xs font-semibold tracking-wide">
-                    {s.member.avatarInitials}
-                  </span>
-                  <div>
-                    <div className="text-sm font-medium text-[var(--fg)]">{s.member.fullName}</div>
-                    <div className="text-xs text-neutral mt-0.5">{s.member.organisation} · {s.member.dutyStation}</div>
-                  </div>
+            {recentActivity.map((a) => (
+              <div key={a.id} className="flex items-start gap-3 px-6 py-3.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--gold)] flex-shrink-0 mt-2" />
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm text-[var(--fg)] truncate">{a.subject}</div>
+                  <div className="text-xs text-neutral mt-0.5">{prettifyAction(a.action)} · {timeAgo(a.createdAt)}</div>
                 </div>
-                <Link
-                  href="/verification"
-                  className="text-[11px] font-medium uppercase tracking-[0.12em] px-4 py-2 rounded-sm bg-[var(--gold)] text-ink hover:bg-[var(--gold-hover)] transition-colors"
-                >
-                  Review
-                </Link>
               </div>
             ))}
           </div>
         </LuxCard>
 
-        {/* Tier distribution */}
+        {/* Tier distribution — a simple proportional list, not a decorative chart. */}
         <LuxCard className="p-6">
           <SectionLabel>Revenue</SectionLabel>
-          <h2 className="font-sans font-semibold text-2xl text-[var(--fg)] leading-none mb-5">Subscription Mix</h2>
+          <h2 className="font-sans font-semibold text-lg text-[var(--fg)] leading-none mb-5">Subscription Mix</h2>
           {stats.tierDistribution.length === 0 && (
             <p className="text-sm text-neutral">No active subscriptions yet.</p>
           )}

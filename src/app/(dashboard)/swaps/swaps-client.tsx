@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation"
 import { ArrowLeftRight, AlertTriangle, Calendar } from "lucide-react"
 import { LuxPageHeader } from "@/components/ui/lux"
 import { StatusBadge, Badge } from "@/components/ui/badges"
+import { AvatarInitials } from "@/components/ui/avatar"
+import { EmptyState } from "@/components/ui/empty-state"
+import { FilterTabs } from "@/components/ui/filter-tabs"
 
 type Swap = {
   id: string
@@ -19,7 +22,15 @@ type Swap = {
   listing: { title: string; city: string; country: string }
 }
 
-const FILTERS = ["all", "disputes", "REQUESTED", "ACCEPTED", "IN_PROGRESS", "COMPLETED", "CANCELLED"]
+const FILTERS = [
+  { key: "all", label: "All" },
+  { key: "disputes", label: "Disputes" },
+  { key: "REQUESTED", label: "Requested" },
+  { key: "ACCEPTED", label: "Accepted" },
+  { key: "IN_PROGRESS", label: "In progress" },
+  { key: "COMPLETED", label: "Completed" },
+  { key: "CANCELLED", label: "Cancelled" },
+]
 
 const fmt = (d: string) => new Date(d).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })
 
@@ -56,28 +67,16 @@ export default function SwapsClient({ initialSwaps }: { initialSwaps: Swap[] }) 
     <div className="max-w-6xl mx-auto pb-12">
       <LuxPageHeader eyebrow="Exchanges" title="Swap Management" subtitle="Monitor exchanges across their lifecycle and mediate disputes." />
 
-      <div className="flex gap-1 bg-surface border border-[var(--hair)] rounded-xl p-1 mb-5 w-fit overflow-x-auto">
-        {FILTERS.map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize whitespace-nowrap transition ${
- filter === f ? "bg-[var(--navy)] text-white" : "text-neutral-dark hover:bg-neutral-light"
- }`}
-          >
-            {f === "all" ? "All" : f === "disputes" ? "Disputes" : f.replace(/_/g, " ").toLowerCase()}
-          </button>
-        ))}
-      </div>
+      <FilterTabs options={FILTERS} value={filter} onChange={setFilter} className="mb-5 w-fit" />
 
       <div className="space-y-3">
         {filtered.map((s) => (
-          <div key={s.id} className={`bg-surface rounded-md border p-5 ${s.disputed ? "border-[var(--crimson)]" : "border-[var(--hair)]"}`}>
+          <div key={s.id} className={`bg-surface rounded-md border p-5 ${s.disputed ? "border-[var(--crimson)]" : "border-[var(--navy)]/10"}`}>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-4">
                 <div className="flex items-center -space-x-2">
-                  <span className="w-9 h-9 rounded-xl bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center text-xs font-bold border-2 border-surface">{s.requester.avatarInitials}</span>
-                  <span className="w-9 h-9 rounded-xl bg-[var(--gold)]/20 text-[var(--gold-dark)] flex items-center justify-center text-xs font-bold border-2 border-surface">{s.host.avatarInitials}</span>
+                  <AvatarInitials initials={s.requester.avatarInitials} tone="navy" className="border-2 border-surface" />
+                  <AvatarInitials initials={s.host.avatarInitials} tone="gold" className="border-2 border-surface" />
                 </div>
                 <div>
                   <div className="text-sm font-semibold text-[var(--fg)] flex items-center gap-2">
@@ -120,9 +119,7 @@ export default function SwapsClient({ initialSwaps }: { initialSwaps: Swap[] }) 
             </div>
           </div>
         ))}
-        {filtered.length === 0 && (
-          <div className="bg-surface rounded-md border border-[var(--hair)] p-10 text-center text-sm text-neutral">No swaps in this view.</div>
-        )}
+        {filtered.length === 0 && <EmptyState padding="sm" description="No swaps in this view." />}
       </div>
     </div>
   )

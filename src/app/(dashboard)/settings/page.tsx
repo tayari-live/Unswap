@@ -35,7 +35,7 @@ export default async function AdminSettingsPage() {
     <div className="max-w-2xl mx-auto pb-12">
       <LuxPageHeader eyebrow="Account" title="Settings" subtitle="Your administrator account." />
 
-      <div className="bg-surface rounded-md border border-[var(--hair)] p-6 sm:p-8">
+      <div className="bg-surface rounded-md border border-[var(--navy)]/10 p-6 sm:p-8">
         <h2 className="font-sans font-semibold text-xl text-[var(--fg)] mb-5">Account</h2>
         <dl className="divide-y divide-[var(--hair)] border border-[var(--hair)] rounded-xl overflow-hidden">
           {rows.map((r) => (
@@ -50,13 +50,13 @@ export default async function AdminSettingsPage() {
         </dl>
       </div>
 
-      <div className="bg-surface rounded-md border border-[var(--hair)] p-6 sm:p-8 mt-6">
+      <div className="bg-surface rounded-md border border-[var(--navy)]/10 p-6 sm:p-8 mt-6">
         <h2 className="font-sans font-semibold text-xl text-[var(--fg)] mb-1.5">Password</h2>
         <p className="text-sm text-neutral mb-5">Change the password for your admin account.</p>
         <ChangePasswordForm />
       </div>
 
-      <div className="bg-surface rounded-md border border-[var(--hair)] p-6 sm:p-8 mt-6">
+      <div className="bg-surface rounded-md border border-[var(--navy)]/10 p-6 sm:p-8 mt-6">
         <h2 className="font-sans font-semibold text-xl text-[var(--fg)] mb-1.5">Session</h2>
         <p className="text-sm text-neutral mb-5">Sign out of the admin console on this device.</p>
         <SignOutButton />

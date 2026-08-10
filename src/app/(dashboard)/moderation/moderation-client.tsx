@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Check, Trash2, MessageSquare, Star, ShieldX } from "lucide-react"
 import { LuxPageHeader } from "@/components/ui/lux"
+import { EmptyState } from "@/components/ui/empty-state"
 
 export type ModReport = {
   id: string
@@ -46,17 +47,11 @@ export default function ModerationClient({ initial }: { initial: ModReport[] }) 
       <LuxPageHeader eyebrow="Trust & Safety" title="Content Moderation" subtitle="Member-reported messages and reviews awaiting review." />
 
       {reports.length === 0 ? (
-        <div className="bg-surface rounded-md border border-[var(--hair)] p-12 text-center">
-          <div className="mx-auto w-14 h-14 rounded-md bg-[var(--teal)]/15 text-[var(--teal)] flex items-center justify-center mb-4">
-            <ShieldX size={26} />
-          </div>
-          <h2 className="font-sans text-xl font-semibold text-[var(--fg)]">Queue is clear</h2>
-          <p className="mt-2 text-sm text-neutral">No open reports to review.</p>
-        </div>
+        <EmptyState icon={ShieldX} tone="success" title="Queue is clear" description="No open reports to review." />
       ) : (
         <div className="space-y-4">
           {reports.map((r) => (
-            <div key={r.id} className="bg-surface rounded-md border border-[var(--hair)] p-5">
+            <div key={r.id} className="bg-surface rounded-md border border-[var(--navy)]/10 p-5">
               <div className="flex items-center justify-between gap-3">
                 <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full bg-[var(--gold)]/15 text-[var(--gold-dark)]">
                   {r.targetType === "message" ? <MessageSquare size={12} /> : <Star size={12} />}

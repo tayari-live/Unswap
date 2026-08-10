@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation"
 import { MapPin, BedDouble, Bath, Users, Flag, Star } from "lucide-react"
 import { LuxPageHeader } from "@/components/ui/lux"
 import { StatusBadge, Badge } from "@/components/ui/badges"
+import { AvatarInitials } from "@/components/ui/avatar"
+import { EmptyState } from "@/components/ui/empty-state"
+import { FilterTabs } from "@/components/ui/filter-tabs"
 
 type Listing = {
   id: string
@@ -23,7 +26,13 @@ type Listing = {
   owner: { fullName: string; avatarInitials: string; organisation: string | null }
 }
 
-const STATUS_FILTERS = ["all", "ACTIVE", "PAUSED", "DRAFT", "ARCHIVED"]
+const STATUS_FILTERS = [
+  { key: "all", label: "All" },
+  { key: "ACTIVE", label: "Active" },
+  { key: "PAUSED", label: "Paused" },
+  { key: "DRAFT", label: "Draft" },
+  { key: "ARCHIVED", label: "Archived" },
+]
 
 export default function ListingsClient({ initialListings }: { initialListings: Listing[] }) {
   const router = useRouter()
@@ -57,23 +66,11 @@ export default function ListingsClient({ initialListings }: { initialListings: L
     <div className="max-w-6xl mx-auto pb-12">
       <LuxPageHeader eyebrow="Inventory" title="Listings" subtitle="All member home listings. Flag for moderation, pause, or archive." />
 
-      <div className="flex gap-1 bg-surface border border-[var(--hair)] rounded-xl p-1 mb-5 w-fit">
-        {STATUS_FILTERS.map((f) => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition ${
- filter === f ? "bg-[var(--navy)] text-white" : "text-neutral-dark hover:bg-neutral-light"
- }`}
-          >
-            {f === "all" ? "All" : f.toLowerCase()}
-          </button>
-        ))}
-      </div>
+      <FilterTabs options={STATUS_FILTERS} value={filter} onChange={setFilter} className="mb-5 w-fit" />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filtered.map((l) => (
-          <div key={l.id} className={`bg-surface rounded-md border overflow-hidden ${l.flagged ? "border-[var(--crimson)]" : "border-[var(--hair)]"}`}>
+          <div key={l.id} className={`bg-surface rounded-md border overflow-hidden ${l.flagged ? "border-[var(--crimson)]" : "border-[var(--navy)]/10"}`}>
             <div className="relative h-36 bg-neutral-light">
               {l.photos[0] && (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -101,9 +98,7 @@ export default function ListingsClient({ initialListings }: { initialListings: L
                 <span className="text-neutral">· {l.propertyType}</span>
               </div>
               <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[var(--hair)]">
-                <span className="w-7 h-7 rounded-lg bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center text-[10px] font-bold">
-                  {l.owner.avatarInitials}
-                </span>
+                <AvatarInitials initials={l.owner.avatarInitials} size="sm" />
                 <span className="text-xs text-neutral-dark truncate">{l.owner.fullName}</span>
               </div>
               <div className="flex gap-2 mt-3">
@@ -130,7 +125,7 @@ export default function ListingsClient({ initialListings }: { initialListings: L
           </div>
         ))}
         {filtered.length === 0 && (
-          <div className="col-span-full bg-surface rounded-md border border-[var(--hair)] p-10 text-center text-sm text-neutral">No listings in this view.</div>
+          <div className="col-span-full"><EmptyState padding="sm" description="No listings in this view." /></div>
         )}
       </div>
     </div>
