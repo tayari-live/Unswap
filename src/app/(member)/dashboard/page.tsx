@@ -110,45 +110,97 @@ export default async function MemberDashboardPage() {
           select: { reviewNote: true },
         })
       : null
-  const checklist = [
+  /*
+   * One list for everything asking something of the member, rather than
+   * separate verification / listing / request blocks that read as unrelated.
+   * Live activity sits above onboarding because it's time-sensitive; the
+   * onboarding steps keep their natural sequence so the list doesn't reshuffle
+   * as they're completed. `urgency` drives the heading and the badge —
+   * "required" means genuinely blocking, not merely unfinished.
+   */
+  const actions: {
+    key: string
+    title: string
+    sub: string | null
+    done: boolean
+    href?: string
+    cta: string
+    urgency: "required" | "recommended"
+    resendEmail?: string
+  }[] = [
+    ...(incoming.length > 0
+      ? [{
+          key: "requests",
+          title: `${incoming.length} incoming swap request${incoming.length > 1 ? "s" : ""}`,
+          sub:
+            incoming.length === 1
+              ? `Someone wants to stay at your home in ${incoming[0].listing.city || incoming[0].listing.title}.`
+              : "Multiple members have requested to stay at your homes.",
+          done: false,
+          href: incoming.length === 1 ? `/dashboard/swaps/${incoming[0].id}` : "/dashboard/swaps",
+          cta: incoming.length === 1 ? "Review request" : "Review requests",
+          urgency: "required" as const,
+        }]
+      : []),
     {
+      key: "email",
       title: "Confirm your email",
       sub: user.verificationStatus === "PENDING_EMAIL" ? "Check your inbox for the confirmation link." : null,
       done: user.verificationStatus !== "PENDING_EMAIL",
-      href: undefined as string | undefined,
-      action: "",
+      cta: "",
+      urgency: "required",
       resendEmail: user.verificationStatus === "PENDING_EMAIL" ? user.email : undefined,
     },
     {
+      key: "profile",
       title: "Complete your profile",
       sub: profileIncomplete ? `${user.profileCompletion}% done — members exchange with people, not just listings.` : null,
       done: !profileIncomplete,
       href: "/dashboard/profile/edit",
-      action: "Complete",
+      cta: "Complete",
+      urgency: "recommended",
     },
     {
-      title: "List your first home",
-      sub: user.listings.length ? null : "Add a home you'd like to offer for exchange.",
-      done: user.listings.length > 0,
-      href: "/dashboard/listings/new",
-      action: "Add home",
-    },
-    {
+      key: "identity",
       title: "Verify your identity",
       sub: isVerified
         ? null
         : idReview
-        ? "Under review — usually within 2 business days."
-        : user.verificationStatus === "REJECTED"
-        ? `Not approved${lastRejection?.reviewNote ? ` — “${lastRejection.reviewNote}”` : ""}. Resubmit with updated documents.`
-        : "Required to request or accept a swap.",
+          ? "Under review — usually within 2 business days."
+          : user.verificationStatus === "REJECTED"
+            ? `Not approved${lastRejection?.reviewNote ? ` — “${lastRejection.reviewNote}”` : ""}. Resubmit with updated documents.`
+            : "Required to request or accept a swap.",
       done: isVerified,
+      // No CTA while a submission is under review — there's nothing to do but wait.
       href: isVerified || idReview ? undefined : "/verify-identity",
-      action: user.verificationStatus === "REJECTED" ? "Resubmit" : "Verify",
+      cta: user.verificationStatus === "REJECTED" ? "Resubmit" : "Verify",
+      urgency: "required",
+    },
+    {
+      key: "membership",
+      title: "Activate your membership",
+      sub: user.subscription?.status === "active" ? null : "Required to confirm an exchange.",
+      done: user.subscription?.status === "active",
+      href: "/dashboard/subscription",
+      cta: "Choose plan",
+      urgency: "required",
+    },
+    {
+      key: "listing",
+      title: "List your first home",
+      sub: user.listings.length ? null : "Add a home you'd like to offer for exchange.",
+      done: user.listings.length > 0,
+      href: "/dashboard/listings/new",
+      cta: "Add home",
+      urgency: "recommended",
     },
   ]
-  const checklistDone = checklist.filter((s) => s.done).length
-  const showChecklist = checklistDone < checklist.length
+
+  const pending = actions.filter((a) => !a.done)
+  // Hidden entirely once nothing is outstanding — a settled member shouldn't
+  // keep seeing a checklist just because the component exists.
+  const showActions = pending.length > 0
+  const hasRequired = pending.some((a) => a.urgency === "required")
 
   /*
    * The greeting itself is just personalisation — this line carries the
@@ -284,8 +336,66 @@ export default async function MemberDashboardPage() {
           <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-gradient-to-l from-white/5 to-transparent pointer-events-none" />
         </div>
 
-        {/* 4. Upcoming Exchanges (Conditional) */}
-        {upcoming.length > 0 ? (
+        {/* 4. Action Required / Your Next Steps — one consolidated module */}
+        {showActions && (
+          <div className="mb-16">
+            <h3 className="font-sans text-xs font-bold text-navy uppercase tracking-[0.14em] mb-4">
+              {hasRequired ? "Action Required" : "Your Next Steps"}
+            </h3>
+            <div className="border-t border-[var(--hair)] max-w-3xl">
+              {actions.map((a) => {
+                const blocking = !a.done && a.urgency === "required"
+                return (
+                  <div
+                    key={a.key}
+                    className={cn(
+                      "flex items-start sm:items-center justify-between gap-4 py-5 border-b border-[var(--hair)]",
+                      blocking && "bg-[var(--gold)]/10 -mx-4 px-4 sm:-mx-6 sm:px-6 rounded-lg border-transparent",
+                    )}
+                  >
+                    <div className="flex items-start sm:items-center gap-4 min-w-0">
+                      <span className={cn("flex-shrink-0 mt-0.5 sm:mt-0", a.done ? "text-[var(--gold)]" : blocking ? "text-[var(--gold-dark)]" : "text-navy/30")}>
+                        {a.done ? (
+                          <Check size={18} strokeWidth={2.5} />
+                        ) : blocking ? (
+                          <Star size={18} fill="currentColor" />
+                        ) : (
+                          <div className="w-[18px] h-[18px] rounded-full border-2 border-current" />
+                        )}
+                      </span>
+                      <div className="flex flex-col min-w-0">
+                        <span className={cn("font-sans text-[15px]", a.done ? "text-navy/60" : "text-navy font-bold")}>
+                          {a.title}
+                        </span>
+                        {!a.done && a.sub && (
+                          <span className="font-sans text-[14px] text-navy/70 mt-1 leading-snug">{a.sub}</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex-shrink-0 mt-1 sm:mt-0">
+                      {a.done ? (
+                        <span className="text-[13px] font-medium text-navy/40">Complete</span>
+                      ) : a.resendEmail ? (
+                        <ResendEmailButton email={a.resendEmail} />
+                      ) : a.href ? (
+                        <Link href={a.href} className="text-[13px] font-bold text-[var(--gold-dark)] hover:text-navy transition-colors flex items-center gap-1">
+                          {a.cta} <ChevronRight size={14} />
+                        </Link>
+                      ) : (
+                        // Under review — nothing for the member to do but wait.
+                        <span className="text-[13px] font-medium text-navy/40">Pending</span>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* 5. Upcoming Exchanges — content, not a to-do, so it simply hides when empty */}
+        {upcoming.length > 0 && (
           <div className="mb-16">
             <h3 className="font-sans text-xs font-bold text-navy uppercase tracking-[0.14em] mb-4">
               Upcoming Exchanges
@@ -303,93 +413,14 @@ export default async function MemberDashboardPage() {
                   </div>
                   <div className="flex items-center gap-6">
                     <span className="font-sans text-[11px] font-bold uppercase tracking-[0.12em] px-3 py-1.5 bg-[var(--parchment-dark)] text-navy rounded-full">
-                      Confirmed
+                      {r.status === "IN_PROGRESS" ? "In progress" : "Confirmed"}
                     </span>
-                    <Link href="/dashboard/swaps" className="text-[13px] font-medium text-[var(--gold-dark)] hover:text-navy transition-colors flex items-center gap-1">
+                    <Link href={`/dashboard/exchanges/${r.id}`} className="text-[13px] font-medium text-[var(--gold-dark)] hover:text-navy transition-colors flex items-center gap-1">
                       View exchange <ChevronRight size={14} />
                     </Link>
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
-        ) : (
-          <div className="mb-16">
-            <h3 className="font-sans text-xs font-bold text-navy uppercase tracking-[0.14em] mb-4">
-              Upcoming Exchanges
-            </h3>
-            <div className="border-t border-[var(--hair)] py-8">
-              <p className="font-sans text-[15px] text-navy/70 mb-2">No upcoming exchanges yet.</p>
-              <Link href="/dashboard/browse" className="text-[14px] font-medium text-[var(--gold-dark)] hover:text-navy transition-colors">
-                Explore homes to find your next stay &rarr;
-              </Link>
-            </div>
-          </div>
-        )}
-
-        {/* 5. Swap Requests (Conditional) */}
-        {incoming.length > 0 && (
-          <div className="mb-16">
-            <h3 className="font-sans text-xs font-bold text-navy uppercase tracking-[0.14em] mb-4">
-              Swap Requests
-            </h3>
-            <div className="border-t border-[var(--hair)] pt-6">
-              <div className="flex flex-col md:flex-row md:items-center justify-between">
-                <div className="flex flex-col mb-4 md:mb-0">
-                  <div className="font-display text-[24px] text-navy font-bold leading-none mb-2">
-                    {incoming.length} incoming request{incoming.length > 1 ? "s" : ""}
-                  </div>
-                  <div className="font-sans text-[15px] text-navy/80">
-                    {incoming.length === 1 
-                      ? `Someone wants to stay at your home in ${incoming[0].listing.city || incoming[0].listing.title}.`
-                      : "Multiple members have requested to stay at your homes."}
-                  </div>
-                </div>
-                <Link href="/dashboard/swaps" className="inline-flex items-center justify-center px-6 py-2.5 rounded-md bg-[var(--navy)] text-white font-sans font-bold text-[12px] uppercase tracking-[0.08em] hover:bg-navy/90 transition-colors shadow-sm">
-                  Review requests <ChevronRight size={14} className="ml-1" />
-                </Link>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* 6. Your Next Steps (Conditional) */}
-        {showChecklist && !isVerified && (
-          <div className="mb-16">
-            <h3 className="font-sans text-xs font-bold text-navy uppercase tracking-[0.14em] mb-4">
-              Your Next Steps
-            </h3>
-            <div className="border-t border-[var(--hair)] max-w-3xl">
-              {checklist.map((s, i) => {
-                const isVerify = s.title === "Verify your identity";
-                return (
-                  <div key={i} className={cn("flex items-start sm:items-center justify-between py-5 border-b border-[var(--hair)] group", isVerify && !s.done && "bg-[var(--gold)]/10 -mx-4 px-4 sm:-mx-6 sm:px-6 rounded-lg mt-2 border-transparent")}>
-                    <div className="flex items-start sm:items-center gap-4">
-                      <span className={`flex-shrink-0 mt-0.5 sm:mt-0 ${s.done ? "text-[var(--gold)]" : (isVerify ? "text-[var(--gold-dark)]" : "text-navy/30")}`}>
-                        {s.done ? <Check size={18} strokeWidth={2.5} /> : (isVerify ? <Star size={18} fill="currentColor" /> : <div className="w-[18px] h-[18px] rounded-full border-2 border-current" />)}
-                      </span>
-                      <div className="flex flex-col">
-                        <span className={`font-sans text-[15px] ${s.done ? "text-navy/60" : "text-navy font-bold"}`}>
-                          {s.title}
-                        </span>
-                        {isVerify && !s.done && (
-                          <span className="font-sans text-[14px] text-navy/70 mt-1 leading-snug">
-                            Required to access the full UnSwap network.
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    {!s.done && s.href && (
-                      <Link href={s.href} className="flex-shrink-0 text-[13px] font-bold text-[var(--gold-dark)] hover:text-navy transition-colors flex items-center gap-1 mt-1 sm:mt-0">
-                        {s.action} <ChevronRight size={14} />
-                      </Link>
-                    )}
-                    {s.done && (
-                      <span className="flex-shrink-0 text-[13px] font-medium text-navy/40 mt-1 sm:mt-0">Complete</span>
-                    )}
-                  </div>
-                );
-              })}
             </div>
           </div>
         )}
