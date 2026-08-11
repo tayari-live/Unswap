@@ -58,7 +58,7 @@ export function ResetForm() {
 
   if (done) {
     return (
-      <AuthShell eyebrow="All done" title="Password updated">
+      <AuthShell eyebrow="All done" title="Password updated" logoHref="/login">
         <div className="text-center">
           <div className="mx-auto w-16 h-16 border border-wl-border text-wl-gold flex items-center justify-center mb-6">
             <CheckCircle2 size={26} strokeWidth={1.4} />
@@ -77,6 +77,7 @@ export function ResetForm() {
       eyebrow="Account recovery"
       title="Choose a new password"
       subtitle="Enter a new password for your account."
+      logoHref="/login"
       footer={
         <Link
           href="/login"

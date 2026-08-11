@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { ThemeToggleIcon } from "@/components/theme/theme-toggle"
 
 /**
@@ -15,13 +16,23 @@ export function AuthShell({
   subtitle,
   children,
   footer,
+  // Where the logo returns you. Defaults to the public landing page; the
+  // password-recovery pages pass "/login". Pass null on the pages a member
+  // lands on mid-flow (email confirmation, identity verification), where there
+  // is no meaningful "back" and a clickable logo would only invite leaving.
+  logoHref = "/",
 }: {
   eyebrow: string
   title: string
   subtitle?: string
   children: React.ReactNode
   footer?: React.ReactNode
+  logoHref?: string | null
 }) {
+  const logo = (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src="/waitlist/logo.png" alt="UnSwap" className="w-24 h-24 object-contain" />
+  )
   return (
     <div className="min-h-screen w-full relative bg-wl-navy text-wl-ivory font-sans">
       <div className="fixed top-5 right-5 z-50">
@@ -49,8 +60,13 @@ export function AuthShell({
 
         <div className="w-full max-w-md mx-auto relative">
           <div className="flex justify-center mb-6">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/waitlist/logo.png" alt="UnSwap" className="w-24 h-24 object-contain" />
+            {logoHref ? (
+              <Link href={logoHref} aria-label="UnSwap" className="inline-flex transition-opacity hover:opacity-90">
+                {logo}
+              </Link>
+            ) : (
+              logo
+            )}
           </div>
 
           <div className="flex items-center justify-center gap-3 mb-5">

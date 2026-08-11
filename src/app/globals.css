@@ -221,6 +221,75 @@
   --color-navy-dark: #18233c;
 }
 
+/*
+ * Marketing ground.
+ *
+ * The product flips with the theme; the marketing site must not. Its whole
+ * composition is a fixed ratio of Navy, Parchment and White with Gold at about
+ * a tenth of the surface, and the dark theme's overrides above (navy lifting to
+ * #22304f, parchment becoming #161f30) would dismantle it.
+ *
+ * Rather than give the marketing components their own colour names, this
+ * re-declares the brand tokens to their literal values on a wrapper element.
+ * Tailwind utilities resolve `bg-navy` through var(--color-navy) at use time,
+ * so everything inside .marketing renders brand-true in either theme, and no
+ * component needs to know the theme exists.
+ */
+.marketing {
+  color-scheme: light;
+
+  --color-navy: #0b1f3a;
+  --color-gold: #c9a84c;
+  --color-gold-hover: #b8973d;
+  --color-parchment: #f5efe0;
+  --color-parchment-dark: #ede7d4;
+
+  /* Gold is an accent, not a text colour on light grounds: #C9A84C on
+     Parchment is 2.1:1. This is the same hue darkened to clear AA, and it is
+     the only gold allowed to carry small type on Parchment or White. */
+  --color-gold-ink: #7d6423;
+
+  /* Navy at fixed alphas for body copy, pre-mixed so no section invents its
+     own opacity. */
+  --color-ink-70: rgba(11, 31, 58, 0.7);
+  --color-ink-55: rgba(11, 31, 58, 0.55);
+
+  background-color: #ffffff;
+  color: var(--color-navy);
+}
+
+/* The display face is used at Light (300) here, against the product's 600. */
+.marketing h1,
+.marketing h2,
+.marketing h3,
+.marketing h4 {
+  font-weight: inherit;
+}
+
+/*
+ * Section entrances. One effect, used everywhere: fade plus a short rise.
+ * Elements start hidden only once the observer has claimed them (JS sets
+ * data-reveal="pending"), so with JS unavailable nothing was ever hidden.
+ */
+[data-reveal="pending"] {
+  opacity: 0;
+  transform: translateY(14px);
+}
+
+[data-reveal="shown"] {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 700ms var(--ease-enter),
+    transform 700ms var(--ease-enter);
+}
+
+/* On the Navy marketing grounds the gold focus ring is too close to the
+   surface; those sections switch to Parchment. */
+.marketing [data-ground="navy"] :where(a, button, [role="button"], summary):focus-visible {
+  outline-color: var(--color-parchment);
+}
+
 body {
   background-color: var(--background);
   color: var(--foreground);
@@ -323,5 +392,13 @@ h1, h2, h3, h4, h5, h6 {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  /* Reveal hides before it animates, and with transitions collapsed the
+     unhiding would never arrive. The observer also bails out early on this
+     preference; this covers anything already marked. */
+  [data-reveal="pending"] {
+    opacity: 1;
+    transform: none;
   }
 }

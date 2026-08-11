@@ -43,6 +43,7 @@ export default function ForgotPasswordPage() {
         eyebrow="Check your inbox"
         title="Instructions sent"
         footer={backToSignIn}
+        logoHref="/login"
       >
         <div className="text-center">
           <div className="mx-auto w-16 h-16 border border-wl-border text-wl-gold flex items-center justify-center mb-6">
@@ -64,6 +65,7 @@ export default function ForgotPasswordPage() {
       title="Reset your password"
       subtitle="Enter the email linked to your account and we will send a secure reset link."
       footer={backToSignIn}
+      logoHref="/login"
     >
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div>

@@ -122,8 +122,12 @@ export default function RegisterPage() {
 
         <div className="w-full max-w-md mx-auto relative">
           <div className="flex justify-center mb-6">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/waitlist/logo.png" alt="UnSwap" className="w-24 h-24 object-contain" />
+            {/* The logo is the way back out of the funnel: from sign-up, that is
+                the public landing page. */}
+            <Link href="/" aria-label="UnSwap — home" className="inline-flex transition-opacity hover:opacity-90">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/waitlist/logo.png" alt="UnSwap" className="w-24 h-24 object-contain" />
+            </Link>
           </div>
 
           <div className="flex items-center justify-center gap-3 mb-5">

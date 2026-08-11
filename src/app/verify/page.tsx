@@ -28,6 +28,7 @@ export default async function VerifyPage({
     <AuthShell
       eyebrow={ok ? "Verified Access" : "Verification"}
       title={ok ? "Email confirmed" : "Verification failed"}
+      logoHref={null}
       footer={
         <p className="text-sm text-wl-ivory-dim">
           Need an account?{" "}

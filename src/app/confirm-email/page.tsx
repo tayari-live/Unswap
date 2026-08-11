@@ -44,6 +44,7 @@ function ConfirmEmailCard() {
     <AuthShell
       eyebrow="One more step"
       title="Verify your email"
+      logoHref={null}
       footer={
         <p className="text-sm text-wl-ivory-dim">
           Wrong email address?{" "}
