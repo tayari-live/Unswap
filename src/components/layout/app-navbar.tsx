@@ -12,6 +12,7 @@ import {
 import { cn } from "@/lib/utils"
 import { useVisiblePolling } from "@/lib/use-visible-polling"
 import { MemberNotificationBell } from "./member-notification-bell"
+import { ThemeToggle } from "@/components/theme/theme-toggle"
 
 /*
  * The logged-in application navbar.
@@ -339,6 +340,10 @@ export function AppNavbar({
                         {i.name}
                       </Link>
                     ))}
+                    {/* Appearance sits with the account destinations, matching
+                        the admin console. ThemeToggle ships styled for the navy
+                        rail, so it's restyled to this white dropdown's rows. */}
+                    <ThemeToggle className="w-full rounded-none gap-3 px-4 py-2.5 text-sm font-medium text-navy hover:bg-[var(--parchment)] hover:text-navy" />
                   </div>
                   <div className="border-t border-navy/10 py-1.5">
                     <button
@@ -400,6 +405,7 @@ export function AppNavbar({
             <div className="mt-auto border-t border-navy/10 py-2">
               <MenuRow item={{ name: "Profile", href: "/dashboard/profile", icon: UserCircle }} onClick={() => setDrawer(false)} />
               <MenuRow item={{ name: "Settings", href: "/dashboard/settings", icon: Settings }} onClick={() => setDrawer(false)} />
+              <ThemeToggle className="w-full rounded-none gap-3 px-4 py-3 text-sm font-medium text-navy hover:bg-[var(--parchment)] hover:text-navy" />
               <button
                 type="button"
                 onClick={() => signOut({ callbackUrl: "/login" })}
