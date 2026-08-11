@@ -7,6 +7,7 @@ import { signOut } from "next-auth/react"
 import { Search, ChevronDown, User, Settings, LogOut, Home, ArrowLeftRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { NotificationBell } from "./notification-bell"
+import { ThemeToggle } from "@/components/theme/theme-toggle"
 
 type SearchResults = {
   members: { id: string; fullName: string; email: string; avatarInitials: string }[]
@@ -186,6 +187,9 @@ export function AdminTopbar({
               <Link href="/settings" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-[var(--parchment)] transition-colors">
                 <Settings size={15} className="text-neutral" /> Admin Settings
               </Link>
+              {/* ThemeToggle defaults to the navy rail's white-on-dark styling;
+                  restyled here for this light dropdown surface. */}
+              <ThemeToggle className="w-full rounded-none px-4 py-2.5 text-sm font-normal text-[var(--fg)] hover:bg-[var(--parchment)] hover:text-[var(--fg)]" />
               <div className="border-t border-[var(--hair)]" />
               <button
                 onClick={() => signOut({ callbackUrl: "/login" })}
