@@ -89,17 +89,17 @@ function NavDropdown({
         aria-haspopup="true"
         className={cn(
           "inline-flex items-center gap-1.5 text-sm font-medium transition-colors duration-150 px-2.5 py-1.5 rounded-lg group",
-          open ? "bg-[var(--parchment-dark)] text-navy" : "text-navy hover:bg-[var(--parchment-dark)] bg-transparent",
+          open ? "bg-[var(--navy)]/8 text-[var(--fg)]" : "text-[var(--fg)] hover:bg-[var(--navy)]/8 bg-transparent",
         )}
       >
         {label}
-        <ChevronDown size={15} className={cn("transition-transform duration-150", open ? "text-[var(--gold)] rotate-180" : "text-navy/55 group-hover:text-[var(--gold)]")} />
+        <ChevronDown size={15} className={cn("transition-transform duration-150", open ? "text-[var(--gold)] rotate-180" : "text-[var(--fg)]/55 group-hover:text-[var(--gold)]")} />
       </button>
 
       {open && (
         <div
           className={cn(
-            "absolute top-full mt-1 bg-white border border-navy/10 rounded-[10px] shadow-dropdown overflow-hidden z-dropdown",
+            "absolute top-full mt-1 bg-[var(--surface)] border border-[var(--border)] rounded-[10px] shadow-dropdown overflow-hidden z-dropdown",
             width,
             align === "right" ? "right-0" : "left-0",
           )}
@@ -116,17 +116,17 @@ function MenuRow({ item, onClick }: { item: Item; onClick: () => void }) {
     <Link
       href={item.href}
       onClick={onClick}
-      className="flex items-start gap-3 px-4 py-3 bg-white hover:bg-[var(--parchment)] transition-colors group"
+      className="flex items-start gap-3 px-4 py-3 bg-[var(--surface)] hover:bg-[var(--navy)]/5 transition-colors group"
     >
-      <item.icon size={18} strokeWidth={1.75} className="mt-0.5 flex-shrink-0 text-navy/45 group-hover:text-[var(--gold)] transition-colors" />
+      <item.icon size={18} strokeWidth={1.75} className="mt-0.5 flex-shrink-0 text-[var(--fg)]/45 group-hover:text-[var(--gold)] transition-colors" />
       <span className="flex-1 min-w-0">
         <span className="flex items-center gap-2">
-          <span className="text-sm font-medium text-navy">{item.name}</span>
+          <span className="text-sm font-medium text-[var(--fg)]">{item.name}</span>
           {!!item.badge && item.badge > 0 && (
             <span className="w-1.5 h-1.5 rounded-full bg-[var(--gold)] inline-block flex-shrink-0" title={`${item.badge} unread`} />
           )}
         </span>
-        {item.desc && <span className="block text-xs text-navy/50 group-hover:text-navy/60 mt-0.5 leading-snug transition-colors">{item.desc}</span>}
+        {item.desc && <span className="block text-xs text-[var(--fg)]/50 group-hover:text-[var(--fg)]/60 mt-0.5 leading-snug transition-colors">{item.desc}</span>}
       </span>
     </Link>
   )
@@ -205,13 +205,13 @@ export function AppNavbar({
 
   return (
     <>
-      <header className="sticky top-0 z-sticky bg-white border-b border-navy/10">
+      <header className="sticky top-0 z-sticky bg-[var(--surface)] border-b border-[var(--border)]">
         <div className="max-w-[1440px] mx-auto flex items-center gap-6 lg:gap-8 px-6 lg:px-10 h-[72px] md:h-[76px]">
           <button
             type="button"
             onClick={() => setDrawer(true)}
             aria-label="Open menu"
-            className="md:hidden -ml-1 p-2 text-navy"
+            className="md:hidden -ml-1 p-2 text-[var(--fg)]"
           >
             <Menu size={22} strokeWidth={1.75} />
           </button>
@@ -219,7 +219,7 @@ export function AppNavbar({
           {/* Permanent brand anchor; returns to the dashboard, not the marketing site. */}
           <Link
             href="/dashboard"
-            className="font-sans text-base font-bold tracking-[0.10em] text-navy hover:text-[var(--gold-dark)] transition-colors w-[92px] flex-shrink-0"
+            className="font-sans text-base font-bold tracking-[0.10em] text-[var(--fg)] hover:text-[var(--gold-dark)] transition-colors w-[92px] flex-shrink-0"
           >
             UNSWAP
           </Link>
@@ -254,7 +254,7 @@ export function AppNavbar({
               {(close) => (
                 <div className="py-1.5">
                   {MINE.map((i) => <MenuRow key={i.name} item={i} onClick={close} />)}
-                  <div className="h-px bg-navy/10 my-1.5" />
+                  <div className="h-px bg-[var(--border)] my-1.5" />
                   <MenuRow item={{ name: "Membership", href: "/dashboard/subscription", icon: CreditCard }} onClick={close} />
                 </div>
               )}
@@ -263,7 +263,7 @@ export function AppNavbar({
 
           <div className="flex items-center gap-1 sm:gap-2 ml-auto">
             <MemberNotificationBell
-              buttonClassName="relative w-10 h-10 rounded-lg text-navy/60 hover:text-[var(--gold-dark)] hover:bg-[var(--parchment)] flex items-center justify-center transition-colors"
+              buttonClassName="relative w-10 h-10 rounded-lg text-[var(--fg)]/60 hover:text-[var(--gold-dark)] hover:bg-[var(--navy)]/5 flex items-center justify-center transition-colors"
               dotClassName="absolute top-2.5 right-2.5 w-1.5 h-1.5 rounded-full bg-[var(--gold)]"
             />
 
@@ -271,7 +271,7 @@ export function AppNavbar({
               href="/dashboard/settings"
               aria-label="Help and support"
               title="Help and support"
-              className="hidden sm:inline-flex w-10 h-10 rounded-lg text-navy/60 hover:text-[var(--gold-dark)] hover:bg-[var(--parchment)] items-center justify-center transition-colors"
+              className="hidden sm:inline-flex w-10 h-10 rounded-lg text-[var(--fg)]/60 hover:text-[var(--gold-dark)] hover:bg-[var(--navy)]/5 items-center justify-center transition-colors"
             >
               <HelpCircle size={19} strokeWidth={1.75} />
             </Link>
@@ -285,7 +285,7 @@ export function AppNavbar({
                 aria-haspopup="true"
                 className={cn(
                   "inline-flex items-center gap-2 pl-1 pr-1.5 sm:pr-2.5 py-1 rounded-lg transition-colors group",
-                  profileOpen ? "bg-[var(--parchment-dark)]" : "hover:bg-[var(--parchment-dark)] bg-transparent",
+                  profileOpen ? "bg-[var(--navy)]/8" : "hover:bg-[var(--navy)]/8 bg-transparent",
                 )}
               >
                 <span className="w-8 h-8 rounded-full bg-transparent flex items-center justify-center overflow-hidden flex-shrink-0">
@@ -293,19 +293,19 @@ export function AppNavbar({
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={image} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-[11px] font-bold text-navy">{initials || "M"}</span>
+                    <span className="text-[11px] font-bold text-[var(--fg)]">{initials || "M"}</span>
                   )}
                 </span>
-                <span className="hidden lg:block text-sm font-medium text-navy max-w-[110px] truncate">
+                <span className="hidden lg:block text-sm font-medium text-[var(--fg)] max-w-[110px] truncate">
                   {name?.split(" ")[0] || "Member"}
                 </span>
-                <ChevronDown size={14} className={cn("transition-transform", profileOpen ? "text-[var(--gold)] rotate-180" : "text-navy/55 group-hover:text-[var(--gold)]")} />
+                <ChevronDown size={14} className={cn("transition-transform", profileOpen ? "text-[var(--gold)] rotate-180" : "text-[var(--fg)]/55 group-hover:text-[var(--gold)]")} />
               </button>
 
               {profileOpen && (
-                <div className="absolute right-0 top-full mt-1 w-[260px] bg-white border border-navy/10 rounded-[12px] shadow-dropdown overflow-hidden z-dropdown">
-                  <div className="px-4 py-3.5 border-b border-navy/10">
-                    <div className="text-sm font-semibold text-navy truncate">{name || "Member"}</div>
+                <div className="absolute right-0 top-full mt-1 w-[260px] bg-[var(--surface)] border border-[var(--border)] rounded-[12px] shadow-dropdown overflow-hidden z-dropdown">
+                  <div className="px-4 py-3.5 border-b border-[var(--border)]">
+                    <div className="text-sm font-semibold text-[var(--fg)] truncate">{name || "Member"}</div>
                     {/* Verification is the network's premise, so it is stated
                         wherever the member looks at their own account. */}
                     {v ? (
@@ -334,24 +334,24 @@ export function AppNavbar({
                         key={i.name}
                         href={i.href}
                         onClick={() => setProfileOpen(false)}
-                        className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-navy bg-white hover:bg-[var(--parchment)] transition-colors group"
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-[var(--fg)] bg-[var(--surface)] hover:bg-[var(--navy)]/5 transition-colors group"
                       >
-                        <i.icon size={17} className="text-navy/45 group-hover:text-[var(--gold)] transition-colors" />
+                        <i.icon size={17} className="text-[var(--fg)]/45 group-hover:text-[var(--gold)] transition-colors" />
                         {i.name}
                       </Link>
                     ))}
                     {/* Appearance sits with the account destinations, matching
                         the admin console. ThemeToggle ships styled for the navy
-                        rail, so it's restyled to this white dropdown's rows. */}
-                    <ThemeToggle className="w-full rounded-none gap-3 px-4 py-2.5 text-sm font-medium text-navy hover:bg-[var(--parchment)] hover:text-navy" />
+                        rail, so it's restyled to this dropdown's rows. */}
+                    <ThemeToggle className="w-full rounded-none gap-3 px-4 py-2.5 text-sm font-medium text-[var(--fg)] hover:bg-[var(--navy)]/5 hover:text-[var(--fg)]" />
                   </div>
-                  <div className="border-t border-navy/10 py-1.5">
+                  <div className="border-t border-[var(--border)] py-1.5">
                     <button
                       type="button"
                       onClick={() => signOut({ callbackUrl: "/login" })}
-                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-navy bg-white hover:bg-[var(--parchment)] transition-colors group"
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-[var(--fg)] bg-[var(--surface)] hover:bg-[var(--navy)]/5 transition-colors group"
                     >
-                      <LogOut size={17} className="text-navy/45 group-hover:text-[var(--gold)] transition-colors" />
+                      <LogOut size={17} className="text-[var(--fg)]/45 group-hover:text-[var(--gold)] transition-colors" />
                       Sign out
                     </button>
                   </div>
@@ -367,45 +367,44 @@ export function AppNavbar({
       {drawer && (
         <div className="fixed inset-0 z-drawer md:hidden">
           <div className="absolute inset-0 bg-navy/40" onClick={() => setDrawer(false)} />
-          <div className="absolute inset-y-0 left-0 w-[86%] max-w-[340px] bg-white flex flex-col overflow-y-auto">
-            <div className="flex items-center justify-between px-5 h-16 border-b border-navy/10">
-              <span className="font-sans text-base font-bold tracking-[0.10em] text-navy">UNSWAP</span>
-              <button type="button" onClick={() => setDrawer(false)} aria-label="Close menu" className="-mr-1 p-2 text-navy">
+          <div className="absolute inset-y-0 left-0 w-[86%] max-w-[340px] bg-[var(--surface)] flex flex-col overflow-y-auto">
+            <div className="flex items-center justify-between px-5 h-16 border-b border-[var(--border)]">
+              <span className="font-sans text-base font-bold tracking-[0.10em] text-[var(--fg)]">UNSWAP</span>
+              <button type="button" onClick={() => setDrawer(false)} aria-label="Close menu" className="-mr-1 p-2 text-[var(--fg)]">
                 <X size={22} strokeWidth={2} />
               </button>
             </div>
 
-            <form onSubmit={submitSearch} className="px-5 py-4 border-b border-navy/10">
+            <form onSubmit={submitSearch} className="px-5 py-4 border-b border-[var(--border)]">
               <label htmlFor="drawer-search" className="sr-only">Search homes, cities or duty stations</label>
               <div className="relative">
-                <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-navy/40 pointer-events-none" />
+                <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--fg)]/40 pointer-events-none" />
                 <input
                   id="drawer-search"
                   type="search"
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
                   placeholder="Search homes or cities"
-                  /* bg-[var(--parchment)], not bg-parchment: the bare utility
-                     reads --color-parchment, which flips to #161f30 in dark
-                     mode, while this drawer stays white and its text stays
-                     navy — so the field went dark-on-dark and the placeholder
-                     vanished. The --parchment alias holds cream in both. */
-                  className="w-full h-11 pl-10 pr-4 rounded-lg bg-[var(--parchment)] border border-navy/10 text-sm text-navy placeholder:text-navy/55 focus:outline-none focus:border-[var(--gold)]"
+                  /* Fully token-driven now that the drawer is theme-aware:
+                     --background is an inset field on both themes (paper on
+                     light, near-black on dark) and --fg keeps the text legible
+                     against it either way. */
+                  className="w-full h-11 pl-10 pr-4 rounded-lg bg-[var(--background)] border border-[var(--border)] text-sm text-[var(--fg)] placeholder:text-[var(--fg)]/45 focus:outline-none focus:border-[var(--gold)]"
                 />
               </div>
             </form>
 
-            <div className="px-5 pt-4 pb-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-navy/40">Explore</div>
+            <div className="px-5 pt-4 pb-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--fg)]/40">Explore</div>
             {EXPLORE.map((i) => <MenuRow key={i.name} item={i} onClick={() => setDrawer(false)} />)}
 
-            <div className="px-5 pt-4 pb-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-navy/40">My UnSwap</div>
+            <div className="px-5 pt-4 pb-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--fg)]/40">My UnSwap</div>
             {MINE.map((i) => <MenuRow key={i.name} item={i} onClick={() => setDrawer(false)} />)}
             <MenuRow item={{ name: "Membership", href: "/dashboard/subscription", icon: CreditCard }} onClick={() => setDrawer(false)} />
 
-            <div className="mt-auto border-t border-navy/10 py-2">
+            <div className="mt-auto border-t border-[var(--border)] py-2">
               <MenuRow item={{ name: "Profile", href: "/dashboard/profile", icon: UserCircle }} onClick={() => setDrawer(false)} />
               <MenuRow item={{ name: "Settings", href: "/dashboard/settings", icon: Settings }} onClick={() => setDrawer(false)} />
-              <ThemeToggle className="w-full rounded-none gap-3 px-4 py-3 text-sm font-medium text-navy hover:bg-[var(--parchment)] hover:text-navy" />
+              <ThemeToggle className="w-full rounded-none gap-3 px-4 py-3 text-sm font-medium text-[var(--fg)] hover:bg-[var(--navy)]/5 hover:text-[var(--fg)]" />
               <button
                 type="button"
                 onClick={() => signOut({ callbackUrl: "/login" })}
