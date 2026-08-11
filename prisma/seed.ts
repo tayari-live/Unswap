@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client"
 import bcrypt from "bcryptjs"
+import { computeCompletion } from "@/server/services/profile"
 
 const prisma = new PrismaClient()
 
@@ -65,37 +66,75 @@ async function main() {
   })
 
   // --- Sample members ---
+  //
+  // `profileCompletion` is a cached derivation of the profile fields, kept in
+  // step by updateProfile(). The seed used to hand-pick the number instead —
+  // every member claimed a completion its own fields couldn't justify (Amara
+  // said 100% on 4 of 7 fields, which actually computes to 57%), so the
+  // dashboard treated her profile as finished while the edit wizard, which
+  // recomputes from the fields, disagreed. It's derived below now, so the seed
+  // can't claim more than it wrote.
+  //
+  // Completion is driven by which optional fields each member gets: the 7
+  // counted fields are fullName, imageUrl, nationality, dutyStation,
+  // organisation, languages, bio — so each one is worth ~14%. Only Amara gets a
+  // photo (a 1x1 data URI — imageUrl holds base64 in this app, so real images
+  // would bloat the seed), which makes her the one fully-complete member and
+  // keeps a settled-dashboard state available to test against.
+  const TINY_PNG =
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII="
+
   const memberPassword = await bcrypt.hash("member1234", 12)
   const members = [
-    { first: "Amara", last: "Okafor", email: "a.okafor@undp.org", org: "UNDP", nat: "Nigerian", duty: "Geneva", status: "FULLY_VERIFIED", completion: 100, trust: 4.8, tier: "professional_4x" },
-    { first: "Liang", last: "Chen", email: "l.chen@who.int", org: "World Health Organization", nat: "Chinese", duty: "Geneva", status: "FULLY_VERIFIED", completion: 95, trust: 4.6, tier: "unlimited_pro" },
-    { first: "Sofia", last: "Rossi", email: "s.rossi@fao.org", org: "FAO", nat: "Italian", duty: "Rome", status: "PENDING_ID_REVIEW", completion: 70, trust: null, tier: null },
-    { first: "Marcus", last: "Weber", email: "m.weber@imf.org", org: "International Monetary Fund", nat: "German", duty: "Vienna", status: "FULLY_VERIFIED", completion: 88, trust: 4.9, tier: "standard_2x" },
-    { first: "Fatima", last: "Al-Rashid", email: "f.alrashid@unhcr.org", org: "UNHCR", nat: "Jordanian", duty: "Nairobi", status: "PENDING_ID_REVIEW", completion: 60, trust: null, tier: null },
-    { first: "James", last: "Mensah", email: "j.mensah@worldbank.org", org: "World Bank Group", nat: "Ghanaian", duty: "Washington", status: "EMAIL_VERIFIED", completion: 40, trust: null, tier: null },
-    { first: "Elena", last: "Popova", email: "e.popova@unicef.org", org: "UNICEF", nat: "Russian", duty: "New York", status: "FULLY_VERIFIED", completion: 92, trust: 4.7, tier: "limited_1x" },
-    { first: "Diego", last: "Fernandez", email: "d.fernandez@un.org", org: "United Nations", nat: "Chilean", duty: "Santiago", status: "REJECTED", completion: 30, trust: null, tier: null },
-  ]
+    { first: "Amara", last: "Okafor", email: "a.okafor@undp.org", org: "UNDP", nat: "Nigerian", duty: "Geneva", status: "FULLY_VERIFIED", trust: 4.8, tier: "professional_4x",
+      languages: "English, French", bio: "Programme officer with UNDP, currently based in Geneva. I travel often for country missions and love hosting fellow staff.", image: TINY_PNG },
+    { first: "Liang", last: "Chen", email: "l.chen@who.int", org: "World Health Organization", nat: "Chinese", duty: "Geneva", status: "FULLY_VERIFIED", trust: 4.6, tier: "unlimited_pro",
+      languages: "Mandarin, English", bio: "Epidemiologist at WHO. Happy to share tips on settling into Geneva, and always glad of a home base when on mission." },
+    { first: "Marcus", last: "Weber", email: "m.weber@imf.org", org: "International Monetary Fund", nat: "German", duty: "Vienna", status: "FULLY_VERIFIED", trust: 4.9, tier: "standard_2x",
+      languages: "German, English", bio: "Economist with the IMF in Vienna. Quiet flat near the centre, ideal for anyone here on a short posting." },
+    { first: "Elena", last: "Popova", email: "e.popova@unicef.org", org: "UNICEF", nat: "Russian", duty: "New York", status: "FULLY_VERIFIED", trust: 4.7, tier: "limited_1x",
+      languages: "Russian, English" },
+    { first: "Sofia", last: "Rossi", email: "s.rossi@fao.org", org: "FAO", nat: "Italian", duty: "Rome", status: "PENDING_ID_REVIEW", trust: null, tier: null,
+      languages: "Italian, English" },
+    { first: "Fatima", last: "Al-Rashid", email: "f.alrashid@unhcr.org", org: "UNHCR", nat: "Jordanian", duty: "Nairobi", status: "PENDING_ID_REVIEW", trust: null, tier: null },
+    { first: "James", last: "Mensah", email: "j.mensah@worldbank.org", org: "World Bank Group", nat: "Ghanaian", duty: "Washington", status: "EMAIL_VERIFIED", trust: null, tier: null },
+    { first: "Diego", last: "Fernandez", email: "d.fernandez@un.org", org: "United Nations", nat: "Chilean", duty: "Santiago", status: "REJECTED", trust: null, tier: null },
+  ] satisfies {
+    first: string; last: string; email: string; org: string; nat: string; duty: string
+    status: string; trust: number | null; tier: string | null
+    languages?: string; bio?: string; image?: string
+  }[]
 
   const created: { id: string; status: string; tier: string | null }[] = []
   for (const m of members) {
+    // Build the profile fields once, then derive completion from that same
+    // object with the app's own function — so the two can never disagree.
+    const profile = {
+      fullName: `${m.first} ${m.last}`,
+      imageUrl: m.image ?? null,
+      organisation: m.org,
+      nationality: m.nat,
+      dutyStation: m.duty,
+      languages: m.languages ?? "",
+      bio: m.bio ?? "",
+      // Collected but deliberately not scored, so it can't affect completion.
+      linkedinUrl: null,
+    }
+
     const u = await prisma.user.upsert({
       where: { email: m.email },
       update: {},
       create: {
+        ...profile,
         email: m.email,
         passwordHash: memberPassword,
         firstName: m.first,
         lastName: m.last,
-        fullName: `${m.first} ${m.last}`,
         role: "member",
         avatarInitials: initials(m.first, m.last),
-        organisation: m.org,
-        nationality: m.nat,
-        dutyStation: m.duty,
         onboardedAt: new Date(),
         verificationStatus: m.status,
-        profileCompletion: m.completion,
+        profileCompletion: computeCompletion(profile),
         trustScore: m.trust ?? undefined,
       },
     })
