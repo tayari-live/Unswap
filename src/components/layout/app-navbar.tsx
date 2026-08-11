@@ -380,7 +380,12 @@ export function AppNavbar({
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
                   placeholder="Search homes or cities"
-                  className="w-full h-11 pl-10 pr-4 rounded-lg bg-parchment border border-navy/10 text-sm text-navy placeholder:text-navy/40 focus:outline-none focus:border-[var(--gold)]"
+                  /* bg-[var(--parchment)], not bg-parchment: the bare utility
+                     reads --color-parchment, which flips to #161f30 in dark
+                     mode, while this drawer stays white and its text stays
+                     navy — so the field went dark-on-dark and the placeholder
+                     vanished. The --parchment alias holds cream in both. */
+                  className="w-full h-11 pl-10 pr-4 rounded-lg bg-[var(--parchment)] border border-navy/10 text-sm text-navy placeholder:text-navy/55 focus:outline-none focus:border-[var(--gold)]"
                 />
               </div>
             </form>
