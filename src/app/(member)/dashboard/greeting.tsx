@@ -25,7 +25,7 @@ export function Greeting({ firstName }: { firstName: string }) {
   }, [])
 
   return (
-    <h1 className="font-display text-4xl md:text-[48px] font-bold text-navy tracking-tight leading-none mb-3">
+    <h1 className="font-display text-4xl md:text-[48px] font-bold text-[var(--fg)] tracking-tight leading-none mb-3">
       <span suppressHydrationWarning>{greeting}</span>, {firstName || "Member"}.
     </h1>
   )

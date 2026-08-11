@@ -230,13 +230,13 @@ export default async function MemberDashboardPage() {
   ];
 
   return (
-    <div className="min-h-[calc(100vh-76px)] bg-[var(--parchment)]">
+    <div className="min-h-[calc(100vh-76px)] bg-[var(--canvas)]">
       <div className="max-w-[1440px] mx-auto px-6 lg:px-10 pt-12 pb-20">
-        
+
         {/* 1. Welcome Header */}
         <div className="mb-10">
           <Greeting firstName={user.firstName || ""} />
-          <p className="font-sans text-sm md:text-[15px] text-navy/65">
+          <p className="font-sans text-sm md:text-[15px] text-[var(--fg)]/65">
             {subtext}
           </p>
           <div className="w-8 h-[2px] bg-[var(--gold)] mt-6" />
@@ -246,12 +246,12 @@ export default async function MemberDashboardPage() {
         <div className="flex flex-wrap lg:flex-nowrap gap-y-8 mb-12">
           {/* Credits */}
           <Link href="/dashboard/credits" className="w-1/2 lg:w-1/4 group lg:pr-8">
-            <div className="font-display text-[32px] md:text-[40px] font-bold text-navy leading-none mb-1 group-hover:text-[var(--gold-dark)] transition-colors">
+            <div className="font-display text-[32px] md:text-[40px] font-bold text-[var(--fg)] leading-none mb-1 group-hover:text-[var(--gold-dark)] transition-colors">
               {credits}
             </div>
             <div className="flex flex-col">
               <span className="font-sans text-[11px] font-medium text-[var(--gold)] uppercase tracking-[0.12em]">Credits</span>
-              <span className="font-sans text-[13px] text-navy/60 mt-1 pr-2">
+              <span className="font-sans text-[13px] text-[var(--fg)]/60 mt-1 pr-2">
                 {credits === 0 ? "Earn credits by hosting homes." : `Enough for up to ${credits} nights.`}
               </span>
             </div>
@@ -259,12 +259,12 @@ export default async function MemberDashboardPage() {
           
           {/* Homes */}
           <Link href="/dashboard/listings" className="w-1/2 lg:w-1/4 group lg:px-8 lg:border-l border-[var(--hair)]">
-            <div className="font-display text-[32px] md:text-[40px] font-bold text-navy leading-none mb-1 group-hover:text-[var(--gold-dark)] transition-colors">
+            <div className="font-display text-[32px] md:text-[40px] font-bold text-[var(--fg)] leading-none mb-1 group-hover:text-[var(--gold-dark)] transition-colors">
               {activeListings}
             </div>
             <div className="flex flex-col">
               <span className="font-sans text-[11px] font-medium text-[var(--gold)] uppercase tracking-[0.12em]">My Homes</span>
-              <span className="font-sans text-[13px] text-navy/60 mt-1 pr-2">
+              <span className="font-sans text-[13px] text-[var(--fg)]/60 mt-1 pr-2">
                 {activeListings === 0 ? "List a home to start." : `${activeListings} listed propert${activeListings === 1 ? "y" : "ies"}.`}
               </span>
             </div>
@@ -272,12 +272,12 @@ export default async function MemberDashboardPage() {
           
           {/* Swaps */}
           <Link href="/dashboard/swaps" className="w-1/2 lg:w-1/4 group lg:px-8 lg:border-l border-[var(--hair)]">
-            <div className="font-display text-[32px] md:text-[40px] font-bold text-navy leading-none mb-1 group-hover:text-[var(--gold-dark)] transition-colors">
+            <div className="font-display text-[32px] md:text-[40px] font-bold text-[var(--fg)] leading-none mb-1 group-hover:text-[var(--gold-dark)] transition-colors">
               {upcoming.length}
             </div>
             <div className="flex flex-col">
               <span className="font-sans text-[11px] font-medium text-[var(--gold)] uppercase tracking-[0.12em]">Active Swaps</span>
-              <span className="font-sans text-[13px] text-navy/60 mt-1 pr-2">
+              <span className="font-sans text-[13px] text-[var(--fg)]/60 mt-1 pr-2">
                 {upcoming.length === 0 ? "No active stays." : `${upcoming.length} upcoming or in-progress.`}
               </span>
             </div>
@@ -285,12 +285,12 @@ export default async function MemberDashboardPage() {
           
           {/* Messages */}
           <Link href="/dashboard/messages" className="w-1/2 lg:w-1/4 group lg:pl-8 lg:border-l border-[var(--hair)]">
-            <div className="font-display text-[32px] md:text-[40px] font-bold text-navy leading-none mb-1 group-hover:text-[var(--gold-dark)] transition-colors">
+            <div className="font-display text-[32px] md:text-[40px] font-bold text-[var(--fg)] leading-none mb-1 group-hover:text-[var(--gold-dark)] transition-colors">
               0 {/* Note: Client-side unread count lives in navbar, server-side count requires query */}
             </div>
             <div className="flex flex-col">
               <span className="font-sans text-[11px] font-medium text-[var(--gold)] uppercase tracking-[0.12em]">Messages</span>
-              <span className="font-sans text-[13px] text-navy/60 mt-1 pr-2">Check your inbox.</span>
+              <span className="font-sans text-[13px] text-[var(--fg)]/60 mt-1 pr-2">Check your inbox.</span>
             </div>
           </Link>
         </div>
@@ -339,7 +339,7 @@ export default async function MemberDashboardPage() {
         {/* 4. Action Required / Your Next Steps — one consolidated module */}
         {showActions && (
           <div className="mb-16">
-            <h3 className="font-sans text-xs font-bold text-navy uppercase tracking-[0.14em] mb-4">
+            <h3 className="font-sans text-xs font-bold text-[var(--fg)] uppercase tracking-[0.14em] mb-4">
               {hasRequired ? "Action Required" : "Your Next Steps"}
             </h3>
             <div className="border-t border-[var(--hair)] max-w-3xl">
@@ -354,7 +354,7 @@ export default async function MemberDashboardPage() {
                     )}
                   >
                     <div className="flex items-start sm:items-center gap-4 min-w-0">
-                      <span className={cn("flex-shrink-0 mt-0.5 sm:mt-0", a.done ? "text-[var(--gold)]" : blocking ? "text-[var(--gold-dark)]" : "text-navy/30")}>
+                      <span className={cn("flex-shrink-0 mt-0.5 sm:mt-0", a.done ? "text-[var(--gold)]" : blocking ? "text-[var(--gold-dark)]" : "text-[var(--fg)]/30")}>
                         {a.done ? (
                           <Check size={18} strokeWidth={2.5} />
                         ) : blocking ? (
@@ -364,27 +364,27 @@ export default async function MemberDashboardPage() {
                         )}
                       </span>
                       <div className="flex flex-col min-w-0">
-                        <span className={cn("font-sans text-[15px]", a.done ? "text-navy/60" : "text-navy font-bold")}>
+                        <span className={cn("font-sans text-[15px]", a.done ? "text-[var(--fg)]/60" : "text-[var(--fg)] font-bold")}>
                           {a.title}
                         </span>
                         {!a.done && a.sub && (
-                          <span className="font-sans text-[14px] text-navy/70 mt-1 leading-snug">{a.sub}</span>
+                          <span className="font-sans text-[14px] text-[var(--fg)]/70 mt-1 leading-snug">{a.sub}</span>
                         )}
                       </div>
                     </div>
 
                     <div className="flex-shrink-0 mt-1 sm:mt-0">
                       {a.done ? (
-                        <span className="text-[13px] font-medium text-navy/40">Complete</span>
+                        <span className="text-[13px] font-medium text-[var(--fg)]/40">Complete</span>
                       ) : a.resendEmail ? (
                         <ResendEmailButton email={a.resendEmail} />
                       ) : a.href ? (
-                        <Link href={a.href} className="text-[13px] font-bold text-[var(--gold-dark)] hover:text-navy transition-colors flex items-center gap-1">
+                        <Link href={a.href} className="text-[13px] font-bold text-[var(--gold-dark)] hover:text-[var(--fg)] transition-colors flex items-center gap-1">
                           {a.cta} <ChevronRight size={14} />
                         </Link>
                       ) : (
                         // Under review — nothing for the member to do but wait.
-                        <span className="text-[13px] font-medium text-navy/40">Pending</span>
+                        <span className="text-[13px] font-medium text-[var(--fg)]/40">Pending</span>
                       )}
                     </div>
                   </div>
@@ -397,25 +397,25 @@ export default async function MemberDashboardPage() {
         {/* 5. Upcoming Exchanges — content, not a to-do, so it simply hides when empty */}
         {upcoming.length > 0 && (
           <div className="mb-16">
-            <h3 className="font-sans text-xs font-bold text-navy uppercase tracking-[0.14em] mb-4">
+            <h3 className="font-sans text-xs font-bold text-[var(--fg)] uppercase tracking-[0.14em] mb-4">
               Upcoming Exchanges
             </h3>
             <div className="border-t border-[var(--hair)] pt-6">
               {upcoming.map((r) => (
                 <div key={r.id} className="flex flex-col md:flex-row md:items-center justify-between pb-6 mb-6 border-b border-[var(--hair)] group last:border-0 last:mb-0 last:pb-0">
                   <div className="flex flex-col mb-4 md:mb-0">
-                    <div className="font-display text-[26px] md:text-[32px] text-navy font-bold leading-none mb-2">
-                      {r.listing.city || r.listing.title} <span className="font-sans text-[18px] text-navy/60 font-normal">· {r.listing.country || "UnSwap"}</span>
+                    <div className="font-display text-[26px] md:text-[32px] text-[var(--fg)] font-bold leading-none mb-2">
+                      {r.listing.city || r.listing.title} <span className="font-sans text-[18px] text-[var(--fg)]/60 font-normal">· {r.listing.country || "UnSwap"}</span>
                     </div>
-                    <div className="font-sans text-[15px] text-navy/80">
+                    <div className="font-sans text-[15px] text-[var(--fg)]/80">
                       {fmtDate(r.startDate)} – {fmtDate(r.endDate)} · {nights(r.startDate, r.endDate)} nights
                     </div>
                   </div>
                   <div className="flex items-center gap-6">
-                    <span className="font-sans text-[11px] font-bold uppercase tracking-[0.12em] px-3 py-1.5 bg-[var(--parchment-dark)] text-navy rounded-full">
+                    <span className="font-sans text-[11px] font-bold uppercase tracking-[0.12em] px-3 py-1.5 bg-[var(--navy)]/8 text-[var(--fg)] rounded-full">
                       {r.status === "IN_PROGRESS" ? "In progress" : "Confirmed"}
                     </span>
-                    <Link href={`/dashboard/exchanges/${r.id}`} className="text-[13px] font-medium text-[var(--gold-dark)] hover:text-navy transition-colors flex items-center gap-1">
+                    <Link href={`/dashboard/exchanges/${r.id}`} className="text-[13px] font-medium text-[var(--gold-dark)] hover:text-[var(--fg)] transition-colors flex items-center gap-1">
                       View exchange <ChevronRight size={14} />
                     </Link>
                   </div>
@@ -428,25 +428,25 @@ export default async function MemberDashboardPage() {
         {/* 6. Recommended Homes */}
         <div className="mb-16">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="font-sans text-xs font-bold text-navy uppercase tracking-[0.14em]">
+            <h3 className="font-sans text-xs font-bold text-[var(--fg)] uppercase tracking-[0.14em]">
               Recommended For You
             </h3>
-            <Link href="/dashboard/browse" className="text-[13px] font-medium text-navy/70 hover:text-navy flex items-center gap-1 transition-colors">
+            <Link href="/dashboard/browse" className="text-[13px] font-medium text-[var(--fg)]/70 hover:text-[var(--fg)] flex items-center gap-1 transition-colors">
               View all <ChevronRight size={14} />
             </Link>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {recommendedHomes.map((home, idx) => (
-              <Link key={idx} href={`/dashboard/browse?q=${home.city}`} className="group flex flex-col bg-[var(--parchment-dark)] rounded-[10px] overflow-hidden border border-transparent hover:border-[var(--hair)] transition-colors">
-                <div className="aspect-[4/3] bg-navy/5 relative overflow-hidden">
+              <Link key={idx} href={`/dashboard/browse?q=${home.city}`} className="group flex flex-col bg-[var(--surface)] rounded-[10px] overflow-hidden border border-[var(--hair)] hover:border-[var(--gold)] transition-colors">
+                <div className="aspect-[4/3] bg-[var(--navy)]/5 relative overflow-hidden">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={home.image} alt={home.city} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" />
                 </div>
                 <div className="p-5">
-                  <h4 className="font-display text-[24px] font-bold text-navy leading-none mb-1">{home.city}</h4>
-                  <div className="font-sans text-[13px] text-navy/70 mb-3">{home.country}</div>
-                  <div className="font-sans text-[13px] text-navy font-medium">
+                  <h4 className="font-display text-[24px] font-bold text-[var(--fg)] leading-none mb-1">{home.city}</h4>
+                  <div className="font-sans text-[13px] text-[var(--fg)]/70 mb-3">{home.country}</div>
+                  <div className="font-sans text-[13px] text-[var(--fg)] font-medium">
                     {home.nights} nights · {home.credits} credits
                   </div>
                 </div>
@@ -458,10 +458,10 @@ export default async function MemberDashboardPage() {
         {/* 8. Recent Activity */}
         <div>
           <div className="flex items-center justify-between mb-6">
-            <h3 className="font-sans text-xs font-bold text-navy uppercase tracking-[0.14em]">
+            <h3 className="font-sans text-xs font-bold text-[var(--fg)] uppercase tracking-[0.14em]">
               Recent Activity
             </h3>
-            <Link href="/dashboard/notifications" className="text-[13px] font-medium text-navy/70 hover:text-navy flex items-center gap-1 transition-colors">
+            <Link href="/dashboard/notifications" className="text-[13px] font-medium text-[var(--fg)]/70 hover:text-[var(--fg)] flex items-center gap-1 transition-colors">
               View all <ChevronRight size={14} />
             </Link>
           </div>
@@ -472,19 +472,19 @@ export default async function MemberDashboardPage() {
                 <div className="flex items-start gap-3">
                   <span className="text-[var(--gold)] mt-0.5"><Check size={18} /></span>
                   <div className="flex flex-col">
-                    <span className="font-sans text-[15px] text-navy font-medium">
+                    <span className="font-sans text-[15px] text-[var(--fg)] font-medium">
                       Swap request {r.status === "COUNTER_OFFERED" ? "countered" : "received"}
                     </span>
-                    <span className="font-sans text-[13px] text-navy/70 mt-0.5">
+                    <span className="font-sans text-[13px] text-[var(--fg)]/70 mt-0.5">
                       From {r.requester.fullName} for {r.listing.title}
                     </span>
                   </div>
                 </div>
-                <span className="flex-shrink-0 font-sans text-[13px] text-navy/50">{fmtDate(r.createdAt)}</span>
+                <span className="flex-shrink-0 font-sans text-[13px] text-[var(--fg)]/50">{fmtDate(r.createdAt)}</span>
               </div>
             ))}
             {incoming.length === 0 && (
-              <div className="py-8 text-[14px] text-navy/60 font-sans italic">
+              <div className="py-8 text-[14px] text-[var(--fg)]/60 font-sans italic">
                 No recent activity. Actions like received swap requests will appear here.
               </div>
             )}
