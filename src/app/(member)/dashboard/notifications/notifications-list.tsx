@@ -30,7 +30,7 @@ const KIND: Record<NotificationKind, { icon: typeof Bell; tone: string }> = {
   confirmed: { icon: CalendarCheck, tone: "bg-[var(--teal)]/15 text-[var(--teal)]" },
   message: { icon: MessageSquare, tone: "bg-[var(--navy)]/10 text-[var(--fg)]" },
   review: { icon: Star, tone: "bg-[var(--gold)]/15 text-[var(--gold-dark)]" },
-  verification: { icon: ShieldAlert, tone: "bg-[var(--parchment)] text-[var(--gold-dark)]" },
+  verification: { icon: ShieldAlert, tone: "bg-[var(--navy)]/5 text-[var(--gold-dark)]" },
   verified: { icon: ShieldCheck, tone: "bg-[var(--teal)]/15 text-[var(--teal)]" },
   rejected: { icon: ShieldX, tone: "bg-[var(--crimson)]/10 text-[var(--crimson)]" },
   credit: { icon: Coins, tone: "bg-[var(--gold)]/15 text-[var(--gold-dark)]" },
@@ -100,7 +100,7 @@ export function NotificationsList({ items }: { items: NotificationRow[] }) {
           {shown.map((n) => {
             const k = KIND[n.kind]
             return (
-              <Link key={n.id} href={n.link} className="flex items-center gap-3 px-5 py-4 hover:bg-[var(--parchment)] transition-colors">
+              <Link key={n.id} href={n.link} className="flex items-center gap-3 px-5 py-4 hover:bg-[var(--navy)]/5 transition-colors">
                 <span className={`w-10 h-10 flex-shrink-0 rounded-xl flex items-center justify-center ${k.tone}`}>
                   <k.icon size={18} />
                 </span>

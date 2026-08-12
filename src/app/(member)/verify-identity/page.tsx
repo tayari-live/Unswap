@@ -132,7 +132,7 @@ function StateCard({
   const toneClass =
     tone === "teal"
       ? "bg-[var(--teal-light)] text-[var(--teal)]"
-      : "bg-[var(--parchment)] text-[var(--gold-dark)]"
+      : "bg-[var(--navy)]/5 text-[var(--gold-dark)]"
   return (
     <div className="bg-surface rounded-md border border-[var(--hair)] p-8 text-center">
       <div className={`mx-auto w-14 h-14 rounded-md flex items-center justify-center mb-5 ${toneClass}`}>

@@ -44,7 +44,7 @@ export default async function CreditsPage() {
         </div>
       </div>
 
-      <div className="flex items-start gap-2.5 text-xs text-neutral bg-[var(--parchment)] border border-[var(--gold)]/20 rounded-xl p-3 mb-6">
+      <div className="flex items-start gap-2.5 text-xs text-neutral bg-[var(--navy)]/5 border border-[var(--gold)]/20 rounded-xl p-3 mb-6">
         <Info size={16} className="text-[var(--gold-dark)] flex-shrink-0 mt-0.5" />
         <span>1 night hosted earns 1 credit. 1 credit redeems 1 night at any member&apos;s home through a non-simultaneous swap.</span>
       </div>

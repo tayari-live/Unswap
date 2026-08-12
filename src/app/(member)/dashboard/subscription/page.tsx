@@ -86,7 +86,7 @@ export default async function SubscriptionPage({
         </div>
       </div>
 
-      <div className="flex items-start gap-2.5 text-xs text-neutral bg-[var(--parchment)] border border-[var(--gold)]/20 rounded-xl p-3 mb-6">
+      <div className="flex items-start gap-2.5 text-xs text-neutral bg-[var(--navy)]/5 border border-[var(--gold)]/20 rounded-xl p-3 mb-6">
         <Info size={16} className="text-[var(--gold-dark)] flex-shrink-0 mt-0.5" />
         <span>Plan changes are processed securely at checkout via Stripe. Upgrades take effect immediately; downgrades at the next renewal.</span>
       </div>

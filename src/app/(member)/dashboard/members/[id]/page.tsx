@@ -105,7 +105,7 @@ export default async function MemberProfilePage({ params }: { params: Promise<{ 
       <div className="mb-8">
         <Link
           href="/dashboard/browse"
-          className="inline-flex items-center gap-2 font-sans text-[13px] font-bold uppercase tracking-[0.08em] text-[var(--gold-dark)] hover:text-navy transition-colors"
+          className="inline-flex items-center gap-2 font-sans text-[13px] font-bold uppercase tracking-[0.08em] text-[var(--gold-dark)] hover:text-[var(--fg)] transition-colors"
         >
           <ChevronLeft size={16} /> Discover homes
         </Link>

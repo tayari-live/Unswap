@@ -570,7 +570,7 @@ export function Thread({
                 <img src={listing.primaryPhotoUrl} alt="Listing" className="w-full h-full object-cover" />
               </div>
             ) : (
-              <div className="aspect-[4/3] rounded-xl bg-[var(--parchment)] mb-4 flex items-center justify-center border border-[var(--hair)]">
+              <div className="aspect-[4/3] rounded-xl bg-[var(--navy)]/5 mb-4 flex items-center justify-center border border-[var(--hair)]">
                 <span className="text-neutral text-sm font-medium">No image</span>
               </div>
             )}

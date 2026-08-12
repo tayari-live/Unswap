@@ -69,7 +69,7 @@ export function MessagesLayoutShell({
               </div>
             ) : (
               <div className="px-6 py-10 text-center">
-                <div className="mx-auto w-12 h-12 rounded-full bg-[var(--parchment)] text-[var(--gold-dark)] flex items-center justify-center mb-4">
+                <div className="mx-auto w-12 h-12 rounded-full bg-[var(--navy)]/5 text-[var(--gold-dark)] flex items-center justify-center mb-4">
                   <MessageSquare size={22} strokeWidth={1.5} />
                 </div>
                 <h2 className="font-display font-light text-xl text-[var(--fg)] leading-snug">

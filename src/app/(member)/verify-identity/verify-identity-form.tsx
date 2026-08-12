@@ -64,7 +64,7 @@ function FileField({
             type="button"
             onClick={() => onChange(null)}
             aria-label="Remove file"
-            className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 text-[var(--fg)] flex items-center justify-center shadow hover:bg-[var(--surface)]"
+            className="absolute top-2 right-2 w-8 h-8 rounded-full bg-[var(--surface)]/90 text-[var(--fg)] flex items-center justify-center shadow hover:bg-[var(--surface)]"
           >
             <X size={16} />
           </button>
@@ -148,7 +148,7 @@ export function VerifyIdentityForm({ type }: { type: "fast_track" | "manual" }) 
         />
       )}
 
-      <div className="flex items-start gap-2.5 text-xs text-neutral bg-[var(--parchment)] border border-[var(--gold)]/20 rounded-xl p-3">
+      <div className="flex items-start gap-2.5 text-xs text-neutral bg-[var(--navy)]/5 border border-[var(--gold)]/20 rounded-xl p-3">
         <ShieldCheck size={16} className="text-[var(--gold-dark)] flex-shrink-0 mt-0.5" />
         <span>
           Your documents are reviewed only by UnSwap verification officers and are
