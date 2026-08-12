@@ -73,16 +73,16 @@ export default async function SwapDetailPage({ params }: { params: Promise<{ id:
   return (
     <div className="max-w-[800px] mx-auto px-6 lg:px-10 pt-12 pb-32">
       <div className="mb-8">
-        <Link href="/dashboard/swaps" className="inline-flex items-center gap-2 font-sans text-[13px] font-bold uppercase tracking-[0.08em] text-[var(--gold-dark)] hover:text-navy transition-colors">
+        <Link href="/dashboard/swaps" className="inline-flex items-center gap-2 font-sans text-[13px] font-bold uppercase tracking-[0.08em] text-[var(--gold-dark)] hover:text-[var(--fg)] transition-colors">
           <ChevronLeft size={16} /> Back to Requests
         </Link>
       </div>
 
       <div className="mb-10">
-        <div className="text-[10px] font-bold uppercase tracking-[0.1em] text-navy/40 mb-3">
+        <div className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--fg)]/40 mb-3">
           {isIncoming ? "Incoming Request" : "Outgoing Request"}
         </div>
-        <h1 className="font-display text-[40px] md:text-[48px] font-bold text-navy leading-none mb-4">
+        <h1 className="font-display text-[40px] md:text-[48px] font-bold text-[var(--fg)] leading-none mb-4">
           {isIncoming ? (
             <>{other.firstName} wants to stay at your home</>
           ) : (
@@ -97,12 +97,12 @@ export default async function SwapDetailPage({ params }: { params: Promise<{ id:
       </div>
 
       {/* Property Hero */}
-      <div className="w-full aspect-[21/9] bg-navy/5 rounded-[12px] overflow-hidden relative mb-12 shadow-sm">
+      <div className="w-full aspect-[21/9] bg-[var(--navy)]/5 rounded-[12px] overflow-hidden relative mb-12 shadow-sm">
         {swap.listing.photos[0] ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={`/api/photos/${swap.listing.photos[0].id}`} alt={swap.listing.title} className="w-full h-full object-cover" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-navy/20">
+          <div className="w-full h-full flex items-center justify-center text-[var(--fg)]/20">
             <MapPin size={48} />
           </div>
         )}
@@ -115,27 +115,27 @@ export default async function SwapDetailPage({ params }: { params: Promise<{ id:
 
       {/* Member Profile */}
       <div className="mb-12 border-b border-[var(--hair)] pb-12">
-        <h3 className="font-sans text-xs font-bold text-navy uppercase tracking-[0.14em] mb-6">
+        <h3 className="font-sans text-xs font-bold text-[var(--fg)] uppercase tracking-[0.14em] mb-6">
           {isIncoming ? "Requester" : "Host"}
         </h3>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <span className="w-14 h-14 rounded-full bg-[var(--parchment-dark)] text-[var(--gold-dark)] flex items-center justify-center text-xl font-bold">
+            <span className="w-14 h-14 rounded-full bg-[var(--navy)]/8 text-[var(--gold-dark)] flex items-center justify-center text-xl font-bold">
               {other.firstName?.[0]}{other.lastName?.[0]}
             </span>
             <div className="flex flex-col gap-1.5">
-              <span className="font-display text-[24px] font-bold text-navy leading-none">{other.firstName}</span>
+              <span className="font-display text-[24px] font-bold text-[var(--fg)] leading-none">{other.firstName}</span>
               <div className="flex items-center gap-2">
-                <span className="font-sans text-[14px] text-navy/60">{other.organisation || "UnSwap Member"}</span>
+                <span className="font-sans text-[14px] text-[var(--fg)]/60">{other.organisation || "UnSwap Member"}</span>
                 <VerificationBadge status={other.verificationStatus} />
               </div>
-              <span className="flex items-center gap-1 font-sans text-[13px] text-navy/70">
+              <span className="flex items-center gap-1 font-sans text-[13px] text-[var(--fg)]/70">
                 <Star size={13} className="text-[var(--gold)] fill-[var(--gold)]" />
                 {other.trustScore != null ? `${other.trustScore.toFixed(1)} trust score` : "New member"}
               </span>
             </div>
           </div>
-          <Link href={`/dashboard/members/${other.id}`} className="inline-flex items-center justify-center text-[12px] font-bold uppercase tracking-[0.08em] text-navy bg-[var(--parchment)] hover:bg-[var(--parchment-dark)] px-5 py-2.5 rounded transition-colors">
+          <Link href={`/dashboard/members/${other.id}`} className="inline-flex items-center justify-center text-[12px] font-bold uppercase tracking-[0.08em] text-[var(--fg)] bg-[var(--navy)]/5 hover:bg-[var(--navy)]/10 px-5 py-2.5 rounded transition-colors">
             View Profile &rarr;
           </Link>
         </div>
@@ -144,10 +144,10 @@ export default async function SwapDetailPage({ params }: { params: Promise<{ id:
       {/* Request Details */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12 border-b border-[var(--hair)] pb-12">
         <div>
-          <h3 className="font-sans text-xs font-bold text-navy uppercase tracking-[0.14em] mb-6">
+          <h3 className="font-sans text-xs font-bold text-[var(--fg)] uppercase tracking-[0.14em] mb-6">
             Request Details
           </h3>
-          <div className="flex flex-col gap-3 font-sans text-[16px] text-navy font-medium">
+          <div className="flex flex-col gap-3 font-sans text-[16px] text-[var(--fg)] font-medium">
             <span className="flex items-center gap-3"><Calendar size={18} className="text-[var(--gold-dark)]" /> {fmt(swap.startDate)} — {fmt(swap.endDate)}</span>
             <span className="flex items-center gap-3"><Users size={18} className="text-[var(--gold-dark)]" /> {swap.guests} guests</span>
             <span className="flex items-center gap-3 ml-[30px]">{nights(swap.startDate, swap.endDate)} nights · {swap.mode === "credits" ? `${nights(swap.startDate, swap.endDate)} credits` : "Direct Swap"}</span>
@@ -156,10 +156,10 @@ export default async function SwapDetailPage({ params }: { params: Promise<{ id:
 
         {swap.message && (
           <div>
-            <h3 className="font-sans text-xs font-bold text-navy uppercase tracking-[0.14em] mb-6">
+            <h3 className="font-sans text-xs font-bold text-[var(--fg)] uppercase tracking-[0.14em] mb-6">
               Message from {other.firstName}
             </h3>
-            <p className="font-sans text-[15px] text-navy/80 leading-relaxed italic border-l-2 border-[var(--gold)] pl-4">
+            <p className="font-sans text-[15px] text-[var(--fg)]/80 leading-relaxed italic border-l-2 border-[var(--gold)] pl-4">
               "{swap.message}"
             </p>
           </div>
@@ -168,7 +168,7 @@ export default async function SwapDetailPage({ params }: { params: Promise<{ id:
 
       {/* Request Timeline */}
       <div className="mb-12 border-b border-[var(--hair)] pb-12">
-        <h3 className="font-sans text-xs font-bold text-navy uppercase tracking-[0.14em] mb-6">
+        <h3 className="font-sans text-xs font-bold text-[var(--fg)] uppercase tracking-[0.14em] mb-6">
           Request Timeline
         </h3>
         <div className="flex flex-col gap-4">
@@ -177,15 +177,15 @@ export default async function SwapDetailPage({ params }: { params: Promise<{ id:
               <span className="flex items-center justify-center w-5 h-5 rounded-full bg-[var(--gold)]/15 text-[var(--gold-dark)] flex-shrink-0">
                 <Check size={12} strokeWidth={3} />
               </span>
-              <span className="text-navy font-medium">{step.label}</span>
-              <span className="text-navy/40">· {fmt(step.date)}</span>
+              <span className="text-[var(--fg)] font-medium">{step.label}</span>
+              <span className="text-[var(--fg)]/40">· {fmt(step.date)}</span>
             </div>
           ))}
           <div className="flex items-center gap-3 font-sans text-[14px]">
-            <span className={`flex items-center justify-center w-5 h-5 rounded-full flex-shrink-0 ${swap.status === "CANCELLED" ? "bg-[var(--crimson)]/15 text-[var(--crimson)]" : "bg-navy/10 text-navy/50"}`}>
+            <span className={`flex items-center justify-center w-5 h-5 rounded-full flex-shrink-0 ${swap.status === "CANCELLED" ? "bg-[var(--crimson)]/15 text-[var(--crimson)]" : "bg-[var(--navy)]/10 text-[var(--fg)]/50"}`}>
               <Clock size={12} />
             </span>
-            <span className={swap.status === "CANCELLED" ? "text-[var(--crimson)] font-medium" : "text-navy/60 font-medium"}>{currentStep}</span>
+            <span className={swap.status === "CANCELLED" ? "text-[var(--crimson)] font-medium" : "text-[var(--fg)]/60 font-medium"}>{currentStep}</span>
           </div>
         </div>
       </div>
@@ -195,7 +195,7 @@ export default async function SwapDetailPage({ params }: { params: Promise<{ id:
           otherUserId={other.id}
           swapRequestId={swap.id}
           label={`Message ${other.firstName}`}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 text-[13px] font-bold uppercase tracking-[0.08em] text-navy bg-white border border-[var(--hair)] hover:bg-[var(--parchment)] px-8 py-4 rounded-md transition-colors shadow-sm"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 text-[13px] font-bold uppercase tracking-[0.08em] text-[var(--fg)] bg-[var(--surface)] border border-[var(--hair)] hover:bg-[var(--navy)]/5 px-8 py-4 rounded-md transition-colors shadow-sm"
         />
       </div>
 

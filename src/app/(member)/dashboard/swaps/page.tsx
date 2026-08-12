@@ -29,10 +29,10 @@ export default async function SwapRequestsPage() {
   return (
     <div className="max-w-[1000px] mx-auto px-6 lg:px-10 pt-12 pb-20">
       <div className="mb-12">
-        <h1 className="font-display text-4xl md:text-[48px] font-bold text-navy tracking-tight leading-none mb-3">
+        <h1 className="font-display text-4xl md:text-[48px] font-bold text-[var(--fg)] tracking-tight leading-none mb-3">
           Swap Requests
         </h1>
-        <p className="font-sans text-sm md:text-[15px] text-navy/65 max-w-xl">
+        <p className="font-sans text-sm md:text-[15px] text-[var(--fg)]/65 max-w-xl">
           Review requests to stay in your home or track the requests you've sent.
         </p>
       </div>

@@ -44,7 +44,7 @@ export function SwapDetailClient({ swap, isIncoming }: { swap: { id: string, sta
   
   if (!canRespond && !canCancel) {
     return (
-      <div className="flex items-center justify-center p-6 bg-[var(--parchment-dark)] rounded-lg text-[13px] font-bold uppercase tracking-[0.1em] text-navy/50">
+      <div className="flex items-center justify-center p-6 bg-[var(--navy)]/5 rounded-lg text-[13px] font-bold uppercase tracking-[0.1em] text-[var(--fg)]/50">
         Status: {swap.status.replace("_", " ")}
       </div>
     )
@@ -52,20 +52,20 @@ export function SwapDetailClient({ swap, isIncoming }: { swap: { id: string, sta
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row items-center justify-between p-8 bg-[var(--parchment-dark)] rounded-xl">
+      <div className="flex flex-col sm:flex-row items-center justify-between p-8 bg-[var(--navy)]/5 rounded-xl">
         <div className="mb-6 sm:mb-0 text-center sm:text-left">
-          <h3 className="font-display text-[24px] font-bold text-navy mb-1">
+          <h3 className="font-display text-[24px] font-bold text-[var(--fg)] mb-1">
             Ready to {isIncoming ? "respond" : "cancel"}?
           </h3>
-          <p className="font-sans text-[14px] text-navy/60">
+          <p className="font-sans text-[14px] text-[var(--fg)]/60">
             {isIncoming ? "This will notify the requester immediately." : "This request will be permanently withdrawn."}
           </p>
         </div>
-        
+
         <div className="flex items-center gap-4 w-full sm:w-auto">
           {canRespond && (
             <>
-              <button onClick={() => setShowDecline(true)} className="flex-1 sm:flex-none inline-flex items-center justify-center text-[12px] font-bold uppercase tracking-[0.08em] text-navy bg-transparent border border-navy/20 hover:bg-navy/5 px-6 py-4 rounded transition-colors">
+              <button onClick={() => setShowDecline(true)} className="flex-1 sm:flex-none inline-flex items-center justify-center text-[12px] font-bold uppercase tracking-[0.08em] text-[var(--fg)] bg-transparent border border-[var(--fg)]/20 hover:bg-[var(--navy)]/5 px-6 py-4 rounded transition-colors">
                 Decline Request
               </button>
               <button onClick={() => setShowAccept(true)} className="flex-1 sm:flex-none inline-flex items-center justify-center text-[12px] font-bold uppercase tracking-[0.08em] text-navy bg-[var(--gold)] hover:bg-[var(--gold-dark)] px-8 py-4 rounded transition-colors shadow-sm">
@@ -85,11 +85,11 @@ export function SwapDetailClient({ swap, isIncoming }: { swap: { id: string, sta
       {/* Accept Modal */}
       {showAccept && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy/80 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-xl max-w-md w-full p-8 shadow-2xl">
-            <h3 className="font-display text-[28px] font-bold text-navy leading-none mb-3">Accept this exchange?</h3>
-            <p className="font-sans text-[15px] text-navy/70 mb-8">This will confirm the stay and generate the final Swap Agreement.</p>
+          <div className="bg-[var(--surface)] rounded-xl max-w-md w-full p-8 shadow-2xl">
+            <h3 className="font-display text-[28px] font-bold text-[var(--fg)] leading-none mb-3">Accept this exchange?</h3>
+            <p className="font-sans text-[15px] text-[var(--fg)]/70 mb-8">This will confirm the stay and generate the final Swap Agreement.</p>
             <div className="flex items-center justify-end gap-3">
-              <button disabled={busy} onClick={() => setShowAccept(false)} className="px-5 py-3 text-[13px] font-bold text-navy hover:bg-[var(--parchment)] rounded transition-colors">Cancel</button>
+              <button disabled={busy} onClick={() => setShowAccept(false)} className="px-5 py-3 text-[13px] font-bold text-[var(--fg)] hover:bg-[var(--navy)]/5 rounded transition-colors">Cancel</button>
               <button disabled={busy} onClick={() => act("accept")} className="px-6 py-3 text-[13px] font-bold text-navy bg-[var(--gold)] hover:bg-[var(--gold-dark)] rounded transition-colors shadow-sm">Accept Request</button>
             </div>
           </div>
@@ -99,11 +99,11 @@ export function SwapDetailClient({ swap, isIncoming }: { swap: { id: string, sta
       {/* Decline Modal */}
       {showDecline && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy/80 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-xl max-w-md w-full p-8 shadow-2xl">
-            <h3 className="font-display text-[28px] font-bold text-navy leading-none mb-3">Decline request?</h3>
-            <p className="font-sans text-[15px] text-navy/70 mb-8">You are about to decline this request. The requester will be notified.</p>
+          <div className="bg-[var(--surface)] rounded-xl max-w-md w-full p-8 shadow-2xl">
+            <h3 className="font-display text-[28px] font-bold text-[var(--fg)] leading-none mb-3">Decline request?</h3>
+            <p className="font-sans text-[15px] text-[var(--fg)]/70 mb-8">You are about to decline this request. The requester will be notified.</p>
             <div className="flex items-center justify-end gap-3">
-              <button disabled={busy} onClick={() => setShowDecline(false)} className="px-5 py-3 text-[13px] font-bold text-navy hover:bg-[var(--parchment)] rounded transition-colors">Cancel</button>
+              <button disabled={busy} onClick={() => setShowDecline(false)} className="px-5 py-3 text-[13px] font-bold text-[var(--fg)] hover:bg-[var(--navy)]/5 rounded transition-colors">Cancel</button>
               <button disabled={busy} onClick={() => act("decline")} className="px-6 py-3 text-[13px] font-bold text-[var(--crimson)] bg-[var(--crimson)]/10 hover:bg-[var(--crimson)]/20 rounded transition-colors shadow-sm">Decline Request</button>
             </div>
           </div>
@@ -113,11 +113,11 @@ export function SwapDetailClient({ swap, isIncoming }: { swap: { id: string, sta
       {/* Cancel Modal */}
       {showCancel && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy/80 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-xl max-w-md w-full p-8 shadow-2xl">
-            <h3 className="font-display text-[28px] font-bold text-navy leading-none mb-3">Withdraw request?</h3>
-            <p className="font-sans text-[15px] text-navy/70 mb-8">Are you sure you want to cancel your request for this property?</p>
+          <div className="bg-[var(--surface)] rounded-xl max-w-md w-full p-8 shadow-2xl">
+            <h3 className="font-display text-[28px] font-bold text-[var(--fg)] leading-none mb-3">Withdraw request?</h3>
+            <p className="font-sans text-[15px] text-[var(--fg)]/70 mb-8">Are you sure you want to cancel your request for this property?</p>
             <div className="flex items-center justify-end gap-3">
-              <button disabled={busy} onClick={() => setShowCancel(false)} className="px-5 py-3 text-[13px] font-bold text-navy hover:bg-[var(--parchment)] rounded transition-colors">Go Back</button>
+              <button disabled={busy} onClick={() => setShowCancel(false)} className="px-5 py-3 text-[13px] font-bold text-[var(--fg)] hover:bg-[var(--navy)]/5 rounded transition-colors">Go Back</button>
               <button disabled={busy} onClick={() => act("cancel")} className="px-6 py-3 text-[13px] font-bold text-[var(--crimson)] bg-[var(--crimson)]/10 hover:bg-[var(--crimson)]/20 rounded transition-colors shadow-sm">Cancel Request</button>
             </div>
           </div>
