@@ -159,7 +159,7 @@ export function SwapRequestForm({
       <h3 className="font-sans text-xl font-semibold text-[var(--fg)]">Request a swap</h3>
 
       {blackouts.length > 0 && (
-        <div className="flex items-start gap-2 rounded-lg bg-[var(--parchment)] border border-[var(--gold)]/20 p-3">
+        <div className="flex items-start gap-2 rounded-lg bg-[var(--navy)]/5 border border-[var(--gold)]/20 p-3">
           <CalendarX2 size={15} className="mt-0.5 shrink-0 text-[var(--gold-dark)]" />
           <div className="text-xs text-neutral-dark">
             <span className="font-semibold text-[var(--fg)]">Host unavailable:</span>{" "}

@@ -45,7 +45,7 @@ export default async function BrowsePage({
         <LuxPageHeader eyebrow="The Portfolio" title="Discover Homes" subtitle="Browse verified homes across the network." />
       <PageTip id="discover">Every home here belongs to a verified peer. Save the ones you like, then send a swap request when your dates are set.</PageTip>
         <div className="bg-surface rounded-md border border-[var(--hair)] p-10 text-center">
-          <div className="mx-auto w-14 h-14 rounded-md bg-[var(--parchment)] text-[var(--gold-dark)] flex items-center justify-center mb-5">
+          <div className="mx-auto w-14 h-14 rounded-md bg-[var(--navy)]/5 text-[var(--gold-dark)] flex items-center justify-center mb-5">
             <MailWarning size={26} />
           </div>
           <h2 className="font-sans text-2xl font-semibold text-[var(--fg)]">Confirm your email to browse</h2>
@@ -135,7 +135,7 @@ export default async function BrowsePage({
                   <FavouriteButton listingId={l.id} initial={l.favourited} />
                 </div>
                 {l.owner.verificationStatus === "FULLY_VERIFIED" && (
-                  <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide bg-white/90 text-[var(--fg)] px-2.5 py-1 rounded-full">
+                  <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide bg-[var(--surface)]/90 text-[var(--fg)] px-2.5 py-1 rounded-full">
                     <BadgeCheck size={12} className="text-[var(--teal)]" /> Verified host
                   </span>
                 )}

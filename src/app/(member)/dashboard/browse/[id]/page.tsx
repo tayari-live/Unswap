@@ -234,7 +234,7 @@ export default async function ListingDetailPage({
 
           {/* Request action */}
           {isOwner ? (
-            <div className="bg-[var(--parchment)] border border-[var(--gold)]/20 rounded-md p-4 text-sm text-neutral-dark text-center">
+            <div className="bg-[var(--navy)]/5 border border-[var(--gold)]/20 rounded-md p-4 text-sm text-neutral-dark text-center">
               This is your own listing.
             </div>
           ) : canRequest ? (
@@ -249,7 +249,7 @@ export default async function ListingDetailPage({
               <MessageButton otherUserId={listing.owner.id} label="Message host" />
             </div>
           ) : (
-            <div className="bg-[var(--parchment)] border border-[var(--gold)]/30 rounded-md p-5 text-center">
+            <div className="bg-[var(--navy)]/5 border border-[var(--gold)]/30 rounded-md p-5 text-center">
               <ShieldAlert size={22} className="mx-auto text-[var(--gold-dark)]" />
               <p className="mt-2 text-sm text-neutral-dark">Get verified to request a swap.</p>
               <Link href="/verify-identity" className="mt-3 inline-block text-sm font-semibold text-[var(--gold-dark)] underline">Verify now</Link>

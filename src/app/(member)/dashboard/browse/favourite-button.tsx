@@ -53,7 +53,7 @@ export function FavouriteButton({
       aria-pressed={fav}
       className={
         className ??
-        "w-9 h-9 rounded-full bg-white/90 flex items-center justify-center shadow hover:bg-[var(--surface)] transition-colors"
+        "w-9 h-9 rounded-full bg-[var(--surface)]/90 flex items-center justify-center shadow hover:bg-[var(--surface)] transition-colors"
       }
     >
       <Heart
