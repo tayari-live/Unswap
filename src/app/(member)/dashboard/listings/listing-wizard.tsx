@@ -175,7 +175,7 @@ function IconCard({
       onClick={onClick}
       aria-pressed={selected}
       className={`relative flex flex-col items-center justify-center gap-2 rounded-xl border p-4 text-center transition-colors ${
- selected ? "border-[var(--gold)] bg-[var(--parchment)]" : "border-[var(--hair)] bg-[var(--surface)] hover:border-[var(--navy)]"
+ selected ? "border-[var(--gold)] bg-[var(--navy)]/8" : "border-[var(--hair)] bg-[var(--surface)] hover:border-[var(--navy)]"
  }`}
     >
       {selected && (
@@ -432,7 +432,7 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
                 type="button"
                 onClick={writeWithAi}
                 disabled={aiBusy}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--gold-dark)] border border-[var(--gold)]/50 hover:bg-[var(--parchment)] px-3 py-1.5 rounded-full transition-colors disabled:opacity-60"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--gold-dark)] border border-[var(--gold)]/50 hover:bg-[var(--navy)]/5 px-3 py-1.5 rounded-full transition-colors disabled:opacity-60"
               >
                 <Sparkles size={13} /> {aiBusy ? "Drafting…" : "Write with AI"}
               </button>
@@ -491,7 +491,7 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
                         type="button"
                         onClick={() => set("photos", v.photos.filter((_, x) => x !== i))}
                         aria-label={`Remove photo ${i + 1}`}
-                        className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/95 text-[var(--fg)] flex items-center justify-center shadow hover:bg-[var(--surface)]"
+                        className="absolute top-2 right-2 w-7 h-7 rounded-full bg-[var(--surface)]/95 text-[var(--fg)] flex items-center justify-center shadow hover:bg-[var(--surface)]"
                       >
                         <X size={14} />
                       </button>
@@ -503,7 +503,7 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
                         <button
                           type="button"
                           onClick={() => reorder(i, 0)}
-                          className="absolute bottom-2 left-2 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide bg-white/95 text-[var(--fg)] px-2.5 py-1 rounded-md shadow hover:bg-[var(--surface)]"
+                          className="absolute bottom-2 left-2 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide bg-[var(--surface)]/95 text-[var(--fg)] px-2.5 py-1 rounded-md shadow hover:bg-[var(--surface)]"
                         >
                           <Star size={11} /> Make cover
                         </button>
@@ -573,7 +573,7 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
         {step === 10 && (
           <div>
             <Heading title="Who can guests call if something goes wrong?" sub="Encrypted, and only shared with a confirmed swap partner." />
-            <div className="rounded-xl bg-[var(--parchment)] border border-[var(--gold)]/20 p-5 space-y-4">
+            <div className="rounded-xl bg-[var(--navy)]/8 border border-[var(--gold)]/20 p-5 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div><label className={label} htmlFor="emergencyName">Contact name</label><input id="emergencyName" className={input} value={v.emergencyName} onChange={(e) => set("emergencyName", e.target.value)} /></div>
                 <div><label className={label} htmlFor="emergencyPhone">Phone</label><input id="emergencyPhone" className={input} value={v.emergencyPhone} onChange={(e) => set("emergencyPhone", e.target.value)} placeholder="+41 …" /></div>
@@ -612,7 +612,7 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
         )}
         <div className="flex items-center gap-3">
           {SCREENS[step].optional && step < SCREENS.length - 1 && (
-            <button type="button" onClick={() => next(true)} className="text-sm font-semibold text-[var(--fg)] px-5 py-2.5 rounded-full border border-[var(--gold)] hover:bg-[var(--parchment)] bg-[var(--surface)]">Skip</button>
+            <button type="button" onClick={() => next(true)} className="text-sm font-semibold text-[var(--fg)] px-5 py-2.5 rounded-full border border-[var(--gold)] hover:bg-[var(--navy)]/5 bg-[var(--surface)]">Skip</button>
           )}
           {step < SCREENS.length - 1 ? (
             <button type="button" onClick={() => next()} className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] px-7 py-2.5 rounded-full">Continue <ChevronRight size={16} /></button>

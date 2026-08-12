@@ -28,10 +28,10 @@ type Listing = {
 }
 
 const STATUS_STYLE: Record<string, string> = {
-  ACTIVE: "bg-[var(--gold)] text-navy", // Gold/soft gold treatment
-  DRAFT: "bg-[var(--parchment-dark)] text-navy", // Parchment/neutral
-  PAUSED: "bg-navy/10 text-navy/70", // Muted Navy/grey
-  ARCHIVED: "bg-navy/10 text-navy/70",
+  ACTIVE: "bg-[var(--gold)] text-[var(--fg)]", // Gold/soft gold treatment
+  DRAFT: "bg-[var(--navy)]/8 text-[var(--fg)]", // Parchment/neutral
+  PAUSED: "bg-[var(--navy)]/10 text-[var(--fg)]/70", // Muted Navy/grey
+  ARCHIVED: "bg-[var(--navy)]/10 text-[var(--fg)]/70",
 }
 
 export function ListingsClient({
@@ -87,14 +87,14 @@ export function ListingsClient({
       {listings.map((l) => {
         const busy = busyId === l.id
         return (
-          <div key={l.id} className="bg-white rounded-[10px] overflow-hidden border border-[var(--hair)] shadow-sm flex flex-col group">
+          <div key={l.id} className="bg-[var(--surface)] rounded-[10px] overflow-hidden border border-[var(--hair)] shadow-sm flex flex-col group">
             {/* Image Header */}
-            <div className="relative aspect-[4/3] bg-navy/5 overflow-hidden">
+            <div className="relative aspect-[4/3] bg-[var(--navy)]/5 overflow-hidden">
               {l.photos[0] ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={`/api/photos/${l.photos[0].id}`} alt={l.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-navy/20">
+                <div className="w-full h-full flex items-center justify-center text-[var(--fg)]/20">
                   <Home size={32} />
                 </div>
               )}
@@ -109,24 +109,24 @@ export function ListingsClient({
 
             {/* Body */}
             <div className="p-6 flex-1 flex flex-col">
-              <h3 className="font-display text-[26px] font-bold text-navy leading-none mb-2">{l.title}</h3>
-              <div className="font-sans text-[15px] text-navy/70 mb-5">
+              <h3 className="font-display text-[26px] font-bold text-[var(--fg)] leading-none mb-2">{l.title}</h3>
+              <div className="font-sans text-[15px] text-[var(--fg)]/70 mb-5">
                 {l.city}, {l.country}
               </div>
               
-              <div className="flex flex-wrap items-center gap-4 font-sans text-[13px] text-navy font-medium mb-6">
+              <div className="flex flex-wrap items-center gap-4 font-sans text-[13px] text-[var(--fg)] font-medium mb-6">
                 <span>{l.bedrooms} {l.bedrooms === 1 ? "bedroom" : "bedrooms"}</span>
-                <span className="w-1 h-1 rounded-full bg-navy/20" />
+                <span className="w-1 h-1 rounded-full bg-[var(--navy)]/20" />
                 <span>{l.propertyType}</span>
               </div>
 
               {/* Actions Footer */}
               <div className="mt-auto pt-5 border-t border-[var(--hair)] flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <Link href={`/dashboard/listings/${l.id}/edit`} className="inline-flex items-center justify-center text-[12px] font-bold uppercase tracking-[0.08em] text-navy bg-white border border-navy/10 hover:bg-[var(--parchment)] px-5 py-2.5 rounded transition-colors shadow-sm">
+                  <Link href={`/dashboard/listings/${l.id}/edit`} className="inline-flex items-center justify-center text-[12px] font-bold uppercase tracking-[0.08em] text-[var(--fg)] bg-[var(--surface)] border border-[var(--border)] hover:bg-[var(--navy)]/5 px-5 py-2.5 rounded transition-colors shadow-sm">
                     Edit
                   </Link>
-                  <button disabled={busy} onClick={() => remove(l.id)} className="inline-flex items-center justify-center text-navy/40 hover:text-[var(--crimson)] px-3 py-2.5 rounded transition-colors" title="Delete">
+                  <button disabled={busy} onClick={() => remove(l.id)} className="inline-flex items-center justify-center text-[var(--fg)]/40 hover:text-[var(--crimson)] px-3 py-2.5 rounded transition-colors" title="Delete">
                     <Trash2 size={16} />
                   </button>
                 </div>
@@ -143,7 +143,7 @@ export function ListingsClient({
                     </button>
                   )}
                   {l.status === "ACTIVE" && (
-                    <button disabled={busy} onClick={() => setStatus(l.id, "PAUSED")} className="inline-flex items-center justify-center text-[12px] font-bold uppercase tracking-[0.08em] text-navy bg-[var(--parchment-dark)] hover:bg-navy/10 px-5 py-2.5 rounded transition-colors shadow-sm">
+                    <button disabled={busy} onClick={() => setStatus(l.id, "PAUSED")} className="inline-flex items-center justify-center text-[12px] font-bold uppercase tracking-[0.08em] text-[var(--fg)] bg-[var(--navy)]/8 hover:bg-[var(--navy)]/10 px-5 py-2.5 rounded transition-colors shadow-sm">
                       Pause
                     </button>
                   )}
