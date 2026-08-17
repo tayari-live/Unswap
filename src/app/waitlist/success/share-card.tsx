@@ -275,7 +275,6 @@ export function ShareCard() {
 
   const refs = parseInt(stats.referrals, 10) || 0
   const nextMil = refs < 1 ? 1 : refs < 5 ? 5 : refs < 10 ? 10 : null
-  const signupHref = `/register${email ? `?email=${encodeURIComponent(email)}` : ""}`
 
   return (
     <div className="min-h-screen relative overflow-x-hidden" style={{ background: "var(--navy)", color: "var(--ivory)" }}>
@@ -401,11 +400,8 @@ export function ShareCard() {
           <motion.div initial={{ y: 80, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 80, opacity: 0 }} transition={{ type: "spring", damping: 26, stiffness: 280 }}
             style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 1000, padding: "14px 20px", background: "linear-gradient(135deg, var(--panel-strong) 0%, var(--panel-strong) 100%)", borderTop: "1px solid rgba(201,168,76,0.25)", backdropFilter: "blur(12px)", display: "flex", alignItems: "center", justifyContent: "center", gap: "16px", flexWrap: "wrap" }}>
             <span style={{ fontSize: "13px", color: "var(--ivory-dim)" }}>Prefer a walkthrough?</span>
-            <a href="/book" style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "transparent", color: "#c9a84c", fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none", padding: "9px 20px", borderRadius: "4px", border: "1px solid rgba(201,168,76,0.5)" }}>
-              Book a call
-            </a>
-            <a href={signupHref} style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "#c9a84c", color: "var(--navy)", fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none", padding: "9px 20px", borderRadius: "4px", boxShadow: "0 2px 16px rgba(201,168,76,0.3)" }}>
-              Add your property {Icons.arrow}
+            <a href="/book" style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "#c9a84c", color: "var(--navy)", fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none", padding: "9px 20px", borderRadius: "4px", boxShadow: "0 2px 16px rgba(201,168,76,0.3)" }}>
+              Book a call {Icons.arrow}
             </a>
           </motion.div>
         )}
