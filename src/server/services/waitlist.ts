@@ -261,6 +261,23 @@ export async function getWaitlistStatusByCode(rawCode: string) {
   }
 }
 
+/**
+ * Public: re-send the "add your property" invite for a still-unconfirmed entry,
+ * keyed by the referral code the share page already holds. A fresh confirm token
+ * is issued so the previous link stops working. Unknown or already-confirmed
+ * codes are a silent no-op (nothing to resend, and it reveals nothing).
+ */
+export async function resendJoinEmail(rawCode: string) {
+  const code = rawCode?.trim()
+  if (!code) return { ok: true as const }
+  const entry = await prisma.waitlistEntry.findUnique({ where: { referralCode: code } })
+  if (!entry || entry.confirmedAt) return { ok: true as const }
+  const token = randomBytes(32).toString("hex")
+  await prisma.waitlistEntry.update({ where: { id: entry.id }, data: { confirmToken: token } })
+  await sendJoinEmail(entry.email, entry.firstName, token)
+  return { ok: true as const }
+}
+
 /** Public leaderboard of top referrers (confirmed only; last name masked). */
 export async function getLeaderboard(limit = 10) {
   const rows = await prisma.waitlistEntry.findMany({

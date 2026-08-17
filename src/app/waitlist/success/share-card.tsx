@@ -189,11 +189,40 @@ export function ShareCard() {
   const [toast, setToast] = useState({ visible: false, message: "" })
   const [hasShared, setHasShared] = useState(false)
   const [showTemplates, setShowTemplates] = useState(false)
+  // Resend of the "add your property" invite. Starts on cooldown because the
+  // email was just sent at signup; the counter resets after each resend.
+  const RESEND_COOLDOWN = 45
+  const [cooldown, setCooldown] = useState(RESEND_COOLDOWN)
+  const [resending, setResending] = useState(false)
 
   const showToast = useCallback((msg: string) => {
     setToast({ visible: true, message: msg })
     setTimeout(() => setToast({ visible: false, message: "" }), 2200)
   }, [])
+
+  useEffect(() => {
+    if (cooldown <= 0) return
+    const t = setInterval(() => setCooldown((s) => Math.max(0, s - 1)), 1000)
+    return () => clearInterval(t)
+  }, [cooldown])
+
+  const resendInvite = async () => {
+    if (cooldown > 0 || resending) return
+    setResending(true)
+    try {
+      const code = new URLSearchParams(window.location.search).get("ref")
+      await fetch("/api/waitlist/resend", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code }),
+      })
+      showToast("Invite re-sent — check your inbox")
+    } catch {
+      /* keep the reply neutral */
+    }
+    setResending(false)
+    setCooldown(RESEND_COOLDOWN)
+  }
 
   const downloadImage = (src: string, filename: string) => {
     fetch(src).then((r) => r.blob()).then((blob) => {
@@ -274,10 +303,15 @@ export function ShareCard() {
                 <span style={{ marginRight: "6px" }}>✉️</span>
                 We&apos;ve emailed you an <strong style={{ color: "var(--gold)" }}>exclusive invite to add your property</strong>{email ? <> at <span style={{ color: "var(--ivory-dim)" }}>{email}</span></> : null}. Click the link in that email to confirm your account and set up your listing.
               </p>
-              <a href={`/register?next=${encodeURIComponent("/dashboard/listings/new")}${email ? `&email=${encodeURIComponent(email)}` : ""}`}
-                style={{ display: "inline-flex", alignItems: "center", gap: "8px", marginTop: "12px", background: "var(--gold)", color: "var(--navy)", fontSize: "12px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none", padding: "9px 18px", borderRadius: "6px" }}>
-                Add your property {Icons.arrow}
-              </a>
+              <div style={{ marginTop: "12px", display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+                <span style={{ fontSize: "12px", color: "var(--muted)" }}>Didn&apos;t get it?</span>
+                <button
+                  onClick={resendInvite}
+                  disabled={cooldown > 0 || resending}
+                  style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "transparent", color: cooldown > 0 || resending ? "var(--muted)" : "var(--gold)", fontSize: "12px", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", padding: "7px 14px", border: `1px solid ${cooldown > 0 || resending ? "var(--border)" : "rgba(201,168,76,0.5)"}`, borderRadius: "6px", cursor: cooldown > 0 || resending ? "not-allowed" : "pointer" }}>
+                  {resending ? "Sending…" : cooldown > 0 ? `Resend email (${cooldown})` : "Resend email"}
+                </button>
+              </div>
             </div>
           )}
           <p style={{ fontSize: "14px", lineHeight: 1.7, color: "var(--ivory-dim)", maxWidth: "440px", margin: "0 auto 8px" }}>
