@@ -8,6 +8,7 @@ import { Logo } from "@/components/brand/logo"
 import { type ProfileValues } from "@/components/profile/profile-form"
 import { ProfileWizard } from "@/components/profile/profile-wizard"
 import { SectionLabel, LUX_GOLD_BTN, LUX_GHOST_BTN } from "@/components/ui/lux"
+import { useToast } from "@/components/ui/toast"
 
 const STEPS = ["Welcome", "Your profile", "Get started"]
 
@@ -23,8 +24,8 @@ export function OnboardingWizard({
   initialProfile: ProfileValues
 }) {
   const router = useRouter()
+  const toast = useToast()
   const [step, setStep] = useState(1)
-  const [hint, setHint] = useState("")
   const [leaving, setLeaving] = useState(false)
 
   // The profile step nests ProfileWizard, which brings its own progress and
@@ -102,13 +103,12 @@ export function OnboardingWizard({
             <p className="mt-2 mb-6 text-sm text-neutral leading-relaxed">
               Members exchange with people, not listings. One question at a time. Reach {MIN_TO_CONTINUE}% to continue.
             </p>
-            {hint && <p className="mb-4 text-xs text-[var(--crimson)] font-medium">{hint}</p>}
             <ProfileWizard
               initial={initialProfile}
-              onExit={() => { setHint(""); setStep(1) }}
+              onExit={() => setStep(1)}
               onSaved={(c) => {
-                if (c >= MIN_TO_CONTINUE) { setHint(""); setStep(3) }
-                else setHint(`You are at ${c}%. Add a little more to reach ${MIN_TO_CONTINUE}% and continue.`)
+                if (c >= MIN_TO_CONTINUE) setStep(3)
+                else toast(`You are at ${c}%. Add a little more to reach ${MIN_TO_CONTINUE}% and continue.`, "info")
               }}
             />
           </div>
@@ -154,7 +154,7 @@ export function OnboardingWizard({
       {step > 1 && !ownsScreen && (
         <button
           type="button"
-          onClick={() => { setHint(""); setStep((s) => Math.max(1, s - 1)) }}
+          onClick={() => setStep((s) => Math.max(1, s - 1))}
           disabled={leaving}
           className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-neutral hover:text-[var(--fg)] disabled:opacity-50 transition-colors"
         >
