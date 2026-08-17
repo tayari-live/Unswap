@@ -51,12 +51,13 @@
 }
 
 /* ── DARK — the original obsidian/gold treatment ──
-   Also applied, in any theme, to pages that opt in with `.wl-navy` (the auth
-   pages: /login, /register), so they keep the navy/gold look instead of the
-   bright parchment ground in light mode. `.wl-root.wl-navy` outranks the light
-   `.wl-root` block above, so it wins without touching the other wl-root pages. */
+   Also applied, in any theme, to any element that opts in with `.wl-navy`, so a
+   single section can carry the navy/gold palette (navy ground + ivory text +
+   gold) on top of the light parchment page — used for the form panel on the auth
+   pages in light mode. In dark mode the whole page is already navy, so the panel
+   simply blends in. */
 .dark .wl-root,
-.wl-root.wl-navy {
+.wl-navy {
   --navy: #0a0e1a;
   --deep: #060910;
   --gold: #c9a84c;

@@ -147,7 +147,8 @@ export default function RegisterPage() {
       <div className="w-full lg:w-[62%] lg:ml-[38%] flex items-center justify-center p-8 sm:p-12 lg:p-16 relative z-10 min-h-[100dvh]">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(201,168,76,0.12)_0%,_transparent_60%)] pointer-events-none" />
 
-        <div className="w-full max-w-md mx-auto relative">
+        {/* Form panel — a navy card in both themes (see /login). */}
+        <div className="w-full max-w-md mx-auto relative wl-navy rounded-2xl border border-wl-border bg-wl-navy p-6 sm:p-8 shadow-2xl">
           <div className="flex justify-center mb-6">
             {/* The logo is the way back out of the funnel: from sign-up, that is
                 the public landing page. */}
