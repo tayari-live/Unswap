@@ -70,7 +70,9 @@ export function OnboardingWizard({
         </div>
       )}
 
-      <div className="bg-[var(--surface)] rounded-md border border-[var(--hair)] p-8 sm:p-10">
+      {/* The profile step nests ProfileWizard, which brings its own card; wrap
+          the framing steps only, so step 2 isn't a card inside a card. */}
+      <div className={ownsScreen ? "" : "bg-[var(--surface)] rounded-md border border-[var(--hair)] p-8 sm:p-10"}>
         {/* Step 1 — Welcome + Mission */}
         {step === 1 && (
           <div className="text-center">
@@ -95,23 +97,17 @@ export function OnboardingWizard({
           </div>
         )}
 
-        {/* Step 2 — Complete your profile (needs 50% to proceed) */}
+        {/* Step 2 — Complete your profile (needs 50% to proceed). ProfileWizard
+            carries its own heading, progress, and card — no extra chrome here. */}
         {step === 2 && (
-          <div>
-            <SectionLabel>Your Profile</SectionLabel>
-            <h1 className="font-sans text-3xl font-light leading-[1.15] text-[var(--fg)]">Complete your profile</h1>
-            <p className="mt-2 mb-6 text-sm text-neutral leading-relaxed">
-              Members exchange with people, not listings. One question at a time. Reach {MIN_TO_CONTINUE}% to continue.
-            </p>
-            <ProfileWizard
-              initial={initialProfile}
-              onExit={() => setStep(1)}
-              onSaved={(c) => {
-                if (c >= MIN_TO_CONTINUE) setStep(3)
-                else toast(`You are at ${c}%. Add a little more to reach ${MIN_TO_CONTINUE}% and continue.`, "info")
-              }}
-            />
-          </div>
+          <ProfileWizard
+            initial={initialProfile}
+            onExit={() => setStep(1)}
+            onSaved={(c) => {
+              if (c >= MIN_TO_CONTINUE) setStep(3)
+              else toast(`You are at ${c}%. Add a little more to reach ${MIN_TO_CONTINUE}% and continue.`, "info")
+            }}
+          />
         )}
 
         {/*

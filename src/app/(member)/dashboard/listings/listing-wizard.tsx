@@ -82,17 +82,19 @@ const EMPTY: WizardValues = {
 const SECTIONS = ["Your home", "Amenities", "Photos", "Exchange", "Final details"]
 const SCREENS: { section: number; optional?: boolean }[] = [
   { section: 0 },                  // 0 title + type
-  { section: 0 },                  // 1 location
-  { section: 0 },                  // 2 space
-  { section: 0 },                  // 3 description
-  { section: 1, optional: true },  // 4 amenities
-  { section: 2 },                  // 5 photos
-  { section: 3 },                  // 6 durations
-  { section: 3 },                  // 7 exchange type
-  { section: 3, optional: true },  // 8 blackouts
-  { section: 4, optional: true },  // 9 house rules
-  { section: 4 },                  // 10 emergency contact
-  { section: 4 },                  // 11 review
+  { section: 0, optional: true },  // 1 full address (private)
+  { section: 0 },                  // 2 city / country / neighbourhood
+  { section: 0 },                  // 3 space
+  { section: 0 },                  // 4 description
+  { section: 1, optional: true },  // 5 amenities
+  { section: 2 },                  // 6 photos
+  { section: 3 },                  // 7 durations
+  { section: 3 },                  // 8 exchange type
+  { section: 3, optional: true },  // 9 blackouts
+  { section: 4, optional: true },  // 10 house rules
+  { section: 4 },                  // 11 emergency name + phone
+  { section: 4, optional: true },  // 12 emergency relationship
+  { section: 4 },                  // 13 review
 ]
 
 function readImage(file: File): Promise<{ url?: string; error?: string }> {
@@ -284,15 +286,15 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
       if (v.title.length > 80) return "Title must be 80 characters or fewer."
       if (!v.propertyType) return "Choose a property type."
     }
-    if (s === 1) {
+    if (s === 2) {
       if (!v.city.trim()) return "City is required."
       if (!v.country.trim()) return "Country is required."
     }
-    if (s === 3 && v.description.trim().length < 100) return "Description must be at least 100 characters."
-    if (s === 5 && v.photos.length < 5) return "Upload at least 5 photos."
-    if (s === 6 && v.swapDurations.length === 0) return "Select at least one swap duration type."
-    if (s === 7 && !v.exchangeType) return "Choose how you want to exchange."
-    if (s === 10 && (!v.emergencyName.trim() || !v.emergencyPhone.trim())) return "Emergency contact name and phone are required."
+    if (s === 4 && v.description.trim().length < 100) return "Description must be at least 100 characters."
+    if (s === 6 && v.photos.length < 5) return "Upload at least 5 photos."
+    if (s === 7 && v.swapDurations.length === 0) return "Select at least one swap duration type."
+    if (s === 8 && !v.exchangeType) return "Choose how you want to exchange."
+    if (s === 11 && (!v.emergencyName.trim() || !v.emergencyPhone.trim())) return "Emergency contact name and phone are required."
     return null
   }
 
@@ -383,15 +385,20 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
           </div>
         )}
 
-        {/* 1 — Location */}
+        {/* 1 — Full address (private) */}
         {step === 1 && (
           <div>
-            <Heading title="Where is your home?" sub="Only the city, country, and neighbourhood are shown publicly. The full address stays encrypted until a swap is confirmed." />
+            <Heading title="What's the full address?" sub="Kept private and encrypted until a swap is confirmed — never shown publicly." />
+            <label className={label} htmlFor="fullAddress">Full address <span className="text-neutral normal-case font-normal">(private)</span></label>
+            <input id="fullAddress" className={input} value={v.fullAddress} onChange={(e) => set("fullAddress", e.target.value)} placeholder="12 Rue du Lac, Apt 4B" />
+          </div>
+        )}
+
+        {/* 2 — City / country / neighbourhood (public) */}
+        {step === 2 && (
+          <div>
+            <Heading title="Where is your home, roughly?" sub="Only the city, country, and neighbourhood are shown publicly." />
             <div className="space-y-5">
-              <div>
-                <label className={label} htmlFor="fullAddress">Full address <span className="text-neutral normal-case font-normal">(private)</span></label>
-                <input id="fullAddress" className={input} value={v.fullAddress} onChange={(e) => set("fullAddress", e.target.value)} placeholder="12 Rue du Lac, Apt 4B" />
-              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div><label className={label} htmlFor="city">City</label><input id="city" className={input} value={v.city} onChange={(e) => set("city", e.target.value)} placeholder="Geneva" /></div>
                 <div>
@@ -410,8 +417,8 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
           </div>
         )}
 
-        {/* 2 — Space */}
-        {step === 2 && (
+        {/* 3 — Space */}
+        {step === 3 && (
           <div>
             <Heading title="How much space is there?" sub="Bedrooms, bathrooms, and the most guests your home comfortably sleeps." />
             <div className="flex flex-wrap gap-10">
@@ -422,8 +429,8 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
           </div>
         )}
 
-        {/* 3 — Description */}
-        {step === 3 && (
+        {/* 4 — Description */}
+        {step === 4 && (
           <div>
             <Heading title="What makes your home unique?" sub="Describe the home, the neighbourhood, and what makes it a great exchange — guests read this first." />
             <div className="flex items-end justify-between gap-3 mb-2">
@@ -444,8 +451,8 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
           </div>
         )}
 
-        {/* 4 — Amenities (optional) */}
-        {step === 4 && (
+        {/* 5 — Amenities (optional) */}
+        {step === 5 && (
           <div>
             <Heading title="What does your home offer?" sub="Select everything that applies — amenities help your home appear in more searches." />
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -456,8 +463,8 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
           </div>
         )}
 
-        {/* 5 — Photos */}
-        {step === 5 && (
+        {/* 6 — Photos */}
+        {step === 6 && (
           <div>
             <Heading title="Add at least 5 pictures" sub="Start with your home's main rooms." />
             {v.photos.length === 0 ? (
@@ -521,8 +528,8 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
           </div>
         )}
 
-        {/* 6 — Durations */}
-        {step === 6 && (
+        {/* 7 — Durations */}
+        {step === 7 && (
           <div>
             <Heading title="How long can guests stay?" sub="Pick every stay length your home is open to — this decides which requests you receive." />
             <div className="grid sm:grid-cols-2 gap-3">
@@ -533,8 +540,8 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
           </div>
         )}
 
-        {/* 7 — Exchange type */}
-        {step === 7 && (
+        {/* 8 — Exchange type */}
+        {step === 8 && (
           <div>
             <Heading title="How do you want to exchange?" sub="Simultaneous swaps happen at the same time; credits let you host now and stay elsewhere later." />
             <div className="grid sm:grid-cols-3 gap-3">
@@ -545,8 +552,8 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
           </div>
         )}
 
-        {/* 8 — Blackouts (optional) */}
-        {step === 8 && (
+        {/* 9 — Blackouts (optional) */}
+        {step === 9 && (
           <div>
             <Heading title="Any dates you're unavailable?" sub="Guests can't request stays that overlap these ranges. You can change them anytime." />
             {v.blackouts.map((b, i) => (
@@ -561,30 +568,36 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
           </div>
         )}
 
-        {/* 9 — House rules (optional) */}
-        {step === 9 && (
+        {/* 10 — House rules (optional) */}
+        {step === 10 && (
           <div>
             <Heading title="Any house rules?" sub="Shown to guests before they send a request — set expectations early." />
             <textarea maxLength={1000} className={TEXTAREA} value={v.houseRules} onChange={(e) => set("houseRules", e.target.value)} placeholder="No smoking, no shoes indoors, please water the plants." />
           </div>
         )}
 
-        {/* 10 — Emergency contact */}
-        {step === 10 && (
+        {/* 11 — Emergency contact: name + phone */}
+        {step === 11 && (
           <div>
             <Heading title="Who can guests call if something goes wrong?" sub="Encrypted, and only shared with a confirmed swap partner." />
             <div className="rounded-xl bg-[var(--navy)]/8 border border-[var(--gold)]/20 p-5 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div><label className={label} htmlFor="emergencyName">Contact name</label><input id="emergencyName" className={input} value={v.emergencyName} onChange={(e) => set("emergencyName", e.target.value)} /></div>
-                <div><label className={label} htmlFor="emergencyPhone">Phone</label><input id="emergencyPhone" className={input} value={v.emergencyPhone} onChange={(e) => set("emergencyPhone", e.target.value)} placeholder="+41 …" /></div>
-              </div>
-              <div><label className={label} htmlFor="emergencyRelationship">Relationship to property</label><input id="emergencyRelationship" className={input} value={v.emergencyRelationship} onChange={(e) => set("emergencyRelationship", e.target.value)} placeholder="Building manager, neighbour…" /></div>
+              <div><label className={label} htmlFor="emergencyName">Contact name</label><input id="emergencyName" className={input} value={v.emergencyName} onChange={(e) => set("emergencyName", e.target.value)} /></div>
+              <div><label className={label} htmlFor="emergencyPhone">Phone</label><input id="emergencyPhone" className={input} value={v.emergencyPhone} onChange={(e) => set("emergencyPhone", e.target.value)} placeholder="+41 …" /></div>
             </div>
           </div>
         )}
 
-        {/* 11 — Review */}
-        {step === 11 && (
+        {/* 12 — Emergency contact: relationship (optional) */}
+        {step === 12 && (
+          <div>
+            <Heading title="How are they connected to the home?" sub="So a guest knows who they're reaching. Encrypted, shared only with a confirmed partner." />
+            <label className={label} htmlFor="emergencyRelationship">Relationship to property</label>
+            <input id="emergencyRelationship" className={input} value={v.emergencyRelationship} onChange={(e) => set("emergencyRelationship", e.target.value)} placeholder="Building manager, neighbour…" />
+          </div>
+        )}
+
+        {/* 13 — Review */}
+        {step === 13 && (
           <div>
             <Heading title="Ready to save?" sub="Your listing is saved as a draft — publish it from My Listings whenever you're ready." />
             <dl className="text-sm divide-y divide-[var(--hair)] border border-[var(--hair)] rounded-xl overflow-hidden">
