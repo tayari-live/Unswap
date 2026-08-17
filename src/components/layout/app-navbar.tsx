@@ -10,6 +10,7 @@ import {
   UserCircle, CreditCard, Settings, LogOut, type LucideIcon,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { MEMBERSHIP_ENABLED } from "@/lib/features"
 import { useVisiblePolling } from "@/lib/use-visible-polling"
 import { MemberNotificationBell } from "./member-notification-bell"
 import { ThemeToggle } from "@/components/theme/theme-toggle"
@@ -254,8 +255,12 @@ export function AppNavbar({
               {(close) => (
                 <div className="py-1.5">
                   {MINE.map((i) => <MenuRow key={i.name} item={i} onClick={close} />)}
-                  <div className="h-px bg-[var(--border)] my-1.5" />
-                  <MenuRow item={{ name: "Membership", href: "/dashboard/subscription", icon: CreditCard }} onClick={close} />
+                  {MEMBERSHIP_ENABLED && (
+                    <>
+                      <div className="h-px bg-[var(--border)] my-1.5" />
+                      <MenuRow item={{ name: "Membership", href: "/dashboard/subscription", icon: CreditCard }} onClick={close} />
+                    </>
+                  )}
                 </div>
               )}
             </NavDropdown>
@@ -327,7 +332,8 @@ export function AppNavbar({
                   <div className="py-1.5">
                     {[
                       { name: "Profile", href: "/dashboard/profile", icon: UserCircle },
-                      { name: "Membership", href: "/dashboard/subscription", icon: CreditCard },
+                      // Membership hidden until payments are set up (features.ts).
+                      ...(MEMBERSHIP_ENABLED ? [{ name: "Membership", href: "/dashboard/subscription", icon: CreditCard }] : []),
                       { name: "Settings", href: "/dashboard/settings", icon: Settings },
                     ].map((i) => (
                       <Link
@@ -399,7 +405,9 @@ export function AppNavbar({
 
             <div className="px-5 pt-4 pb-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--fg)]/40">My UnSwap</div>
             {MINE.map((i) => <MenuRow key={i.name} item={i} onClick={() => setDrawer(false)} />)}
-            <MenuRow item={{ name: "Membership", href: "/dashboard/subscription", icon: CreditCard }} onClick={() => setDrawer(false)} />
+            {MEMBERSHIP_ENABLED && (
+              <MenuRow item={{ name: "Membership", href: "/dashboard/subscription", icon: CreditCard }} onClick={() => setDrawer(false)} />
+            )}
 
             <div className="mt-auto border-t border-[var(--border)] py-2">
               <MenuRow item={{ name: "Profile", href: "/dashboard/profile", icon: UserCircle }} onClick={() => setDrawer(false)} />

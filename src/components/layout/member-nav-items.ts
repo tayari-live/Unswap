@@ -12,6 +12,7 @@ import {
   Settings,
   type LucideIcon,
 } from "lucide-react"
+import { MEMBERSHIP_ENABLED } from "@/lib/features"
 
 export type MemberNavItem = {
   name: string
@@ -33,7 +34,10 @@ export const memberNavigation: MemberNavItem[] = [
   { name: "Messages", href: "/dashboard/messages", icon: MessageSquare, live: true },
   { name: "Credits", href: "/dashboard/credits", icon: Coins, live: true },
   { name: "Profile", href: "/dashboard/profile", icon: UserCircle, live: true },
-  { name: "Subscription", href: "/dashboard/subscription", icon: CreditCard, live: true },
+  // Membership/billing is hidden until payments are set up (see features.ts).
+  ...(MEMBERSHIP_ENABLED
+    ? [{ name: "Subscription", href: "/dashboard/subscription", icon: CreditCard, live: true } as MemberNavItem]
+    : []),
   { name: "Notifications", href: "/dashboard/notifications", icon: Bell, live: true },
   { name: "Settings", href: "/dashboard/settings", icon: Settings, live: true },
 ]

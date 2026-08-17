@@ -15,6 +15,7 @@ import {
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
 import { cn } from "@/lib/utils"
+import { MEMBERSHIP_ENABLED } from "@/lib/features"
 import { LuxPageHeader, SectionLabel } from "@/components/ui/lux"
 import { ResendEmailButton } from "@/components/ui/resend-email-button"
 import { PROFILE_COMPLETE_AT } from "@/server/services/profile"
@@ -196,7 +197,8 @@ export default async function MemberDashboardPage() {
     },
   ]
 
-  const pending = actions.filter((a) => !a.done)
+  // Membership/activation is hidden until payments are set up (see features.ts).
+  const pending = actions.filter((a) => !a.done && (MEMBERSHIP_ENABLED || a.key !== "membership"))
   // Hidden entirely once nothing is outstanding — a settled member shouldn't
   // keep seeing a checklist just because the component exists.
   const showActions = pending.length > 0
@@ -295,8 +297,10 @@ export default async function MemberDashboardPage() {
           </Link>
         </div>
 
-        {/* 3. Primary Discovery Module */}
-        <div className="bg-[var(--navy)] rounded-lg p-10 md:p-14 mb-16 shadow-md overflow-hidden relative">
+        {/* 3. Primary Discovery Module — full-bleed on mobile (cancels the
+            layout's p-4 so the search field can be as wide as the viewport),
+            back to a padded, rounded card from sm up. */}
+        <div className="bg-[var(--navy)] -mx-4 rounded-none px-5 py-9 sm:mx-0 sm:rounded-lg sm:p-10 md:p-14 mb-16 shadow-md overflow-hidden relative">
           <div className="relative z-10 max-w-2xl">
             <h2 className="font-display text-[36px] md:text-[44px] text-[var(--gold)] font-bold mb-3 leading-none">
               FIND YOUR NEXT STAY
