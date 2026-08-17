@@ -147,8 +147,7 @@ export default function RegisterPage() {
       <div className="w-full lg:w-[62%] lg:ml-[38%] flex items-center justify-center p-8 sm:p-12 lg:p-16 relative z-10 min-h-[100dvh]">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(201,168,76,0.12)_0%,_transparent_60%)] pointer-events-none" />
 
-        {/* Form panel — a navy card in both themes (see /login). */}
-        <div className="w-full max-w-md mx-auto relative wl-navy rounded-2xl border border-wl-border bg-wl-navy p-6 sm:p-8 shadow-2xl">
+        <div className="w-full max-w-md mx-auto relative">
           <div className="flex justify-center mb-6">
             {/* The logo is the way back out of the funnel: from sign-up, that is
                 the public landing page. */}
@@ -227,16 +226,17 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          <div className="mt-8 pt-6 border-t border-wl-border text-center">
+          {/* Footer sits on its own navy band (ivory text via the `wl-navy`
+              palette) in both themes, matching /login. */}
+          <div className="wl-navy bg-wl-navy mt-8 px-6 py-5 rounded-xl text-center space-y-2">
             <p className="text-sm text-wl-ivory-dim">
               Already have an account?{" "}
               <Link href="/login" className="font-semibold text-wl-gold hover:text-wl-gold-light transition-colors">Log in</Link>
             </p>
+            <p className="text-[11px] text-wl-muted">
+              UnSwap is an independent, staff-led platform, not affiliated with the United Nations.
+            </p>
           </div>
-
-          <p className="mt-6 text-center text-[11px] text-wl-muted">
-            UnSwap is an independent, staff-led platform, not affiliated with the United Nations.
-          </p>
         </div>
       </div>
     </div>

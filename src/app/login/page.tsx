@@ -131,10 +131,7 @@ export default function LoginPage() {
       <div className="w-full lg:w-[62%] lg:ml-[38%] flex items-center justify-center p-8 sm:p-12 lg:p-16 relative z-10 min-h-[100dvh]">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--gold-dim)_0%,_transparent_60%)] pointer-events-none" />
 
-        {/* Form panel — a navy card (the `wl-navy` palette keeps its text ivory)
-            in both themes: it lifts the form off the parchment ground in light
-            mode and off the obsidian ground in dark mode. */}
-        <div className="w-full max-w-md mx-auto relative wl-navy rounded-2xl border border-wl-border bg-wl-navy p-6 sm:p-8 shadow-2xl">
+        <div className="w-full max-w-md mx-auto relative">
           <div className="flex justify-center mb-6">
             <Link href="/" aria-label="UnSwap — home" className="inline-flex transition-opacity hover:opacity-90">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -172,13 +169,6 @@ export default function LoginPage() {
                   {loading ? "Checking…" : "Continue"}
                 </button>
               </form>
-
-              <div className="mt-8 pt-6 border-t border-wl-border text-center">
-                <p className="text-sm text-wl-ivory-dim">
-                  Don&apos;t have an account?{" "}
-                  <Link href="/register" className="font-semibold text-wl-gold hover:text-wl-gold-light transition-colors">Sign up</Link>
-                </p>
-              </div>
             </>
           )}
 
@@ -257,9 +247,19 @@ export default function LoginPage() {
             </>
           )}
 
-          <p className="mt-6 text-center text-[11px] text-wl-muted">
-            UnSwap is an independent, staff-led platform, not affiliated with the United Nations.
-          </p>
+          {/* Footer sits on its own navy band (ivory text via the `wl-navy`
+              palette) in both themes, per design. */}
+          <div className="wl-navy bg-wl-navy mt-8 px-6 py-5 rounded-xl text-center space-y-2">
+            {stage === "email" && (
+              <p className="text-sm text-wl-ivory-dim">
+                Don&apos;t have an account?{" "}
+                <Link href="/register" className="font-semibold text-wl-gold hover:text-wl-gold-light transition-colors">Sign up</Link>
+              </p>
+            )}
+            <p className="text-[11px] text-wl-muted">
+              UnSwap is an independent, staff-led platform, not affiliated with the United Nations.
+            </p>
+          </div>
         </div>
       </div>
     </div>
