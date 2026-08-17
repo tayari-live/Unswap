@@ -50,8 +50,13 @@
   overflow-x: hidden;
 }
 
-/* ── DARK — the original obsidian/gold treatment ── */
-.dark .wl-root {
+/* ── DARK — the original obsidian/gold treatment ──
+   Also applied, in any theme, to pages that opt in with `.wl-navy` (the auth
+   pages: /login, /register), so they keep the navy/gold look instead of the
+   bright parchment ground in light mode. `.wl-root.wl-navy` outranks the light
+   `.wl-root` block above, so it wins without touching the other wl-root pages. */
+.dark .wl-root,
+.wl-root.wl-navy {
   --navy: #0a0e1a;
   --deep: #060910;
   --gold: #c9a84c;

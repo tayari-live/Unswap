@@ -149,6 +149,22 @@ export async function registerMember(input: RegisterInput) {
 
 const LOGIN_TTL_MS = 60 * 60 * 1000 // one-time sign-in token validity: 1 hour
 
+export type LoginState = "password" | "passwordless" | "none"
+
+/**
+ * Email-first login lookup: does this address have an account, and has it set a
+ * password? Lets the login page show the right next step (password field, a
+ * sign-in link for passwordless members, or a nudge to register). The endpoint
+ * that calls this is rate limited — it does reveal account existence.
+ */
+export async function lookupLoginState(rawEmail: string): Promise<LoginState> {
+  const email = rawEmail?.trim().toLowerCase()
+  if (!email || !EMAIL_RE.test(email)) return "none"
+  const user = await prisma.user.findUnique({ where: { email }, select: { passwordHash: true } })
+  if (!user) return "none"
+  return user.passwordHash ? "password" : "passwordless"
+}
+
 /** Mint a single-use, 1-hour sign-in token for a user (passwordless login). */
 export async function issueLoginToken(userId: string): Promise<string> {
   const t = token()

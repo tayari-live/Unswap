@@ -297,10 +297,12 @@ export default async function MemberDashboardPage() {
           </Link>
         </div>
 
-        {/* 3. Primary Discovery Module — full-bleed on mobile (cancels the
-            layout's p-4 so the search field can be as wide as the viewport),
-            back to a padded, rounded card from sm up. */}
-        <div className="bg-[var(--navy)] -mx-4 rounded-none px-5 py-9 sm:mx-0 sm:rounded-lg sm:p-10 md:p-14 mb-16 shadow-md overflow-hidden relative">
+        {/* 3. Primary Discovery Module — full-bleed on mobile so the search
+            field can be as wide as the viewport. The negative margin cancels
+            both horizontal paddings around it: the layout's p-4 (16px) and this
+            page's px-6 (24px) = 40px → -mx-10. Back to a padded, rounded card
+            from sm up. */}
+        <div className="bg-[var(--navy)] -mx-10 rounded-none px-6 py-9 sm:mx-0 sm:rounded-lg sm:p-10 md:p-14 mb-16 shadow-md overflow-hidden relative">
           <div className="relative z-10 max-w-2xl">
             <h2 className="font-display text-[36px] md:text-[44px] text-[var(--gold)] font-bold mb-3 leading-none">
               FIND YOUR NEXT STAY
