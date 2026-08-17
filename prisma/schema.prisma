@@ -22,7 +22,10 @@ datasource db {
 model User {
   id                 String    @id @default(uuid())
   email              String    @unique
-  passwordHash       String
+  // Nullable: members arriving from the waitlist invite are created without a
+  // password (email already verified by the invite click) and set one only after
+  // onboarding + adding a property. Null => passwordless, still completing setup.
+  passwordHash       String?
   firstName          String
   lastName           String
   fullName           String
@@ -81,6 +84,7 @@ model User {
   auditLogs          AuditLog[]               @relation("ActorRelation")
   resetTokens        PasswordResetToken[]
   emailTokens        EmailVerificationToken[]
+  loginTokens        LoginToken[]
   favourites         Favourite[]
   conversations      ConversationParticipant[]
   messages           Message[]
@@ -91,6 +95,22 @@ model User {
 
   @@index([verificationStatus])
   @@index([role])
+}
+
+// Single-use, short-lived token that signs a member in without a password —
+// used to drop a passwordless waitlist member straight into onboarding, and to
+// send a "resume setup / sign-in link" to anyone who hasn't set a password yet.
+model LoginToken {
+  id        String    @id @default(uuid())
+  token     String    @unique
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 // A member-submitted report on a message or review, for admin moderation.

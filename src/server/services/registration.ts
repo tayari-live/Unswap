@@ -6,7 +6,7 @@ import { sendEmail, renderEmail, esc } from "@/server/email"
 import { logAudit } from "@/server/services/audit"
 import { grantCreditsOnce } from "@/server/services/credits"
 import { consumeRegisterGrant } from "@/server/services/waitlist"
-import { registerSchema, firstError } from "@/lib/validation/auth"
+import { registerSchema, passwordSchema, firstError } from "@/lib/validation/auth"
 
 const baseUrl = () => process.env.AUTH_URL || "http://localhost:3000"
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -145,6 +145,139 @@ export async function registerMember(input: RegisterInput) {
   })
 
   return { fastTrack, emailSent, email, emailVerified: preVerified }
+}
+
+const LOGIN_TTL_MS = 60 * 60 * 1000 // one-time sign-in token validity: 1 hour
+
+/** Mint a single-use, 1-hour sign-in token for a user (passwordless login). */
+export async function issueLoginToken(userId: string): Promise<string> {
+  const t = token()
+  await prisma.loginToken.create({
+    data: { token: t, userId, expiresAt: new Date(Date.now() + LOGIN_TTL_MS) },
+  })
+  return t
+}
+
+/**
+ * Create (or find) the member behind a confirmed waitlist invite and return a
+ * one-time login token. The invite click already proved inbox ownership, so a
+ * new account is created already EMAIL_VERIFIED and WITHOUT a password — they
+ * set one only after onboarding and adding a property. If the account already
+ * exists, this just issues a fresh sign-in token (magic-link style).
+ */
+export async function beginPasswordlessMember(input: {
+  email: string
+  firstName: string
+  lastName: string
+}): Promise<string> {
+  const email = input.email.trim().toLowerCase()
+  const firstName = input.firstName.trim()
+  const lastName = input.lastName.trim()
+
+  let user = await prisma.user.findUnique({ where: { email } })
+  if (!user) {
+    const waitlisted = await prisma.waitlistEntry.findUnique({ where: { email } })
+    user = await prisma.user.create({
+      data: {
+        email,
+        passwordHash: null,
+        firstName,
+        lastName,
+        fullName: `${firstName} ${lastName}`.trim(),
+        role: "member",
+        avatarInitials: initialsOf(firstName, lastName),
+        verificationStatus: "EMAIL_VERIFIED",
+        organisation: waitlisted?.organisation ?? null,
+        profileCompletion: waitlisted?.organisation ? 30 : 20,
+      },
+    })
+    if (waitlisted && waitlisted.status !== "converted") {
+      await prisma.waitlistEntry.update({ where: { email }, data: { status: "converted" } })
+    }
+    await grantCreditsOnce(user.id, "welcome")
+    await logAudit({
+      action: "MEMBER_REGISTERED",
+      subject: `New member (passwordless): ${user.fullName}`,
+      metadata: { email, passwordless: true },
+    })
+  }
+
+  return issueLoginToken(user.id)
+}
+
+/**
+ * Email a fresh one-time sign-in link to a passwordless member who left before
+ * setting a password (they otherwise have no way back in — the invite link is
+ * single-use). Silent no-op for unknown addresses and for accounts that already
+ * have a password (those use normal login / forgot-password), so it never
+ * reveals whether an address has an account.
+ */
+export async function sendResumeLink(rawEmail: string) {
+  const email = rawEmail?.trim().toLowerCase()
+  if (!email || !EMAIL_RE.test(email)) return { ok: true as const }
+
+  const user = await prisma.user.findUnique({ where: { email } })
+  if (!user || user.passwordHash) return { ok: true as const }
+
+  const t = await issueLoginToken(user.id)
+  await sendEmail({
+    to: email,
+    subject: "Your UnSwap sign-in link",
+    html: renderEmail({
+      heading: `Pick up where you left off, ${esc(user.firstName)}.`,
+      preheader: "A one-time link to finish setting up your UnSwap account.",
+      body: `<p style="margin:0 0 14px">Use the button below to sign back in and finish setting up your account.</p>
+             <p style="margin:0">For your security this link can be used once and expires in an hour.</p>`,
+      ctaLabel: "Sign in to UnSwap",
+      ctaUrl: `${baseUrl()}/continue?token=${t}`,
+      footnote: "If you did not request this, you can ignore this email.",
+    }),
+    text: `Sign back in to UnSwap: ${baseUrl()}/continue?token=${t}\n\nThis link can be used once and expires in an hour.`,
+  })
+  return { ok: true as const }
+}
+
+/** Welcome / account-ready email, sent once the member sets their password. */
+function sendWelcomeEmail(user: { email: string; firstName: string }) {
+  return sendEmail({
+    to: user.email,
+    subject: "Your UnSwap account is ready",
+    html: renderEmail({
+      heading: `Welcome aboard, ${esc(user.firstName)}.`,
+      preheader: "Your account is set up — your home is listed and you're ready to exchange.",
+      body: `<p style="margin:0 0 14px">Your account is complete: your email is verified, your property is listed, and your password is set.</p>
+             <p style="margin:0">You can now explore homes across the network and arrange exchanges with verified peers.</p>`,
+      ctaLabel: "Go to your dashboard",
+      ctaUrl: `${baseUrl()}/dashboard`,
+      footnote: "If you did not create this account, please contact support.",
+    }),
+    text: `Welcome aboard, ${user.firstName}. Your UnSwap account is ready: ${baseUrl()}/dashboard`,
+  })
+}
+
+/**
+ * Set the first password for a passwordless member (final step of the waitlist
+ * setup flow). Only valid while the account has no password; sends the welcome
+ * email once done. The member is already signed in, so no re-login is needed.
+ */
+export async function setInitialPassword(userId: string, password: string) {
+  const parsed = passwordSchema.safeParse(password)
+  if (!parsed.success) throw new ApiError(400, firstError(parsed.error))
+
+  const user = await prisma.user.findUnique({ where: { id: userId } })
+  if (!user) throw new ApiError(404, "Account not found.")
+  if (user.passwordHash) throw new ApiError(409, "A password is already set for this account.")
+
+  const passwordHash = await bcrypt.hash(password, 12)
+  await prisma.user.update({ where: { id: userId }, data: { passwordHash } })
+
+  await sendWelcomeEmail({ email: user.email, firstName: user.firstName })
+  await logAudit({
+    action: "MEMBER_PASSWORD_SET",
+    subject: `Password set: ${user.fullName}`,
+    metadata: { email: user.email },
+  })
+  return { ok: true }
 }
 
 /**

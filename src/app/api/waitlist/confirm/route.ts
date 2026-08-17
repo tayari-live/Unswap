@@ -1,22 +1,25 @@
 import { NextRequest, NextResponse } from "next/server"
 import { confirmWaitlist } from "@/server/services/waitlist"
+import { beginPasswordlessMember } from "@/server/services/registration"
 
 const base = () => process.env.AUTH_URL || "http://localhost:3000"
 
 // GET /api/waitlist/confirm?token=… — the emailed "add your property" link.
-// Finalizes the waitlist entry (credits the referrer, syncs Kit), then hands
-// off to registration. The click proves the person owns this inbox, so it also
-// mints a short-lived grant that lets /register skip its own email verification
-// and drop them straight into onboarding → adding their property.
+// Finalizes the waitlist entry (credits the referrer, syncs Kit). The click
+// proves the person owns this inbox, so we create their account already
+// email-verified but WITHOUT a password, mint a one-time sign-in token, and hand
+// off to /continue → onboarding → adding a property. The password comes later.
 export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get("token") ?? ""
   try {
     const result = await confirmWaitlist(token)
-    const url = new URL("/register", base())
-    url.searchParams.set("email", result.email)
-    url.searchParams.set("name", `${result.firstName} ${result.lastName}`.trim())
-    url.searchParams.set("grant", result.registerGrant)
-    url.searchParams.set("next", "/dashboard/listings/new")
+    const loginToken = await beginPasswordlessMember({
+      email: result.email,
+      firstName: result.firstName,
+      lastName: result.lastName,
+    })
+    const url = new URL("/continue", base())
+    url.searchParams.set("token", loginToken)
     return NextResponse.redirect(url)
   } catch {
     const url = new URL("/waitlist", base())

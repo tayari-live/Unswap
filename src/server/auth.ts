@@ -20,7 +20,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           where: { email: credentials.email as string }
         })
 
-        if (!user) {
+        // No account, or a passwordless account still completing setup (no hash
+        // yet) — password login is not available until they set one.
+        if (!user || !user.passwordHash) {
           return null
         }
 
@@ -46,7 +48,41 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           remember: credentials.remember === "true",
         }
       }
-    })
+    }),
+    // Passwordless sign-in via a single-use token (waitlist invite hand-off and
+    // "resume setup" links). Authorizes on the token instead of a password; the
+    // token is consumed here so it can never be replayed.
+    Credentials({
+      id: "onetime",
+      name: "One-time link",
+      credentials: {
+        token: { label: "Token", type: "text" },
+      },
+      async authorize(credentials) {
+        const token = credentials?.token as string | undefined
+        if (!token) return null
+
+        const rec = await prisma.loginToken.findUnique({
+          where: { token },
+          include: { user: true },
+        })
+        if (!rec || rec.usedAt || rec.expiresAt < new Date()) return null
+
+        // Single use: consume before issuing the session.
+        await prisma.loginToken.update({ where: { id: rec.id }, data: { usedAt: new Date() } })
+
+        const user = rec.user
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.fullName,
+          role: user.role,
+          image: null,
+          initials: user.avatarInitials,
+          remember: false,
+        }
+      },
+    }),
   ],
   callbacks: {
     async jwt({ token, user }) {
@@ -93,9 +129,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               imgHash: string | null
               onboardedAt: Date | null
               verificationStatus: string
+              needsPassword: boolean
             }[]
           >`
             SELECT "fullName", "role", "avatarInitials", "onboardedAt", "verificationStatus",
+                   ("passwordHash" IS NULL) AS "needsPassword",
                    CASE WHEN "imageUrl" IS NULL OR "imageUrl" = '' THEN NULL
                         ELSE md5("imageUrl") END AS "imgHash"
             FROM "User" WHERE "id" = ${token.id as string}
@@ -111,6 +149,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             ;(session.user as any).initials = dbUser.avatarInitials
             ;(session.user as any).onboardedAt = dbUser.onboardedAt
             ;(session.user as any).verificationStatus = dbUser.verificationStatus
+            ;(session.user as any).needsPassword = dbUser.needsPassword
           } else {
             ;(session.user as any).role = token.role as string
             ;(session.user as any).initials = token.initials as string

@@ -66,6 +66,9 @@ export async function changePassword(userId: string, currentPassword: string, ne
 
   const user = await prisma.user.findUnique({ where: { id: userId } })
   if (!user) throw new ApiError(404, "Account not found.")
+  // A passwordless account (still completing waitlist setup) has no current
+  // password to verify — it sets one through the dedicated set-password step.
+  if (!user.passwordHash) throw new ApiError(400, "Set a password from the account setup step first.")
 
   const valid = await bcrypt.compare(currentPassword ?? "", user.passwordHash)
   if (!valid) throw new ApiError(400, "Your current password is incorrect.")

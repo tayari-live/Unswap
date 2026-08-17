@@ -136,10 +136,14 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-8 pt-6 border-t border-wl-border text-center">
+          <div className="mt-8 pt-6 border-t border-wl-border text-center space-y-2">
             <p className="text-sm text-wl-ivory-dim">
               Don&apos;t have an account?{" "}
               <Link href="/register" className="font-semibold text-wl-gold hover:text-wl-gold-light transition-colors">Sign up</Link>
+            </p>
+            <p className="text-xs text-wl-muted">
+              Joined from the waitlist and haven&apos;t set a password?{" "}
+              <Link href="/resume" className="font-medium text-wl-gold hover:text-wl-gold-light transition-colors">Get a sign-in link</Link>
             </p>
           </div>
 
