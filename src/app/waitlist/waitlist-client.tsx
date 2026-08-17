@@ -21,7 +21,7 @@ const inputCls =
 type CountData = { count: number; recentJoiners: { initials: string }[] }
 // The API answers identically for a new address and one already on the list,
 // so this page cannot tell them apart — which is the point.
-type Initiated = { status: "pending"; email: string; confirmUrl?: string }
+type Initiated = { status: "pending"; email: string; referralCode?: string; confirmUrl?: string }
 
 export function WaitlistClient() {
   const [mode, setMode] = useState<"join" | "status" | "success" | "error">("join")
@@ -82,9 +82,14 @@ export function WaitlistClient() {
       })
       const data = (await res.json()) as Initiated & { error?: string }
       if (!res.ok) throw new Error(data.error || "Failed to initiate signup")
-      setDevConfirmUrl(data.confirmUrl)
-      setMode("success")
-      setStatus("idle")
+      // Straight to the share page — no "check your inbox" wait. The email that
+      // just went out is the exclusive invite to add their property; the share
+      // page tells them to expect it.
+      const params = new URLSearchParams()
+      if (data.referralCode) params.set("ref", data.referralCode)
+      if (email) params.set("email", email)
+      params.set("pending", "1")
+      window.location.href = `/waitlist/success?${params.toString()}`
     } catch (err) {
       setErrorMessage((err as Error).message || "Failed to initiate signup")
       setMode("error")
@@ -117,12 +122,6 @@ export function WaitlistClient() {
       setStatus("error")
     }
   }
-
-  // Prefilled direct-signup link (bypasses the queue; hands name/email to /register).
-  const signupParams = new URLSearchParams()
-  if (email) signupParams.set("email", email)
-  if (name) signupParams.set("name", name)
-  const signupHref = `/register${signupParams.toString() ? `?${signupParams.toString()}` : ""}`
 
   return (
     <div className="min-h-screen bg-wl-navy text-wl-ivory relative">
@@ -217,12 +216,11 @@ export function WaitlistClient() {
                   </div>
                 </form>
 
-                {/* Prefer not to wait — book a call or sign up directly (bypass the queue) */}
+                {/* Prefer not to wait — book a call */}
                 <div className="mt-6 pt-6 border-t border-wl-border text-center">
                   <p className="text-[12px] text-wl-ivory-dim mb-3">Prefer not to wait?</p>
-                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    <a href="/book" className="btn-outline flex-1 text-center">Book a call</a>
-                    <a href={signupHref} className="btn-gold flex-1 text-center">Sign up now →</a>
+                  <div className="flex justify-center">
+                    <a href="/book" className="btn-outline text-center px-8">Book a call</a>
                   </div>
                 </div>
               </div>

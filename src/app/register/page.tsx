@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { signIn } from "next-auth/react"
 import { Eye, EyeOff, Info, ShieldCheck } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
 import { ThemeToggleIcon } from "@/components/theme/theme-toggle"
@@ -42,6 +43,11 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
   const toast = useToast()
 
+  // Waitlist hand-off: a signed grant means the email is already verified, and
+  // `next` is where to land once the account is live (onboarding → listing).
+  const [grant, setGrant] = useState<string | null>(null)
+  const [next, setNext] = useState<string | null>(null)
+
   // The schema is shared with the server, so the rules a member sees while
   // typing are the rules the endpoint enforces on submit.
   const {
@@ -70,6 +76,8 @@ export default function RegisterPage() {
       setValue("firstName", first)
       if (rest.length) setValue("lastName", rest.join(" "))
     }
+    setGrant(params.get("grant"))
+    setNext(params.get("next"))
   }, [setValue])
 
   const status = domainStatus(email)
@@ -79,13 +87,32 @@ export default function RegisterPage() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+        body: JSON.stringify({ ...values, grant: grant ?? undefined }),
       })
       const data = await res.json()
       if (!res.ok) {
         toast(data.error || "Could not create your account.", "error")
         return
       }
+
+      // Pre-verified (came from the waitlist link): no email step — sign them in
+      // and continue straight into the app (onboarding → add their property).
+      if (data.emailVerified) {
+        const signRes = await signIn("credentials", {
+          email: values.email,
+          password: values.password,
+          redirect: false,
+        })
+        if (signRes?.error) {
+          // Account exists but auto sign-in failed — fall back to manual login.
+          router.push(`/login?email=${encodeURIComponent(values.email)}`)
+          return
+        }
+        router.push(next || "/dashboard")
+        router.refresh()
+        return
+      }
+
       const qs = new URLSearchParams({ email: values.email })
       if (data.fastTrack) qs.set("fast", "1")
       router.push(`/confirm-email?${qs}`)

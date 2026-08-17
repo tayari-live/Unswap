@@ -5,6 +5,7 @@ import { ApiError } from "@/server/http"
 import { sendEmail, renderEmail, esc } from "@/server/email"
 import { logAudit } from "@/server/services/audit"
 import { grantCreditsOnce } from "@/server/services/credits"
+import { consumeRegisterGrant } from "@/server/services/waitlist"
 import { registerSchema, firstError } from "@/lib/validation/auth"
 
 const baseUrl = () => process.env.AUTH_URL || "http://localhost:3000"
@@ -41,6 +42,10 @@ export type RegisterInput = {
   lastName: string
   email: string
   password: string
+  // Optional signed proof that this email was already verified (e.g. by clicking
+  // the waitlist "add your property" link). When valid, the account is created
+  // already-verified and no verification email is sent.
+  grant?: string
 }
 
 /** Create a fresh 24h verification token and email the confirm link. */
@@ -95,6 +100,12 @@ export async function registerMember(input: RegisterInput) {
   const matched = await matchAllowedDomain(email)
   const fastTrack = matched?.fastTrack ?? false
 
+  // A valid grant means this exact address was already verified (the waitlist
+  // link was clicked from its inbox), so skip the account's own email step. This
+  // consumes the grant (single use); we've already passed validation and the
+  // existing-account check above, so we're committed to creating the account.
+  const preVerified = await consumeRegisterGrant(email, input.grant)
+
   // Carry over anything they already gave us on the waitlist so they don't set
   // up twice — pull their organisation onto the new account and mark the entry
   // converted. Linked purely by email, so it works however they arrive.
@@ -110,7 +121,7 @@ export async function registerMember(input: RegisterInput) {
       fullName: `${firstName} ${lastName}`,
       role: "member",
       avatarInitials: initialsOf(firstName, lastName),
-      verificationStatus: "PENDING_EMAIL",
+      verificationStatus: preVerified ? "EMAIL_VERIFIED" : "PENDING_EMAIL",
       organisation: waitlisted?.organisation ?? null,
       profileCompletion: waitlisted?.organisation ? 30 : 20,
     },
@@ -120,7 +131,9 @@ export async function registerMember(input: RegisterInput) {
     await prisma.waitlistEntry.update({ where: { email }, data: { status: "converted" } })
   }
 
-  const emailSent = await issueVerificationLink({ id: user.id, email, firstName }, fastTrack)
+  // Pre-verified accounts (arriving from the waitlist link) skip the email step;
+  // everyone else gets the usual verification link.
+  const emailSent = preVerified ? false : await issueVerificationLink({ id: user.id, email, firstName }, fastTrack)
 
   // Free sign-up credit (once per account).
   await grantCreditsOnce(user.id, "welcome")
@@ -128,10 +141,10 @@ export async function registerMember(input: RegisterInput) {
   await logAudit({
     action: "MEMBER_REGISTERED",
     subject: `New member registered: ${user.fullName}`,
-    metadata: { email, fastTrack },
+    metadata: { email, fastTrack, preVerified },
   })
 
-  return { fastTrack, emailSent, email }
+  return { fastTrack, emailSent, email, emailVerified: preVerified }
 }
 
 /**

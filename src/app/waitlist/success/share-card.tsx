@@ -181,6 +181,9 @@ export function ShareCard() {
   const [copiedId, setCopiedId] = useState<string | number | null>(null)
   const [loadingRef, setLoadingRef] = useState(true)
   const [email, setEmail] = useState("")
+  // True right after signup, before the emailed link is clicked: the invite to
+  // add their property is in their inbox but the email isn't confirmed yet.
+  const [pending, setPending] = useState(false)
   const [stats, setStats] = useState({ position: "-", points: "-", referrals: "-" })
   const [showModal, setShowModal] = useState(false)
   const [toast, setToast] = useState({ visible: false, message: "" })
@@ -218,6 +221,7 @@ export function ShareCard() {
       .then((data) => {
         if (!data?.found) return
         if (data.referralUrl) setShareUrl(data.referralUrl)
+        setPending(!!data.pending)
         setIsPersonal(true)
         const refs = data.referrals ?? 0
         setStats({ position: String(data.position ?? "-"), points: String(refs * 30), referrals: String(refs) })
@@ -262,6 +266,18 @@ export function ShareCard() {
               <span style={{ fontSize: "14px", color: "var(--ivory)" }}>Unswap</span>
               <span style={{ fontSize: "16px" }}>🤝</span>
               <span style={{ fontSize: "14px", color: "var(--ivory-dim)" }}>{email}</span>
+            </div>
+          )}
+          {pending && (
+            <div style={{ maxWidth: "460px", margin: "0 auto 22px", padding: "16px 18px", borderRadius: "12px", background: "rgba(201,168,76,0.07)", border: "1px solid rgba(201,168,76,0.25)", textAlign: "left" }}>
+              <p style={{ fontSize: "13.5px", lineHeight: 1.6, color: "var(--ivory)", margin: 0 }}>
+                <span style={{ marginRight: "6px" }}>✉️</span>
+                We&apos;ve emailed you an <strong style={{ color: "var(--gold)" }}>exclusive invite to add your property</strong>{email ? <> at <span style={{ color: "var(--ivory-dim)" }}>{email}</span></> : null}. Click the link in that email to confirm your account and set up your listing.
+              </p>
+              <a href={`/register?next=${encodeURIComponent("/dashboard/listings/new")}${email ? `&email=${encodeURIComponent(email)}` : ""}`}
+                style={{ display: "inline-flex", alignItems: "center", gap: "8px", marginTop: "12px", background: "var(--gold)", color: "var(--navy)", fontSize: "12px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none", padding: "9px 18px", borderRadius: "6px" }}>
+                Add your property {Icons.arrow}
+              </a>
             </div>
           )}
           <p style={{ fontSize: "14px", lineHeight: 1.7, color: "var(--ivory-dim)", maxWidth: "440px", margin: "0 auto 8px" }}>
@@ -350,12 +366,12 @@ export function ShareCard() {
         {hasShared && (
           <motion.div initial={{ y: 80, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 80, opacity: 0 }} transition={{ type: "spring", damping: 26, stiffness: 280 }}
             style={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 1000, padding: "14px 20px", background: "linear-gradient(135deg, var(--panel-strong) 0%, var(--panel-strong) 100%)", borderTop: "1px solid rgba(201,168,76,0.25)", backdropFilter: "blur(12px)", display: "flex", alignItems: "center", justifyContent: "center", gap: "16px", flexWrap: "wrap" }}>
-            <span style={{ fontSize: "13px", color: "var(--ivory-dim)" }}>Want to skip the queue?</span>
+            <span style={{ fontSize: "13px", color: "var(--ivory-dim)" }}>Prefer a walkthrough?</span>
             <a href="/book" style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "transparent", color: "#c9a84c", fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none", padding: "9px 20px", borderRadius: "4px", border: "1px solid rgba(201,168,76,0.5)" }}>
               Book a call
             </a>
             <a href={signupHref} style={{ display: "inline-flex", alignItems: "center", gap: "8px", background: "#c9a84c", color: "var(--navy)", fontSize: "12px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", textDecoration: "none", padding: "9px 20px", borderRadius: "4px", boxShadow: "0 2px 16px rgba(201,168,76,0.3)" }}>
-              Get Early Access {Icons.arrow}
+              Add your property {Icons.arrow}
             </a>
           </motion.div>
         )}

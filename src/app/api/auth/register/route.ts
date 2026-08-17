@@ -29,6 +29,7 @@ export async function POST(req: NextRequest) {
       lastName: body.lastName,
       email: body.email,
       password: body.password,
+      grant: body.grant,
     })
     return NextResponse.json(result, { status: 201 })
   } catch (err) {

@@ -379,6 +379,11 @@ model WaitlistEntry {
   // Double opt-in: an entry only counts once the emailed link is clicked.
   confirmToken String?   @unique
   confirmedAt  DateTime? // null = email not yet confirmed (not on the list yet)
+  // Single-use grant minted when the emailed link is confirmed: proof the person
+  // owns this address, handed to /register so the account is created already
+  // email-verified. Consumed (nulled) on first use so it can never be replayed.
+  registerGrant        String?   @unique
+  registerGrantExpires DateTime?
   createdAt    DateTime  @default(now())
 
   @@index([createdAt])

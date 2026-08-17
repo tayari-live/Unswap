@@ -8,6 +8,7 @@ import { kitAddToForm, kitUpdateReferralCount } from "@/server/kit"
 const baseUrl = () => process.env.AUTH_URL || "http://localhost:3000"
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const EARLY_BIRD_CAP = 500
+const GRANT_TTL_MS = 60 * 60 * 1000 // registration grant validity: 1 hour
 
 /** Admin: all entries — confirmed first (best-referrers), then unconfirmed leads. */
 export function listWaitlist() {
@@ -29,28 +30,31 @@ const referralUrl = (code: string) => `${baseUrl()}/waitlist?ref=${code}`
 const confirmUrl = (token: string) => `${baseUrl()}/api/waitlist/confirm?token=${token}`
 
 /**
- * The double opt-in email, sent from here rather than triggered as a Kit
+ * The exclusive-invite email, sent from here rather than triggered as a Kit
  * automation, so the wording lives with every other transactional email
  * instead of in a dashboard. Shared by first signup and both admin resends —
  * three copies of the same letter would drift apart.
  *
- * Kit only receives an address once it is confirmed, which is what double
- * opt-in is for: an unconfirmed address does not belong on a marketing list.
+ * The link doubles as email verification: clicking it proves the person owns
+ * the inbox (which is what lets registration skip its own verification step)
+ * and drops them straight into adding their property. Kit only receives an
+ * address once that link is clicked — an unconfirmed address does not belong on
+ * a marketing list.
  */
-function sendConfirmationEmail(email: string, firstName: string, token: string) {
+function sendJoinEmail(email: string, firstName: string, token: string) {
   return sendEmail({
     to: email,
-    subject: "Confirm your place on the UnSwap waitlist",
+    subject: "You're in — add your property on UnSwap",
     html: renderEmail({
-      heading: `Hello ${esc(firstName)},`,
-      preheader: "One click confirms your place on the waitlist.",
-      body: `<p style="margin:0 0 14px">Thank you for your interest in UnSwap, the closed home exchange network for staff of the UN, World Bank, IMF and other international organisations.</p>
-             <p style="margin:0">Confirm your email to claim your place in the queue. Nothing is reserved until you do.</p>`,
-      ctaLabel: "Confirm my place",
+      heading: `You're in, ${esc(firstName)}.`,
+      preheader: "Your exclusive invite to add your property is ready.",
+      body: `<p style="margin:0 0 14px">Welcome to UnSwap, the closed home exchange network for staff of the UN, World Bank, IMF and other international organisations. Your place is reserved.</p>
+             <p style="margin:0">As a founding member you can add your property now. The button below confirms your email and takes you straight there — no separate verification step.</p>`,
+      ctaLabel: "Add your property",
       ctaUrl: confirmUrl(token),
       footnote: "If you did not request this, you can ignore this email and nothing further will happen.",
     }),
-    text: `Hello ${firstName},\n\nConfirm your place on the UnSwap waitlist: ${confirmUrl(token)}\n\nIf you did not request this, you can ignore this email.`,
+    text: `You're in, ${firstName}. Add your property on UnSwap — this link also confirms your email: ${confirmUrl(token)}\n\nIf you did not request this, you can ignore this email.`,
   })
 }
 
@@ -102,12 +106,15 @@ export async function initiateWaitlist(input: { name: string; email: string; org
     // an address from this form, so send their place to the inbox and return
     // exactly what a first-time signup returns.
     await sendWaitlistStatusLink(email)
-    return { status: "pending" as const, email, emailSent: true, confirmUrl: undefined }
+    // Their own code, so returning it to their own submission just sends them
+    // back to their share page — it reveals nothing a stranger could not.
+    return { status: "pending" as const, email, referralCode: existing.referralCode, emailSent: true, confirmUrl: undefined }
   }
 
   const token = randomBytes(32).toString("hex")
   const referredBy = await resolveRef(input.ref, email)
 
+  let created = existing
   if (existing) {
     // Unconfirmed already — refresh their details + token and re-send the link.
     await prisma.waitlistEntry.update({
@@ -115,17 +122,18 @@ export async function initiateWaitlist(input: { name: string; email: string; org
       data: { firstName, lastName, organisation, confirmToken: token, referredBy: existing.referredBy ?? referredBy },
     })
   } else {
-    await prisma.waitlistEntry.create({
+    created = await prisma.waitlistEntry.create({
       data: { firstName, lastName, email, organisation, referralCode: await uniqueReferralCode(), referredBy, confirmToken: token },
     })
   }
 
-  const sent = await sendConfirmationEmail(email, firstName, token)
+  const sent = await sendJoinEmail(email, firstName, token)
+  const referralCode = created!.referralCode // set by the update (existing) or create branch above
 
   await logAudit({ action: "WAITLIST_INITIATED", subject: `${firstName} ${lastName}`, metadata: { email, referredBy } })
 
   // Without a mail token (local dev), hand back the link so the flow is testable.
-  return { status: "pending" as const, email, emailSent: sent, confirmUrl: emailConfigured() ? undefined : confirmUrl(token) }
+  return { status: "pending" as const, email, referralCode, emailSent: sent, confirmUrl: emailConfigured() ? undefined : confirmUrl(token) }
 }
 
 /**
@@ -138,7 +146,15 @@ export async function confirmWaitlist(token: string) {
   if (!entry) throw new ApiError(400, "This confirmation link is invalid or has already been used.")
 
   const confirmedAt = new Date()
-  await prisma.waitlistEntry.update({ where: { id: entry.id }, data: { confirmedAt, confirmToken: null } })
+  // Mint a single-use grant: proof this person owns the address, handed to
+  // /register so the account is created already email-verified. Stored on the
+  // row (not a stateless token) so it is consumed exactly once and expires.
+  const registerGrant = randomBytes(32).toString("hex")
+  const registerGrantExpires = new Date(Date.now() + GRANT_TTL_MS)
+  await prisma.waitlistEntry.update({
+    where: { id: entry.id },
+    data: { confirmedAt, confirmToken: null, registerGrant, registerGrantExpires },
+  })
 
   // Credit the referrer now (only verified sign-ups count).
   if (entry.referredBy) {
@@ -153,23 +169,9 @@ export async function confirmWaitlist(token: string) {
   const position = await positionOf({ referrals: entry.referrals, confirmedAt })
   await logAudit({ action: "WAITLIST_CONFIRMED", subject: `${entry.firstName} ${entry.lastName}`, metadata: { email: entry.email } })
 
-  // Put the share link in their inbox now. Otherwise the only way back to it is
-  // the status lookup, which makes that lookup load-bearing — the reason it had
-  // to answer anyone who asked in the first place.
-  await sendEmail({
-    to: entry.email,
-    subject: "You're on the UnSwap waitlist",
-    html: renderEmail({
-      heading: `You're in, ${esc(entry.firstName)}.`,
-      preheader: `You are number ${position} on the waitlist. Keep this link to track your place.`,
-      body: `<p style="margin:0 0 14px">Your place is confirmed. You are currently <strong>number ${position}</strong> in the queue.</p>
-             <p style="margin:0">Every peer who joins through your invitation moves you up. Keep this link — it is how you track your position and share your invitation.</p>`,
-      ctaLabel: "View my place",
-      ctaUrl: `${baseUrl()}/waitlist/success?ref=${entry.referralCode}`,
-      footnote: "Save this email so you can return to your invitation link at any time.",
-    }),
-    text: `You're in, ${entry.firstName}. You are number ${position} on the UnSwap waitlist.\n\nTrack your place and share your invitation: ${baseUrl()}/waitlist/success?ref=${entry.referralCode}`,
-  })
+  // No "you're on the waitlist" email here any more: the share page was already
+  // shown at signup, and this link now leads straight on to registration rather
+  // than back to the share page. A second email would only repeat that step.
 
   return {
     referralCode: entry.referralCode,
@@ -177,7 +179,27 @@ export async function confirmWaitlist(token: string) {
     position,
     earlyBird: position <= EARLY_BIRD_CAP,
     email: entry.email,
+    firstName: entry.firstName,
+    lastName: entry.lastName,
+    registerGrant,
   }
+}
+
+/**
+ * Consume a registration grant (see confirmWaitlist). Valid only if it matches
+ * the given email, has not expired, and has not already been used. The update is
+ * atomic — the row is nulled in the same statement that matches it — so it is
+ * consumed exactly once even under concurrent registrations. Returns whether the
+ * email is proven (grant was valid and is now spent).
+ */
+export async function consumeRegisterGrant(rawEmail: string, token: string | undefined): Promise<boolean> {
+  if (!token) return false
+  const email = rawEmail?.trim().toLowerCase()
+  const res = await prisma.waitlistEntry.updateMany({
+    where: { registerGrant: token, email, registerGrantExpires: { gt: new Date() } },
+    data: { registerGrant: null, registerGrantExpires: null },
+  })
+  return res.count === 1
 }
 
 /**
@@ -220,10 +242,16 @@ export async function getWaitlistStatusByCode(rawCode: string) {
   const code = rawCode?.trim()
   if (!code) throw new ApiError(400, "Referral code is required.")
   const e = await prisma.waitlistEntry.findUnique({ where: { referralCode: code } })
-  if (!e || !e.confirmedAt) return { found: false as const }
-  const position = await positionOf({ referrals: e.referrals, confirmedAt: e.confirmedAt })
+  if (!e) return { found: false as const }
+  // Unconfirmed entries now reach the share page immediately after signup (the
+  // confirmation click happens later, from the email). Show a provisional
+  // position — computed as if they confirmed now — and flag it as pending so the
+  // page can say the email is on its way.
+  const pending = !e.confirmedAt
+  const position = await positionOf({ referrals: e.referrals, confirmedAt: e.confirmedAt ?? new Date() })
   return {
     found: true as const,
+    pending,
     firstName: e.firstName,
     referralCode: e.referralCode,
     referralUrl: referralUrl(e.referralCode),
@@ -382,7 +410,7 @@ export async function resendConfirmation(actorId: string, id: string) {
   if (entry.confirmedAt) throw new ApiError(409, "This member has already confirmed their spot.")
   const token = randomBytes(32).toString("hex")
   await prisma.waitlistEntry.update({ where: { id }, data: { confirmToken: token } })
-  const sent = await sendConfirmationEmail(entry.email, entry.firstName, token)
+  const sent = await sendJoinEmail(entry.email, entry.firstName, token)
   await logAudit({ actorId, action: "WAITLIST_RESEND", subject: `${entry.firstName} ${entry.lastName}`, metadata: { email: entry.email, sent } })
   return { sent, confirmUrl: emailConfigured() ? undefined : confirmUrl(token) }
 }
@@ -394,7 +422,7 @@ export async function resendAllUnconfirmed(actorId: string) {
   for (const e of rows) {
     const token = randomBytes(32).toString("hex")
     await prisma.waitlistEntry.update({ where: { id: e.id }, data: { confirmToken: token } })
-    if (await sendConfirmationEmail(e.email, e.firstName, token)) sent++
+    if (await sendJoinEmail(e.email, e.firstName, token)) sent++
   }
   await logAudit({ actorId, action: "WAITLIST_RESEND_ALL", subject: `Resent to ${rows.length} unconfirmed`, metadata: { total: rows.length, sent } })
   return { total: rows.length, sent }
