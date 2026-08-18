@@ -184,6 +184,9 @@ export function ShareCard() {
   // True right after signup, before the emailed link is clicked: the invite to
   // add their property is in their inbox but the email isn't confirmed yet.
   const [pending, setPending] = useState(false)
+  // Whether they landed here straight from the join form, which decides if the
+  // page explains what was just emailed.
+  const [justJoined, setJustJoined] = useState(false)
   const [stats, setStats] = useState({ position: "-", points: "-", referrals: "-" })
   const [showModal, setShowModal] = useState(false)
   const [toast, setToast] = useState({ visible: false, message: "" })
@@ -243,7 +246,17 @@ export function ShareCard() {
     const code = params.get("ref")
     const emailParam = params.get("email")
     if (emailParam) setEmail(emailParam)
-    const q = code ? `code=${encodeURIComponent(code)}` : emailParam ? `email=${encodeURIComponent(emailParam)}` : null
+
+    // The join form sets this on every submission, confirmed or not, so it
+    // means "arrived straight from the form" rather than "is unconfirmed".
+    // Someone reaching this page from the emailed link gets no notice, because
+    // for them nothing has just been sent.
+    if (params.get("pending") === "1") setJustJoined(true)
+
+    // Only the referral code is accepted here. Looking up by address was
+    // removed so the endpoint cannot be used to test whether someone is on the
+    // list; sending `email` would just return found:false and blank the page.
+    const q = code ? `code=${encodeURIComponent(code)}` : null
     if (!q) { setLoadingRef(false); return }
     fetch(`/api/waitlist/status?${q}`)
       .then((r) => (r.ok ? r.json() : null))
@@ -296,11 +309,25 @@ export function ShareCard() {
               <span style={{ fontSize: "14px", color: "var(--ivory-dim)" }}>{email}</span>
             </div>
           )}
-          {pending && (
+          {justJoined && (
             <div style={{ maxWidth: "460px", margin: "0 auto 22px", padding: "16px 18px", borderRadius: "12px", background: "rgba(201,168,76,0.07)", border: "1px solid rgba(201,168,76,0.25)", textAlign: "left" }}>
               <p style={{ fontSize: "13.5px", lineHeight: 1.6, color: "var(--ivory)", margin: 0 }}>
                 <span style={{ marginRight: "6px" }}>✉️</span>
-                We&apos;ve emailed you an <strong style={{ color: "var(--gold)" }}>exclusive invite to add your property</strong>{email ? <> at <span style={{ color: "var(--ivory-dim)" }}>{email}</span></> : null}. Click the link in that email to confirm your account and set up your listing.
+                {/*
+                  Two different emails go out here, so the notice has to match
+                  the one that actually arrived. A confirmed member rejoining
+                  gets their place and referral link, not the property invite,
+                  and previously saw no explanation at all.
+                */}
+                {pending ? (
+                  <>
+                    We&apos;ve emailed you an <strong style={{ color: "var(--gold)" }}>exclusive invite to add your property</strong>{email ? <> at <span style={{ color: "var(--ivory-dim)" }}>{email}</span></> : null}. Click the link in that email to confirm your account and set up your listing.
+                  </>
+                ) : (
+                  <>
+                    You&apos;re already on the waitlist, so we&apos;ve emailed{email ? <> <span style={{ color: "var(--ivory-dim)" }}>{email}</span></> : null} your <strong style={{ color: "var(--gold)" }}>place and referral link</strong>. Everything you need is on this page too.
+                  </>
+                )}
               </p>
               {/*
                 A quiet text link rather than a bordered button. Resending is
@@ -308,6 +335,13 @@ export function ShareCard() {
                 should stay available without competing with the share actions
                 below it, which are what this page is for.
               */}
+              {/*
+                Only offered while there is something to resend. resendJoinEmail
+                no-ops for a confirmed entry but still reports success, so
+                showing this to a confirmed member would confirm a send that
+                never happened.
+              */}
+              {pending && (
               <p style={{ marginTop: "10px", fontSize: "12px", color: "var(--muted)" }}>
                 Didn&apos;t get it?{" "}
                 <button
@@ -317,6 +351,7 @@ export function ShareCard() {
                   {resending ? "Sending…" : cooldown > 0 ? `Resend it (${cooldown})` : "Resend it"}
                 </button>
               </p>
+              )}
             </div>
           )}
           <p style={{ fontSize: "14px", lineHeight: 1.7, color: "var(--ivory-dim)", maxWidth: "440px", margin: "0 auto 8px" }}>
