@@ -4,8 +4,13 @@ import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
 import { LuxPageHeader } from "@/components/ui/lux"
 import { CheckoutButton, CancelButton } from "./billing-buttons"
+import { MEMBERSHIP_ENABLED } from "@/lib/features"
 
 export const dynamic = "force-dynamic"
+
+// Hiding the nav entries left this page reachable by URL, tier cards and
+// all. Until payments are wired up there is nothing here anyone should be
+// able to act on.
 
 const TIERS = [
   { key: "limited_1x", name: "Limited 1X", price: "$129", per: "/yr", exchanges: "1 exchange / year", guarantee: "$500,000 guarantee" },
@@ -25,6 +30,8 @@ export default async function SubscriptionPage({
 }: {
   searchParams: Promise<{ activated?: string; cancelled?: string }>
 }) {
+  if (!MEMBERSHIP_ENABLED) redirect("/dashboard")
+
   const session = await auth()
   const userId = (session?.user as any)?.id as string | undefined
   if (!userId) redirect("/login")
