@@ -17,7 +17,6 @@ const ORGS = [
 const inputCls =
   "w-full bg-[var(--field-bg)] border border-wl-border px-[20px] py-[16px] text-wl-ivory placeholder-wl-muted focus:outline-none focus:border-wl-gold focus:shadow-[0_0_0_1px_var(--border)] transition-all duration-300 text-[15px]"
 
-type CountData = { count: number; recentJoiners: { initials: string }[] }
 // The API answers identically for a new address and one already on the list,
 // so this page cannot tell them apart — which is the point.
 type Initiated = { status: "pending"; email: string; referralCode?: string; confirmUrl?: string }
@@ -34,8 +33,6 @@ export function WaitlistClient() {
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle")
   const [errorMessage, setErrorMessage] = useState("")
 
-  const [waitlistCount, setWaitlistCount] = useState<number | null>(null)
-  const [recentJoiners, setRecentJoiners] = useState<{ initials: string }[]>([])
   const [devConfirmUrl, setDevConfirmUrl] = useState<string | undefined>()
 
   // Confetti burst + reduce to the "check inbox" state on success.
@@ -58,13 +55,6 @@ export function WaitlistClient() {
       setMode("error")
       window.history.replaceState({}, document.title, window.location.pathname)
     }
-    fetch("/api/waitlist/count")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d: CountData | null) => {
-        if (d && typeof d.count === "number") setWaitlistCount(d.count)
-        if (d && Array.isArray(d.recentJoiners)) setRecentJoiners(d.recentJoiners)
-      })
-      .catch(() => setWaitlistCount(0))
   }, [])
 
   async function handleInitiateJoin(e: React.FormEvent) {
@@ -188,22 +178,14 @@ export function WaitlistClient() {
                     ) : "Request Access →"}
                   </button>
 
+                  {/*
+                    No member count or joiner avatars. Early on a low number
+                    argues against joining rather than for it, and an exclusive
+                    network does not need to prove it has a crowd. The
+                    /api/waitlist/count request went with it — nothing on this
+                    page read the result.
+                  */}
                   <div className="pt-6 mt-4 border-t border-wl-border flex flex-col items-center gap-3">
-                    {waitlistCount === 0 ? (
-                      <p className="text-[13px] text-wl-ivory-dim">Be the first to join!</p>
-                    ) : waitlistCount !== null && (
-                      <div className="flex items-center gap-3">
-                        <div className="flex -space-x-2">
-                          {recentJoiners.slice(0, 3).map((j, i) => (
-                            <div key={i} className="w-8 h-8 rounded-full bg-[rgba(201,168,76,0.15)] border border-wl-border flex items-center justify-center text-[10px] font-medium text-wl-gold shadow-sm z-10">{j.initials}</div>
-                          ))}
-                          {waitlistCount > 3 && (
-                            <div className="w-8 h-8 z-0 rounded-full bg-[rgba(10,14,26,0.5)] border border-wl-border flex items-center justify-center text-[10px] font-medium text-wl-ivory-dim">+{waitlistCount - 3}</div>
-                          )}
-                        </div>
-                        <span className="text-[13px] text-wl-ivory-dim"><span className="text-wl-ivory font-medium">{waitlistCount}</span> members already on the list</span>
-                      </div>
-                    )}
                     <button type="button" onClick={() => { setMode("status"); setErrorMessage("") }} className="text-wl-muted hover:text-wl-gold text-[11px] font-medium tracking-[0.18em] uppercase transition-colors">
                       Check Status →
                     </button>
