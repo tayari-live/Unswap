@@ -6,6 +6,7 @@ import { ArrowRight, ArrowLeft, Home, PartyPopper } from "lucide-react"
 import { Logo } from "@/components/brand/logo"
 import { type ProfileValues } from "@/components/profile/profile-form"
 import { ProfileWizard } from "@/components/profile/profile-wizard"
+import { ListingWizard } from "@/app/(member)/dashboard/listings/listing-wizard"
 import { SectionLabel, LUX_GOLD_BTN } from "@/components/ui/lux"
 import { useToast } from "@/components/ui/toast"
 
@@ -27,17 +28,35 @@ export function OnboardingWizard({
 
   // The profile step nests ProfileWizard, which brings its own progress and
   // Back button — so the outer chrome steps aside while it is on screen.
-  const ownsScreen = step === 2
+  const ownsScreen = step === 2 || step === 4
 
-  async function finishAndGo(path: string) {
+  /**
+   * Called once the property is saved. Marking onboarding complete here — not
+   * before — is what makes the step mandatory: the member layout sends anyone
+   * without `onboardedAt` back to this wizard, so there is no route into the
+   * app that skips it.
+   */
+  async function finish() {
     setLeaving(true)
     try {
-      await fetch("/api/onboarding/finish", { method: "POST" })
+      const res = await fetch("/api/onboarding/finish", { method: "POST" })
+      if (!res.ok) {
+        // fetch resolves on a 4xx, so this has to be checked explicitly —
+        // navigating anyway would land on the dashboard, fail the gate, and
+        // bounce straight back here with no explanation.
+        const data = await res.json().catch(() => ({}))
+        toast(data.error || "Could not finish setting up your account.", "error")
+        setLeaving(false)
+        return
+      }
     } catch {
-      /* proceed regardless */
+      toast("Something went wrong. Please try again.", "error")
+      setLeaving(false)
+      return
     }
-    router.push(path)
-    router.refresh()
+    // Hard navigation so the dashboard renders with onboarding already marked
+    // complete, rather than from a payload cached moments earlier.
+    window.location.assign("/dashboard")
   }
 
   return (
@@ -94,11 +113,21 @@ export function OnboardingWizard({
             </p>
 
             <div className="mt-9 flex justify-center">
-              <button onClick={() => finishAndGo("/dashboard/listings/new")} disabled={leaving} className={`${LUX_GOLD_BTN} disabled:opacity-50`}>
+              <button onClick={() => setStep(4)} disabled={leaving} className={`${LUX_GOLD_BTN} disabled:opacity-50`}>
                 <Home size={16} /> Add your property
               </button>
             </div>
           </div>
+        )}
+
+        {/*
+          Step 4 — the property itself, inside the flow rather than a hand-off
+          to /dashboard/listings/new. Sending members into the app to add it
+          meant onboarding was already marked complete when they arrived, so
+          they could simply navigate to the dashboard and never add one.
+        */}
+        {step === 4 && (
+          <ListingWizard mode="create" onSaved={finish} />
         )}
       </div>
 

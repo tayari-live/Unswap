@@ -85,8 +85,13 @@ export default function LoginPage() {
       } else {
         const session = await getSession()
         const role = (session?.user as any)?.role
-        router.push(role === "admin" ? "/overview" : "/dashboard")
-        router.refresh()
+        // A full document load, not router.push. A client navigation can serve
+        // an RSC payload cached from before sign-in — rendered while logged out
+        // — and calling router.refresh() alongside it invalidates the cache
+        // mid-flight, discarding the response. That is the blank page that only
+        // a manual reload fixed. A hard navigation guarantees the server sees
+        // the new session cookie.
+        window.location.assign(role === "admin" ? "/overview" : "/dashboard")
       }
     } catch {
       toast("Something went wrong. Please try again.", "error")

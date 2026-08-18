@@ -133,6 +133,16 @@ export async function updateNotificationPrefs(userId: string, prefs: Record<stri
 
 /** Mark the onboarding wizard complete. */
 export async function finishOnboarding(userId: string) {
+  // Onboarding is complete only once a property exists. The wizard already
+  // waits for the listing to save before calling this, but the endpoint is
+  // reachable on its own — without this check a member could POST to it and
+  // open the gate without ever adding a home, which is the whole point of the
+  // step.
+  const listings = await prisma.listing.count({ where: { ownerId: userId } })
+  if (listings === 0) {
+    throw new ApiError(400, "Add your property to finish setting up your account.")
+  }
+
   await prisma.user.update({
     where: { id: userId },
     data: { onboardedAt: new Date() },

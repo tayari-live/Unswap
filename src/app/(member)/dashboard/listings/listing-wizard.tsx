@@ -201,7 +201,20 @@ function Heading({ title, sub }: { title: string; sub?: string }) {
   )
 }
 
-export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; initial?: WizardValues }) {
+export function ListingWizard({
+  mode,
+  initial,
+  onSaved,
+}: {
+  mode: "create" | "edit"
+  initial?: WizardValues
+  /**
+   * Handle the save instead of navigating to the listings page. Onboarding
+   * embeds this wizard and needs to finish its own flow afterwards, so the
+   * caller decides where the member goes next.
+   */
+  onSaved?: () => void
+}) {
   const router = useRouter()
   const toast = useToast()
   const [step, setStep] = useState(0)
@@ -321,6 +334,10 @@ export function ListingWizard({ mode, initial }: { mode: "create" | "edit"; init
       const data = await res.json()
       if (!res.ok) { toast(data.error || "Could not save the listing.", "error"); setLoading(false); return }
       toast(mode === "create" ? "Listing saved as draft" : "Listing updated", "success")
+      if (onSaved) {
+        onSaved()
+        return
+      }
       router.push("/dashboard/listings")
       router.refresh()
     } catch {

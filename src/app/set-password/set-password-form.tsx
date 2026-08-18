@@ -33,8 +33,8 @@ export function SetPasswordForm({ firstName }: { firstName: string }) {
         setSubmitting(false)
         return
       }
-      router.push("/dashboard")
-      router.refresh()
+      // Hard navigation: the session cookie has just changed.
+      window.location.assign("/dashboard")
     } catch {
       toast("Something went wrong. Please try again.", "error")
       setSubmitting(false)

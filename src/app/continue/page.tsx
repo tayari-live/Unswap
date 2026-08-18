@@ -26,8 +26,8 @@ function ContinueInner() {
         const res = await signIn("onetime", { token, redirect: false })
         if (cancelled) return
         if (res?.ok && !res.error) {
-          router.push("/onboarding")
-          router.refresh()
+          // Hard navigation: the session cookie has just changed.
+          window.location.assign("/onboarding")
         } else {
           setFailed(true)
         }

@@ -108,8 +108,9 @@ export default function RegisterPage() {
           router.push(`/login?email=${encodeURIComponent(values.email)}`)
           return
         }
-        router.push(next || "/dashboard")
-        router.refresh()
+        // Hard navigation: the session cookie has just changed, and a client
+        // navigation can serve an RSC payload cached from before it.
+        window.location.assign(next || "/dashboard")
         return
       }
 
