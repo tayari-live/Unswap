@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import confetti from "canvas-confetti"
-import { ThemeToggleIcon } from "@/components/theme/theme-toggle"
 
 const ORGS = [
   "United Nations",
@@ -125,11 +124,6 @@ export function WaitlistClient() {
 
   return (
     <div className="min-h-screen bg-wl-navy text-wl-ivory relative">
-      {/* Theme switch — floats above every mode of the page */}
-      <div className="fixed top-5 right-5 z-50">
-        <ThemeToggleIcon />
-      </div>
-
       <AnimatePresence mode="wait">
         {/* ── JOIN ── */}
         {mode === "join" && (
