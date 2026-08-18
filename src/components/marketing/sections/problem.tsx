@@ -13,7 +13,7 @@ import { Reveal } from "../reveal";
 
 const FIGURES = [
   {
-    value: "$40K–$80K",
+    value: "$40K to $80K",
     label: "Typical annual accommodation costs associated with international moves.",
   },
   {
@@ -39,7 +39,7 @@ export function Problem() {
             </Display>
             <p className="mt-8 text-[16px] leading-[1.8] text-ink-70">
               Rotation moves people, not property. A posting begins and a home
-              sits closed for months — while a colleague arriving in the same
+              sits closed for months, while a colleague arriving in the same
               city signs a short let at commercial rates, and another does the
               same in the city you have just left. Everybody pays a market that
               exists only because two homes are empty at the wrong times, and

@@ -29,7 +29,7 @@ export function ResendMyVerification({ email }: { email: string }) {
       disabled={state !== "idle"}
       className="inline-flex items-center justify-center py-3 px-6 rounded-xl text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] disabled:opacity-50 transition-colors"
     >
-      {state === "sending" ? "Sending…" : state === "sent" ? "Sent — check your inbox" : "Resend confirmation email"}
+      {state === "sending" ? "Sending…" : state === "sent" ? "Sent. Check your inbox" : "Resend confirmation email"}
     </button>
   )
 }

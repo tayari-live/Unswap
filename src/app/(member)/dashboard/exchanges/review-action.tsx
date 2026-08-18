@@ -87,7 +87,7 @@ export function ReviewAction({
         setLoading(false)
         return
       }
-      toast("Review submitted — thank you!", "success")
+      toast("Review submitted. Thank you.", "success")
       router.refresh()
     } catch {
       toast("Something went wrong. Please try again.", "error")
@@ -124,7 +124,7 @@ export function ReviewAction({
         onChange={(e) => setBody(e.target.value)}
         rows={3}
         placeholder={`Share how the exchange went (min 50 characters)…`}
-        className="block w-full px-3 py-2 border border-[var(--hair)] rounded-lg bg-[var(--surface)] text-sm text-[var(--fg)] placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)]"
+        className="block w-full px-3 py-2 border border-[var(--hair)] rounded-lg bg-[var(--surface)] text-sm text-[var(--fg)] placeholder:text-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)]"
       />
       <div className="flex items-center gap-2">
         <button type="submit" disabled={loading} className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] px-4 py-2 rounded-lg disabled:opacity-50 transition-colors">

@@ -127,7 +127,7 @@ export async function getMemberNotifications(userId: string): Promise<MemberNoti
     } else if (status === "SUSPENDED") {
       items.push({ id: "ver-suspended", kind: "rejected", title: "Account suspended", body: "Your access has been suspended. Contact hello@unswap.net to resolve this.", date: new Date(), link: "/dashboard/notifications" })
     } else if (status === "PENDING_ID_REVIEW") {
-      items.push({ id: "ver-review", kind: "verification", title: "Verification under review", body: "We're reviewing your documents — usually within 2 business days.", date: submission?.createdAt ?? new Date(), link: "/verify-identity" })
+      items.push({ id: "ver-review", kind: "verification", title: "Verification under review", body: "We're reviewing your documents, usually within 2 business days.", date: submission?.createdAt ?? new Date(), link: "/verify-identity" })
     } else if (status === "EMAIL_VERIFIED") {
       items.push({ id: "ver-getid", kind: "verification", title: "Get verified", body: "Upload your staff ID to unlock listings, swaps, and messaging.", date: new Date(), link: "/verify-identity" })
     } else if (status === "PENDING_EMAIL") {

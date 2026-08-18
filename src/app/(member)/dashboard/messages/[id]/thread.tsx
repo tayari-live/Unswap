@@ -537,8 +537,8 @@ export function Thread({
                 onChange={(e) => { setBody(e.target.value); if (e.target.value.trim()) pingTyping() }}
                 onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(e) } }}
                 rows={1}
-                placeholder="Write your response here..."
-                className="flex-1 resize-none px-0 py-3 bg-transparent text-sm text-[var(--fg)] placeholder-neutral focus:outline-none"
+                placeholder="Write your message"
+                className="flex-1 resize-none px-0 py-3 bg-transparent text-sm text-[var(--fg)] placeholder:text-neutral focus:outline-none"
               />
               <label className="flex-shrink-0 p-3 text-neutral hover:text-[var(--fg)] cursor-pointer transition-colors" title="Attach a file">
                 <Paperclip size={20} />

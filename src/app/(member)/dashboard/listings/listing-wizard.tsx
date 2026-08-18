@@ -45,7 +45,7 @@ const DURATIONS: { v: string; l: string; d: string; icon: LucideIcon }[] = [
   { v: "extended", l: "Extended rotation", d: "181–548 days · full duty-station rotation", icon: Calendar },
 ]
 const EXCHANGE_TYPES: { v: string; l: string; d: string; icon: LucideIcon }[] = [
-  { v: "either", l: "Either", d: "Appears in all searches — simultaneous or credits", icon: Shuffle },
+  { v: "either", l: "Either", d: "Appears in all searches, simultaneous or credits", icon: Shuffle },
   { v: "simultaneous", l: "Simultaneous", d: "We swap homes at the same time", icon: Repeat },
   { v: "credits", l: "Credits", d: "Host now, earn credits to stay later", icon: Coins },
 ]
@@ -106,7 +106,7 @@ function readImage(file: File): Promise<{ url?: string; error?: string }> {
       const img = new window.Image()
       img.onload = () => {
         if (Math.min(img.naturalWidth, img.naturalHeight) < 1080)
-          return resolve({ error: "This photo is too small — please upload a higher resolution image." })
+          return resolve({ error: "This photo is too small. Please upload a higher resolution image." })
         // Downscale to MAX_EDGE and re-encode as JPEG to shrink the upload payload.
         const scale = Math.min(1, MAX_EDGE / Math.max(img.naturalWidth, img.naturalHeight))
         const w = Math.round(img.naturalWidth * scale)
@@ -386,7 +386,7 @@ export function ListingWizard({
             <div className="space-y-6">
               <div>
                 <label className={label} htmlFor="title">Property title <span className="text-neutral normal-case font-normal">({v.title.length}/80)</span></label>
-                <input id="title" className={input} maxLength={80} value={v.title} onChange={(e) => set("title", e.target.value)} placeholder="Sunlit apartment near the lake" />
+                <input id="title" className={input} maxLength={80} value={v.title} onChange={(e) => set("title", e.target.value)} placeholder="A short title for your home" />
               </div>
               <div>
                 {/* Toggle buttons, not a form control, so this is a labelled
@@ -405,9 +405,9 @@ export function ListingWizard({
         {/* 1 — Full address (private) */}
         {step === 1 && (
           <div>
-            <Heading title="What's the full address?" sub="Kept private and encrypted until a swap is confirmed — never shown publicly." />
+            <Heading title="What's the full address?" sub="Kept private and encrypted until a swap is confirmed. Never shown publicly." />
             <label className={label} htmlFor="fullAddress">Full address <span className="text-neutral normal-case font-normal">(private)</span></label>
-            <input id="fullAddress" className={input} value={v.fullAddress} onChange={(e) => set("fullAddress", e.target.value)} placeholder="12 Rue du Lac, Apt 4B" />
+            <input id="fullAddress" className={input} value={v.fullAddress} onChange={(e) => set("fullAddress", e.target.value)} placeholder="Street address" />
           </div>
         )}
 
@@ -417,7 +417,7 @@ export function ListingWizard({
             <Heading title="Where is your home, roughly?" sub="Only the city, country, and neighbourhood are shown publicly." />
             <div className="space-y-5">
               <div className="grid grid-cols-2 gap-4">
-                <div><label className={label} htmlFor="city">City</label><input id="city" className={input} value={v.city} onChange={(e) => set("city", e.target.value)} placeholder="Geneva" /></div>
+                <div><label className={label} htmlFor="city">City</label><input id="city" className={input} value={v.city} onChange={(e) => set("city", e.target.value)} placeholder="Your duty station" /></div>
                 <div>
                   <label className={label} htmlFor="country">Country</label>
                   <select id="country" className={input} value={v.country} onChange={(e) => set("country", e.target.value)}>
@@ -428,7 +428,7 @@ export function ListingWizard({
               </div>
               <div>
                 <label className={label} htmlFor="neighbourhood">Neighbourhood <span className="text-neutral normal-case font-normal">(shown publicly)</span></label>
-                <input id="neighbourhood" className={input} value={v.neighbourhood} onChange={(e) => set("neighbourhood", e.target.value)} placeholder="Eaux-Vives" />
+                <input id="neighbourhood" className={input} value={v.neighbourhood} onChange={(e) => set("neighbourhood", e.target.value)} placeholder="Neighbourhood" />
               </div>
             </div>
           </div>
@@ -449,7 +449,7 @@ export function ListingWizard({
         {/* 4 — Description */}
         {step === 4 && (
           <div>
-            <Heading title="What makes your home unique?" sub="Describe the home, the neighbourhood, and what makes it a great exchange — guests read this first." />
+            <Heading title="What makes your home unique?" sub="Describe the home, the neighbourhood, and what makes it a great exchange. Guests read this first." />
             <div className="flex items-end justify-between gap-3 mb-2">
               <label className={`${label} mb-0`}>Description <span className="text-neutral normal-case font-normal">({v.description.trim().length}/100 min)</span></label>
               <button
@@ -461,9 +461,9 @@ export function ListingWizard({
                 <Sparkles size={13} /> {aiBusy ? "Drafting…" : "Write with AI"}
               </button>
             </div>
-            <textarea className={TEXTAREA} value={v.description} onChange={(e) => set("description", e.target.value)} placeholder="Bright two-bed five minutes from the lake, quiet street, weekly market around the corner…" />
+            <textarea className={TEXTAREA} value={v.description} onChange={(e) => set("description", e.target.value)} placeholder="Describe your home and the area around it" />
             <p className="mt-2 text-xs text-neutral">
-              Write a few rough notes and “Write with AI” will polish them — it only uses the details you&apos;ve entered.
+              Write a few rough notes and “Write with AI” will polish them. It only uses the details you&apos;ve entered.
             </p>
           </div>
         )}
@@ -471,7 +471,7 @@ export function ListingWizard({
         {/* 5 — Amenities (optional) */}
         {step === 5 && (
           <div>
-            <Heading title="What does your home offer?" sub="Select everything that applies — amenities help your home appear in more searches." />
+            <Heading title="What does your home offer?" sub="Select everything that applies. Amenities help your home appear in more searches." />
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {AMENITIES.map((a) => (
                 <IconCard key={a.v} icon={a.icon} title={a.l} selected={v.amenities.includes(a.v)} onClick={() => toggle("amenities", a.v)} />
@@ -494,7 +494,7 @@ export function ListingWizard({
             ) : (
               <>
                 <p className="text-xs text-neutral mb-3">
-                  Drag and drop pictures to reorder them — the first picture is your cover photo ({v.photos.length}/20).
+                  Drag and drop pictures to reorder them. The first picture is your cover photo ({v.photos.length}/20).
                 </p>
                 <div className="grid grid-cols-2 gap-3">
                   {v.photos.map((p, i) => (
@@ -548,7 +548,7 @@ export function ListingWizard({
         {/* 7 — Durations */}
         {step === 7 && (
           <div>
-            <Heading title="How long can guests stay?" sub="Pick every stay length your home is open to — this decides which requests you receive." />
+            <Heading title="How long can guests stay?" sub="Pick every stay length your home is open to. This decides which requests you receive." />
             <div className="grid sm:grid-cols-2 gap-3">
               {DURATIONS.map((d) => (
                 <IconCard key={d.v} icon={d.icon} title={d.l} desc={d.d} selected={v.swapDurations.includes(d.v)} onClick={() => toggle("swapDurations", d.v)} />
@@ -588,8 +588,8 @@ export function ListingWizard({
         {/* 10 — House rules (optional) */}
         {step === 10 && (
           <div>
-            <Heading title="Any house rules?" sub="Shown to guests before they send a request — set expectations early." />
-            <textarea maxLength={1000} className={TEXTAREA} value={v.houseRules} onChange={(e) => set("houseRules", e.target.value)} placeholder="No smoking, no shoes indoors, please water the plants." />
+            <Heading title="Any house rules?" sub="Shown to guests before they send a request. Set expectations early." />
+            <textarea maxLength={1000} className={TEXTAREA} value={v.houseRules} onChange={(e) => set("houseRules", e.target.value)} placeholder="Anything guests should know before they arrive" />
           </div>
         )}
 
@@ -599,7 +599,7 @@ export function ListingWizard({
             <Heading title="Who can guests call if something goes wrong?" sub="Encrypted, and only shared with a confirmed swap partner." />
             <div className="rounded-xl bg-[var(--navy)]/8 border border-[var(--gold)]/20 p-5 space-y-4">
               <div><label className={label} htmlFor="emergencyName">Contact name</label><input id="emergencyName" className={input} value={v.emergencyName} onChange={(e) => set("emergencyName", e.target.value)} /></div>
-              <div><label className={label} htmlFor="emergencyPhone">Phone</label><input id="emergencyPhone" className={input} value={v.emergencyPhone} onChange={(e) => set("emergencyPhone", e.target.value)} placeholder="+41 …" /></div>
+              <div><label className={label} htmlFor="emergencyPhone">Phone</label><input id="emergencyPhone" className={input} value={v.emergencyPhone} onChange={(e) => set("emergencyPhone", e.target.value)} placeholder="Contact phone number" /></div>
             </div>
           </div>
         )}
@@ -609,14 +609,14 @@ export function ListingWizard({
           <div>
             <Heading title="How are they connected to the home?" sub="So a guest knows who they're reaching. Encrypted, shared only with a confirmed partner." />
             <label className={label} htmlFor="emergencyRelationship">Relationship to property</label>
-            <input id="emergencyRelationship" className={input} value={v.emergencyRelationship} onChange={(e) => set("emergencyRelationship", e.target.value)} placeholder="Building manager, neighbour…" />
+            <input id="emergencyRelationship" className={input} value={v.emergencyRelationship} onChange={(e) => set("emergencyRelationship", e.target.value)} placeholder="How you know them" />
           </div>
         )}
 
         {/* 13 — Review */}
         {step === 13 && (
           <div>
-            <Heading title="Ready to save?" sub="Your listing is saved as a draft — publish it from My Listings whenever you're ready." />
+            <Heading title="Ready to save?" sub="Your listing is saved as a draft. Publish it from My Listings whenever you're ready." />
             <dl className="text-sm divide-y divide-[var(--hair)] border border-[var(--hair)] rounded-xl overflow-hidden">
               {[
                 ["Title", v.title], ["Type", v.propertyType], ["Location", `${v.neighbourhood ? v.neighbourhood + ", " : ""}${v.city}, ${v.country}`],

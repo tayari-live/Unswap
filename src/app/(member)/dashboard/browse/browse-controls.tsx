@@ -58,7 +58,7 @@ export function BrowseControls({ initial }: { initial: BrowseFilters }) {
             value={f.q}
             onChange={(e) => setF({ ...f, q: e.target.value })}
             placeholder="Search by city, country, or duty station"
-            className="w-full pl-11 pr-4 py-3 border border-[var(--hair)] rounded-xl bg-[var(--surface)] text-sm text-[var(--fg)] placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] transition-all"
+            className="w-full pl-11 pr-4 py-3 border border-[var(--hair)] rounded-xl bg-[var(--surface)] text-sm text-[var(--fg)] placeholder:text-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)] transition-all"
           />
         </form>
         <button

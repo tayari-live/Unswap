@@ -54,7 +54,7 @@ export default function VerificationClient({ initialSubmissions }: { initialSubm
   async function review(action: "approve" | "reject") {
     if (!selected) return
     if (action === "reject" && note.trim().length < MIN_NOTE) {
-      toast(`Add a rejection reason of at least ${MIN_NOTE} characters — the member sees this as why they were declined.`, "error")
+      toast(`Add a rejection reason of at least ${MIN_NOTE} characters. The member sees this as why they were declined.`, "error")
       return
     }
     setBusy(true)
@@ -168,7 +168,7 @@ export default function VerificationClient({ initialSubmissions }: { initialSubm
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 rows={3}
-                placeholder="Explain why — the member receives this as the reason (e.g. “Staff ID photo was blurry, please re-upload a clear scan”)."
+                placeholder="Explain why. The member receives this as the reason."
                 className="w-full px-3 py-2 rounded-xl border border-[var(--hair)] bg-[var(--background)] text-sm text-[var(--fg)] focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)]"
               />
               <p className="mt-1.5 text-xs text-neutral">Approving needs no note. A note is only required to reject.</p>

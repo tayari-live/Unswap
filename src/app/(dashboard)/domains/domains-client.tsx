@@ -61,7 +61,7 @@ export default function DomainsClient({ initialDomains }: { initialDomains: Doma
               id="d-domain"
               value={domain}
               onChange={(e) => setDomain(e.target.value)}
-              placeholder="un.org"
+              placeholder="Domain to allow"
               required
               className="w-full px-3 py-2.5 rounded-xl border border-[var(--hair)] bg-[var(--background)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40"
             />
@@ -72,7 +72,7 @@ export default function DomainsClient({ initialDomains }: { initialDomains: Doma
               id="d-org"
               value={label}
               onChange={(e) => setLabel(e.target.value)}
-              placeholder="United Nations"
+              placeholder="Organisation name"
               required
               className="w-full px-3 py-2.5 rounded-xl border border-[var(--hair)] bg-[var(--background)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40"
             />

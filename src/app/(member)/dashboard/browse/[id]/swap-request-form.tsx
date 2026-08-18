@@ -216,7 +216,7 @@ export function SwapRequestForm({
 
       <div>
         <label htmlFor="message" className={labelCls}>Message <span className="text-neutral normal-case font-normal">(optional)</span></label>
-        <textarea id="message" value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Introduce yourself and your plans." className={TEXTAREA} />
+        <textarea id="message" value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Introduce yourself and your plans" className={TEXTAREA} />
       </div>
 
       <div className="flex gap-3">

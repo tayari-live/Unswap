@@ -75,7 +75,7 @@ export default function WaitlistClient({ initialEntries }: { initialEntries: Ent
       const res = await fetch(`/api/waitlist/${id}/resend`, { method: "POST" })
       const data = await res.json()
       if (!res.ok) return toast(data.error || "Could not resend.", "error")
-      toast(data.sent ? "Confirmation email sent." : "Queued (Kit not configured — link generated).", "success")
+      toast(data.sent ? "Confirmation email sent." : "Queued (Kit not configured, link generated).", "success")
     } finally {
       setBusyId(null)
     }
@@ -233,7 +233,7 @@ export default function WaitlistClient({ initialEntries }: { initialEntries: Ent
       <Modal open={importOpen} onClose={() => !importBusy && setImportOpen(false)} busy={importBusy} title="Import leads" titleId="import-leads-title">
         <div className="space-y-4">
           <p className="text-sm text-neutral">
-            Paste rows or upload a CSV with columns <strong>email, name, organisation</strong> (a header row is detected automatically). Imported as unconfirmed leads — dupes are skipped. Send them a confirmation with <em>Resend unconfirmed</em>.
+            Paste rows or upload a CSV with columns <strong>email, name, organisation</strong> (a header row is detected automatically). Imported as unconfirmed leads. Duplicates are skipped. Send them a confirmation with <em>Resend unconfirmed</em>.
           </p>
           <textarea
             value={importText}

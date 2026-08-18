@@ -260,7 +260,7 @@ function sendWelcomeEmail(user: { email: string; firstName: string }) {
     subject: "Your UnSwap account is ready",
     html: renderEmail({
       heading: `Welcome aboard, ${esc(user.firstName)}.`,
-      preheader: "Your account is set up — your home is listed and you're ready to exchange.",
+      preheader: "Your account is set up. Your home is listed and you're ready to exchange.",
       body: `<p style="margin:0 0 14px">Your account is complete: your email is verified, your property is listed, and your password is set.</p>
              <p style="margin:0">You can now explore homes across the network and arrange exchanges with verified peers.</p>`,
       ctaLabel: "Go to your dashboard",

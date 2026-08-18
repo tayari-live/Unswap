@@ -118,7 +118,7 @@ export default async function ProfilePage() {
             done={isFullyVerified}
             pending={identityPending}
             icon={ShieldCheck}
-            label={identityPending ? "Identity & employment — under review" : "Identity & employment verified"}
+            label={identityPending ? "Identity and employment under review" : "Identity & employment verified"}
           />
         </div>
         {!isFullyVerified && (

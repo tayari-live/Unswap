@@ -15,7 +15,7 @@ export function BookClient() {
             Book Your Assessment Call
           </h1>
           <p style={{ fontSize: "14px", lineHeight: 1.7, color: "var(--ivory-dim)", maxWidth: "440px", margin: "0 auto" }}>
-            Grab 15–20 minutes with our team and we&apos;ll walk you through how UnSwap works, personally.
+            Grab 15 to 20 minutes with our team and we&apos;ll walk you through how UnSwap works, personally.
           </p>
         </div>
         <div style={{ borderRadius: "12px", padding: "4px", background: "var(--panel)", border: "1px solid rgba(201,168,76,0.2)", overflow: "hidden" }}>

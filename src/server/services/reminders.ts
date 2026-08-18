@@ -45,7 +45,7 @@ export async function sendSwapReminders(): Promise<number> {
         subject: "Your UnSwap exchange starts soon",
         html: renderEmail({
           heading: "Your exchange is almost here",
-          body: `<p>Hello ${esc(p.firstName)},</p><p>Your exchange at <strong>${esc(s.listing.title)}</strong> (${place}) begins on <strong>${when}</strong> — just a couple of days from now. Confirm access details, keys, and travel plans with your counterpart.</p>`,
+          body: `<p>Hello ${esc(p.firstName)},</p><p>Your exchange at <strong>${esc(s.listing.title)}</strong> (${place}) begins on <strong>${when}</strong>, just a couple of days from now. Confirm access details, keys, and travel plans with your counterpart.</p>`,
           ctaLabel: "View exchange",
           ctaUrl: `${APP()}/dashboard/exchanges`,
         }),

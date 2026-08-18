@@ -155,7 +155,7 @@ export default async function MemberDashboardPage() {
     {
       key: "profile",
       title: "Complete your profile",
-      sub: profileIncomplete ? `${user.profileCompletion}% done — members exchange with people, not just listings.` : null,
+      sub: profileIncomplete ? `${user.profileCompletion}% done. Members exchange with people, not just listings.` : null,
       done: !profileIncomplete,
       href: "/dashboard/profile/edit",
       cta: "Complete",
@@ -167,7 +167,7 @@ export default async function MemberDashboardPage() {
       sub: isVerified
         ? null
         : idReview
-          ? "Under review — usually within 2 business days."
+          ? "Under review. Usually within 2 business days."
           : user.verificationStatus === "REJECTED"
             ? `Not approved${lastRejection?.reviewNote ? ` — “${lastRejection.reviewNote}”` : ""}. Resubmit with updated documents.`
             : "Required to request or accept a swap.",
@@ -317,7 +317,7 @@ export default async function MemberDashboardPage() {
               <input
                 type="search"
                 name="q"
-                placeholder="Search a city, country or duty station..."
+                placeholder="Search a city, country or duty station"
                 className="w-full h-14 pl-12 pr-4 rounded-lg bg-white border border-transparent text-[15px] text-navy placeholder:text-navy/50 focus:outline-none focus:border-[var(--gold)] focus:ring-2 focus:ring-[var(--gold)] transition-colors shadow-sm"
               />
             </form>

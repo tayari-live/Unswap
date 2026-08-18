@@ -122,8 +122,8 @@ export async function buildAgreementPdf(userId: string, swapId: string): Promise
     page.drawLine({ start: { x, y }, end: { x: x + colW, y }, thickness: 0.75, color: rgb(0.7, 0.73, 0.78) })
     page.drawText(name, { x, y: y - 14, size: 9, font, color: MUTED })
   }
-  sig(M, `Host — ${swap.host.fullName}`)
-  sig(M + colW + 30, `Guest — ${swap.requester.fullName}`)
+  sig(M, `Host: ${swap.host.fullName}`)
+  sig(M + colW + 30, `Guest: ${swap.requester.fullName}`)
 
   // Footer
   page.drawText(

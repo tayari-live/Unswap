@@ -32,7 +32,7 @@ export function toFriendlyAIError(err: unknown): ApiError {
   if (err instanceof Anthropic.APIError) {
     console.error(`Anthropic API error (${err.status}):`, err.message)
     if (err.status === 429) {
-      return new ApiError(503, "The assistant is a little busy right now — please try again in a moment.")
+      return new ApiError(503, "The assistant is a little busy right now. Please try again in a moment.")
     }
     // 400 insufficient credits, 401/403 bad key, 5xx outages — all read the
     // same to a member: the feature is temporarily unavailable.

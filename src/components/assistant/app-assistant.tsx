@@ -104,7 +104,7 @@ export function AppAssistant() {
             {messages.length === 0 && (
               <div>
                 <p className="text-sm text-neutral-dark leading-relaxed">
-                  Hi! I can explain how UnSwap works — verification, listing your
+                  Hi! I can explain how UnSwap works, including verification, listing your
                   home, swaps, credits, and membership. What would you like to know?
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
@@ -170,7 +170,7 @@ export function AppAssistant() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask the guide…"
-              className="flex-1 px-3.5 py-2.5 border border-[var(--hair)] rounded-xl bg-[var(--surface)] text-sm text-[var(--fg)] placeholder-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)]"
+              className="flex-1 px-3.5 py-2.5 border border-[var(--hair)] rounded-xl bg-[var(--surface)] text-sm text-[var(--fg)] placeholder:text-neutral focus:outline-none focus:ring-2 focus:ring-[var(--gold)]/40 focus:border-[var(--gold)]"
             />
             <button
               type="submit"

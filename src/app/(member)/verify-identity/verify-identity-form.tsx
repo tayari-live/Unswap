@@ -139,7 +139,7 @@ export function VerifyIdentityForm({ type }: { type: "fast_track" | "manual" }) 
       {manual && (
         <FileField
           label="Proof of employment"
-          hint="Pay slip with personal details redacted — organisation and status only"
+          hint="Pay slip with personal details redacted. Organisation and status only"
           value={proof}
           onChange={(v, err) => {
             setProof(v)

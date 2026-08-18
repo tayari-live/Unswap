@@ -299,6 +299,24 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/*
+ * Placeholders must never read as a filled-in value.
+ *
+ * Tailwind v4 dropped the v3 `placeholder-{color}` utility, so ten inputs were
+ * silently emitting no rule and inheriting the field's own text colour. This is
+ * the floor beneath the explicit classes: derived from currentColor, so it dims
+ * correctly on the light dashboard and the navy auth pages alike, without
+ * either needing to name a colour.
+ *
+ * Firefox also applies its own opacity to placeholders, which would compound
+ * with the alpha here — pinned to 1 so the two do not stack.
+ */
+::placeholder {
+  color: #9CA3AF; /* fallback where color-mix is unsupported */
+  color: color-mix(in srgb, currentColor 45%, transparent);
+  opacity: 1;
+}
+
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
   font-weight: 600;

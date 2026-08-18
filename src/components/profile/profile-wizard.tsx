@@ -97,7 +97,7 @@ export function ProfileWizard({
     if (SCREENS[s].key === "fullName" && !v.fullName.trim()) return "Display name is required."
     if (SCREENS[s].key === "bio") {
       const len = v.bio.trim().length
-      if (len > 0 && len < MIN_BIO) return `A sentence or two works best — ${MIN_BIO - len} more character${MIN_BIO - len === 1 ? "" : "s"} to go.`
+      if (len > 0 && len < MIN_BIO) return `A sentence or two works best. ${MIN_BIO - len} more character${MIN_BIO - len === 1 ? "" : "s"} to go.`
     }
     return null
   }
@@ -197,7 +197,7 @@ export function ProfileWizard({
           <div>
             <Heading title="What's your name?" sub="This is how you'll appear to other members of the network." />
             <label className={label} htmlFor="fullName">Display name</label>
-            <input id="fullName" className={input} value={v.fullName} onChange={(e) => set("fullName", e.target.value)} placeholder="Amara Okafor" />
+            <input id="fullName" className={input} value={v.fullName} onChange={(e) => set("fullName", e.target.value)} placeholder="Your full name" />
           </div>
         )}
 
@@ -227,7 +227,7 @@ export function ProfileWizard({
           <div>
             <Heading title="Where are you based?" sub="Your current duty station." />
             <label className={label} htmlFor="dutyStation">Current duty station</label>
-            <input id="dutyStation" className={input} value={v.dutyStation} onChange={(e) => set("dutyStation", e.target.value)} placeholder="Geneva" />
+            <input id="dutyStation" className={input} value={v.dutyStation} onChange={(e) => set("dutyStation", e.target.value)} placeholder="Your duty station" />
           </div>
         )}
 
@@ -235,7 +235,7 @@ export function ProfileWizard({
           <div>
             <Heading title="Which languages do you speak?" sub="Helpful for members considering an exchange with you." />
             <label className={label} htmlFor="languages">Languages</label>
-            <input id="languages" className={input} value={v.languages} onChange={(e) => set("languages", e.target.value)} placeholder="English, French" />
+            <input id="languages" className={input} value={v.languages} onChange={(e) => set("languages", e.target.value)} placeholder="Languages you speak" />
           </div>
         )}
 
@@ -243,7 +243,7 @@ export function ProfileWizard({
           <div>
             <Heading title="Tell members about yourself" sub="A short introduction. Your work, your interests, what you are looking for." />
             <label className={label} htmlFor="bio">Bio</label>
-            <textarea id="bio" className={TEXTAREA} value={v.bio} onChange={(e) => set("bio", e.target.value)} placeholder="A short introduction for fellow members." />
+            <textarea id="bio" className={TEXTAREA} value={v.bio} onChange={(e) => set("bio", e.target.value)} placeholder="A short introduction for fellow members" />
             <p className="mt-2 text-xs text-neutral">
               {v.bio.trim().length === 0
                 ? `At least ${MIN_BIO} characters, or skip this for now.`
@@ -256,9 +256,9 @@ export function ProfileWizard({
 
         {key === "linkedinUrl" && (
           <div>
-            <Heading title="Add your LinkedIn" sub="Optional — an extra signal of trust for potential swap partners." />
+            <Heading title="Add your LinkedIn" sub="Optional. An extra signal of trust for potential swap partners." />
             <label className={label} htmlFor="linkedinUrl">LinkedIn <span className="text-neutral normal-case font-normal">(optional)</span></label>
-            <input id="linkedinUrl" className={input} value={v.linkedinUrl} onChange={(e) => set("linkedinUrl", e.target.value)} placeholder="https://linkedin.com/in/…" />
+            <input id="linkedinUrl" className={input} value={v.linkedinUrl} onChange={(e) => set("linkedinUrl", e.target.value)} placeholder="Link to your LinkedIn profile" />
           </div>
         )}
 

@@ -20,7 +20,7 @@ const QUESTIONS = [
   },
   {
     q: "Do I need to work for the UN?",
-    a: "No. The UN system is well represented, but eligibility extends across international organisations — development banks, financial institutions, agencies and comparable bodies.",
+    a: "No. The UN system is well represented, but eligibility extends across international organisations, including development banks, financial institutions, agencies and comparable bodies.",
   },
   {
     q: "How does verification work?",

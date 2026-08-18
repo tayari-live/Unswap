@@ -41,7 +41,7 @@ export default async function VerifyIdentityPage() {
           icon={<Clock size={26} />}
           tone="gold"
           title="Documents under review"
-          body="Thank you. Our verification officers are reviewing your submission — usually within 2 business days — and will email you once a decision is made."
+          body="Thank you. Our verification officers are reviewing your submission, usually within 2 business days, and will email you once a decision is made."
           cta={{ href: "/dashboard", label: "Back to dashboard" }}
         />
       </Shell>
@@ -95,7 +95,7 @@ export default async function VerifyIdentityPage() {
       <div className="bg-surface rounded-md border border-[var(--hair)] p-6 sm:p-8">
         <p className="text-sm text-neutral mb-6">
           {type === "fast_track"
-            ? "Your institutional email qualifies for fast-track review — upload your staff ID to complete verification."
+            ? "Your institutional email qualifies for fast track review. Upload your staff ID to complete verification."
             : "Upload your staff ID and proof of employment so our team can verify your professional status."}
         </p>
         <VerifyIdentityForm type={type} />

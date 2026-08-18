@@ -8,7 +8,7 @@ import { PasswordRequirements } from "@/components/ui/password-requirements"
 import { SuggestPassword } from "@/components/ui/suggest-password"
 
 const inputCls =
-  "w-full bg-[var(--field-bg)] border border-wl-border px-5 py-4 text-wl-ivory placeholder-wl-muted focus:outline-none focus:border-wl-gold focus:shadow-[0_0_0_1px_rgba(201,168,76,0.35)] transition-all duration-300 text-[15px]"
+  "w-full bg-[var(--field-bg)] border border-wl-border px-5 py-4 text-wl-ivory placeholder:text-wl-muted focus:outline-none focus:border-wl-gold focus:shadow-[0_0_0_1px_rgba(201,168,76,0.35)] transition-all duration-300 text-[15px]"
 
 export function SetPasswordForm({ firstName }: { firstName: string }) {
   const router = useRouter()
@@ -56,7 +56,7 @@ export function SetPasswordForm({ firstName }: { firstName: string }) {
         Secure your account
       </h1>
       <p className="text-wl-ivory-dim text-center text-sm leading-relaxed mb-8">
-        Nice work, {firstName} — your home is listed. Set a password so you can sign back in anytime.
+        Nice work, {firstName}. Your home is listed. Set a password so you can sign back in anytime.
       </p>
 
       <form onSubmit={onSubmit} className="space-y-4">

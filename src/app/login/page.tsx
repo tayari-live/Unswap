@@ -9,7 +9,7 @@ import { useToast } from "@/components/ui/toast"
 import { ThemeToggleIcon } from "@/components/theme/theme-toggle"
 
 const inputCls =
-  "w-full bg-[var(--field-bg)] border border-wl-border px-5 py-4 text-wl-ivory placeholder-wl-muted focus:outline-none focus:border-wl-gold focus:shadow-[0_0_0_1px_var(--border)] transition-all duration-300 text-[15px]"
+  "w-full bg-[var(--field-bg)] border border-wl-border px-5 py-4 text-wl-ivory placeholder:text-wl-muted focus:outline-none focus:border-wl-gold focus:shadow-[0_0_0_1px_var(--border)] transition-all duration-300 text-[15px]"
 const labelCls = "block text-wl-ivory-dim text-xs tracking-[0.08em] uppercase font-medium mb-2 pl-1"
 
 // Email-first login: ask for the email, then show the step that fits the
@@ -35,7 +35,7 @@ export default function LoginPage() {
     const e = params.get("email")
     if (e) setEmail(e)
     if (params.get("notice") === "already-confirmed") {
-      toast("You've already confirmed your email — sign in to continue.", "info")
+      toast("You've already confirmed your email. Sign in to continue.", "info")
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -150,7 +150,7 @@ export default function LoginPage() {
 
         <div className="w-full max-w-md mx-auto relative">
           <div className="flex justify-center mb-6">
-            <Link href="/" aria-label="UnSwap — home" className="inline-flex transition-opacity hover:opacity-90">
+            <Link href="/" aria-label="UnSwap home" className="inline-flex transition-opacity hover:opacity-90">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/waitlist/logo.png" alt="UnSwap" className="w-24 h-24 object-contain" />
             </Link>
@@ -179,7 +179,7 @@ export default function LoginPage() {
                     <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
                       <Mail size={18} className="text-wl-muted" />
                     </div>
-                    <input id="email" name="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@organisation.int" className={`${inputCls} pr-11`} />
+                    <input id="email" name="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Your work email" className={`${inputCls} pr-11`} />
                   </div>
                 </div>
                 <button type="submit" disabled={loading} className="w-full bg-wl-gold hover:bg-wl-gold-light text-wl-navy text-sm font-medium tracking-[0.08em] uppercase py-4 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_4px_24px_rgba(201,168,76,0.25)]">

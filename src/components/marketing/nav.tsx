@@ -75,7 +75,7 @@ export function Nav() {
             <Link
               href="/"
               className="inline-flex items-center gap-2.5"
-              aria-label="UnSwap — home"
+              aria-label="UnSwap home"
             >
               <Image
                 src="/unswap-logo.png"

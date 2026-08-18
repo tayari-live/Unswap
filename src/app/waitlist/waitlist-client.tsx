@@ -15,7 +15,7 @@ const ORGS = [
 ]
 
 const inputCls =
-  "w-full bg-[var(--field-bg)] border border-wl-border px-[20px] py-[16px] text-wl-ivory placeholder-wl-muted focus:outline-none focus:border-wl-gold focus:shadow-[0_0_0_1px_var(--border)] transition-all duration-300 text-[15px]"
+  "w-full bg-[var(--field-bg)] border border-wl-border px-[20px] py-[16px] text-wl-ivory placeholder:text-wl-muted focus:outline-none focus:border-wl-gold focus:shadow-[0_0_0_1px_var(--border)] transition-all duration-300 text-[15px]"
 
 // The API answers identically for a new address and one already on the list,
 // so this page cannot tell them apart — which is the point.
@@ -140,13 +140,13 @@ export function WaitlistClient() {
                     <label htmlFor="wl-name" className="text-wl-ivory-dim text-xs tracking-[0.08em] uppercase font-medium mb-2 pl-1 flex items-center gap-1">
                       Full Name <span className="text-wl-gold">*</span>
                     </label>
-                    <input id="wl-name" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter your full name" required className={inputCls} />
+                    <input id="wl-name" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your full name" required className={inputCls} />
                   </div>
                   <div>
                     <label htmlFor="wl-email" className="text-wl-ivory-dim text-xs tracking-[0.08em] uppercase font-medium mb-2 pl-1 flex items-center gap-1">
                       Email Address <span className="text-wl-gold">*</span>
                     </label>
-                    <input id="wl-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your@email.com" required className={inputCls} />
+                    <input id="wl-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Your email address" required className={inputCls} />
                   </div>
                   <div>
                     <label htmlFor="wl-org" className="text-wl-ivory-dim text-xs tracking-[0.08em] uppercase font-medium mb-2 pl-1 flex items-center gap-1">
@@ -289,7 +289,7 @@ export function WaitlistClient() {
                 </p>
                 <form onSubmit={handleCheckStatus} className="w-full flex flex-col items-center gap-4">
                   <label htmlFor="wl-check-email" className="sr-only">Email address</label>
-                  <input id="wl-check-email" type="email" value={checkEmail} onChange={(e) => { setCheckEmail(e.target.value); if (errorMessage) setErrorMessage("") }} placeholder="email@example.com" required className={inputCls} />
+                  <input id="wl-check-email" type="email" value={checkEmail} onChange={(e) => { setCheckEmail(e.target.value); if (errorMessage) setErrorMessage("") }} placeholder="Your email address" required className={inputCls} />
                   <button type="submit" disabled={status === "loading"} className="btn-gold w-full flex items-center justify-center mt-2 group shadow-[0_4px_24px_var(--gold-dim)]">
                     {status === "loading" ? "Sending..." : "Email me my link"}
                   </button>

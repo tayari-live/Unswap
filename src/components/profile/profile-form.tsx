@@ -115,7 +115,7 @@ export function ProfileForm({
 
       <div>
         <label htmlFor="fullName" className={labelCls}>Display name</label>
-        <input id="fullName" required value={v.fullName} onChange={(e) => set("fullName", e.target.value)} className={inputCls} placeholder="Amara Okafor" />
+        <input id="fullName" required value={v.fullName} onChange={(e) => set("fullName", e.target.value)} className={inputCls} placeholder="Your full name" />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -138,22 +138,22 @@ export function ProfileForm({
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label htmlFor="dutyStation" className={labelCls}>Current duty station</label>
-          <input id="dutyStation" value={v.dutyStation} onChange={(e) => set("dutyStation", e.target.value)} className={inputCls} placeholder="Geneva" />
+          <input id="dutyStation" value={v.dutyStation} onChange={(e) => set("dutyStation", e.target.value)} className={inputCls} placeholder="Your duty station" />
         </div>
         <div>
           <label htmlFor="languages" className={labelCls}>Languages</label>
-          <input id="languages" value={v.languages} onChange={(e) => set("languages", e.target.value)} className={inputCls} placeholder="English, French" />
+          <input id="languages" value={v.languages} onChange={(e) => set("languages", e.target.value)} className={inputCls} placeholder="Languages you speak" />
         </div>
       </div>
 
       <div>
         <label htmlFor="bio" className={labelCls}>Bio</label>
-        <textarea id="bio" value={v.bio} onChange={(e) => set("bio", e.target.value)} className={TEXTAREA} placeholder="A short introduction for fellow members." />
+        <textarea id="bio" value={v.bio} onChange={(e) => set("bio", e.target.value)} className={TEXTAREA} placeholder="A short introduction for fellow members" />
       </div>
 
       <div>
         <label htmlFor="linkedinUrl" className={labelCls}>LinkedIn <span className="text-neutral normal-case font-normal">(optional)</span></label>
-        <input id="linkedinUrl" value={v.linkedinUrl} onChange={(e) => set("linkedinUrl", e.target.value)} className={inputCls} placeholder="https://linkedin.com/in/…" />
+        <input id="linkedinUrl" value={v.linkedinUrl} onChange={(e) => set("linkedinUrl", e.target.value)} className={inputCls} placeholder="Link to your LinkedIn profile" />
       </div>
 
       <button type="submit" disabled={loading} className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] disabled:opacity-50 transition-colors">

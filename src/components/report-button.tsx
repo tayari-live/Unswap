@@ -30,7 +30,7 @@ export function ReportButton({
       })
       if (res.ok) {
         setDone(true)
-        toast("Thanks — our team will review this.", "success")
+        toast("Thanks. Our team will review this.", "success")
       } else {
         toast("Could not submit the report", "error")
       }

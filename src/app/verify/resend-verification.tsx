@@ -33,7 +33,7 @@ export function ResendVerification() {
         required
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        placeholder="you@organisation.org"
+        placeholder="Your email address"
         className="flex-1 px-4 py-2.5 border border-wl-border bg-transparent text-sm text-wl-ivory placeholder:text-wl-muted focus:outline-none focus:border-wl-gold transition-colors"
       />
       <button

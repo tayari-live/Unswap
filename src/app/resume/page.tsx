@@ -5,7 +5,7 @@ import Link from "next/link"
 import { AuthShell } from "@/components/auth/auth-shell"
 
 const inputCls =
-  "w-full bg-[var(--field-bg)] border border-wl-border px-5 py-4 text-wl-ivory placeholder-wl-muted focus:outline-none focus:border-wl-gold focus:shadow-[0_0_0_1px_rgba(201,168,76,0.35)] transition-all duration-300 text-[15px]"
+  "w-full bg-[var(--field-bg)] border border-wl-border px-5 py-4 text-wl-ivory placeholder:text-wl-muted focus:outline-none focus:border-wl-gold focus:shadow-[0_0_0_1px_rgba(201,168,76,0.35)] transition-all duration-300 text-[15px]"
 
 // For members who arrived from the waitlist invite but never set a password:
 // their invite link is single-use, so this issues a fresh one-time sign-in link.
@@ -59,7 +59,7 @@ export default function ResumePage() {
               <label htmlFor="resume-email" className="block text-wl-ivory-dim text-xs tracking-[0.08em] uppercase font-medium mb-2 pl-1">
                 Email address
               </label>
-              <input id="resume-email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your@email.com" className={inputCls} />
+              <input id="resume-email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Your email address" className={inputCls} />
             </div>
             <button type="submit" disabled={submitting} className="w-full bg-wl-gold hover:bg-wl-gold-light text-wl-navy text-sm font-medium tracking-[0.08em] uppercase py-4 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_4px_24px_rgba(201,168,76,0.25)]">
               {submitting ? "Sending…" : "Email me a sign-in link"}

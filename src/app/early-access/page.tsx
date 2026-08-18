@@ -45,7 +45,7 @@ export default async function EarlyAccessPage() {
             <h2 className="font-display font-bold text-lg text-[var(--navy)]">Top referrers</h2>
           </div>
           {leaders.length === 0 ? (
-            <p className="px-6 py-10 text-center text-sm text-neutral">No referrals yet — be the first to share your link.</p>
+            <p className="px-6 py-10 text-center text-sm text-neutral">No referrals yet. Be the first to share your link.</p>
           ) : (
             <div className="divide-y divide-[var(--border)]">
               {leaders.map((l, i) => (

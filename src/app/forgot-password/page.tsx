@@ -78,7 +78,7 @@ export default function ForgotPasswordPage() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="j.doe@un.org"
+            placeholder="Your work email"
             className={authInputCls}
           />
         </div>

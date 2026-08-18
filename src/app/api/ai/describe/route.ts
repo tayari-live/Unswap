@@ -7,11 +7,11 @@ const SYSTEM = `You write listing descriptions for UnSwap, a verified home-excha
 Write a warm, factual description of the member's home in the host's first-person voice ("our apartment", "you'll find").
 
 Rules:
-- 120–180 words, two or three short paragraphs, no headings, no emoji, no markdown.
+- 120 to 180 words, two or three short paragraphs, no headings, no emoji, no markdown.
 - Use ONLY the facts provided. Never invent amenities, views, distances, or neighbourhood details that were not given.
 - If the member wrote notes or a draft, honour their content and tone; polish rather than replace.
 - Mention what makes the home practical for professionals on assignment (workspace, transport, longer stays) only when the facts support it.
-- Return the description text only — no preamble.`
+- Return the description text only. No preamble.`
 
 // POST /api/ai/describe — draft a listing description from wizard facts.
 export async function POST(req: NextRequest) {

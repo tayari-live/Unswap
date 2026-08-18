@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
 
   if (!secret) {
     if (!isLocalDev) {
-      console.error("CRON_SECRET is not set — refusing to run the cron job.")
+      console.error("CRON_SECRET is not set. Refusing to run the cron job.")
       return NextResponse.json({ error: "Cron is not configured." }, { status: 503 })
     }
     // Local development only: run unguarded so the job stays testable.

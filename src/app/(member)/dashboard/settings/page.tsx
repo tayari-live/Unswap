@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic"
 
 const VSTATUS: Record<string, string> = {
   PENDING_EMAIL: "Confirm your email",
-  EMAIL_VERIFIED: "Not verified — needed to swap",
+  EMAIL_VERIFIED: "Not verified. Needed to swap",
   PENDING_ID_REVIEW: "Under review",
   FULLY_VERIFIED: "Verified",
   REJECTED: "Action needed",

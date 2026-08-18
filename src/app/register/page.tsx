@@ -32,7 +32,7 @@ function domainStatus(email: string): "fast" | "manual" | null {
 const inputCls =
   // --field-bg flips with the theme; a hardcoded white here left ivory text on
   // a white field (invisible) once dark mode was added.
-  "w-full bg-[var(--field-bg)] border border-wl-border px-5 py-4 text-wl-ivory placeholder-wl-muted focus:outline-none focus:border-wl-gold focus:shadow-[0_0_0_1px_rgba(201,168,76,0.35)] transition-all duration-300 text-[15px]"
+  "w-full bg-[var(--field-bg)] border border-wl-border px-5 py-4 text-wl-ivory placeholder:text-wl-muted focus:outline-none focus:border-wl-gold focus:shadow-[0_0_0_1px_rgba(201,168,76,0.35)] transition-all duration-300 text-[15px]"
 const labelCls = "block text-wl-ivory-dim text-xs tracking-[0.08em] uppercase font-medium mb-2 pl-1"
 // Validation text sits on a dark ground, so the fixed light red rather than
 // --destructive, which is too dark to read here.
@@ -152,7 +152,7 @@ export default function RegisterPage() {
           <div className="flex justify-center mb-6">
             {/* The logo is the way back out of the funnel: from sign-up, that is
                 the public landing page. */}
-            <Link href="/" aria-label="UnSwap — home" className="inline-flex transition-opacity hover:opacity-90">
+            <Link href="/" aria-label="UnSwap home" className="inline-flex transition-opacity hover:opacity-90">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/waitlist/logo.png" alt="UnSwap" className="w-24 h-24 object-contain" />
             </Link>
@@ -175,19 +175,19 @@ export default function RegisterPage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label htmlFor="firstName" className={labelCls}>First name</label>
-                <input id="firstName" {...register("firstName")} aria-invalid={!!errors.firstName} aria-describedby={errors.firstName ? "firstName-error" : undefined} placeholder="John" className={inputCls} />
+                <input id="firstName" {...register("firstName")} aria-invalid={!!errors.firstName} aria-describedby={errors.firstName ? "firstName-error" : undefined} placeholder="First name" className={inputCls} />
                 {errors.firstName && <p id="firstName-error" role="alert" className={errCls}>{errors.firstName.message}</p>}
               </div>
               <div>
                 <label htmlFor="lastName" className={labelCls}>Last name</label>
-                <input id="lastName" {...register("lastName")} aria-invalid={!!errors.lastName} aria-describedby={errors.lastName ? "lastName-error" : undefined} placeholder="Doe" className={inputCls} />
+                <input id="lastName" {...register("lastName")} aria-invalid={!!errors.lastName} aria-describedby={errors.lastName ? "lastName-error" : undefined} placeholder="Last name" className={inputCls} />
                 {errors.lastName && <p id="lastName-error" role="alert" className={errCls}>{errors.lastName.message}</p>}
               </div>
             </div>
 
             <div>
               <label htmlFor="email" className={labelCls}>Work email</label>
-              <input id="email" type="email" {...register("email")} aria-invalid={!!errors.email} aria-describedby={errors.email ? "email-error" : undefined} placeholder="j.doe@un.org" className={inputCls} />
+              <input id="email" type="email" {...register("email")} aria-invalid={!!errors.email} aria-describedby={errors.email ? "email-error" : undefined} placeholder="Your work email" className={inputCls} />
               {errors.email && <p id="email-error" role="alert" className={errCls}>{errors.email.message}</p>}
             </div>
 
@@ -217,7 +217,7 @@ export default function RegisterPage() {
               {status === "fast" ? <ShieldCheck size={18} className="flex-shrink-0 mt-0.5 text-wl-gold" /> : <Info size={18} className="flex-shrink-0 mt-0.5 text-wl-gold" />}
               <span>
                 {status === "fast"
-                  ? "Recognised institutional email — you qualify for fast-track verification."
+                  ? "Recognised institutional email. You qualify for fast-track verification."
                   : "Use your institutional email (@un.org, @undp.org, etc.) for fast-track verification. Other addresses enter manual review."}
               </span>
             </div>

@@ -5,17 +5,17 @@ import { motion, AnimatePresence } from "framer-motion"
 import confetti from "canvas-confetti"
 
 // ── Share copy ──────────────────────────────────────────────────────────────
-const MSG_WHATSAPP = "This is the first home exchange system I've seen that was actually built for UN staff and foreign service professionals — not tourists. If your home sits empty during postings, get on this waitlist before it opens:"
-const MSG_LINKEDIN = "I found someone who calculated what diplomatic professionals actually lose on accommodation across a full career. The number is staggering — and she built the solution specifically for people with security clearances.\n\nJoin the waitlist here:"
+const MSG_WHATSAPP = "This is the first home exchange system I've seen that was actually built for UN staff and foreign service professionals, not tourists. If your home sits empty during postings, get on this waitlist before it opens:"
+const MSG_LINKEDIN = "I found someone who calculated what diplomatic professionals actually lose on accommodation across a full career. The number is staggering, and she built the solution specifically for people with security clearances.\n\nJoin the waitlist here:"
 const MSG_TWITTER = "Diplomat A: $60K on serviced apartments, home unprotected for 18 months.\nDiplomat B: $0 on accommodation, home with a vetted UN peer, three future exchanges lined up.\n\nSame posting. One decision. Join the waitlist:"
 const MSG_FACEBOOK = "You know the 3am feeling when you're posted abroad and you wonder if everything's okay at home? Jacqueline Tsuma built the answer to that.\n\nSecure your spot on the waitlist:"
 
 const TEMPLATES = [
-  { id: 1, title: "The Calculation", subtitle: "Best for: LinkedIn or professional networks", content: "I found someone who calculated what diplomatic professionals actually lose on accommodation across a full career. The number is staggering — and she built the solution specifically for people with security clearances.\n\nJoin the waitlist here: [LINK]" },
-  { id: 2, title: "The 'Finally'", subtitle: "Best for: UN / Foreign Service WhatsApp groups", content: "This is the first home exchange system I've seen that was actually built for UN staff and foreign service professionals — not tourists. If your home sits empty during postings, get on this waitlist before it opens: [LINK]" },
+  { id: 1, title: "The Calculation", subtitle: "Best for: LinkedIn or professional networks", content: "I found someone who calculated what diplomatic professionals actually lose on accommodation across a full career. The number is staggering, and she built the solution specifically for people with security clearances.\n\nJoin the waitlist here: [LINK]" },
+  { id: 2, title: "The 'Finally'", subtitle: "Best for: UN / Foreign Service WhatsApp groups", content: "This is the first home exchange system I've seen that was actually built for UN staff and foreign service professionals, not tourists. If your home sits empty during postings, get on this waitlist before it opens: [LINK]" },
   { id: 3, title: "The Specific Pain", subtitle: "Best for: Personal storytelling or 1-on-1 outreach", content: "You know the 3am feeling when you're posted abroad and you wonder if everything's okay at home? Jacqueline Tsuma built the answer to that.\n\nSecure your spot on the waitlist: [LINK]" },
   { id: 4, title: "The Contrast", subtitle: "Best for: High-impact posts", content: "Diplomat A: $60K on serviced apartments, home unprotected for 18 months.\nDiplomat B: $0 on accommodation, home with a vetted UN peer, three future exchanges lined up.\n\nSame posting. One decision. Join the waitlist: [LINK]" },
-  { id: 5, title: "The Credibility Pass", subtitle: "Best for: Establishing authority and trust", content: "A former UN advisor built a vetted home exchange network specifically for diplomatic professionals — verified by institutional credentials, not star ratings. If you own a home that sits empty during postings, this is for you: [LINK]" },
+  { id: 5, title: "The Credibility Pass", subtitle: "Best for: Establishing authority and trust", content: "A former UN advisor built a vetted home exchange network specifically for diplomatic professionals, verified by institutional credentials, not star ratings. If you own a home that sits empty during postings, this is for you: [LINK]" },
 ]
 
 const Icons = {
@@ -67,7 +67,7 @@ function NativeShareButton({ shareUrl, onShare }: { shareUrl: string; onShare?: 
   if (typeof navigator === "undefined" || !navigator.share) return null
   const handle = async () => {
     try {
-      await navigator.share({ title: "Join UnSwap — Exclusive Waitlist", text: `${MSG_WHATSAPP} `, url: shareUrl })
+      await navigator.share({ title: "Join UnSwap, Exclusive Waitlist", text: `${MSG_WHATSAPP} `, url: shareUrl })
       setUsed(true)
       onShare?.()
     } catch { /* cancelled */ }
@@ -216,7 +216,7 @@ export function ShareCard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code }),
       })
-      showToast("Invite re-sent — check your inbox")
+      showToast("Invite resent. Check your inbox")
     } catch {
       /* keep the reply neutral */
     }

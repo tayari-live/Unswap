@@ -44,17 +44,17 @@ const confirmUrl = (token: string) => `${baseUrl()}/api/waitlist/confirm?token=$
 function sendJoinEmail(email: string, firstName: string, token: string) {
   return sendEmail({
     to: email,
-    subject: "You're in — add your property on UnSwap",
+    subject: "You're in. Add your property on UnSwap",
     html: renderEmail({
       heading: `You're in, ${esc(firstName)}.`,
       preheader: "Your exclusive invite to add your property is ready.",
       body: `<p style="margin:0 0 14px">Welcome to UnSwap, the closed home exchange network for staff of the UN, World Bank, IMF and other international organisations. Your place is reserved.</p>
-             <p style="margin:0">As a founding member you can add your property now. The button below confirms your email and takes you straight there — no separate verification step.</p>`,
+             <p style="margin:0">As a founding member you can add your property now. The button below confirms your email and takes you straight there, with no separate verification step.</p>`,
       ctaLabel: "Add your property",
       ctaUrl: confirmUrl(token),
       footnote: "If you did not request this, you can ignore this email and nothing further will happen.",
     }),
-    text: `You're in, ${firstName}. Add your property on UnSwap — this link also confirms your email: ${confirmUrl(token)}\n\nIf you did not request this, you can ignore this email.`,
+    text: `You're in, ${firstName}. Add your property on UnSwap. This link also confirms your email: ${confirmUrl(token)}\n\nIf you did not request this, you can ignore this email.`,
   })
 }
 
