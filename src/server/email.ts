@@ -1,14 +1,33 @@
 import { MailtrapClient } from "mailtrap"
 
 const apiToken = process.env.MAILTRAP_TOKEN
-// Sender address. Must be on a domain verified in Mailtrap, otherwise sending
-// is rejected — verification is per-domain, exactly as it was with Resend.
-const fromRaw = process.env.EMAIL_FROM || "UnSwap <noreply@unswap.net>"
+
+/*
+ * Sender address.
+ *
+ * Mailtrap verifies an exact domain, and ours is the mail.unswap.net
+ * subdomain, not the apex. Sending from @unswap.net is rejected, and because a
+ * failed send only returns false, the symptom is silent: the account is
+ * created and no email arrives.
+ *
+ * The fallback therefore matches the verified subdomain rather than the apex,
+ * and a missing EMAIL_FROM says so at boot instead of being discovered later
+ * through mail that never turned up.
+ */
+const DEFAULT_FROM = "UnSwap <hello@mail.unswap.net>"
+const fromRaw = process.env.EMAIL_FROM || DEFAULT_FROM
+
+if (!process.env.EMAIL_FROM && process.env.NODE_ENV === "production") {
+  console.warn(
+    `EMAIL_FROM is not set. Falling back to ${DEFAULT_FROM}, which only sends ` +
+    `if that exact domain is verified in Mailtrap.`,
+  )
+}
 
 const client = apiToken ? new MailtrapClient({ token: apiToken }) : null
 
 /**
- * Split an RFC-style sender ("UnSwap <noreply@unswap.net>") into the parts the
+ * Split an RFC-style sender ("UnSwap <hello@mail.unswap.net>") into the parts the
  * Mailtrap SDK expects. Kept so EMAIL_FROM stays in one familiar format rather
  * than becoming two environment variables.
  */
