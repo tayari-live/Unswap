@@ -102,12 +102,12 @@ export function CreditCelebration() {
       role="dialog"
       aria-modal="true"
       aria-labelledby="credit-celebration-title"
-      className="fixed inset-0 z-modal flex items-center justify-center p-6 bg-[rgba(10,14,26,0.72)] backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]"
+      className="fixed inset-0 z-modal flex items-center justify-center overflow-y-auto p-6 bg-[rgba(10,14,26,0.72)] backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]"
       onClick={dismiss}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-md bg-[var(--surface)] border border-[var(--gold)] rounded-md p-9 text-center shadow-[0_24px_80px_rgba(10,14,26,0.45)]"
+        className="relative my-auto w-full max-w-md max-h-[90dvh] overflow-y-auto bg-[var(--surface)] border border-[var(--gold)] rounded-md p-9 text-center shadow-[0_24px_80px_rgba(10,14,26,0.45)]"
       >
         <button
           type="button"

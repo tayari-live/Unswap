@@ -95,12 +95,12 @@ export function VerificationCelebration() {
       role="dialog"
       aria-modal="true"
       aria-labelledby="verified-celebration-title"
-      className="fixed inset-0 z-modal flex items-center justify-center p-6 bg-[rgba(10,14,26,0.78)] backdrop-blur-sm animate-[fadeIn_0.25s_ease-out]"
+      className="fixed inset-0 z-modal flex items-center justify-center overflow-y-auto p-6 bg-[rgba(10,14,26,0.78)] backdrop-blur-sm animate-[fadeIn_0.25s_ease-out]"
       onClick={dismiss}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-lg bg-[var(--surface)] border border-[var(--gold)] rounded-md p-10 text-center shadow-[0_24px_80px_rgba(10,14,26,0.5)]"
+        className="relative my-auto w-full max-w-lg max-h-[90dvh] overflow-y-auto bg-[var(--surface)] border border-[var(--gold)] rounded-md p-10 text-center shadow-[0_24px_80px_rgba(10,14,26,0.5)]"
       >
         <button
           type="button"
