@@ -302,15 +302,21 @@ export function ShareCard() {
                 <span style={{ marginRight: "6px" }}>✉️</span>
                 We&apos;ve emailed you an <strong style={{ color: "var(--gold)" }}>exclusive invite to add your property</strong>{email ? <> at <span style={{ color: "var(--ivory-dim)" }}>{email}</span></> : null}. Click the link in that email to confirm your account and set up your listing.
               </p>
-              <div style={{ marginTop: "12px", display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
-                <span style={{ fontSize: "12px", color: "var(--muted)" }}>Didn&apos;t get it?</span>
+              {/*
+                A quiet text link rather than a bordered button. Resending is
+                the recovery path for a message that did not arrive, so it
+                should stay available without competing with the share actions
+                below it, which are what this page is for.
+              */}
+              <p style={{ marginTop: "10px", fontSize: "12px", color: "var(--muted)" }}>
+                Didn&apos;t get it?{" "}
                 <button
                   onClick={resendInvite}
                   disabled={cooldown > 0 || resending}
-                  style={{ display: "inline-flex", alignItems: "center", gap: "6px", background: "transparent", color: cooldown > 0 || resending ? "var(--muted)" : "var(--gold)", fontSize: "12px", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", padding: "7px 14px", border: `1px solid ${cooldown > 0 || resending ? "var(--border)" : "rgba(201,168,76,0.5)"}`, borderRadius: "6px", cursor: cooldown > 0 || resending ? "not-allowed" : "pointer" }}>
-                  {resending ? "Sending…" : cooldown > 0 ? `Resend email (${cooldown})` : "Resend email"}
+                  style={{ background: "transparent", border: "none", padding: 0, font: "inherit", color: cooldown > 0 || resending ? "var(--muted)" : "var(--gold)", textDecoration: "underline", cursor: cooldown > 0 || resending ? "not-allowed" : "pointer" }}>
+                  {resending ? "Sending…" : cooldown > 0 ? `Resend it (${cooldown})` : "Resend it"}
                 </button>
-              </div>
+              </p>
             </div>
           )}
           <p style={{ fontSize: "14px", lineHeight: 1.7, color: "var(--ivory-dim)", maxWidth: "440px", margin: "0 auto 8px" }}>
