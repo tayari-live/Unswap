@@ -1,7 +1,5 @@
 import { redirect } from "next/navigation"
-import { headers } from "next/headers"
 import { auth } from "@/server/auth"
-import { prisma } from "@/server/prisma"
 import { AppNavbar } from "@/components/layout/app-navbar"
 import { AppAssistant } from "@/components/assistant/app-assistant"
 import { CreditCelebration } from "@/components/credits/credit-celebration"
@@ -31,21 +29,15 @@ export default async function MemberLayout({
     redirect("/onboarding")
   }
 
-  // Setup gate (applies to every member): after onboarding, everyone must add a
-  // property before the rest of the platform opens, and only then set a password
-  // (passwordless members arriving from the waitlist invite). The pathname comes
-  // from middleware so we can exempt the add-listing page itself (no loop).
-  const pathname = (await headers()).get("x-pathname") || ""
-  const onAddListing = pathname.startsWith("/dashboard/listings/new")
-  if (!onAddListing) {
-    const listingCount = await prisma.listing.count({ where: { ownerId: u.id } })
-    if (listingCount === 0) {
-      redirect("/dashboard/listings/new")
-    }
-    // Property is in place — passwordless members now set their password.
-    if (u.needsPassword) {
-      redirect("/set-password")
-    }
+  // Passwordless members (arriving from the waitlist invite) set a password
+  // before the rest of the platform opens.
+  //
+  // There is deliberately no property gate here: onboarding owns that step and
+  // only marks itself complete once a listing has saved, so a member who
+  // reaches this point already has one. Repeating the check meant a listing
+  // count on every single navigation for a condition that cannot occur.
+  if (u.needsPassword) {
+    redirect("/set-password")
   }
 
   const initials = (u.name || "M")
