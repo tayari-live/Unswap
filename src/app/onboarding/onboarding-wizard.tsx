@@ -98,14 +98,6 @@ export function OnboardingWizard({
                 <Home size={16} /> Add your property
               </button>
             </div>
-
-            <button
-              onClick={() => finishAndGo("/dashboard")}
-              disabled={leaving}
-              className="mt-6 text-[11px] font-medium uppercase tracking-[0.14em] text-neutral hover:text-[var(--gold-soft)] disabled:opacity-50 transition-colors"
-            >
-              Skip for now
-            </button>
           </div>
         )}
       </div>
