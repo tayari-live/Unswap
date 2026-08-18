@@ -61,11 +61,11 @@ export function Footer() {
               <Image
                 src="/unswap-logo.png"
                 alt=""
-                width={68}
-                height={68}
-                className="h-9 w-9 object-contain"
+                width={128}
+                height={128}
+                className="h-14 w-14 object-contain"
               />
-              <span className="text-[15px] font-bold tracking-[0.16em] text-white">
+              <span className="text-[16px] font-bold tracking-[0.16em] text-white">
                 UNSWAP
               </span>
             </Link>

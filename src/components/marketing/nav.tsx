@@ -80,13 +80,13 @@ export function Nav() {
               <Image
                 src="/unswap-logo.png"
                 alt=""
-                width={68}
-                height={68}
+                width={112}
+                height={112}
                 priority
-                className="h-8 w-8 object-contain"
+                className="h-12 w-12 object-contain sm:h-14 sm:w-14"
               />
               <span
-                className={`text-[15px] font-bold tracking-[0.16em] transition-colors duration-300 ${
+                className={`text-[17px] font-bold tracking-[0.16em] transition-colors duration-300 ${
                   light ? "text-navy" : "text-white"
                 }`}
               >
