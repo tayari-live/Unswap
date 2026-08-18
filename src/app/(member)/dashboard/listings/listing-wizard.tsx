@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import Link from "next/link"
 import {
   UploadCloud, X, Plus, Minus, Check, ChevronRight, ChevronLeft, Star, Sparkles,
@@ -215,7 +214,6 @@ export function ListingWizard({
    */
   onSaved?: () => void
 }) {
-  const router = useRouter()
   const toast = useToast()
   const [step, setStep] = useState(0)
   const [v, setV] = useState<WizardValues>(initial ?? EMPTY)
@@ -338,8 +336,12 @@ export function ListingWizard({
         onSaved()
         return
       }
-      router.push("/dashboard/listings")
-      router.refresh()
+      // Hard navigation. push() and refresh() together race: refresh
+      // invalidates the router cache while push is still fetching, and the
+      // discarded payload leaves a blank page until a manual reload. The
+      // destination also has to show what was just saved, which a cached
+      // payload would not.
+      window.location.assign("/dashboard/listings")
     } catch {
       toast("Something went wrong. Please try again.", "error")
       setLoading(false)

@@ -1,11 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { useToast } from "@/components/ui/toast"
 
 export function SwapDetailClient({ swap, isIncoming }: { swap: { id: string, status: string }, isIncoming: boolean }) {
-  const router = useRouter()
   const toast = useToast()
   const [busy, setBusy] = useState(false)
   
@@ -30,8 +28,10 @@ export function SwapDetailClient({ swap, isIncoming }: { swap: { id: string, sta
         setShowAccept(false)
         setShowDecline(false)
         setShowCancel(false)
-        router.push("/dashboard/swaps") // Return to list after action
-        router.refresh()
+        // Return to the list. Hard navigation: push() and refresh() together
+        // race and can leave the page blank, and the list must show the
+        // status that just changed.
+        window.location.assign("/dashboard/swaps")
       }
     } finally {
       setBusy(false)

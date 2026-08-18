@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { UploadCloud, FileCheck2, X, ShieldCheck } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
 
@@ -90,7 +89,6 @@ function FileField({
 }
 
 export function VerifyIdentityForm({ type }: { type: "fast_track" | "manual" }) {
-  const router = useRouter()
   const toast = useToast()
   const [idCard, setIdCard] = useState<string | null>(null)
   const [proof, setProof] = useState<string | null>(null)
@@ -116,8 +114,12 @@ export function VerifyIdentityForm({ type }: { type: "fast_track" | "manual" }) 
         setLoading(false)
         return
       }
-      router.push("/dashboard")
-      router.refresh()
+      // Hard navigation. push() and refresh() together race: refresh
+      // invalidates the router cache while push is still fetching, and the
+      // discarded payload leaves a blank page until a manual reload. The
+      // destination also has to show what was just saved, which a cached
+      // payload would not.
+      window.location.assign("/dashboard")
     } catch {
       toast("Something went wrong. Please try again.", "error")
       setLoading(false)

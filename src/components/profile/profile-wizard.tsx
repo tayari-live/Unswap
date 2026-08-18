@@ -129,8 +129,9 @@ export function ProfileWizard({
         router.refresh()
       } else {
         // Standalone profile page: return to the display view after saving.
-        router.push(redirectTo)
-        router.refresh()
+        // Hard navigation: push() and refresh() together race and can leave
+        // the page blank, and the profile view must show what was saved.
+        window.location.assign(redirectTo)
       }
     } catch {
       toast("Something went wrong. Please try again.", "error")
