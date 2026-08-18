@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { signIn, getSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
@@ -27,6 +27,18 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [remember, setRemember] = useState(false)
   const [linkSent, setLinkSent] = useState(false)
+
+  // Prefill the email and explain the arrival when sent here from a re-clicked
+  // waitlist link (already confirmed → sign in).
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const e = params.get("email")
+    if (e) setEmail(e)
+    if (params.get("notice") === "already-confirmed") {
+      toast("You've already confirmed your email — sign in to continue.", "info")
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const resetToEmail = () => {
     setStage("email")

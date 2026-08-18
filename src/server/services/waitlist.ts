@@ -145,6 +145,24 @@ export async function confirmWaitlist(token: string) {
   const entry = await prisma.waitlistEntry.findUnique({ where: { confirmToken: token } })
   if (!entry) throw new ApiError(400, "This confirmation link is invalid or has already been used.")
 
+  // Idempotent re-click: the link is kept resolvable (confirmToken is not nulled)
+  // so a second visit doesn't dead-end on an error. The side effects below run
+  // once — on a repeat we report the confirmed state and let the caller route
+  // the person to sign in instead of re-crediting or re-minting anything.
+  if (entry.confirmedAt) {
+    return {
+      alreadyConfirmed: true as const,
+      email: entry.email,
+      firstName: entry.firstName,
+      lastName: entry.lastName,
+      referralCode: entry.referralCode,
+      referralUrl: referralUrl(entry.referralCode),
+      position: 0,
+      earlyBird: false,
+      registerGrant: "",
+    }
+  }
+
   const confirmedAt = new Date()
   // Mint a single-use grant: proof this person owns the address, handed to
   // /register so the account is created already email-verified. Stored on the
@@ -153,7 +171,8 @@ export async function confirmWaitlist(token: string) {
   const registerGrantExpires = new Date(Date.now() + GRANT_TTL_MS)
   await prisma.waitlistEntry.update({
     where: { id: entry.id },
-    data: { confirmedAt, confirmToken: null, registerGrant, registerGrantExpires },
+    // confirmToken kept (not nulled) so a re-click still resolves to this row.
+    data: { confirmedAt, registerGrant, registerGrantExpires },
   })
 
   // Credit the referrer now (only verified sign-ups count).
@@ -174,6 +193,7 @@ export async function confirmWaitlist(token: string) {
   // than back to the share page. A second email would only repeat that step.
 
   return {
+    alreadyConfirmed: false as const,
     referralCode: entry.referralCode,
     referralUrl: referralUrl(entry.referralCode),
     position,

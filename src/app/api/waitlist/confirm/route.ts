@@ -13,6 +13,17 @@ export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get("token") ?? ""
   try {
     const result = await confirmWaitlist(token)
+
+    // Re-click on an already-used link: the account exists, so don't error and
+    // don't silently re-issue a sign-in link (a magic link shouldn't work
+    // forever). Send them to sign in, email prefilled, with a gentle notice.
+    if (result.alreadyConfirmed) {
+      const url = new URL("/login", base())
+      url.searchParams.set("email", result.email)
+      url.searchParams.set("notice", "already-confirmed")
+      return NextResponse.redirect(url)
+    }
+
     const loginToken = await beginPasswordlessMember({
       email: result.email,
       firstName: result.firstName,
