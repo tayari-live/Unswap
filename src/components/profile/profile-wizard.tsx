@@ -285,7 +285,7 @@ export function ProfileWizard({
       </div>
 
       {/* Nav */}
-      <div className="mt-6 px-6 sm:px-0 flex items-center justify-between gap-3">
+      <div className="mt-6 px-6 sm:px-0 flex flex-wrap items-center justify-between gap-3">
         {step > 0 || onExit ? (
           <button
             type="button"
@@ -302,9 +302,9 @@ export function ProfileWizard({
             <button type="button" onClick={() => next(true)} className="text-[12px] font-medium uppercase tracking-[0.12em] text-[var(--gold-soft)] px-5 py-3 rounded-sm border border-[var(--hair)] hover:border-[var(--gold)] bg-[var(--surface)] transition-colors">Skip</button>
           )}
           {step < SCREENS.length - 1 ? (
-            <button type="button" onClick={() => next()} disabled={!answered} title={!answered ? "Answer this question or use Skip" : undefined} className="inline-flex items-center gap-1.5 text-[12px] font-medium uppercase tracking-[0.12em] text-ink bg-[var(--gold)] hover:bg-[var(--gold-hover)] px-7 py-3 rounded-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[var(--gold)]">Continue <ChevronRight size={15} /></button>
+            <button type="button" onClick={() => next()} disabled={!answered} title={!answered ? "Answer this question or use Skip" : undefined} className="inline-flex items-center gap-1.5 text-[12px] font-medium uppercase tracking-[0.12em] text-ink bg-[var(--gold)] hover:bg-[var(--gold-hover)] px-5 sm:px-7 py-3 rounded-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[var(--gold)]">Continue <ChevronRight size={15} /></button>
           ) : (
-            <button type="button" onClick={submit} disabled={loading} className="inline-flex items-center gap-1.5 text-[12px] font-medium uppercase tracking-[0.12em] text-ink bg-[var(--gold)] hover:bg-[var(--gold-hover)] px-7 py-3 rounded-sm transition-colors disabled:opacity-50">{loading ? "Saving…" : (<><Check size={15} /> Save profile</>)}</button>
+            <button type="button" onClick={submit} disabled={loading} className="inline-flex items-center gap-1.5 text-[12px] font-medium uppercase tracking-[0.12em] text-ink bg-[var(--gold)] hover:bg-[var(--gold-hover)] px-5 sm:px-7 py-3 rounded-sm transition-colors disabled:opacity-50">{loading ? "Saving…" : (<><Check size={15} /> Save profile</>)}</button>
           )}
         </div>
       </div>

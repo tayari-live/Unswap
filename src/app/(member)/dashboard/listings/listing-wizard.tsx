@@ -636,7 +636,7 @@ export function ListingWizard({
       </div>
 
       {/* Nav */}
-      <div className="mt-6 px-6 sm:px-0 flex items-center justify-between gap-3">
+      <div className="mt-6 px-6 sm:px-0 flex flex-wrap items-center justify-between gap-3">
         {step > 0 ? (
           <button type="button" onClick={() => setStep((s) => s - 1)} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--fg)] px-5 py-2.5 rounded-full border border-[var(--hair)] hover:border-[var(--navy)] bg-[var(--surface)]"><ChevronLeft size={16} /> Back</button>
         ) : (
@@ -647,9 +647,9 @@ export function ListingWizard({
             <button type="button" onClick={() => next(true)} className="text-sm font-semibold text-[var(--fg)] px-5 py-2.5 rounded-full border border-[var(--gold)] hover:bg-[var(--navy)]/5 bg-[var(--surface)]">Skip</button>
           )}
           {step < SCREENS.length - 1 ? (
-            <button type="button" onClick={() => next()} className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] px-7 py-2.5 rounded-full">Continue <ChevronRight size={16} /></button>
+            <button type="button" onClick={() => next()} className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] px-5 sm:px-7 py-2.5 rounded-full">Continue <ChevronRight size={16} /></button>
           ) : (
-            <button type="button" onClick={submit} disabled={loading} className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] px-7 py-2.5 rounded-full disabled:opacity-50">{loading ? "Saving…" : (<><Check size={16} /> Save listing</>)}</button>
+            <button type="button" onClick={submit} disabled={loading} className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] px-5 sm:px-7 py-2.5 rounded-full disabled:opacity-50">{loading ? "Saving…" : (<><Check size={16} /> Save listing</>)}</button>
           )}
         </div>
       </div>
