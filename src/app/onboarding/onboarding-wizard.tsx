@@ -67,7 +67,7 @@ export function OnboardingWizard({
 
       {/* The profile step nests ProfileWizard, which brings its own card; wrap
           the framing steps only, so step 2 isn't a card inside a card. */}
-      <div className={ownsScreen ? "" : "bg-[var(--surface)] rounded-md border border-[var(--hair)] p-8 sm:p-10"}>
+      <div className={ownsScreen ? "" : "bg-[var(--surface)] sm:rounded-md border-y sm:border border-[var(--hair)] p-6 sm:p-10"}>
         {/* Step 1 — Welcome + Mission */}
         {step === 1 && (
           <div className="text-center">
@@ -137,7 +137,7 @@ export function OnboardingWizard({
           type="button"
           onClick={() => setStep((s) => Math.max(1, s - 1))}
           disabled={leaving}
-          className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-neutral hover:text-[var(--fg)] disabled:opacity-50 transition-colors"
+          className="mt-5 ml-6 sm:ml-0 inline-flex items-center gap-1.5 text-sm font-semibold text-neutral hover:text-[var(--fg)] disabled:opacity-50 transition-colors"
         >
           <ArrowLeft size={16} /> Back
         </button>

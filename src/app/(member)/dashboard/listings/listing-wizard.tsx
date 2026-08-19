@@ -366,7 +366,7 @@ export function ListingWizard({
   return (
     <div className="max-w-2xl mx-auto">
       {/* Progress — section name, step count, segmented bar */}
-      <div className="mb-8">
+      <div className="mb-8 px-6 sm:px-0">
         <div className="flex items-baseline justify-between mb-2">
           <span className="text-sm font-bold text-[var(--fg)]">{SECTIONS[section]}</span>
           <span className="text-xs text-neutral font-semibold">{step + 1}/{SCREENS.length}</span>
@@ -380,7 +380,7 @@ export function ListingWizard({
         </div>
       </div>
 
-      <div className="bg-surface rounded-md border border-[var(--hair)] p-6 sm:p-10 min-h-[24rem]">
+      <div className="bg-surface sm:rounded-md border-y sm:border border-[var(--hair)] p-6 sm:p-10 min-h-[24rem]">
         {/* 0 — Title + type */}
         {step === 0 && (
           <div>
@@ -636,7 +636,7 @@ export function ListingWizard({
       </div>
 
       {/* Nav */}
-      <div className="mt-6 flex items-center justify-between gap-3">
+      <div className="mt-6 px-6 sm:px-0 flex items-center justify-between gap-3">
         {step > 0 ? (
           <button type="button" onClick={() => setStep((s) => s - 1)} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--fg)] px-5 py-2.5 rounded-full border border-[var(--hair)] hover:border-[var(--navy)] bg-[var(--surface)]"><ChevronLeft size={16} /> Back</button>
         ) : (

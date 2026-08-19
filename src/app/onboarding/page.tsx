@@ -28,7 +28,7 @@ export default async function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-[var(--canvas)]">
+    <div className="min-h-screen flex items-center justify-center px-0 py-6 sm:p-6 bg-[var(--canvas)]">
       <OnboardingWizard
         firstName={user.firstName}
         initialProfile={initialProfile}

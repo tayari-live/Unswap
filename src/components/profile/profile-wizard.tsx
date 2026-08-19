@@ -160,7 +160,7 @@ export function ProfileWizard({
   return (
     <div>
       {/* Progress — live profile completion % + step count */}
-      <div className="mb-8">
+      <div className="mb-8 px-6 sm:px-0">
         <div className="flex items-baseline justify-between mb-2.5">
           <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-[var(--gold-soft)]">Profile completion · {completion}%</span>
           <span className="text-[11px] text-neutral font-medium uppercase tracking-[0.14em]">Step {step + 1}/{SCREENS.length}</span>
@@ -170,7 +170,7 @@ export function ProfileWizard({
         </div>
       </div>
 
-      <div className="bg-[var(--surface)] rounded-md border border-[var(--hair)] p-6 sm:p-10 min-h-[22rem]">
+      <div className="bg-[var(--surface)] sm:rounded-md border-y sm:border border-[var(--hair)] p-6 sm:p-10 min-h-[22rem]">
         {key === "photo" && (
           <div>
             <Heading title="Add a profile photo" sub="A friendly face helps other members recognise and trust you." />
@@ -285,7 +285,7 @@ export function ProfileWizard({
       </div>
 
       {/* Nav */}
-      <div className="mt-6 flex items-center justify-between gap-3">
+      <div className="mt-6 px-6 sm:px-0 flex items-center justify-between gap-3">
         {step > 0 || onExit ? (
           <button
             type="button"
