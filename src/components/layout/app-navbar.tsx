@@ -192,7 +192,7 @@ export function AppNavbar({
     { name: "Swap requests", href: "/dashboard/swaps", icon: ArrowLeftRight, desc: "Incoming and outgoing" },
     { name: "My exchanges", href: "/dashboard/exchanges", icon: CalendarCheck, desc: "Confirmed and completed" },
     { name: "Messages", href: "/dashboard/messages", icon: MessageSquare, badge: unread },
-    { name: "Credits", href: "/dashboard/credits", icon: Coins },
+    { name: "Points", href: "/dashboard/points", icon: Coins },
   ]
 
   const v = VERIFY[verificationStatus]

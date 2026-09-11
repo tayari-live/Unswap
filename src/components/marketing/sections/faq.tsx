@@ -31,8 +31,8 @@ const QUESTIONS = [
     a: "No. Homes are exchanged rather than rented, so no nightly rate passes between members. You pay an annual membership to UnSwap, and nothing to the person whose home you stay in.",
   },
   {
-    q: "What are credits?",
-    a: "One credit equals one night. You earn credits by hosting and spend them when you stay, which means two members never have to want each other's homes at the same time.",
+    q: "What are points?",
+    a: "One point equals one night. You earn points by hosting and spend them when you stay, which means two members never have to want each other's homes at the same time.",
   },
   {
     q: "How does property protection work?",
@@ -44,7 +44,7 @@ const QUESTIONS = [
   },
   {
     q: "What happens if my exchange request is declined?",
-    a: "Nothing is charged and no credits move. Members decline for reasons of timing far more often than anything else, and you are free to request another home straight away.",
+    a: "Nothing is charged and no points move. Members decline for reasons of timing far more often than anything else, and you are free to request another home straight away.",
   },
   {
     q: "How does membership work?",
@@ -52,7 +52,7 @@ const QUESTIONS = [
   },
   {
     q: "What happens when my membership ends?",
-    a: "Your listing stops being visible to the network and you cannot start new exchanges. Credits you have already earned are held against your account, and renewing restores access to them.",
+    a: "Your listing stops being visible to the network and you cannot start new exchanges. Points you have already earned are held against your account, and renewing restores access to them.",
   },
 ];
 

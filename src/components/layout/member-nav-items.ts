@@ -32,7 +32,7 @@ export const memberNavigation: MemberNavItem[] = [
   { name: "Swap Requests", href: "/dashboard/swaps", icon: ArrowLeftRight, live: true },
   { name: "My Exchanges", href: "/dashboard/exchanges", icon: CalendarCheck, live: true },
   { name: "Messages", href: "/dashboard/messages", icon: MessageSquare, live: true },
-  { name: "Credits", href: "/dashboard/credits", icon: Coins, live: true },
+  { name: "Points", href: "/dashboard/points", icon: Coins, live: true },
   { name: "Profile", href: "/dashboard/profile", icon: UserCircle, live: true },
   // Membership/billing is hidden until payments are set up (see features.ts).
   ...(MEMBERSHIP_ENABLED

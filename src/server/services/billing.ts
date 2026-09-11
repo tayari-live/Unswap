@@ -2,7 +2,7 @@ import Stripe from "stripe"
 import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
 import { logAudit } from "@/server/services/audit"
-import { grantCreditsOnce } from "@/server/services/credits"
+import { grantPointsOnce } from "@/server/services/points"
 import { sendEmail, renderEmail, esc } from "@/server/email"
 
 // Tier catalogue — the single source of truth for entitlements and pricing.
@@ -77,7 +77,7 @@ export async function activateSubscription(
         heading: `Welcome aboard, ${esc(user.firstName)}.`,
         preheader: `Your ${t.name} membership is now active.`,
         body: `<p style="margin:0 0 14px">Your <strong>${t.name}</strong> membership is now active. You have full access to the network and its verified homes.</p>
-               <p style="margin:0">Three credits have been added to your balance as a subscription bonus.</p>`,
+               <p style="margin:0">Three points have been added to your balance as a subscription bonus.</p>`,
         ctaLabel: "Browse homes",
         ctaUrl: `${process.env.AUTH_URL || "http://localhost:3000"}/dashboard/browse`,
       }),
@@ -85,8 +85,8 @@ export async function activateSubscription(
     })
   }
   await logAudit({ actorId: userId, action: "SUBSCRIPTION_ACTIVATED", subject: `Activated ${t.name}`, metadata: { tier: tierKey } })
-  // First paid subscription grants a credit bonus (idempotent — renewals don't re-pay).
-  await grantCreditsOnce(userId, "first_subscription")
+  // First paid subscription grants a point bonus (idempotent — renewals don't re-pay).
+  await grantPointsOnce(userId, "first_subscription")
 }
 
 async function getOrCreateCustomer(userId: string): Promise<string> {

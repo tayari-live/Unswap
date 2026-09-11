@@ -128,7 +128,7 @@ export function BrowseControls({ initial }: { initial: BrowseFilters }) {
               <select id="f-exchange" value={f.exchangeType} onChange={(e) => apply({ exchangeType: e.target.value })} className={selectCls}>
                 <option value="">Any exchange</option>
                 <option value="simultaneous">Simultaneous</option>
-                <option value="credits">Credits</option>
+                <option value="points">Points</option>
               </select>
             </div>
           </div>

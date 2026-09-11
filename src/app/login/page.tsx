@@ -26,7 +26,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [remember, setRemember] = useState(false)
-  const [linkSent, setLinkSent] = useState(false)
 
   // Prefill the email and explain the arrival when sent here from a re-clicked
   // waitlist link (already confirmed → sign in).
@@ -43,7 +42,47 @@ export default function LoginPage() {
   const resetToEmail = () => {
     setStage("email")
     setPassword("")
-    setLinkSent(false)
+  }
+
+  // Fire-and-forget: email a one-time sign-in link. Always resolves and never
+  // reveals whether the address has an account (the endpoint is neutral).
+  const sendLink = async () => {
+    try {
+      await fetch("/api/auth/resume", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      })
+    } catch {
+      /* neutral confirmation regardless */
+    }
+  }
+
+  // Instant sign-in for a passwordless member (joined from the waitlist, no
+  // password yet): trade the email for a one-time token and spend it right here,
+  // so they walk into onboarding without an inbox round-trip. Returns true once
+  // the session is set and we're navigating away; false to fall back to emailing
+  // a link. (Deliberate trade-off: access on the email alone, scoped to
+  // pre-password accounts — see /api/auth/passwordless-start.)
+  const startInstantSession = async (): Promise<boolean> => {
+    try {
+      const res = await fetch("/api/auth/passwordless-start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok || !data.token) return false
+      const signInRes = await signIn("onetime", { token: data.token, redirect: false })
+      if (signInRes?.ok && !signInRes.error) {
+        // Hard navigation: the session cookie has just changed.
+        window.location.assign("/onboarding")
+        return true
+      }
+      return false
+    } catch {
+      return false
+    }
   }
 
   const handleEmailContinue = async (e: React.FormEvent) => {
@@ -62,7 +101,17 @@ export default function LoginPage() {
         setLoading(false)
         return
       }
-      setStage(data.state as Stage)
+      const state = data.state as Stage
+      // Passwordless members (joined from the waitlist, no password yet) go
+      // straight into onboarding: no inbox round-trip. If that can't complete
+      // for any reason, fall back to emailing a one-time sign-in link and show
+      // the confirmation instead.
+      if (state === "passwordless") {
+        const signedIn = await startInstantSession()
+        if (signedIn) return // navigating away; keep the loading state
+        await sendLink()
+      }
+      setStage(state)
     } catch {
       toast("Something went wrong. Please try again.", "error")
     }
@@ -99,19 +148,11 @@ export default function LoginPage() {
     }
   }
 
-  const handleSendLink = async () => {
+  const handleResend = async () => {
     setLoading(true)
-    try {
-      await fetch("/api/auth/resume", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      })
-    } catch {
-      /* neutral confirmation regardless */
-    }
-    setLinkSent(true)
+    await sendLink()
     setLoading(false)
+    toast("We've sent another sign-in link to your inbox.", "info")
   }
 
   const EmailPill = (
@@ -223,30 +264,24 @@ export default function LoginPage() {
             </>
           )}
 
-          {/* ── STEP 2b: passwordless → send a sign-in link ── */}
+          {/* ── STEP 2b: passwordless → a one-time sign-in link is emailed
+              automatically. They joined from the waitlist and have no password;
+              opening the emailed link is how they prove they own the inbox, so
+              there is no button to press for it here. ── */}
           {stage === "passwordless" && (
             <>
               {EmailPill}
-              {linkSent ? (
-                <div className="text-center">
-                  <div className="mx-auto w-14 h-14 border border-wl-border text-wl-gold flex items-center justify-center mb-5">
-                    <MailCheck size={24} strokeWidth={1.4} />
-                  </div>
-                  <div className="border-l-2 border-wl-gold bg-wl-gold-dim px-4 py-3.5 text-sm text-wl-ivory text-left">
-                    We&apos;ve sent a one-time sign-in link to <span className="font-medium break-all">{email}</span>. It expires in an hour.
-                  </div>
+              <div className="text-center">
+                <div className="mx-auto w-14 h-14 border border-wl-border text-wl-gold flex items-center justify-center mb-5">
+                  <MailCheck size={24} strokeWidth={1.4} />
                 </div>
-              ) : (
-                <>
-                  <p className="text-wl-ivory-dim text-sm leading-relaxed mb-6">
-                    You joined from the waitlist but haven&apos;t set a password yet. We&apos;ll email you a secure,
-                    one-time link to sign in and finish setting up your account.
-                  </p>
-                  <button type="button" onClick={handleSendLink} disabled={loading} className="w-full bg-wl-gold hover:bg-wl-gold-light text-wl-navy text-sm font-medium tracking-[0.08em] uppercase py-4 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_4px_24px_rgba(201,168,76,0.25)]">
-                    {loading ? "Sending…" : "Email me a sign-in link"}
-                  </button>
-                </>
-              )}
+                <div className="border-l-2 border-wl-gold bg-wl-gold-dim px-4 py-3.5 text-sm text-wl-ivory text-left">
+                  You joined from the waitlist, so we&apos;ve emailed a one-time sign-in link to <span className="font-medium break-all">{email}</span>. Open it to finish setting up your account. It expires in an hour.
+                </div>
+                <button type="button" onClick={handleResend} disabled={loading} className="mt-5 text-xs text-wl-muted hover:text-wl-gold transition-colors disabled:opacity-50">
+                  {loading ? "Sending…" : "Didn't get it? Resend"}
+                </button>
+              </div>
             </>
           )}
 

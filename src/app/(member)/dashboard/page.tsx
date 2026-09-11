@@ -87,14 +87,14 @@ export default async function MemberDashboardPage() {
     .filter((r) => UPCOMING.includes(r.status))
     .sort((a, b) => a.startDate.getTime() - b.startDate.getTime())
 
-  // Credits: 1 night hosted = 1 credit earned; 1 night stayed = 1 spent.
+  // Points: 1 night hosted = 1 point earned; 1 night stayed = 1 spent.
   const earned = user.hostedRequests
-    .filter((r) => r.status === "COMPLETED" && r.mode === "credits")
+    .filter((r) => r.status === "COMPLETED" && r.mode === "points")
     .reduce((s, r) => s + nights(r.startDate, r.endDate), 0)
   const spent = user.sentRequests
-    .filter((r) => r.status === "COMPLETED" && r.mode === "credits")
+    .filter((r) => r.status === "COMPLETED" && r.mode === "points")
     .reduce((s, r) => s + nights(r.startDate, r.endDate), 0)
-  const credits = earned - spent
+  const points = earned - spent
 
   const isVerified = user.verificationStatus === "FULLY_VERIFIED"
   const profileIncomplete = user.profileCompletion < PROFILE_COMPLETE_AT
@@ -226,9 +226,9 @@ export default async function MemberDashboardPage() {
 
   // Mock recommended homes
   const recommendedHomes = [
-    { city: "Geneva", country: "Switzerland", image: "/images/residence-geneva.png", nights: 7, credits: 7 },
-    { city: "Mayfair, London", country: "United Kingdom", image: "/images/residence-mayfair.png", nights: 5, credits: 5 },
-    { city: "Singapore", country: "Singapore", image: "/images/residence-singapore.png", nights: 10, credits: 10 }
+    { city: "Geneva", country: "Switzerland", image: "/images/residence-geneva.png", nights: 7, points: 7 },
+    { city: "Mayfair, London", country: "United Kingdom", image: "/images/residence-mayfair.png", nights: 5, points: 5 },
+    { city: "Singapore", country: "Singapore", image: "/images/residence-singapore.png", nights: 10, points: 10 }
   ];
 
   return (
@@ -246,15 +246,15 @@ export default async function MemberDashboardPage() {
 
         {/* 2. Member Status / Summary Strip */}
         <div className="flex flex-wrap lg:flex-nowrap gap-y-8 mb-12">
-          {/* Credits */}
-          <Link href="/dashboard/credits" className="w-1/2 lg:w-1/4 group lg:pr-8">
+          {/* Points */}
+          <Link href="/dashboard/points" className="w-1/2 lg:w-1/4 group lg:pr-8">
             <div className="font-display text-[32px] md:text-[40px] font-bold text-[var(--fg)] leading-none mb-1 group-hover:text-[var(--gold-dark)] transition-colors">
-              {credits}
+              {points}
             </div>
             <div className="flex flex-col">
-              <span className="font-sans text-[11px] font-medium text-[var(--gold)] uppercase tracking-[0.12em]">Credits</span>
+              <span className="font-sans text-[11px] font-medium text-[var(--gold)] uppercase tracking-[0.12em]">Points</span>
               <span className="font-sans text-[13px] text-[var(--fg)]/60 mt-1 pr-2">
-                {credits === 0 ? "Earn credits by hosting homes." : `Enough for up to ${credits} nights.`}
+                {points === 0 ? "Earn points by hosting homes." : `Enough for up to ${points} nights.`}
               </span>
             </div>
           </Link>
@@ -453,7 +453,7 @@ export default async function MemberDashboardPage() {
                   <h4 className="font-display text-[24px] font-bold text-[var(--fg)] leading-none mb-1">{home.city}</h4>
                   <div className="font-sans text-[13px] text-[var(--fg)]/70 mb-3">{home.country}</div>
                   <div className="font-sans text-[13px] text-[var(--fg)] font-medium">
-                    {home.nights} nights · {home.credits} credits
+                    {home.nights} nights · {home.points} points
                   </div>
                 </div>
               </Link>

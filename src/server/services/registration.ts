@@ -4,8 +4,9 @@ import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
 import { sendEmail, renderEmail, esc } from "@/server/email"
 import { logAudit } from "@/server/services/audit"
-import { grantCreditsOnce } from "@/server/services/credits"
+import { grantPointsOnce } from "@/server/services/points"
 import { consumeRegisterGrant } from "@/server/services/waitlist"
+import { kitTagAccountCreated } from "@/server/kit"
 import { registerSchema, passwordSchema, firstError } from "@/lib/validation/auth"
 
 const baseUrl = () => process.env.AUTH_URL || "http://localhost:3000"
@@ -135,8 +136,8 @@ export async function registerMember(input: RegisterInput) {
   // everyone else gets the usual verification link.
   const emailSent = preVerified ? false : await issueVerificationLink({ id: user.id, email, firstName }, fastTrack)
 
-  // Free sign-up credit (once per account).
-  await grantCreditsOnce(user.id, "welcome")
+  // Free sign-up point (once per account).
+  await grantPointsOnce(user.id, "welcome")
 
   await logAudit({
     action: "MEMBER_REGISTERED",
@@ -175,6 +176,27 @@ export async function issueLoginToken(userId: string): Promise<string> {
 }
 
 /**
+ * Mint a one-time sign-in token and hand it straight back to the browser (no
+ * email) so a waitlist member who has not set a password yet can walk into
+ * onboarding after only typing their address.
+ *
+ * DELIBERATE TRADE-OFF: this grants a session on knowledge of the email alone,
+ * which for guessable institutional addresses means anyone could enter as that
+ * person. It is intentionally scoped to passwordless (pre-password) accounts —
+ * the moment a password is set, `lookupLoginState` returns "password" and this
+ * path is never offered. Returns null for unknown addresses and for password
+ * accounts, so those fall through to normal login. See the login page for the
+ * product decision behind removing the inbox round-trip.
+ */
+export async function startPasswordlessSession(rawEmail: string): Promise<string | null> {
+  const email = rawEmail?.trim().toLowerCase()
+  if (!email || !EMAIL_RE.test(email)) return null
+  const user = await prisma.user.findUnique({ where: { email }, select: { id: true, passwordHash: true } })
+  if (!user || user.passwordHash) return null
+  return issueLoginToken(user.id)
+}
+
+/**
  * Create (or find) the member behind a confirmed waitlist invite and return a
  * one-time login token. The invite click already proved inbox ownership, so a
  * new account is created already EMAIL_VERIFIED and WITHOUT a password — they
@@ -210,12 +232,14 @@ export async function beginPasswordlessMember(input: {
     if (waitlisted && waitlisted.status !== "converted") {
       await prisma.waitlistEntry.update({ where: { email }, data: { status: "converted" } })
     }
-    await grantCreditsOnce(user.id, "welcome")
+    await grantPointsOnce(user.id, "welcome")
     await logAudit({
       action: "MEMBER_REGISTERED",
       subject: `New member (passwordless): ${user.fullName}`,
       metadata: { email, passwordless: true },
     })
+    // Move them into the 'account-created' Kit segment.
+    await kitTagAccountCreated(email)
   }
 
   return issueLoginToken(user.id)
@@ -248,7 +272,12 @@ export async function sendResumeLink(rawEmail: string) {
       ctaUrl: `${baseUrl()}/continue?token=${t}`,
       footnote: "If you did not request this, you can ignore this email.",
     }),
-    text: `Sign back in to UnSwap: ${baseUrl()}/continue?token=${t}\n\nThis link can be used once and expires in an hour.`,
+    text:
+      `Pick up where you left off, ${user.firstName}.\n\n` +
+      `Use the link below to sign back in and finish setting up your account:\n` +
+      `${baseUrl()}/continue?token=${t}\n\n` +
+      `For your security this link can be used once and expires in an hour.\n\n` +
+      `If you did not request this, you can ignore this email.`,
   })
   return { ok: true as const }
 }

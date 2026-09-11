@@ -34,7 +34,7 @@ const STEPS = [
   {
     n: "05",
     title: "Exchange",
-    body: "Use credits to stay without paying nightly accommodation rates.",
+    body: "Use points to stay without paying nightly accommodation rates.",
   },
 ];
 

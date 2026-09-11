@@ -1,5 +1,5 @@
 import { prisma } from "@/server/prisma"
-import { CREDIT_GRANTS } from "@/server/services/credits"
+import { POINT_GRANTS } from "@/server/services/points"
 
 /**
  * The "you are verified" moment.
@@ -10,7 +10,7 @@ import { CREDIT_GRANTS } from "@/server/services/credits"
  */
 export type PendingVerification = {
   firstName: string
-  credits: number
+  points: number
 } | null
 
 /**
@@ -23,14 +23,14 @@ export async function getPendingVerification(userId: string): Promise<PendingVer
     select: { firstName: true, verificationStatus: true, verifiedCelebratedAt: true },
   })
   if (!user || user.verificationStatus !== "FULLY_VERIFIED" || user.verifiedCelebratedAt) return null
-  return { firstName: user.firstName, credits: CREDIT_GRANTS.verified.amount }
+  return { firstName: user.firstName, points: POINT_GRANTS.verified.amount }
 }
 
 /**
  * Mark the moment as shown.
  *
- * Verification also grants credits, which would otherwise queue up a second
- * modal immediately behind this one. The credit shown inside this celebration
+ * Verification also grants points, which would otherwise queue up a second
+ * modal immediately behind this one. The point shown inside this celebration
  * is the same one, so both markers move together and the member sees a single
  * coherent moment rather than two popups fighting for the same screen.
  */
@@ -38,6 +38,6 @@ export async function markVerificationCelebrated(userId: string) {
   const now = new Date()
   await prisma.user.update({
     where: { id: userId },
-    data: { verifiedCelebratedAt: now, creditsCelebratedAt: now },
+    data: { verifiedCelebratedAt: now, pointsCelebratedAt: now },
   })
 }

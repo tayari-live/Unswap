@@ -17,8 +17,8 @@ export const dynamic = "force-dynamic"
 
 const EXCHANGE_LABEL: Record<string, string> = {
   simultaneous: "Simultaneous only",
-  credits: "Credits only",
-  either: "Simultaneous or credits",
+  points: "Points only",
+  either: "Simultaneous or points",
 }
 const DURATION_LABEL: Record<string, string> = {
   short_term: "Short-term", medium_term: "Medium-term", long_term: "Long-term", extended: "Extended rotation",

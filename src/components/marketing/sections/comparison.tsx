@@ -16,7 +16,7 @@ import { Reveal } from "../reveal";
 const ROWS = [
   ["Open marketplace", "Closed network"],
   ["Strangers", "Verified professionals"],
-  ["Pay nightly rates", "Exchange credits"],
+  ["Pay nightly rates", "Exchange points"],
   ["Reviews after the fact", "Institutional identity + trust"],
   ["Transaction focused", "Community focused"],
 ];

@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
 import { Coins, ArrowUpRight, ArrowDownRight, Info } from "lucide-react"
 import { auth } from "@/server/auth"
-import { getCreditsLedger } from "@/server/services/credits"
+import { getPointsLedger } from "@/server/services/points"
 import { LuxPageHeader } from "@/components/ui/lux"
 import { PageTip } from "@/components/ui/page-tip"
 
@@ -11,17 +11,17 @@ function fmt(d: Date) {
   return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(d)
 }
 
-export default async function CreditsPage() {
+export default async function PointsPage() {
   const session = await auth()
   const userId = (session?.user as any)?.id as string | undefined
   if (!userId) redirect("/login")
 
-  const { balance, earned, spent, transactions } = await getCreditsLedger(userId)
+  const { balance, earned, spent, transactions } = await getPointsLedger(userId)
 
   return (
     <div className="max-w-3xl mx-auto pb-12">
-      <LuxPageHeader eyebrow="Balance" title="UnSwap Credits" subtitle="Host now, stay later. Your non-simultaneous exchange balance." />
-      <PageTip id="credits">One credit is one night. Earn them by hosting or through milestones, and spend them to stay with a peer when you are not swapping at the same time.</PageTip>
+      <LuxPageHeader eyebrow="Balance" title="UnSwap Points" subtitle="Host now, stay later. Your non-simultaneous exchange balance." />
+      <PageTip id="points">One point is one night. Earn them by hosting or through milestones, and spend them to stay with a peer when you are not swapping at the same time.</PageTip>
 
       {/* Balance + summary */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
@@ -30,7 +30,7 @@ export default async function CreditsPage() {
             <Coins size={15} className="text-[var(--gold)]" /> Balance
           </div>
           <div className="mt-3 font-sans text-4xl font-bold">{balance}</div>
-          <div className="text-xs text-white/50 mt-1">credit{balance === 1 ? "" : "s"} available</div>
+          <div className="text-xs text-white/50 mt-1">point{balance === 1 ? "" : "s"} available</div>
         </div>
         <div className="bg-surface rounded-md border border-[var(--hair)] p-6">
           <div className="text-xs text-neutral uppercase tracking-wide font-semibold">Earned</div>
@@ -46,7 +46,7 @@ export default async function CreditsPage() {
 
       <div className="flex items-start gap-2.5 text-xs text-neutral bg-[var(--navy)]/5 border border-[var(--gold)]/20 rounded-xl p-3 mb-6">
         <Info size={16} className="text-[var(--gold-dark)] flex-shrink-0 mt-0.5" />
-        <span>1 night hosted earns 1 credit. 1 credit redeems 1 night at any member&apos;s home through a non-simultaneous swap.</span>
+        <span>1 night hosted earns 1 point. 1 point redeems 1 night at any member&apos;s home through a non-simultaneous swap.</span>
       </div>
 
       {/* Ledger */}
@@ -55,7 +55,7 @@ export default async function CreditsPage() {
           <h2 className="font-sans font-semibold text-xl text-[var(--fg)]">Earn & spend history</h2>
         </div>
         {transactions.length === 0 ? (
-          <p className="px-6 py-10 text-center text-sm text-neutral">No credit activity yet. Host a member to start earning.</p>
+          <p className="px-6 py-10 text-center text-sm text-neutral">No point activity yet. Host a member to start earning.</p>
         ) : (
           <div className="divide-y divide-[var(--hair)]">
             {transactions.map((t) => (

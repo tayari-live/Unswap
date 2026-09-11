@@ -124,7 +124,7 @@ export function renderEmail(opts: {
     : ""
 
   const preview = preheader
-    ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all;">${preheader}${"&#8199;&#65279;&#847; ".repeat(60)}</div>`
+    ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all;">${preheader}${"&#8199;&#65279;&#847; ".repeat(12)}</div>`
     : ""
 
   return `<!--[if mso]><style>body,table,td{font-family:Arial,sans-serif !important}</style><![endif]-->

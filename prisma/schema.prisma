@@ -55,12 +55,13 @@ model User {
   // member opens their notifications page.
   notificationsSeenAt DateTime?
 
-  // Last time the member saw the credit celebration. Kept separate from
+  // Last time the member saw the points celebration. Kept separate from
   // notificationsSeenAt so opening the bell never swallows the celebration.
-  creditsCelebratedAt DateTime?
+  // Column name kept as "creditsCelebratedAt" (via @map) to avoid a rename.
+  pointsCelebratedAt DateTime? @map("creditsCelebratedAt")
 
   // Set once the member has been shown the "you are verified" moment. Separate
-  // from creditsCelebratedAt so the two never swallow one another.
+  // from pointsCelebratedAt so the two never swallow one another.
   verifiedCelebratedAt DateTime?
 
   // Presence: bumped on activity; recent value => "online" in chat.
@@ -91,7 +92,7 @@ model User {
   reviewsWritten     Review[]                 @relation("ReviewAuthor")
   reviewsReceived    Review[]                 @relation("ReviewSubject")
   reportsMade        Report[]                 @relation("ReportReporter")
-  creditTransactions CreditTransaction[]      @relation("CreditUser")
+  pointTransactions  PointTransaction[]       @relation("PointUser")
 
   @@index([verificationStatus])
   @@index([role])
@@ -277,7 +278,7 @@ model Listing {
   maxGuests       Int      @default(2)
   description     String?
   primaryPhotoUrl String?  // mirrors the first gallery photo, for card rendering
-  exchangeType    String   @default("either") // simultaneous | credits | either
+  exchangeType    String   @default("either") // simultaneous | points | either
   status          String   @default("DRAFT")  // DRAFT | ACTIVE | PAUSED | ARCHIVED
   flagged         Boolean  @default(false)
   autoPaused      Boolean  @default(false) // paused by the system on subscription lapse
@@ -307,26 +308,29 @@ model Listing {
   @@index([city])
 }
 
-// A credit ledger entry. Host earns on a completed credits swap; requester
-// spends. Earned credits are PENDING on confirmation, CONFIRMED on completion.
-model CreditTransaction {
+// A points ledger entry. Host earns on a completed points swap; requester
+// spends. Earned points are PENDING on confirmation, CONFIRMED on completion.
+// The physical table stays "CreditTransaction" (via @@map) so this rename needs
+// no table migration — only the code moves from "credits" to "points".
+model PointTransaction {
   id        String   @id @default(uuid())
   userId    String
   swapId    String?
   type      String   // earned | spent
-  amount    Int      // whole credits (positive)
+  amount    Int      // whole points (positive)
   status    String   @default("confirmed") // pending | confirmed
-  reason    String?  // free-credit grant source: welcome | first_listing | verified | first_subscription (null for swap txns)
+  reason    String?  // free-points grant source: welcome | first_listing | verified | first_subscription (null for swap txns)
   createdAt DateTime @default(now())
 
-  user      User     @relation("CreditUser", fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation("PointUser", fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, status])
-  // One free-credit grant per member per reason, enforced by the database.
+  // One free-points grant per member per reason, enforced by the database.
   // The service checked before inserting, but two concurrent calls could both
   // pass that check. Swap transactions carry reason = NULL, and Postgres treats
   // NULLs as distinct, so they are unaffected by this constraint.
   @@unique([userId, reason])
+  @@map("CreditTransaction")
 }
 
 // A gallery photo for a listing. position 0 is the primary card image.
@@ -362,7 +366,7 @@ model SwapRequest {
   requesterId String
   hostId      String
   listingId   String
-  mode        String   // simultaneous | credits
+  mode        String   // simultaneous | points
   startDate   DateTime
   endDate     DateTime
   guests      Int      @default(1)

@@ -33,7 +33,7 @@ const KIND: Record<NotificationKind, { icon: typeof Bell; tone: string }> = {
   verification: { icon: ShieldAlert, tone: "bg-[var(--navy)]/5 text-[var(--gold-dark)]" },
   verified: { icon: ShieldCheck, tone: "bg-[var(--teal)]/15 text-[var(--teal)]" },
   rejected: { icon: ShieldX, tone: "bg-[var(--crimson)]/10 text-[var(--crimson)]" },
-  credit: { icon: Coins, tone: "bg-[var(--gold)]/15 text-[var(--gold-dark)]" },
+  point: { icon: Coins, tone: "bg-[var(--gold)]/15 text-[var(--gold-dark)]" },
   profile: { icon: UserCircle, tone: "bg-[var(--navy)]/10 text-[var(--fg)]" },
   membership: { icon: CreditCard, tone: "bg-[var(--gold)]/15 text-[var(--gold-dark)]" },
 }

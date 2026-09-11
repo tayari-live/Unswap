@@ -3,7 +3,7 @@ import { ApiError } from "@/server/http"
 import { logAudit } from "@/server/services/audit"
 import { sendEmail, renderEmail, esc } from "@/server/email"
 import { notifyAllowed } from "@/server/services/notify"
-import { getAvailableCredits } from "@/server/services/credits"
+import { getAvailablePoints } from "@/server/services/points"
 
 const APP = () => process.env.AUTH_URL || "http://localhost:3000"
 const fmtD = (d: Date) =>
@@ -79,7 +79,7 @@ export async function listMemberSwaps(userId: string) {
 
 const DAY = 24 * 60 * 60 * 1000
 const nightsBetween = (s: Date, e: Date) => Math.max(1, Math.round((e.getTime() - s.getTime()) / DAY))
-// Short-term hosting (7–14 nights) earns credits at an accelerated 1.5× rate.
+// Short-term hosting (7–14 nights) earns points at an accelerated 1.5× rate.
 const earnAmount = (n: number) => (n >= 7 && n <= 14 ? Math.ceil(n * 1.5) : n)
 
 /**
@@ -89,23 +89,23 @@ const earnAmount = (n: number) => (n >= 7 && n <= 14 ? Math.ceil(n * 1.5) : n)
  * subscription renewal date.
  */
 /**
- * A credits stay must be fully funded. Checked when the request is made so the
+ * A points stay must be fully funded. Checked when the request is made so the
  * requester finds out immediately, and again on acceptance because the dates
  * (and therefore the cost) can change through a counter-offer, and other swaps
  * may have been accepted in between. A shortfall blocks: balances never go
  * negative.
  */
-async function assertCanAffordCredits(requesterId: string, start: Date, end: Date, atAccept = false) {
+async function assertCanAffordPoints(requesterId: string, start: Date, end: Date, atAccept = false) {
   const cost = nightsBetween(start, end)
-  const { available } = await getAvailableCredits(requesterId)
+  const { available } = await getAvailablePoints(requesterId)
   if (available >= cost) return
 
   const short = cost - available
   throw new ApiError(
     402,
     atAccept
-      ? `This exchange costs ${cost} credit${cost === 1 ? "" : "s"} and the requester is ${short} short. They need to earn more credits before it can be accepted.`
-      : `This stay costs ${cost} credit${cost === 1 ? "" : "s"} and you have ${available} available. Host a fellow member to earn ${short} more, or choose a simultaneous exchange.`,
+      ? `This exchange costs ${cost} point${cost === 1 ? "" : "s"} and the requester is ${short} short. They need to earn more points before it can be accepted.`
+      : `This stay costs ${cost} point${cost === 1 ? "" : "s"} and you have ${available} available. Host a fellow member to earn ${short} more, or choose a simultaneous exchange.`,
   )
 }
 
@@ -158,7 +158,7 @@ async function assertConfirmable(
 }
 
 /**
- * Finalise a completed exchange: set status, post credits (host earns, requester
+ * Finalise a completed exchange: set status, post points (host earns, requester
  * spends), and prompt both parties to review. Shared by manual completion and
  * the auto-complete cron. Idempotent — only acts on confirmed/in-progress swaps.
  */
@@ -175,17 +175,17 @@ export async function completeSwap(swapId: string) {
 
   await prisma.swapRequest.update({ where: { id: swapId }, data: { status: "COMPLETED", completedAt: new Date() } })
 
-  if (swap.mode === "credits") {
+  if (swap.mode === "points") {
     const nights = nightsBetween(swap.startDate, swap.endDate)
     // Confirm the host's pending earn (or create it), and record the spend.
-    const earned = await prisma.creditTransaction.updateMany({
+    const earned = await prisma.pointTransaction.updateMany({
       where: { swapId, type: "earned", status: "pending" },
       data: { status: "confirmed" },
     })
     if (earned.count === 0) {
-      await prisma.creditTransaction.create({ data: { userId: swap.hostId, swapId, type: "earned", amount: earnAmount(nights), status: "confirmed" } })
+      await prisma.pointTransaction.create({ data: { userId: swap.hostId, swapId, type: "earned", amount: earnAmount(nights), status: "confirmed" } })
     }
-    await prisma.creditTransaction.create({ data: { userId: swap.requesterId, swapId, type: "spent", amount: nights, status: "confirmed" } })
+    await prisma.pointTransaction.create({ data: { userId: swap.requesterId, swapId, type: "spent", amount: nights, status: "confirmed" } })
   }
 
   // Prompt both parties to review.
@@ -233,7 +233,7 @@ export async function createSwapRequest(input: {
   if (listing.ownerId === input.requesterId) throw new ApiError(400, "You cannot request your own listing.")
 
   // Mode must be compatible with the listing's exchange preference.
-  if (!["simultaneous", "credits"].includes(input.mode)) throw new ApiError(400, "Choose a valid swap mode.")
+  if (!["simultaneous", "points"].includes(input.mode)) throw new ApiError(400, "Choose a valid swap mode.")
   if (listing.exchangeType !== "either" && listing.exchangeType !== input.mode) {
     throw new ApiError(400, `This home only accepts ${listing.exchangeType} exchanges.`)
   }
@@ -263,9 +263,9 @@ export async function createSwapRequest(input: {
     if (!fits) throw new ApiError(400, "Your stay length doesn't match this home's offered swap durations.")
   }
 
-  // A credits stay is funded by the requester, so refuse one they cannot cover.
-  if (input.mode === "credits") {
-    await assertCanAffordCredits(input.requesterId, start, end)
+  // A points stay is funded by the requester, so refuse one they cannot cover.
+  if (input.mode === "points") {
+    await assertCanAffordPoints(input.requesterId, start, end)
   }
 
   const swap = await prisma.swapRequest.create({
@@ -331,7 +331,7 @@ export async function respondToSwap(input: {
   const isRequester = swap.requesterId === input.userId
   if (!isHost && !isRequester) throw new ApiError(403, "You are not part of this swap.")
 
-  // Completion runs through the shared helper (posts credits, prompts reviews).
+  // Completion runs through the shared helper (posts points, prompts reviews).
   if (input.action === "complete") {
     if (!["CONFIRMED", "IN_PROGRESS"].includes(swap.status)) throw new ApiError(409, "Only a confirmed exchange can be completed.")
     await completeSwap(swap.id)
@@ -390,10 +390,10 @@ export async function respondToSwap(input: {
   const accepting = input.action === "accept" || input.action === "accept_counter"
 
   // Re-check funding before confirming: a counter-offer may have changed the
-  // dates, and the requester may have committed credits elsewhere since. This
+  // dates, and the requester may have committed points elsewhere since. This
   // runs before the update so a shortfall leaves the swap untouched.
-  if (accepting && swap.mode === "credits") {
-    await assertCanAffordCredits(
+  if (accepting && swap.mode === "points") {
+    await assertCanAffordPoints(
       swap.requesterId,
       (data.startDate as Date) ?? swap.startDate,
       (data.endDate as Date) ?? swap.endDate,
@@ -403,9 +403,9 @@ export async function respondToSwap(input: {
 
   await prisma.swapRequest.update({ where: { id: swap.id }, data })
 
-  // Credits mode: confirming creates the host's pending earn (posted on completion).
-  if (accepting && swap.mode === "credits") {
-    await prisma.creditTransaction.create({
+  // Points mode: confirming creates the host's pending earn (posted on completion).
+  if (accepting && swap.mode === "points") {
+    await prisma.pointTransaction.create({
       data: { userId: swap.hostId, swapId: swap.id, type: "earned", amount: earnAmount(nightsBetween(swap.startDate, swap.endDate)), status: "pending" },
     })
   }
@@ -541,7 +541,7 @@ async function progressConfirmed(): Promise<number> {
   return r.count
 }
 
-/** Auto-complete swaps whose end date has passed (posts credits, prompts reviews). */
+/** Auto-complete swaps whose end date has passed (posts points, prompts reviews). */
 async function autoCompleteDue(): Promise<number> {
   const due = await prisma.swapRequest.findMany({
     where: { status: { in: ["CONFIRMED", "IN_PROGRESS"] }, endDate: { lte: new Date() } },

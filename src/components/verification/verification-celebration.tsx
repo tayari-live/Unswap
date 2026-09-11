@@ -6,12 +6,12 @@ import Link from "next/link"
 import confetti from "canvas-confetti"
 import { BadgeCheck, Search, Home, Coins, X } from "lucide-react"
 
-type Pending = { firstName: string; credits: number }
+type Pending = { firstName: string; points: number }
 
 const GOLD = ["#c9a84c", "#e4c97a", "#f5f0e8"]
 
 /**
- * A longer, slower burst than the credit one. This is the moment the network
+ * A longer, slower burst than the point one. This is the moment the network
  * actually opens to them, so it should feel like arrival rather than a
  * notification. zIndex clears the dialog: canvas-confetti mounts its canvas at
  * 100 by default, which would put the particles behind the backdrop.
@@ -146,12 +146,12 @@ export function VerificationCelebration() {
           ))}
         </ul>
 
-        {pending.credits > 0 && (
+        {pending.points > 0 && (
           <div className="mt-5 flex items-center justify-center gap-2.5 text-sm text-neutral">
             <Coins size={16} strokeWidth={1.5} className="text-[var(--gold)]" />
             <span>
-              <span className="font-sans text-lg font-light text-[var(--gold)]">+{pending.credits}</span>{" "}
-              credit{pending.credits === 1 ? "" : "s"} added to get you started
+              <span className="font-sans text-lg font-light text-[var(--gold)]">+{pending.points}</span>{" "}
+              point{pending.points === 1 ? "" : "s"} added to get you started
             </span>
           </div>
         )}

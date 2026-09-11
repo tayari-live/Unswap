@@ -90,7 +90,7 @@ export default async function MyListingsPage() {
           </div>
           <h2 className="font-display text-[32px] font-bold text-[var(--fg)] mb-3 leading-tight">Your home can open a door for someone else.</h2>
           <p className="font-sans text-[15px] text-[var(--fg)]/65 mb-8 max-w-md mx-auto">
-            List a home and earn credits that you can use to stay in another member's home across the UnSwap network.
+            List a home and earn points that you can use to stay in another member's home across the UnSwap network.
           </p>
           <Link
             href="/dashboard/listings/new"

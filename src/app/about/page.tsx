@@ -18,7 +18,7 @@ export default function AboutPage() {
           UN and IO professionals face mandatory geographic rotations every two to three years. Commercial accommodation in duty-station cities — New York, Geneva, Vienna, Nairobi, Rome, Paris — is prohibitively expensive for short and medium-term stays, while a professional&apos;s own home sits empty and unprotected.
         </p>
         <p>
-          UnSwap turns that empty home into a living asset. Members exchange homes — simultaneously, or non-simultaneously using UnSwap Credits — eliminating accommodation costs at both ends of a posting.
+          UnSwap turns that empty home into a living asset. Members exchange homes — simultaneously, or non-simultaneously using UnSwap Points — eliminating accommodation costs at both ends of a posting.
         </p>
       </LegalSection>
 

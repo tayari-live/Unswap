@@ -3,7 +3,15 @@ import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
 import { logAudit } from "@/server/services/audit"
 import { sendEmail, renderEmail, esc, emailConfigured } from "@/server/email"
-import { kitAddToForm, kitUpdateReferralCount } from "@/server/kit"
+import {
+  kitUpsertSubscriber,
+  kitTagUnswap,
+  kitTagJoined,
+  kitTagConfirmed,
+  kitTagReferrer,
+  kitUpdateReferralCount,
+} from "@/server/kit"
+import { waitlisterAddSubscriber, getWaitlisterSubscriber } from "@/server/waitlister"
 
 const baseUrl = () => process.env.AUTH_URL || "http://localhost:3000"
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -27,7 +35,11 @@ async function uniqueReferralCode(): Promise<string> {
 }
 
 const referralUrl = (code: string) => `${baseUrl()}/waitlist?ref=${code}`
-const confirmUrl = (token: string) => `${baseUrl()}/api/waitlist/confirm?token=${token}`
+// Points at the read-only interstitial, not the mutating API route: nothing is
+// confirmed until the person taps the button on /continue, so a scanner that
+// pre-fetches the link can't burn it. The API GET still redirects here too, for
+// invite links already sitting in inboxes.
+const confirmUrl = (token: string) => `${baseUrl()}/continue?ct=${token}`
 
 /**
  * The exclusive-invite email, sent from here rather than triggered as a Kit
@@ -130,6 +142,31 @@ export async function initiateWaitlist(input: { name: string; email: string; org
   const sent = await sendJoinEmail(email, firstName, token)
   const referralCode = created!.referralCode // set by the update (existing) or create branch above
 
+  // Mirror the signup onto our providers (Option A: added at signup, before
+  // confirmation). Both are fail-safe no-ops when unconfigured, filter junk and
+  // scanner addresses, and run in parallel so neither slows the response. Kit
+  // tags 'waitlist-joined'; Waitlister gets the hosted-list entry.
+  const kitFields: Record<string, string> = {}
+  if (organisation) kitFields.organisation = organisation
+  if (referredBy) kitFields.referred_by = referredBy
+  await Promise.allSettled([
+    (async () => {
+      await kitUpsertSubscriber(email, { firstName, fields: kitFields })
+      // 'unswap' is the blanket source tag (the moment they're added); then the
+      // 'waitlist-joined' milestone.
+      await kitTagUnswap(email)
+      await kitTagJoined(email)
+    })(),
+    waitlisterAddSubscriber({
+      email,
+      name: `${firstName} ${lastName}`.trim(),
+      // Raw incoming code, not our resolved one: Waitlister owns the referral
+      // loop now, so its codes (not ours) are what should be forwarded.
+      referredBy: input.ref?.trim() || undefined,
+      metadata: organisation ? { organisation } : undefined,
+    }),
+  ])
+
   await logAudit({ action: "WAITLIST_INITIATED", subject: `${firstName} ${lastName}`, metadata: { email, referredBy } })
 
   // Without a mail token (local dev), hand back the link so the flow is testable.
@@ -181,9 +218,12 @@ export async function confirmWaitlist(token: string) {
     if (referrer) {
       const updated = await prisma.waitlistEntry.update({ where: { id: referrer.id }, data: { referrals: { increment: 1 } } })
       await kitUpdateReferralCount(referrer.email, updated.referrals)
+      await kitTagReferrer(referrer.email)
     }
   }
-  await kitAddToForm(entry.email)
+  // Confirmed: they were added to Kit at signup, so just move them to the
+  // 'waitlist-confirmed' segment.
+  await kitTagConfirmed(entry.email)
 
   const position = await positionOf({ referrals: entry.referrals, confirmedAt })
   await logAudit({ action: "WAITLIST_CONFIRMED", subject: `${entry.firstName} ${entry.lastName}`, metadata: { email: entry.email } })
@@ -268,15 +308,23 @@ export async function getWaitlistStatusByCode(rawCode: string) {
   // position — computed as if they confirmed now — and flag it as pending so the
   // page can say the email is on its way.
   const pending = !e.confirmedAt
-  const position = await positionOf({ referrals: e.referrals, confirmedAt: e.confirmedAt ?? new Date() })
+  const ownPosition = await positionOf({ referrals: e.referrals, confirmedAt: e.confirmedAt ?? new Date() })
+
+  // Waitlister is the referral engine: prefer its live referral code and figures
+  // so referring visibly moves the member up. Falls back to our own values when
+  // Waitlister is unconfigured or unreachable, so the page always renders.
+  const wl = await getWaitlisterSubscriber(e.email)
+  const refCode = wl?.referralCode ?? e.referralCode
+  const position = wl?.inflatedPosition ?? wl?.position ?? ownPosition
   return {
     found: true as const,
     pending,
     firstName: e.firstName,
-    referralCode: e.referralCode,
-    referralUrl: referralUrl(e.referralCode),
+    referralCode: refCode,
+    referralUrl: referralUrl(refCode),
     position,
-    referrals: e.referrals,
+    referrals: wl?.referralCount ?? e.referrals,
+    points: wl?.points,
     earlyBird: position <= EARLY_BIRD_CAP,
   }
 }

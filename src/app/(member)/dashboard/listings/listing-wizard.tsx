@@ -44,9 +44,9 @@ const DURATIONS: { v: string; l: string; d: string; icon: LucideIcon }[] = [
   { v: "extended", l: "Extended rotation", d: "181–548 days · full duty-station rotation", icon: Calendar },
 ]
 const EXCHANGE_TYPES: { v: string; l: string; d: string; icon: LucideIcon }[] = [
-  { v: "either", l: "Either", d: "Appears in all searches, simultaneous or credits", icon: Shuffle },
+  { v: "either", l: "Either", d: "Appears in all searches, simultaneous or points", icon: Shuffle },
   { v: "simultaneous", l: "Simultaneous", d: "We swap homes at the same time", icon: Repeat },
-  { v: "credits", l: "Credits", d: "Host now, earn credits to stay later", icon: Coins },
+  { v: "points", l: "Points", d: "Host now, earn points to stay later", icon: Coins },
 ]
 const ACCEPT = ["image/png", "image/jpeg", "image/webp"]
 const MAX_BYTES = 10 * 1024 * 1024
@@ -562,7 +562,7 @@ export function ListingWizard({
         {/* 8 — Exchange type */}
         {step === 8 && (
           <div>
-            <Heading title="How do you want to exchange?" sub="Simultaneous swaps happen at the same time; credits let you host now and stay elsewhere later." />
+            <Heading title="How do you want to exchange?" sub="Simultaneous swaps happen at the same time; points let you host now and stay elsewhere later." />
             <div className="grid sm:grid-cols-3 gap-3">
               {EXCHANGE_TYPES.map((t) => (
                 <IconCard key={t.v} icon={t.icon} title={t.l} desc={t.d} selected={v.exchangeType === t.v} onClick={() => set("exchangeType", t.v)} />

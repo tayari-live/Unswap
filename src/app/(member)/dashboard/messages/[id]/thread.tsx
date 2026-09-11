@@ -317,8 +317,8 @@ export function Thread({
   const guests = swapRequest?.guests || 1
   const arrival = swapRequest?.startDate ? new Intl.DateTimeFormat("en-GB", { month: "short", day: "numeric" }).format(new Date(swapRequest.startDate)) : "--"
   const departure = swapRequest?.endDate ? new Intl.DateTimeFormat("en-GB", { month: "short", day: "numeric" }).format(new Date(swapRequest.endDate)) : "--"
-  // SwapRequest.mode is "simultaneous" | "credits".
-  const exchangeType = swapRequest?.mode === "credits" ? "Credits" : "Simultaneous"
+  // SwapRequest.mode is "simultaneous" | "points".
+  const exchangeType = swapRequest?.mode === "points" ? "Points" : "Simultaneous"
   // Human-readable swap stage for the header chip.
   const SWAP_STAGE: Record<string, string> = {
     REQUESTED: "Requested",

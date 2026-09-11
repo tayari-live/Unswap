@@ -13,10 +13,10 @@ const labelCls = LABEL
 const MODE_OPTIONS: Record<string, { value: string; label: string }[]> = {
   either: [
     { value: "simultaneous", label: "Simultaneous (we swap at the same time)" },
-    { value: "credits", label: "Credits (I stay now, host earns credits)" },
+    { value: "points", label: "Points (I stay now, host earns points)" },
   ],
   simultaneous: [{ value: "simultaneous", label: "Simultaneous (we swap at the same time)" }],
-  credits: [{ value: "credits", label: "Credits (I stay now, host earns credits)" }],
+  points: [{ value: "points", label: "Points (I stay now, host earns points)" }],
 }
 
 // Must mirror the server's duration bands in services/swaps.ts (nights, inclusive).
@@ -209,7 +209,7 @@ export function SwapRequestForm({
         <div>
           <label htmlFor="mode" className={labelCls}>Mode</label>
           <select id="mode" value={mode} onChange={(e) => setMode(e.target.value)} className={inputCls} disabled={modes.length === 1}>
-            {modes.map((m) => <option key={m.value} value={m.value}>{m.value === "simultaneous" ? "Simultaneous" : "Credits"}</option>)}
+            {modes.map((m) => <option key={m.value} value={m.value}>{m.value === "simultaneous" ? "Simultaneous" : "Points"}</option>)}
           </select>
         </div>
       </div>

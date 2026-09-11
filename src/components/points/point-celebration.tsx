@@ -33,15 +33,15 @@ function burst() {
 }
 
 /**
- * Congratulates a member the first time they earn free credits (welcome bonus,
+ * Congratulates a member the first time they earn free points (welcome bonus,
  * first listing, identity verified, first subscription). Polls once per route
  * change rather than on a timer, so it costs nothing while idle.
  */
-export function CreditCelebration() {
+export function PointsCelebration() {
   const pathname = usePathname()
   const [grants, setGrants] = useState<Grant[]>([])
   const [open, setOpen] = useState(false)
-  // Grants already celebrated in this tab. Clicking "View my credits" navigates
+  // Grants already celebrated in this tab. Clicking "View my points" navigates
   // immediately, so the next route's check can otherwise outrun the POST below
   // and show the same grants a second time.
   const dismissed = useRef<Set<string>>(new Set())
@@ -56,7 +56,7 @@ export function CreditCelebration() {
         // Let any in-flight "mark celebrated" settle first.
         if (marking.current) await marking.current
         if (cancelled) return
-        const res = await fetch("/api/credits/celebrate", { cache: "no-store" })
+        const res = await fetch("/api/points/celebrate", { cache: "no-store" })
         if (!res.ok) return
         const data = await res.json()
         if (cancelled || !data.grants?.length) return
@@ -77,7 +77,7 @@ export function CreditCelebration() {
     // Record synchronously, before any await, so a navigation triggered by the
     // same click cannot re-show these grants.
     grants.forEach((g) => dismissed.current.add(g.id))
-    const done = fetch("/api/credits/celebrate", { method: "POST" }).catch(() => {
+    const done = fetch("/api/points/celebrate", { method: "POST" }).catch(() => {
       /* if this fails the member simply sees it again on a later visit */
     })
     marking.current = done
@@ -101,7 +101,7 @@ export function CreditCelebration() {
     <div
       role="dialog"
       aria-modal="true"
-      aria-labelledby="credit-celebration-title"
+      aria-labelledby="point-celebration-title"
       className="fixed inset-0 z-modal flex items-center justify-center overflow-y-auto p-6 bg-[rgba(10,14,26,0.72)] backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]"
       onClick={dismiss}
     >
@@ -125,19 +125,19 @@ export function CreditCelebration() {
         <div className="flex items-center justify-center gap-3 mb-3">
           <span className="h-px w-10 bg-gradient-to-r from-transparent to-[var(--gold-soft)]/50" />
           <span className="text-[11px] tracking-[0.28em] uppercase font-medium text-[var(--gold-soft)]">
-            Credits Earned
+            Points Earned
           </span>
           <span className="h-px w-10 bg-gradient-to-l from-transparent to-[var(--gold-soft)]/50" />
         </div>
 
-        <h2 id="credit-celebration-title" className="font-sans font-semibold text-[2.5rem] leading-none text-[var(--fg)]">
-          +{total} <span className="text-[var(--gold)]">{total === 1 ? "credit" : "credits"}</span>
+        <h2 id="point-celebration-title" className="font-sans font-semibold text-[2.5rem] leading-none text-[var(--fg)]">
+          +{total} <span className="text-[var(--gold)]">{total === 1 ? "point" : "points"}</span>
         </h2>
 
         <p className="mt-4 text-sm text-neutral leading-relaxed">
           {multiple
             ? "Nicely done. You have unlocked several rewards:"
-            : "Nicely done. One credit is one night in a fellow member's home."}
+            : "Nicely done. One point is one night in a fellow member's home."}
         </p>
 
         <ul className="mt-5 space-y-2 text-left">
@@ -154,11 +154,11 @@ export function CreditCelebration() {
 
         <div className="mt-7 flex flex-col sm:flex-row gap-3 justify-center">
           <Link
-            href="/dashboard/credits"
+            href="/dashboard/points"
             onClick={dismiss}
             className="inline-flex justify-center items-center gap-2 text-[12px] font-medium uppercase tracking-[0.12em] text-ink bg-[var(--gold)] hover:bg-[var(--gold-hover)] px-6 py-3 rounded-sm transition-colors"
           >
-            View my credits
+            View my points
           </Link>
           <button
             type="button"

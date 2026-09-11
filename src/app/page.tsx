@@ -6,7 +6,7 @@ import { TrustStrip } from "@/components/marketing/sections/trust-strip";
 import { Problem } from "@/components/marketing/sections/problem";
 import { Network } from "@/components/marketing/sections/network";
 import { HowItWorks } from "@/components/marketing/sections/how-it-works";
-import { Credits } from "@/components/marketing/sections/credits";
+import { Points } from "@/components/marketing/sections/points";
 import { Comparison } from "@/components/marketing/sections/comparison";
 import { Trust } from "@/components/marketing/sections/trust";
 import { Cities } from "@/components/marketing/sections/cities";
@@ -29,7 +29,7 @@ export const metadata = {
  *
  *   Who is this for?         Hero, trust strip
  *   What is the problem?     Problem
- *   Why is UnSwap different? Network, credits, comparison
+ *   Why is UnSwap different? Network, points, comparison
  *   How does it work?        How it works
  *   Can I trust it?          Trust & safety, community
  *   Where can I use it?      Cities
@@ -55,7 +55,7 @@ export default function LandingPage() {
         <Problem />
         <Network />
         <HowItWorks />
-        <Credits />
+        <Points />
         <Comparison />
         <Trust />
         <Proof />

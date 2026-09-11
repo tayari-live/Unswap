@@ -102,7 +102,7 @@ export async function buildAgreementPdf(userId: string, swapId: string): Promise
   row("Dates", `${fmt(swap.startDate)} – ${fmt(swap.endDate)}`)
   row("Duration", `${nights} night${nights === 1 ? "" : "s"}`)
   row("Guests", String(swap.guests))
-  row("Mode", swap.mode === "credits" ? "Non-simultaneous (UnSwap Credits)" : "Simultaneous exchange")
+  row("Mode", swap.mode === "points" ? "Non-simultaneous (UnSwap Points)" : "Simultaneous exchange")
   row("Status", swap.status.replace("_", " "))
   y -= 6
 

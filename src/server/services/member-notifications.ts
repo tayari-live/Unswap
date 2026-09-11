@@ -1,7 +1,7 @@
 import { prisma } from "@/server/prisma"
 import { getUnreadByConversation } from "@/server/services/messaging"
 import { pendingReviewsFor } from "@/server/services/reviews"
-import { CREDIT_GRANTS, type GrantReason } from "@/server/services/credits"
+import { POINT_GRANTS, type GrantReason } from "@/server/services/points"
 import { PROFILE_COMPLETE_AT } from "@/server/services/profile"
 
 import type { NotificationKind } from "@/lib/notification-categories"
@@ -15,8 +15,8 @@ export type MemberNotification = {
   link: string
 }
 
-// Only free-credit grants (last 30 days) surface as notifications; hosting-earned
-// credits already get context from their swap notification.
+// Only free-point grants (last 30 days) surface as notifications; hosting-earned
+// points already get context from their swap notification.
 const CREDIT_WINDOW_MS = 30 * 24 * 60 * 60 * 1000
 
 // How far ahead a renewal starts being worth mentioning.
@@ -49,7 +49,7 @@ export async function getMemberNotifications(userId: string): Promise<MemberNoti
       orderBy: { createdAt: "desc" },
       select: { status: true, reviewNote: true, reviewedAt: true, createdAt: true },
     }),
-    prisma.creditTransaction.findMany({
+    prisma.pointTransaction.findMany({
       where: { userId, type: "earned", reason: { not: null }, createdAt: { gte: new Date(Date.now() - CREDIT_WINDOW_MS) } },
       orderBy: { createdAt: "desc" },
       take: 20,
@@ -59,17 +59,17 @@ export async function getMemberNotifications(userId: string): Promise<MemberNoti
 
   const items: MemberNotification[] = []
 
-  // Free-credit grants ("You earned 2 credits — Identity verified").
+  // Free-point grants ("You earned 2 points — Identity verified").
   for (const c of grants) {
-    if (!c.reason || !(c.reason in CREDIT_GRANTS)) continue
-    const label = CREDIT_GRANTS[c.reason as GrantReason].title
+    if (!c.reason || !(c.reason in POINT_GRANTS)) continue
+    const label = POINT_GRANTS[c.reason as GrantReason].title
     items.push({
-      id: `credit-${c.id}`,
-      kind: "credit",
-      title: `You earned ${c.amount} credit${c.amount === 1 ? "" : "s"}`,
+      id: `point-${c.id}`,
+      kind: "point",
+      title: `You earned ${c.amount} point${c.amount === 1 ? "" : "s"}`,
       body: label,
       date: c.createdAt,
-      link: "/dashboard/credits",
+      link: "/dashboard/points",
     })
   }
 
@@ -185,7 +185,7 @@ export async function getMemberNotifications(userId: string): Promise<MemberNoti
 // prompts, profile, unread messages) are excluded — they carry `date: new Date()`
 // and would otherwise keep the badge lit forever. Verification outcomes
 // (approved/rejected) are real dated events, so they do count.
-export const ACTIVITY_KINDS: MemberNotification["kind"][] = ["swap", "counter", "confirmed", "verified", "rejected", "credit"]
+export const ACTIVITY_KINDS: MemberNotification["kind"][] = ["swap", "counter", "confirmed", "verified", "rejected", "point"]
 
 /** Activity items newer than the member's last visit to the notifications page. */
 export async function countNewMemberNotifications(userId: string) {
@@ -210,8 +210,8 @@ export async function countNewMemberNotifications(userId: string) {
     prisma.verificationSubmission.count({
       where: { memberId: userId, status: { in: ["APPROVED", "REJECTED"] }, reviewedAt: { gt: since } },
     }),
-    // Free-credit grants the member hasn't seen yet.
-    prisma.creditTransaction.count({
+    // Free-point grants the member hasn't seen yet.
+    prisma.pointTransaction.count({
       where: { userId, type: "earned", reason: { not: null }, createdAt: { gt: since } },
     }),
   ])

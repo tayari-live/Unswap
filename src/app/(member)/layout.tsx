@@ -2,7 +2,7 @@ import { redirect } from "next/navigation"
 import { auth } from "@/server/auth"
 import { AppNavbar } from "@/components/layout/app-navbar"
 import { AppAssistant } from "@/components/assistant/app-assistant"
-import { CreditCelebration } from "@/components/credits/credit-celebration"
+import { PointsCelebration } from "@/components/points/point-celebration"
 import { VerificationCelebration } from "@/components/verification/verification-celebration"
 
 export default async function MemberLayout({
@@ -58,7 +58,7 @@ export default async function MemberLayout({
       </main>
       <AppAssistant />
       <VerificationCelebration />
-      <CreditCelebration />
+      <PointsCelebration />
     </div>
   )
 }

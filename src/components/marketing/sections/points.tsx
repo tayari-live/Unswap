@@ -2,7 +2,7 @@ import { Container, Display, Eyebrow } from "../ui";
 import { Reveal } from "../reveal";
 
 /*
- * Credits.
+ * Points.
  *
  * The differentiator, and the one mechanic a visitor has to actually
  * understand — so it gets a diagram rather than another paragraph. The chain
@@ -12,29 +12,29 @@ import { Reveal } from "../reveal";
 
 const CHAIN = [
   { label: "You", detail: "Host in Nairobi" },
-  { label: "Earn credits", detail: "One credit for each night hosted" },
+  { label: "Earn points", detail: "One point for each night hosted" },
   { label: "Travel to Geneva", detail: "Your next duty station" },
   { label: "Stay with another member", detail: "No nightly rate paid" },
 ];
 
-export function Credits() {
+export function Points() {
   return (
     <section className="bg-parchment">
       <Container className="py-20 lg:py-28">
         <div className="grid items-start gap-14 lg:grid-cols-2 lg:gap-20">
           <Reveal>
-            <Eyebrow>Credits</Eyebrow>
+            <Eyebrow>Points</Eyebrow>
             <Display className="mt-6 text-[clamp(2.25rem,4.4vw,3.5rem)]">
               Stay now. Host later.
             </Display>
             <p className="mt-8 max-w-[520px] text-[16px] leading-[1.8] text-ink-70">
-              Credits remove the need for two members to want each other&rsquo;s
+              Points remove the need for two members to want each other&rsquo;s
               homes at exactly the same time.
             </p>
 
             <div className="mt-12 border-t border-navy/10 pt-8">
               <div className="font-display text-[clamp(3rem,6vw,4.75rem)] font-light leading-none text-navy">
-                1 credit <span className="text-gold">=</span> 1 night
+                1 point <span className="text-gold">=</span> 1 night
               </div>
             </div>
           </Reveal>

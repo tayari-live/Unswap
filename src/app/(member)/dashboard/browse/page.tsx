@@ -14,8 +14,8 @@ export const dynamic = "force-dynamic"
 
 const EXCHANGE_LABEL: Record<string, string> = {
   simultaneous: "Simultaneous",
-  credits: "Credits",
-  either: "Simultaneous or credits",
+  points: "Points",
+  either: "Simultaneous or points",
 }
 
 export default async function BrowsePage({

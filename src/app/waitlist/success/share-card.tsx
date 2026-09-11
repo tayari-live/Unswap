@@ -266,7 +266,9 @@ export function ShareCard() {
         setPending(!!data.pending)
         setIsPersonal(true)
         const refs = data.referrals ?? 0
-        setStats({ position: String(data.position ?? "-"), points: String(refs * 30), referrals: String(refs) })
+        // Points come from the referral engine when available; otherwise fall
+        // back to the simple per-referral estimate.
+        setStats({ position: String(data.position ?? "-"), points: String(data.points ?? refs * 30), referrals: String(refs) })
         setTimeout(() => confetti({ particleCount: 80, spread: 60, origin: { y: 0.55 }, colors: ["#C9A84C", "#F5F0E8", "#0A0E1A"] }), 300)
       })
       .catch(() => {})

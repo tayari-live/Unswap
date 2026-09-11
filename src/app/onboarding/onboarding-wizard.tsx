@@ -71,8 +71,11 @@ export function OnboardingWizard({
         {/* Step 1 — Welcome + Mission */}
         {step === 1 && (
           <div className="text-center">
-            <h1 className="font-sans text-4xl font-light leading-[1.1] text-[var(--fg)]">Welcome to UnSwap, {firstName}</h1>
-            <p className="mt-5 text-neutral leading-[1.8] max-w-md mx-auto">
+            {/* Cormorant (via the global heading rule) at a light weight — the
+                global `h1` rule forces 600, so `font-light!` is needed to win.
+                Marketing/hero display face, apt for this welcome moment. */}
+            <h1 className="text-4xl font-light! leading-[1.15] text-[var(--fg)]">Welcome to UnSwap, {firstName}</h1>
+            <p className="mt-5 text-[var(--fg)]/70 leading-[1.7] max-w-md mx-auto">
               You have joined a closed, verified network built exclusively for UN and
               international organisation professionals. Exchange homes, not money,
               and travel on rotation with peers who have as much to protect as you do.
@@ -106,8 +109,8 @@ export function OnboardingWizard({
               <PartyPopper size={26} strokeWidth={1.4} />
             </div>
             <SectionLabel align="center">Ready</SectionLabel>
-            <h1 className="font-sans text-3xl font-light leading-[1.15] text-[var(--fg)]">You are all set, {firstName}</h1>
-            <p className="mt-4 text-neutral leading-[1.8] max-w-md mx-auto">
+            <h1 className="text-4xl font-light! leading-[1.15] text-[var(--fg)]">You are all set, {firstName}</h1>
+            <p className="mt-4 text-[var(--fg)]/70 leading-[1.7] max-w-md mx-auto">
               One last step: add your home so peers across duty stations can find it
               and start exchanging with you.
             </p>

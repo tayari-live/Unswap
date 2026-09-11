@@ -4,24 +4,41 @@ import { beginPasswordlessMember } from "@/server/services/registration"
 
 const base = () => process.env.AUTH_URL || "http://localhost:3000"
 
-// GET /api/waitlist/confirm?token=… — the emailed "add your property" link.
-// Finalizes the waitlist entry (credits the referrer, syncs Kit). The click
-// proves the person owns this inbox, so we create their account already
-// email-verified but WITHOUT a password, mint a one-time sign-in token, and hand
-// off to /continue → onboarding → adding a property. The password comes later.
+// The emailed "add your property" link. Clicking it proves the person owns the
+// inbox, which is what lets us create their account already email-verified,
+// without a password, and drop them into onboarding.
+//
+// The state changes (confirming the entry, crediting the referrer, creating the
+// member, minting a sign-in token) happen on POST only — triggered by a human
+// tapping the button on /continue. A plain GET, which mail apps and security
+// scanners (Safe Links, Proofpoint, Mimecast) fire to vet the link, must never
+// mutate: it would confirm the entry and burn the single-use flow before the
+// person ever clicks. So GET just hands off to the read-only interstitial.
+
+// GET /api/waitlist/confirm?token=… — kept for links already sitting in inboxes.
+// Newer invite emails point straight at /continue?ct=…; either way, nothing
+// changes here.
 export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get("token") ?? ""
+  const url = new URL("/continue", base())
+  if (token) url.searchParams.set("ct", token)
+  return NextResponse.redirect(url)
+}
+
+// POST /api/waitlist/confirm { token } — the actual confirmation, run from the
+// /continue button. Returns JSON so the page can sign the member in (new
+// confirm) or send them to log in (already confirmed) without a full reload.
+export async function POST(req: NextRequest) {
   try {
+    const body = await req.json().catch(() => ({}))
+    const token = typeof body.token === "string" ? body.token : ""
     const result = await confirmWaitlist(token)
 
     // Re-click on an already-used link: the account exists, so don't error and
     // don't silently re-issue a sign-in link (a magic link shouldn't work
-    // forever). Send them to sign in, email prefilled, with a gentle notice.
+    // forever). Send them to sign in, email prefilled.
     if (result.alreadyConfirmed) {
-      const url = new URL("/login", base())
-      url.searchParams.set("email", result.email)
-      url.searchParams.set("notice", "already-confirmed")
-      return NextResponse.redirect(url)
+      return NextResponse.json({ status: "already-confirmed", email: result.email })
     }
 
     const loginToken = await beginPasswordlessMember({
@@ -29,12 +46,11 @@ export async function GET(req: NextRequest) {
       firstName: result.firstName,
       lastName: result.lastName,
     })
-    const url = new URL("/continue", base())
-    url.searchParams.set("token", loginToken)
-    return NextResponse.redirect(url)
+    return NextResponse.json({ status: "ready", loginToken })
   } catch {
-    const url = new URL("/waitlist", base())
-    url.searchParams.set("error", "This confirmation link is invalid or has already been used.")
-    return NextResponse.redirect(url)
+    return NextResponse.json(
+      { error: "This confirmation link is invalid or has already been used." },
+      { status: 400 },
+    )
   }
 }

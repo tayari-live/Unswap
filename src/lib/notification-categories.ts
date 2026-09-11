@@ -8,7 +8,7 @@
 
 export type NotificationKind =
   | "swap" | "counter" | "confirmed" | "message" | "review"
-  | "verification" | "verified" | "rejected" | "credit" | "profile" | "membership"
+  | "verification" | "verified" | "rejected" | "point" | "profile" | "membership"
 
 /*
  * "Account" rather than the "System" a platform notice would need: every item
@@ -33,7 +33,7 @@ const KIND_CATEGORY: Record<NotificationKind, Exclude<NotificationCategory, "all
   review: "exchanges",
   message: "messages",
   membership: "membership",
-  credit: "membership",
+  point: "membership",
   verification: "account",
   verified: "account",
   rejected: "account",
