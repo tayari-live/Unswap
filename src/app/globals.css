@@ -317,6 +317,15 @@ body {
   opacity: 1;
 }
 
+/* Native <select> option lists. In dark mode the browser renders the popup on a
+   light system background while the option text keeps the dark-mode light
+   colour, so options become unreadable. Pin the options to an opaque surface
+   and text token so they stay legible in both themes. */
+option {
+  background-color: var(--surface);
+  color: var(--foreground);
+}
+
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
   font-weight: 600;
