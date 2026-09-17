@@ -61,3 +61,29 @@ export const NATIONALITIES: string[] = [
   "Ukrainian", "Uruguayan", "Uzbek", "Vanuatuan", "Venezuelan", "Vietnamese", "Yemeni",
   "Zambian", "Zimbabwean",
 ]
+
+// Major cities and UN / international-organisation duty stations, for the
+// searchable city picker. The biggest hubs lead so they show first before any
+// typing; any other city can still be entered freely.
+export const CITIES: string[] = [
+  "Geneva", "New York", "Nairobi", "Vienna", "Rome", "Bangkok", "Addis Ababa",
+  "Copenhagen", "Bonn", "The Hague", "Brussels", "Paris", "London", "Washington D.C.",
+  "Amman", "Beirut", "Cairo", "Tunis", "Rabat", "Dakar", "Abidjan", "Accra", "Abuja",
+  "Dar es Salaam", "Kampala", "Kigali", "Kinshasa", "Juba", "Khartoum", "Mogadishu",
+  "Pretoria", "Johannesburg", "Panama City", "Santiago", "Bogotá", "Lima", "Quito",
+  "Mexico City", "Guatemala City", "Port-au-Prince", "Buenos Aires", "Brasília",
+  "Kathmandu", "Islamabad", "New Delhi", "Dhaka", "Colombo", "Jakarta",
+  "Manila", "Hanoi", "Phnom Penh", "Yangon", "Ulaanbaatar", "Beijing", "Tokyo", "Seoul",
+  "Suva", "Kabul", "Baghdad", "Damascus", "Sanaa", "Tehran", "Istanbul", "Ankara",
+  "Kyiv", "Sarajevo", "Belgrade", "Pristina", "Tbilisi", "Tashkent", "Almaty",
+  "Madrid", "Berlin", "Turin", "Budapest", "Warsaw", "Stockholm", "Oslo", "Helsinki",
+]
+
+// Common languages spoken across the network, UN official six first. Members can
+// still add any other language.
+export const LANGUAGES: string[] = [
+  "English", "French", "Spanish", "Arabic", "Chinese", "Russian",
+  "Portuguese", "German", "Italian", "Dutch", "Swahili", "Hindi", "Urdu",
+  "Bengali", "Japanese", "Korean", "Turkish", "Persian", "Amharic", "Hausa",
+  "Yoruba", "Wolof", "Indonesian", "Vietnamese", "Thai", "Nepali",
+]

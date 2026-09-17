@@ -10,8 +10,9 @@ import {
   type LucideIcon,
 } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
-import { COUNTRIES } from "@/lib/geo"
+import { COUNTRIES, CITIES } from "@/lib/geo"
 import { FIELD, LABEL, TEXTAREA } from "@/components/ui/form"
+import { Combobox } from "@/components/ui/combobox"
 
 // Field styling lives in components/ui/form so all forms stay in step.
 const input = FIELD
@@ -419,7 +420,7 @@ export function ListingWizard({
             <Heading title="Where is your home, roughly?" sub="Only the city, country, and neighbourhood are shown publicly." />
             <div className="space-y-5">
               <div className="grid grid-cols-2 gap-4">
-                <div><label className={label} htmlFor="city">City</label><input id="city" className={input} value={v.city} onChange={(e) => set("city", e.target.value)} placeholder="Your duty station" /></div>
+                <div><label className={label} htmlFor="city">City</label><Combobox id="city" value={v.city} onChange={(val) => set("city", val)} options={CITIES} placeholder="Start typing or pick a city" /></div>
                 <div>
                   <label className={label} htmlFor="country">Country</label>
                   <select id="country" className={input} value={v.country} onChange={(e) => set("country", e.target.value)}>

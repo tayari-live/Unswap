@@ -4,9 +4,18 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { UploadCloud, X, Check, ChevronLeft, ChevronRight } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
-import { NATIONALITIES } from "@/lib/geo"
+import { NATIONALITIES, CITIES, LANGUAGES } from "@/lib/geo"
 import type { ProfileValues } from "@/components/profile/profile-form"
 import { FIELD, LABEL, TEXTAREA } from "@/components/ui/form"
+import { Combobox } from "@/components/ui/combobox"
+
+// Languages are stored as a comma-separated string; these keep the chip
+// toggles in sync with that format.
+const langList = (s: string) => s.split(",").map((x) => x.trim()).filter(Boolean)
+const toggleLanguage = (s: string, lang: string) => {
+  const cur = langList(s)
+  return (cur.includes(lang) ? cur.filter((l) => l !== lang) : [...cur, lang]).join(", ")
+}
 
 // Field styling lives in components/ui/form so all forms stay in step.
 const input = FIELD
@@ -226,17 +235,35 @@ export function ProfileWizard({
 
         {key === "dutyStation" && (
           <div>
-            <Heading title="Where are you based?" sub="Your current duty station." />
+            <Heading title="Where are you based?" sub="Your current duty station. Pick from the list or type your own." />
             <label className={label} htmlFor="dutyStation">Current duty station</label>
-            <input id="dutyStation" className={input} value={v.dutyStation} onChange={(e) => set("dutyStation", e.target.value)} placeholder="Your duty station" />
+            <Combobox id="dutyStation" value={v.dutyStation} onChange={(val) => set("dutyStation", val)} options={CITIES} placeholder="Start typing or pick a city" />
           </div>
         )}
 
         {key === "languages" && (
           <div>
-            <Heading title="Which languages do you speak?" sub="Helpful for members considering an exchange with you." />
-            <label className={label} htmlFor="languages">Languages</label>
-            <input id="languages" className={input} value={v.languages} onChange={(e) => set("languages", e.target.value)} placeholder="Languages you speak" />
+            <Heading title="Which languages do you speak?" sub="Tap all that apply. Helpful for members considering an exchange with you." />
+            <div className="flex flex-wrap gap-2">
+              {[...LANGUAGES, ...langList(v.languages).filter((l) => !LANGUAGES.includes(l))].map((lang) => {
+                const selected = langList(v.languages).includes(lang)
+                return (
+                  <button
+                    key={lang}
+                    type="button"
+                    aria-pressed={selected}
+                    onClick={() => set("languages", toggleLanguage(v.languages, lang))}
+                    className={`px-3.5 py-2 rounded-full text-sm font-medium border transition-colors ${
+                      selected
+                        ? "bg-[var(--gold)] text-ink border-[var(--gold)]"
+                        : "bg-[var(--surface)] text-[var(--fg)] border-[var(--hair)] hover:border-[var(--gold)]"
+                    }`}
+                  >
+                    {lang}
+                  </button>
+                )
+              })}
+            </div>
           </div>
         )}
 
