@@ -4,6 +4,7 @@ import { logAudit } from "@/server/services/audit"
 import { grantPointsOnce } from "@/server/services/points"
 import { encryptField, decryptField } from "@/server/crypto"
 import { kitTagHomeListed } from "@/server/kit"
+import { computeNightlyPoints, clampAdjustment } from "@/lib/valuation"
 
 // Admin moderation grid. Card fields only — photos are served via
 // /api/photos/:id, so photo bytes never travel with the listing rows.
@@ -61,6 +62,7 @@ export type ListingInput = {
   photos?: PhotoInput[]
   swapDurations?: string[]
   exchangeType?: string
+  nightlyAdjustment?: number
   blackouts?: BlackoutInput[]
   houseRules?: string
   emergencyName?: string
@@ -189,6 +191,8 @@ export async function createListing(ownerId: string, input: ListingInput) {
         amenities: v.amenities.join(",") || null,
         swapDurations: v.durations.join(","),
         exchangeType: input.exchangeType || "either",
+        nightlyPoints: computeNightlyPoints({ city: v.city, bedrooms: clampInt(input.bedrooms, 1, 1, 10), maxGuests: clampInt(input.maxGuests, 2, 1, 12), amenities: v.amenities }),
+        nightlyAdjustment: clampAdjustment(input.nightlyAdjustment ?? 0),
         houseRules: input.houseRules?.trim().slice(0, 1000) || null,
         primaryPhotoUrl: v.photos[0]?.url ?? null,
         status,
@@ -262,6 +266,8 @@ export async function updateMemberListing(ownerId: string, id: string, input: Li
         amenities: v.amenities.join(",") || null,
         swapDurations: v.durations.join(","),
         exchangeType: input.exchangeType || existing.exchangeType,
+        nightlyPoints: computeNightlyPoints({ city: v.city, bedrooms: clampInt(input.bedrooms, existing.bedrooms, 1, 10), maxGuests: clampInt(input.maxGuests, existing.maxGuests, 1, 12), amenities: v.amenities }),
+        nightlyAdjustment: input.nightlyAdjustment !== undefined ? clampAdjustment(input.nightlyAdjustment) : existing.nightlyAdjustment,
         houseRules: input.houseRules?.trim().slice(0, 1000) || null,
         primaryPhotoUrl: v.photos[0]?.url ?? null,
         ...(input.status !== undefined ? { status: input.status } : {}),

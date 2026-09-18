@@ -4,7 +4,6 @@ import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
 import { sendEmail, renderEmail, esc } from "@/server/email"
 import { logAudit } from "@/server/services/audit"
-import { grantPointsOnce } from "@/server/services/points"
 import { consumeRegisterGrant } from "@/server/services/waitlist"
 import { kitTagAccountCreated } from "@/server/kit"
 import { registerSchema, passwordSchema, firstError } from "@/lib/validation/auth"
@@ -136,8 +135,8 @@ export async function registerMember(input: RegisterInput) {
   // everyone else gets the usual verification link.
   const emailSent = preVerified ? false : await issueVerificationLink({ id: user.id, email, firstName }, fastTrack)
 
-  // Free sign-up point (once per account).
-  await grantPointsOnce(user.id, "welcome")
+  // No signup grant: the welcome value lands at the profile and verification
+  // milestones instead.
 
   await logAudit({
     action: "MEMBER_REGISTERED",
@@ -232,7 +231,6 @@ export async function beginPasswordlessMember(input: {
     if (waitlisted && waitlisted.status !== "converted") {
       await prisma.waitlistEntry.update({ where: { email }, data: { status: "converted" } })
     }
-    await grantPointsOnce(user.id, "welcome")
     await logAudit({
       action: "MEMBER_REGISTERED",
       subject: `New member (passwordless): ${user.fullName}`,

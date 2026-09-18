@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
+import { getAvailablePoints } from "@/server/services/points"
 import {
   Home,
   ArrowLeftRight,
@@ -87,14 +88,9 @@ export default async function MemberDashboardPage() {
     .filter((r) => UPCOMING.includes(r.status))
     .sort((a, b) => a.startDate.getTime() - b.startDate.getTime())
 
-  // Points: 1 night hosted = 1 point earned; 1 night stayed = 1 spent.
-  const earned = user.hostedRequests
-    .filter((r) => r.status === "COMPLETED" && r.mode === "points")
-    .reduce((s, r) => s + nights(r.startDate, r.endDate), 0)
-  const spent = user.sentRequests
-    .filter((r) => r.status === "COMPLETED" && r.mode === "points")
-    .reduce((s, r) => s + nights(r.startDate, r.endDate), 0)
-  const points = earned - spent
+  // The confirmed points ledger balance (hosting earns, staying spends, plus
+  // milestone bonuses) — the same figure the Points page shows.
+  const { balance: points } = await getAvailablePoints(userId)
 
   const isVerified = user.verificationStatus === "FULLY_VERIFIED"
   const profileIncomplete = user.profileCompletion < PROFILE_COMPLETE_AT
@@ -226,9 +222,9 @@ export default async function MemberDashboardPage() {
 
   // Mock recommended homes
   const recommendedHomes = [
-    { city: "Geneva", country: "Switzerland", image: "/images/residence-geneva.png", nights: 7, points: 7 },
-    { city: "Mayfair, London", country: "United Kingdom", image: "/images/residence-mayfair.png", nights: 5, points: 5 },
-    { city: "Singapore", country: "Singapore", image: "/images/residence-singapore.png", nights: 10, points: 10 }
+    { city: "Geneva", country: "Switzerland", image: "/images/residence-geneva.png", nights: 7, points: 1820 },
+    { city: "Mayfair, London", country: "United Kingdom", image: "/images/residence-mayfair.png", nights: 5, points: 1300 },
+    { city: "Singapore", country: "Singapore", image: "/images/residence-singapore.png", nights: 10, points: 2200 }
   ];
 
   return (
@@ -254,7 +250,7 @@ export default async function MemberDashboardPage() {
             <div className="flex flex-col">
               <span className="font-sans text-[11px] font-medium text-[var(--gold)] uppercase tracking-[0.12em]">Points</span>
               <span className="font-sans text-[13px] text-[var(--fg)]/60 mt-1 pr-2">
-                {points === 0 ? "Earn points by hosting homes." : `Enough for up to ${points} nights.`}
+                {points === 0 ? "Earn points by hosting and at milestones." : "Spend them on stays across the network."}
               </span>
             </div>
           </Link>

@@ -37,6 +37,7 @@ export default async function EditListingPage({ params }: { params: Promise<{ id
     photos: listing.photos.map((p) => ({ url: p.url, caption: p.caption ?? "" })),
     swapDurations: listing.swapDurations,
     exchangeType: listing.exchangeType,
+    nightlyAdjustment: listing.nightlyAdjustment,
     blackouts: listing.blackouts.map((b) => ({ startDate: day(b.startDate), endDate: day(b.endDate) })),
     houseRules: listing.houseRules ?? "",
     emergencyName: listing.emergencyName ?? "",

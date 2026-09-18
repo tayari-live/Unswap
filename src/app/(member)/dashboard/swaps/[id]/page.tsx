@@ -150,7 +150,7 @@ export default async function SwapDetailPage({ params }: { params: Promise<{ id:
           <div className="flex flex-col gap-3 font-sans text-[16px] text-[var(--fg)] font-medium">
             <span className="flex items-center gap-3"><Calendar size={18} className="text-[var(--gold-dark)]" /> {fmt(swap.startDate)} — {fmt(swap.endDate)}</span>
             <span className="flex items-center gap-3"><Users size={18} className="text-[var(--gold-dark)]" /> {swap.guests} guests</span>
-            <span className="flex items-center gap-3 ml-[30px]">{nights(swap.startDate, swap.endDate)} nights · {swap.mode === "points" ? `${nights(swap.startDate, swap.endDate)} points` : "Direct Swap"}</span>
+            <span className="flex items-center gap-3 ml-[30px]">{nights(swap.startDate, swap.endDate)} nights · {swap.mode === "points" ? `${nights(swap.startDate, swap.endDate) * (swap.pointsPerNight ?? 0)} points` : "Direct Swap"}</span>
           </div>
         </div>
 

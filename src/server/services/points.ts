@@ -1,14 +1,16 @@
 import { prisma } from "@/server/prisma"
 
-// Free-point grants (1 point = 1 night). Amounts are the single source of
-// truth — tweak here to change the economy. `reason` is stored on the ledger
-// row and drives both idempotency and the human label shown to members.
+// Free-point grants. Amounts are the single source of truth — tweak here to
+// change the economy. `reason` is stored on the ledger row and drives both
+// idempotency and the human label shown to members. Scale matches the nightly
+// valuation (homes cost ~100–300 points/night), HomeExchange-style. Signup
+// grants nothing; the welcome value lands at the profile and verification
+// milestones instead.
 export const POINT_GRANTS = {
-  welcome: { amount: 1, title: "Welcome bonus" },
-  profile_complete: { amount: 1, title: "Profile completed" },
-  first_listing: { amount: 3, title: "First listing published" },
-  verified: { amount: 2, title: "Identity verified" },
-  first_subscription: { amount: 3, title: "Subscription bonus" },
+  profile_complete: { amount: 100, title: "Profile completed" },
+  first_listing: { amount: 500, title: "First listing published" },
+  verified: { amount: 500, title: "Identity verified" },
+  first_subscription: { amount: 500, title: "Subscription bonus" },
 } as const
 export type GrantReason = keyof typeof POINT_GRANTS
 
@@ -31,11 +33,12 @@ export async function getAvailablePoints(userId: string) {
     }),
     prisma.swapRequest.findMany({
       where: { requesterId: userId, mode: "points", status: { in: ["CONFIRMED", "IN_PROGRESS"] } },
-      select: { startDate: true, endDate: true },
+      select: { startDate: true, endDate: true, pointsPerNight: true },
     }),
   ])
   const balance = txns.reduce((n, t) => n + (t.type === "earned" ? t.amount : -t.amount), 0)
-  const held = committed.reduce((n, s) => n + nights(s.startDate, s.endDate), 0)
+  // Cost is nights × the home's nightly value snapshotted on the swap.
+  const held = committed.reduce((n, s) => n + nights(s.startDate, s.endDate) * (s.pointsPerNight ?? 100), 0)
   return { balance, held, available: balance - held }
 }
 

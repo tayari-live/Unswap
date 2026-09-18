@@ -77,7 +77,7 @@ export default async function ExchangeDetailPage({ params }: { params: Promise<{
         <div className="flex flex-wrap items-center gap-3 font-sans text-[15px] text-[var(--fg)]/70">
           <span className="font-medium text-[var(--fg)]">{fmt(swap.startDate)} — {fmt(swap.endDate)}</span>
           <span className="text-[var(--fg)]/30">|</span>
-          <span>{n} nights · {swap.mode === "points" ? `${n} points` : "Direct Swap"}</span>
+          <span>{n} nights · {swap.mode === "points" ? `${n * (swap.pointsPerNight ?? 0)} points` : "Direct Swap"}</span>
         </div>
       </div>
 
@@ -142,7 +142,7 @@ export default async function ExchangeDetailPage({ params }: { params: Promise<{
             </div>
             <div className="flex items-center justify-between">
               <span className="text-[var(--fg)]/60">Points</span>
-              <span className="font-medium text-[var(--fg)]">{swap.mode === "points" ? n : "Direct Swap"}</span>
+              <span className="font-medium text-[var(--fg)]">{swap.mode === "points" ? n * (swap.pointsPerNight ?? 0) : "Direct Swap"}</span>
             </div>
           </div>
         </div>

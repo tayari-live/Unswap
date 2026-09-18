@@ -4,6 +4,7 @@ import { logAudit } from "@/server/services/audit"
 import { sendEmail, renderEmail, esc } from "@/server/email"
 import { notifyAllowed } from "@/server/services/notify"
 import { getAvailablePoints } from "@/server/services/points"
+import { effectiveNightly } from "@/lib/valuation"
 
 const APP = () => process.env.AUTH_URL || "http://localhost:3000"
 const fmtD = (d: Date) =>
@@ -79,8 +80,6 @@ export async function listMemberSwaps(userId: string) {
 
 const DAY = 24 * 60 * 60 * 1000
 const nightsBetween = (s: Date, e: Date) => Math.max(1, Math.round((e.getTime() - s.getTime()) / DAY))
-// Short-term hosting (7–14 nights) earns points at an accelerated 1.5× rate.
-const earnAmount = (n: number) => (n >= 7 && n <= 14 ? Math.ceil(n * 1.5) : n)
 
 /**
  * Enforce the requester's per-period exchange allowance. A slot is consumed when
@@ -95,8 +94,8 @@ const earnAmount = (n: number) => (n >= 7 && n <= 14 ? Math.ceil(n * 1.5) : n)
  * may have been accepted in between. A shortfall blocks: balances never go
  * negative.
  */
-async function assertCanAffordPoints(requesterId: string, start: Date, end: Date, atAccept = false) {
-  const cost = nightsBetween(start, end)
+async function assertCanAffordPoints(requesterId: string, start: Date, end: Date, pointsPerNight: number, atAccept = false) {
+  const cost = nightsBetween(start, end) * pointsPerNight
   const { available } = await getAvailablePoints(requesterId)
   if (available >= cost) return
 
@@ -177,15 +176,18 @@ export async function completeSwap(swapId: string) {
 
   if (swap.mode === "points") {
     const nights = nightsBetween(swap.startDate, swap.endDate)
+    // Symmetric: the host earns exactly what the guest spends — nights × the
+    // home's snapshotted nightly value.
+    const cost = nights * (swap.pointsPerNight ?? 0)
     // Confirm the host's pending earn (or create it), and record the spend.
     const earned = await prisma.pointTransaction.updateMany({
       where: { swapId, type: "earned", status: "pending" },
       data: { status: "confirmed" },
     })
     if (earned.count === 0) {
-      await prisma.pointTransaction.create({ data: { userId: swap.hostId, swapId, type: "earned", amount: earnAmount(nights), status: "confirmed" } })
+      await prisma.pointTransaction.create({ data: { userId: swap.hostId, swapId, type: "earned", amount: cost, status: "confirmed" } })
     }
-    await prisma.pointTransaction.create({ data: { userId: swap.requesterId, swapId, type: "spent", amount: nights, status: "confirmed" } })
+    await prisma.pointTransaction.create({ data: { userId: swap.requesterId, swapId, type: "spent", amount: cost, status: "confirmed" } })
   }
 
   // Prompt both parties to review.
@@ -263,9 +265,13 @@ export async function createSwapRequest(input: {
     if (!fits) throw new ApiError(400, "Your stay length doesn't match this home's offered swap durations.")
   }
 
+  // The home's nightly value, snapshotted onto the swap so a later listing edit
+  // never changes this exchange's cost.
+  const perNight = effectiveNightly(listing.nightlyPoints, listing.nightlyAdjustment)
+
   // A points stay is funded by the requester, so refuse one they cannot cover.
   if (input.mode === "points") {
-    await assertCanAffordPoints(input.requesterId, start, end)
+    await assertCanAffordPoints(input.requesterId, start, end, perNight)
   }
 
   const swap = await prisma.swapRequest.create({
@@ -274,6 +280,7 @@ export async function createSwapRequest(input: {
       hostId: listing.ownerId,
       listingId: listing.id,
       mode: input.mode,
+      pointsPerNight: input.mode === "points" ? perNight : null,
       startDate: start,
       endDate: end,
       guests,
@@ -392,21 +399,25 @@ export async function respondToSwap(input: {
   // Re-check funding before confirming: a counter-offer may have changed the
   // dates, and the requester may have committed points elsewhere since. This
   // runs before the update so a shortfall leaves the swap untouched.
+  const perNight = swap.pointsPerNight ?? 0
   if (accepting && swap.mode === "points") {
     await assertCanAffordPoints(
       swap.requesterId,
       (data.startDate as Date) ?? swap.startDate,
       (data.endDate as Date) ?? swap.endDate,
+      perNight,
       true,
     )
   }
 
   await prisma.swapRequest.update({ where: { id: swap.id }, data })
 
-  // Points mode: confirming creates the host's pending earn (posted on completion).
+  // Points mode: confirming creates the host's pending earn (posted on
+  // completion) — nights × the snapshotted nightly value.
   if (accepting && swap.mode === "points") {
+    const n = nightsBetween((data.startDate as Date) ?? swap.startDate, (data.endDate as Date) ?? swap.endDate)
     await prisma.pointTransaction.create({
-      data: { userId: swap.hostId, swapId: swap.id, type: "earned", amount: earnAmount(nightsBetween(swap.startDate, swap.endDate)), status: "pending" },
+      data: { userId: swap.hostId, swapId: swap.id, type: "earned", amount: n * perNight, status: "pending" },
     })
   }
 

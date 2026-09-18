@@ -21,7 +21,7 @@ export default async function PointsPage() {
   return (
     <div className="max-w-3xl mx-auto pb-12">
       <LuxPageHeader eyebrow="Balance" title="UnSwap Points" subtitle="Host now, stay later. Your non-simultaneous exchange balance." />
-      <PageTip id="points">One point is one night. Earn them by hosting or through milestones, and spend them to stay with a peer when you are not swapping at the same time.</PageTip>
+      <PageTip id="points">Every home has a nightly value in points, set from its location, size, and amenities (about 100 to 300 a night). Hosting a peer earns you points; staying spends them. You also earn points through milestones like completing your profile, listing your home, and getting verified.</PageTip>
 
       {/* Balance + summary */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
@@ -35,18 +35,18 @@ export default async function PointsPage() {
         <div className="bg-surface rounded-md border border-[var(--hair)] p-6">
           <div className="text-xs text-neutral uppercase tracking-wide font-semibold">Earned</div>
           <div className="mt-3 font-sans text-3xl font-bold text-[var(--teal)]">+{earned}</div>
-          <div className="text-xs text-neutral mt-1">nights hosted</div>
+          <div className="text-xs text-neutral mt-1">hosting &amp; bonuses</div>
         </div>
         <div className="bg-surface rounded-md border border-[var(--hair)] p-6">
           <div className="text-xs text-neutral uppercase tracking-wide font-semibold">Spent</div>
           <div className="mt-3 font-sans text-3xl font-bold text-[var(--fg)]">-{spent}</div>
-          <div className="text-xs text-neutral mt-1">nights stayed</div>
+          <div className="text-xs text-neutral mt-1">on stays</div>
         </div>
       </div>
 
       <div className="flex items-start gap-2.5 text-xs text-neutral bg-[var(--navy)]/5 border border-[var(--gold)]/20 rounded-xl p-3 mb-6">
         <Info size={16} className="text-[var(--gold-dark)] flex-shrink-0 mt-0.5" />
-        <span>1 night hosted earns 1 point. 1 point redeems 1 night at any member&apos;s home through a non-simultaneous swap.</span>
+        <span>A home&apos;s nightly value depends on its location, size, and amenities (about 100 to 300 points a night). Hosting a peer earns you that home&apos;s value per night; staying spends it.</span>
       </div>
 
       {/* Ledger */}

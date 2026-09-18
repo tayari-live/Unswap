@@ -79,6 +79,21 @@ export const CITIES: string[] = [
   "Madrid", "Berlin", "Turin", "Budapest", "Warsaw", "Stockholm", "Oslo", "Helsinki",
 ]
 
+// Demand tiers for the nightly points valuation (HomeExchange-style: location
+// influences a home's value). Tier 1 = highest-demand cities, tier 2 = major
+// duty stations / capitals, everything else is tier 3 (no location bonus).
+export const CITY_TIER1: string[] = [
+  "Geneva", "New York", "London", "Paris", "Rome", "Vienna", "Washington D.C.",
+  "Copenhagen", "Brussels", "Madrid", "Berlin", "Tokyo", "Singapore", "Istanbul",
+]
+export const CITY_TIER2: string[] = [
+  "Nairobi", "Bangkok", "Addis Ababa", "Bonn", "The Hague", "Amman", "Beirut",
+  "Cairo", "Tunis", "Rabat", "Dakar", "Accra", "Abuja", "Johannesburg", "Pretoria",
+  "Panama City", "Santiago", "Bogotá", "Mexico City", "Buenos Aires", "Lima", "Quito",
+  "Kathmandu", "New Delhi", "Dhaka", "Colombo", "Jakarta", "Manila", "Hanoi", "Seoul",
+  "Beijing", "Ankara", "Kyiv", "Budapest", "Warsaw", "Stockholm", "Oslo", "Helsinki",
+]
+
 // Common languages spoken across the network, UN official six first. Members can
 // still add any other language.
 export const LANGUAGES: string[] = [

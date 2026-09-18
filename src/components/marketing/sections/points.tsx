@@ -12,7 +12,7 @@ import { Reveal } from "../reveal";
 
 const CHAIN = [
   { label: "You", detail: "Host in Nairobi" },
-  { label: "Earn points", detail: "One point for each night hosted" },
+  { label: "Earn points", detail: "Your home's nightly value, per night hosted" },
   { label: "Travel to Geneva", detail: "Your next duty station" },
   { label: "Stay with another member", detail: "No nightly rate paid" },
 ];
@@ -34,7 +34,7 @@ export function Points() {
 
             <div className="mt-12 border-t border-navy/10 pt-8">
               <div className="font-display text-[clamp(3rem,6vw,4.75rem)] font-light leading-none text-navy">
-                1 point <span className="text-gold">=</span> 1 night
+                100 to 300 <span className="text-gold">points</span> a night
               </div>
             </div>
           </Reveal>

@@ -13,6 +13,7 @@ import { useToast } from "@/components/ui/toast"
 import { COUNTRIES, CITIES } from "@/lib/geo"
 import { FIELD, LABEL, TEXTAREA } from "@/components/ui/form"
 import { Combobox } from "@/components/ui/combobox"
+import { computeNightlyPoints, effectiveNightly } from "@/lib/valuation"
 
 // Field styling lives in components/ui/form so all forms stay in step.
 const input = FIELD
@@ -63,7 +64,7 @@ export type WizardValues = {
   title: string; propertyType: string; fullAddress: string; city: string; neighbourhood: string; country: string
   bedrooms: number; bathrooms: number; maxGuests: number; description: string; amenities: string[]
   photos: { url: string; caption?: string }[]
-  swapDurations: string[]; exchangeType: string; blackouts: { startDate: string; endDate: string }[]
+  swapDurations: string[]; exchangeType: string; nightlyAdjustment: number; blackouts: { startDate: string; endDate: string }[]
   houseRules: string; emergencyName: string; emergencyPhone: string; emergencyRelationship: string
 }
 
@@ -72,7 +73,7 @@ export type WizardValues = {
 const EMPTY: WizardValues = {
   title: "", propertyType: "", fullAddress: "", city: "", neighbourhood: "", country: "",
   bedrooms: 1, bathrooms: 1, maxGuests: 2, description: "", amenities: [],
-  photos: [], swapDurations: [], exchangeType: "", blackouts: [],
+  photos: [], swapDurations: [], exchangeType: "", nightlyAdjustment: 0, blackouts: [],
   houseRules: "", emergencyName: "", emergencyPhone: "", emergencyRelationship: "",
 }
 
@@ -569,6 +570,24 @@ export function ListingWizard({
                 <IconCard key={t.v} icon={t.icon} title={t.l} desc={t.d} selected={v.exchangeType === t.v} onClick={() => set("exchangeType", t.v)} />
               ))}
             </div>
+            {(v.exchangeType === "points" || v.exchangeType === "either") && (() => {
+              const nightly = effectiveNightly(computeNightlyPoints({ city: v.city, bedrooms: v.bedrooms, maxGuests: v.maxGuests, amenities: v.amenities }), v.nightlyAdjustment)
+              return (
+                <div className="mt-6 rounded-md border border-[var(--hair)] bg-[var(--background)] p-5">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className={label}>Your home&apos;s nightly value</span>
+                    <span className="font-sans text-2xl font-semibold text-[var(--gold-dark)]">{nightly}<span className="ml-1 text-sm font-normal text-neutral">points / night</span></span>
+                  </div>
+                  <p className="mt-1.5 text-xs text-neutral leading-relaxed">Set automatically from your location, size, and amenities. You can nudge it up or down by 30.</p>
+                  <div className="mt-4 flex items-center gap-3">
+                    <span className="text-xs text-neutral w-8 text-right">-30</span>
+                    <input type="range" min={-30} max={30} step={5} value={v.nightlyAdjustment} onChange={(e) => set("nightlyAdjustment", Number(e.target.value))} className="flex-1 accent-[var(--gold)]" aria-label="Nightly value adjustment" />
+                    <span className="text-xs text-neutral w-8">+30</span>
+                  </div>
+                  <div className="mt-1 text-center text-xs text-neutral">Adjustment {v.nightlyAdjustment > 0 ? "+" : ""}{v.nightlyAdjustment}</div>
+                </div>
+              )
+            })()}
           </div>
         )}
 

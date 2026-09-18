@@ -279,6 +279,8 @@ model Listing {
   description     String?
   primaryPhotoUrl String?  // mirrors the first gallery photo, for card rendering
   exchangeType    String   @default("either") // simultaneous | points | either
+  nightlyPoints   Int      @default(100)      // auto-assigned value per night (100-300), amenity-weighted
+  nightlyAdjustment Int    @default(0)        // host's manual nudge, -30..30
   status          String   @default("DRAFT")  // DRAFT | ACTIVE | PAUSED | ARCHIVED
   flagged         Boolean  @default(false)
   autoPaused      Boolean  @default(false) // paused by the system on subscription lapse
@@ -367,6 +369,7 @@ model SwapRequest {
   hostId      String
   listingId   String
   mode        String   // simultaneous | points
+  pointsPerNight Int?  // snapshot of the home's nightly value when the request was made (points swaps)
   startDate   DateTime
   endDate     DateTime
   guests      Int      @default(1)

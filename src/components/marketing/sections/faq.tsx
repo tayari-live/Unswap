@@ -32,7 +32,7 @@ const QUESTIONS = [
   },
   {
     q: "What are points?",
-    a: "One point equals one night. You earn points by hosting and spend them when you stay, which means two members never have to want each other's homes at the same time.",
+    a: "Each home has a nightly value in points, from about 100 to 300, based on its location, size, and amenities. You earn points by hosting a peer and spend them when you stay, which means two members never have to want each other's homes at the same time.",
   },
   {
     q: "How does property protection work?",
