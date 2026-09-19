@@ -5,7 +5,7 @@ import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { signOut } from "next-auth/react"
 import {
-  Search, ChevronDown, HelpCircle, Menu, X, BadgeCheck, ShieldAlert, Clock,
+  Search, ChevronDown, Menu, X, BadgeCheck, ShieldAlert, Clock,
   Home, MapPin, Sparkles, ArrowLeftRight, CalendarCheck, MessageSquare, Coins,
   UserCircle, CreditCard, Settings, LogOut, type LucideIcon,
 } from "lucide-react"
@@ -138,11 +138,13 @@ export function AppNavbar({
   initials,
   image,
   verificationStatus,
+  pointsBalance,
 }: {
   name: string
   initials: string
   image: string | null
   verificationStatus: string
+  pointsBalance: number
 }) {
   const pathname = usePathname()
   const router = useRouter()
@@ -207,7 +209,7 @@ export function AppNavbar({
   return (
     <>
       <header className="sticky top-0 z-sticky bg-[var(--surface)] border-b border-[var(--border)]">
-        <div className="max-w-[1440px] mx-auto flex items-center gap-6 lg:gap-8 px-6 lg:px-10 h-[72px] md:h-[76px]">
+        <div className="max-w-[1440px] mx-auto flex items-center gap-3 md:gap-6 lg:gap-8 px-4 sm:px-6 lg:px-10 h-[72px] md:h-[76px]">
           <button
             type="button"
             onClick={() => setDrawer(true)}
@@ -267,19 +269,23 @@ export function AppNavbar({
           </nav>
 
           <div className="flex items-center gap-1 sm:gap-2 ml-auto">
+            {/* Points balance — always visible so a member knows at a glance
+                what they can spend. Taps through to the full ledger. */}
+            <Link
+              href="/dashboard/points"
+              title="Your points balance"
+              aria-label={`${pointsBalance} points — view your balance`}
+              className="inline-flex items-center gap-1.5 h-9 pl-2 pr-2.5 sm:pr-3 rounded-full bg-[var(--gold)]/12 border border-[var(--gold)]/30 text-[var(--gold-dark)] hover:bg-[var(--gold)]/20 transition-colors"
+            >
+              <Coins size={16} strokeWidth={2} className="flex-shrink-0" />
+              <span className="text-sm font-bold tabular-nums leading-none">{pointsBalance.toLocaleString()}</span>
+              <span className="hidden lg:inline text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--gold-dark)]/70 leading-none">pts</span>
+            </Link>
+
             <MemberNotificationBell
               buttonClassName="relative w-10 h-10 rounded-lg text-[var(--fg)]/60 hover:text-[var(--gold-dark)] hover:bg-[var(--navy)]/5 flex items-center justify-center transition-colors"
               dotClassName="absolute top-2.5 right-2.5 w-1.5 h-1.5 rounded-full bg-[var(--gold)]"
             />
-
-            <Link
-              href="/dashboard/settings"
-              aria-label="Help and support"
-              title="Help and support"
-              className="hidden sm:inline-flex w-10 h-10 rounded-lg text-[var(--fg)]/60 hover:text-[var(--gold-dark)] hover:bg-[var(--navy)]/5 items-center justify-center transition-colors"
-            >
-              <HelpCircle size={19} strokeWidth={1.75} />
-            </Link>
 
             {/* Profile */}
             <div ref={profileRef} className="relative">

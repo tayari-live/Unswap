@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation"
 import { auth } from "@/server/auth"
+import { getAvailablePoints } from "@/server/services/points"
 import { AppNavbar } from "@/components/layout/app-navbar"
 import { AppAssistant } from "@/components/assistant/app-assistant"
 import { PointsCelebration } from "@/components/points/point-celebration"
@@ -47,12 +48,16 @@ export default async function MemberLayout({
     .slice(0, 2)
     .toUpperCase()
 
+  // The confirmed points balance, surfaced in the navbar so a member always
+  // knows what they can spend. Matches the figure on the Points page.
+  const { balance: pointsBalance } = await getAvailablePoints(u.id)
+
   return (
     <div className="min-h-screen bg-[var(--canvas)]">
       {/* Two dropdowns rather than eleven rail items, so this is a short hop —
          but still worth offering on every navigation. */}
       <a href="#main" className="sr-only skip-link">Skip to content</a>
-      <AppNavbar name={u.name || ""} initials={initials} image={u.image || null} verificationStatus={u.verificationStatus} />
+      <AppNavbar name={u.name || ""} initials={initials} image={u.image || null} verificationStatus={u.verificationStatus} pointsBalance={pointsBalance} />
       <main id="main" className="max-w-[1440px] mx-auto p-4 md:p-8">
         {children}
       </main>
