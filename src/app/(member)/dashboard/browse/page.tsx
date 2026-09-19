@@ -4,6 +4,7 @@ import { MapPin, Star, BadgeCheck, SearchX, ChevronLeft, ChevronRight, MailWarni
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
 import { searchListings } from "@/server/services/discovery"
+import { effectiveNightly } from "@/lib/valuation"
 import { LuxPageHeader } from "@/components/ui/lux"
 import { PageTip } from "@/components/ui/page-tip"
 import { BrowseControls } from "./browse-controls"
@@ -149,7 +150,11 @@ export default async function BrowsePage({
                   {l.propertyType} · {l.bedrooms} {l.bedrooms === 1 ? "bed" : "beds"} · up to {l.maxGuests} guests
                 </div>
                 <div className="mt-3 pt-3 border-t border-[var(--hair)] flex items-center justify-between">
-                  <span className="text-xs text-neutral">{EXCHANGE_LABEL[l.exchangeType] ?? l.exchangeType}</span>
+                  <span className="text-xs text-neutral">
+                    {l.exchangeType !== "simultaneous" ? (
+                      <><span className="font-semibold text-[var(--gold-dark)]">{effectiveNightly(l.nightlyPoints, l.nightlyAdjustment)}</span> pts/night</>
+                    ) : (EXCHANGE_LABEL[l.exchangeType] ?? l.exchangeType)}
+                  </span>
                   <span className="flex items-center gap-1 text-xs font-bold text-[var(--fg)]">
                     <Star size={12} className="text-[var(--gold)]" />
                     {l.owner.trustScore != null ? l.owner.trustScore.toFixed(1) : "New"}

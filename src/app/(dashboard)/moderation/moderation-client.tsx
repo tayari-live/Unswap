@@ -77,7 +77,7 @@ export default function ModerationClient({ initial }: { initial: ModReport[] }) 
                 <button
                   disabled={busyId === r.id}
                   onClick={() => resolve(r.id, "dismiss")}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg border border-[var(--hair)] text-[var(--fg)] hover:bg-neutral-light disabled:opacity-50 transition-colors"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg border border-[var(--hair)] text-[var(--fg)] hover:bg-[var(--parchment)] disabled:opacity-50 transition-colors"
                 >
                   <Check size={14} /> Dismiss
                 </button>

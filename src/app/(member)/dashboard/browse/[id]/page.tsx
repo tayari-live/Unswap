@@ -6,6 +6,7 @@ import {
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
 import { getListingDetail } from "@/server/services/discovery"
+import { effectiveNightly } from "@/lib/valuation"
 import { listReviewsForListing } from "@/server/services/reviews"
 import { FavouriteButton } from "../favourite-button"
 import { ReportButton } from "@/components/report-button"
@@ -89,6 +90,12 @@ export default async function ListingDetailPage({
               <span className="inline-flex items-center gap-1.5"><Bath size={16} className="text-neutral" /> {listing.bathrooms} {listing.bathrooms === 1 ? "bathroom" : "bathrooms"}</span>
               <span className="inline-flex items-center gap-1.5"><Users size={16} className="text-neutral" /> up to {listing.maxGuests} guests</span>
             </div>
+            {listing.exchangeType !== "simultaneous" && (
+              <div className="mt-4 inline-flex items-baseline gap-2 rounded-md bg-[var(--gold)]/10 border border-[var(--gold)]/30 px-3.5 py-2">
+                <span className="font-sans text-2xl font-bold text-[var(--gold-dark)]">{effectiveNightly(listing.nightlyPoints, listing.nightlyAdjustment)}</span>
+                <span className="text-sm text-neutral-dark">points / night</span>
+              </div>
+            )}
           </div>
 
           {listing.description && (
@@ -245,6 +252,7 @@ export default async function ListingDetailPage({
                 maxGuests={listing.maxGuests}
                 swapDurations={listing.swapDurations}
                 blackouts={listing.blackouts}
+                pointsPerNight={effectiveNightly(listing.nightlyPoints, listing.nightlyAdjustment)}
               />
               <MessageButton otherUserId={listing.owner.id} label="Message host" />
             </div>

@@ -186,17 +186,18 @@ export function WaitlistClient() {
                     page read the result.
                   */}
                   <div className="pt-6 mt-4 border-t border-wl-border flex flex-col items-center gap-3">
+                    {/* Returning members self-route to sign in — given prominence
+                        so it's easy to spot. The join form stays anti-enumeration
+                        (identical response either way), so this is how someone
+                        already on the list gets in without the field revealing
+                        membership. Email-first login then does the right thing
+                        (one-time link for passwordless, password otherwise). */}
+                    <a href="/login" className="text-wl-gold hover:text-wl-gold-light text-[13px] font-semibold tracking-[0.04em] transition-colors">
+                      Already joined? Sign in →
+                    </a>
                     <button type="button" onClick={() => { setMode("status"); setErrorMessage("") }} className="text-wl-muted hover:text-wl-gold text-[11px] font-medium tracking-[0.18em] uppercase transition-colors">
                       Check Status →
                     </button>
-                    {/* Returning members self-route to sign in. The join form
-                        stays anti-enumeration (identical response either way), so
-                        this is how someone already on the list gets in without the
-                        form revealing membership. Email-first login then does the
-                        right thing (magic link for passwordless, password otherwise). */}
-                    <a href="/login" className="text-wl-muted hover:text-wl-gold text-[11px] font-medium tracking-[0.18em] uppercase transition-colors">
-                      Already joined? Sign in →
-                    </a>
                   </div>
                 </form>
 

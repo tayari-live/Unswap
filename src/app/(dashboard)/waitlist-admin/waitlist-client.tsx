@@ -148,7 +148,7 @@ export default function WaitlistClient({ initialEntries }: { initialEntries: Ent
         subtitle="Pre-launch signups with referral tracking. Import leads, resend confirmations, invite founders."
         action={
           <div className="flex items-center gap-2 flex-wrap">
-            <button onClick={() => setImportOpen(true)} className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--hair)] bg-surface text-sm font-semibold text-[var(--fg)] hover:bg-neutral-light transition">
+            <button onClick={() => setImportOpen(true)} className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--hair)] bg-surface text-sm font-semibold text-[var(--fg)] hover:bg-[var(--parchment)] transition">
               <Upload size={16} /> Import leads
             </button>
             {unconfirmedCount > 0 && (
@@ -161,7 +161,7 @@ export default function WaitlistClient({ initialEntries }: { initialEntries: Ent
                 <Send size={16} /> {bulkBusy ? "Inviting…" : `Invite all (${pendingCount})`}
               </button>
             )}
-            <button onClick={exportCsv} className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--hair)] bg-surface text-sm font-semibold text-[var(--fg)] hover:bg-neutral-light transition">
+            <button onClick={exportCsv} className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--hair)] bg-surface text-sm font-semibold text-[var(--fg)] hover:bg-[var(--parchment)] transition">
               <Download size={16} /> Export CSV
             </button>
           </div>
@@ -247,7 +247,7 @@ export default function WaitlistClient({ initialEntries }: { initialEntries: Ent
             <input type="file" accept=".csv,text/csv" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
           </label>
           <div className="flex justify-end gap-3 pt-2">
-            <button onClick={() => setImportOpen(false)} disabled={importBusy} className="px-4 py-2.5 rounded-xl border border-[var(--hair)] text-sm font-semibold text-[var(--fg)] hover:bg-neutral-light transition">Cancel</button>
+            <button onClick={() => setImportOpen(false)} disabled={importBusy} className="px-4 py-2.5 rounded-xl border border-[var(--hair)] text-sm font-semibold text-[var(--fg)] hover:bg-[var(--parchment)] transition">Cancel</button>
             <button onClick={doImport} disabled={importBusy} className="px-5 py-2.5 rounded-xl bg-[var(--gold-dark)] text-sm font-semibold text-white hover:bg-[var(--gold-hover)] transition disabled:opacity-50">
               {importBusy ? "Importing…" : "Import"}
             </button>

@@ -137,7 +137,7 @@ export function PointsCelebration() {
         <p className="mt-4 text-sm text-neutral leading-relaxed">
           {multiple
             ? "Nicely done. You have unlocked several rewards:"
-            : "Nicely done. One point is one night in a fellow member's home."}
+            : "Nicely done. Spend points to stay in a fellow member's home."}
         </p>
 
         <ul className="mt-5 space-y-2 text-left">

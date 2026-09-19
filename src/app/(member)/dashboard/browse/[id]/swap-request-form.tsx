@@ -53,12 +53,14 @@ export function SwapRequestForm({
   maxGuests,
   swapDurations = [],
   blackouts = [],
+  pointsPerNight = 0,
 }: {
   listingId: string
   exchangeType: string
   maxGuests: number
   swapDurations?: string[]
   blackouts?: Blackout[]
+  pointsPerNight?: number
 }) {
   const router = useRouter()
   const toast = useToast()
@@ -218,6 +220,16 @@ export function SwapRequestForm({
         <label htmlFor="message" className={labelCls}>Message <span className="text-neutral normal-case font-normal">(optional)</span></label>
         <textarea id="message" value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Introduce yourself and your plans" className={TEXTAREA} />
       </div>
+
+      {mode === "points" && pointsPerNight > 0 && startDate && endDate && endDate > startDate && (() => {
+        const n = nightsBetween(startDate, endDate)
+        return (
+          <div className="flex items-center justify-between rounded-lg bg-[var(--navy)]/5 border border-[var(--gold)]/25 px-3.5 py-2.5">
+            <span className="text-xs text-neutral-dark">{n} night{n === 1 ? "" : "s"} × {pointsPerNight} points</span>
+            <span className="font-sans text-lg font-semibold text-[var(--gold-dark)]">{n * pointsPerNight} points</span>
+          </div>
+        )
+      })()}
 
       <div className="flex gap-3">
         {/* Always clickable — a blocked submit explains itself via toast. */}

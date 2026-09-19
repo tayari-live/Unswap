@@ -215,6 +215,10 @@
   --color-border: rgba(233, 201, 122, 0.14);
   --color-neutral: #98a2b6;
   --color-neutral-light: #1e2740;
+  /* In light mode this is a strong dark grey for prominent secondary text; on
+     dark it has to flip to a strong light grey, or text-neutral-dark (amenity
+     chips, verified lines, bios) renders dark-on-dark and disappears. */
+  --color-neutral-dark: #c9d2e0;
   --color-parchment: #161f30;
   --color-navy: #22304f;
   --color-navy-light: #30416a;

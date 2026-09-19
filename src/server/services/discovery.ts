@@ -76,6 +76,8 @@ export async function searchListings(p: SearchParams) {
         bedrooms: true,
         maxGuests: true,
         exchangeType: true,
+        nightlyPoints: true,
+        nightlyAdjustment: true,
         owner: OWNER_CARD,
         photos: { select: { id: true }, orderBy: { position: "asc" }, take: 1 },
       },
