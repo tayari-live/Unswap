@@ -148,11 +148,11 @@ export default function WaitlistClient({ initialEntries }: { initialEntries: Ent
         subtitle="Pre-launch signups with referral tracking. Import leads, resend confirmations, invite founders."
         action={
           <div className="flex items-center gap-2 flex-wrap">
-            <button onClick={() => setImportOpen(true)} className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--hair)] bg-surface text-sm font-semibold text-[var(--fg)] hover:bg-[var(--parchment)] transition">
+            <button onClick={() => setImportOpen(true)} className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--hair)] bg-surface text-sm font-semibold text-[var(--fg)] hover:bg-[var(--gold)]/10 transition">
               <Upload size={16} /> Import leads
             </button>
             {unconfirmedCount > 0 && (
-              <button onClick={resendAll} disabled={resendAllBusy} className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--gold)] bg-surface text-sm font-semibold text-[var(--gold-dark)] hover:bg-[var(--parchment)] transition disabled:opacity-50">
+              <button onClick={resendAll} disabled={resendAllBusy} className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--gold)] bg-surface text-sm font-semibold text-[var(--gold-dark)] hover:bg-[var(--gold)]/10 transition disabled:opacity-50">
                 <MailWarning size={16} /> {resendAllBusy ? "Sending…" : `Resend unconfirmed (${unconfirmedCount})`}
               </button>
             )}
@@ -161,7 +161,7 @@ export default function WaitlistClient({ initialEntries }: { initialEntries: Ent
                 <Send size={16} /> {bulkBusy ? "Inviting…" : `Invite all (${pendingCount})`}
               </button>
             )}
-            <button onClick={exportCsv} className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--hair)] bg-surface text-sm font-semibold text-[var(--fg)] hover:bg-[var(--parchment)] transition">
+            <button onClick={exportCsv} className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--hair)] bg-surface text-sm font-semibold text-[var(--fg)] hover:bg-[var(--gold)]/10 transition">
               <Download size={16} /> Export CSV
             </button>
           </div>
@@ -200,7 +200,7 @@ export default function WaitlistClient({ initialEntries }: { initialEntries: Ent
           }
         >
           {entries.map((e) => (
-            <tr key={e.id} className="hover:bg-[var(--parchment)]">
+            <tr key={e.id} className="hover:bg-[var(--gold)]/10">
               <td className="px-5 py-3.5">
                 <div className="font-semibold text-[var(--fg)]">{e.firstName} {e.lastName}</div>
                 <div className="text-xs text-neutral">{e.email}</div>
@@ -247,7 +247,7 @@ export default function WaitlistClient({ initialEntries }: { initialEntries: Ent
             <input type="file" accept=".csv,text/csv" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
           </label>
           <div className="flex justify-end gap-3 pt-2">
-            <button onClick={() => setImportOpen(false)} disabled={importBusy} className="px-4 py-2.5 rounded-xl border border-[var(--hair)] text-sm font-semibold text-[var(--fg)] hover:bg-[var(--parchment)] transition">Cancel</button>
+            <button onClick={() => setImportOpen(false)} disabled={importBusy} className="px-4 py-2.5 rounded-xl border border-[var(--hair)] text-sm font-semibold text-[var(--fg)] hover:bg-[var(--gold)]/10 transition">Cancel</button>
             <button onClick={doImport} disabled={importBusy} className="px-5 py-2.5 rounded-xl bg-[var(--gold-dark)] text-sm font-semibold text-white hover:bg-[var(--gold-hover)] transition disabled:opacity-50">
               {importBusy ? "Importing…" : "Import"}
             </button>
@@ -286,7 +286,7 @@ function WaitlistActions({
           onClick={() => onResend(e.id)}
           disabled={busy}
           title="Resend confirmation email"
-          className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-[var(--gold)] text-[var(--gold-dark)] hover:bg-[var(--parchment)] transition disabled:opacity-50"
+          className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-[var(--gold)] text-[var(--gold-dark)] hover:bg-[var(--gold)]/10 transition disabled:opacity-50"
         >
           <RefreshCw size={13} /> Resend
         </button>

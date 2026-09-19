@@ -93,7 +93,7 @@ export default async function OverviewPage() {
           <Link
             key={c.label}
             href={c.href}
-            className="group bg-[var(--surface)] rounded-md p-5 border border-[var(--navy)]/10 hover:border-[var(--gold)] hover:bg-[var(--parchment)] transition-colors"
+            className="group bg-[var(--surface)] rounded-md p-5 border border-[var(--navy)]/10 hover:border-[var(--gold)] hover:bg-[var(--gold)]/10 transition-colors"
           >
             <div className="flex items-center justify-between">
               <span className="w-9 h-9 border border-[var(--hair)] flex items-center justify-center text-[var(--gold-soft)] group-hover:border-[var(--gold)] transition-colors">
@@ -121,7 +121,7 @@ export default async function OverviewPage() {
               <Link
                 key={i}
                 href={a.href}
-                className="flex items-center justify-between gap-4 px-6 py-4 hover:bg-[var(--parchment)] transition-colors"
+                className="flex items-center justify-between gap-4 px-6 py-4 hover:bg-[var(--gold)]/10 transition-colors"
               >
                 <div className="flex items-center gap-3.5">
                   <span className={`w-9 h-9 rounded-md flex items-center justify-center flex-shrink-0 ${a.urgent ? "bg-[var(--crimson)]/10 text-[var(--crimson)]" : "bg-[var(--gold)]/15 text-[var(--gold-dark)]"}`}>

@@ -141,7 +141,7 @@ export default function MembersClient({
           }
         >
           {filtered.map((m) => (
-            <tr key={m.id} className="hover:bg-[var(--parchment)]">
+            <tr key={m.id} className="hover:bg-[var(--gold)]/10">
               <td className="px-5 py-3.5">
                 <div className="flex items-center gap-3">
                   <AvatarInitials initials={m.avatarInitials} />

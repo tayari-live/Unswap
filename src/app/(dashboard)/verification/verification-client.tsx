@@ -104,7 +104,7 @@ export default function VerificationClient({ initialSubmissions }: { initialSubm
             <button
               key={s.id}
               onClick={() => open(s)}
-              className="text-left bg-surface rounded-md border border-[var(--navy)]/10 p-5 hover:border-[var(--gold)] hover:bg-[var(--parchment)] transition"
+              className="text-left bg-surface rounded-md border border-[var(--navy)]/10 p-5 hover:border-[var(--gold)] hover:bg-[var(--gold)]/10 transition"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">

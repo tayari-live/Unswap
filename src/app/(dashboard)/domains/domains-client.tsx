@@ -95,7 +95,7 @@ export default function DomainsClient({ initialDomains }: { initialDomains: Doma
 
       <div className="bg-surface rounded-md border border-[var(--navy)]/10 divide-y divide-[var(--hair)]">
         {domains.map((d) => (
-          <div key={d.id} className="flex items-center justify-between px-5 py-3.5 hover:bg-[var(--parchment)] transition-colors">
+          <div key={d.id} className="flex items-center justify-between px-5 py-3.5 hover:bg-[var(--gold)]/10 transition-colors">
             <div className="flex items-center gap-3">
               <AvatarInitials icon={Globe} />
               <div>

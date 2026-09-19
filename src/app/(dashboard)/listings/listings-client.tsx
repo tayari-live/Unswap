@@ -107,14 +107,14 @@ export default function ListingsClient({ initialListings }: { initialListings: L
                   disabled={busyId === l.id}
                   className={`flex-1 text-xs font-semibold py-2 rounded-lg border transition disabled:opacity-50 ${
  l.flagged
- ? "border-[var(--hair)] text-neutral-dark hover:bg-[var(--parchment)]"
+ ? "border-[var(--hair)] text-neutral-dark hover:bg-[var(--gold)]/10"
  : "border-[var(--crimson)] text-[var(--crimson)] hover:bg-[var(--crimson)]/10"
  }`}
                 >
                   {l.flagged ? "Unflag" : "Flag"}
                 </button>
                 {l.status === "ACTIVE" ? (
-                  <button onClick={() => patch(l.id, { status: "PAUSED" })} disabled={busyId === l.id} className="flex-1 text-xs font-semibold py-2 rounded-lg border border-[var(--hair)] text-neutral-dark hover:bg-[var(--parchment)] transition disabled:opacity-50">Pause</button>
+                  <button onClick={() => patch(l.id, { status: "PAUSED" })} disabled={busyId === l.id} className="flex-1 text-xs font-semibold py-2 rounded-lg border border-[var(--hair)] text-neutral-dark hover:bg-[var(--gold)]/10 transition disabled:opacity-50">Pause</button>
                 ) : l.status === "ARCHIVED" ? (
                   <button onClick={() => patch(l.id, { status: "ACTIVE" })} disabled={busyId === l.id} className="flex-1 text-xs font-semibold py-2 rounded-lg border border-[var(--teal)] text-[var(--teal)] hover:bg-[var(--teal)]/10 transition disabled:opacity-50">Restore</button>
                 ) : (
