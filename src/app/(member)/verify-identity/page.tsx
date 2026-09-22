@@ -1,11 +1,12 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { ShieldCheck, Clock, MailWarning } from "lucide-react"
+import { ShieldCheck, Clock, MailWarning, MailCheck } from "lucide-react"
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
-import { reviewTypeForEmail } from "@/server/services/registration"
+import { reviewTypeForEmail, matchAllowedDomain } from "@/server/services/registration"
 import { LuxPageHeader } from "@/components/ui/lux"
 import { VerifyIdentityForm } from "./verify-identity-form"
+import { AddWorkEmail } from "./add-work-email"
 
 export const dynamic = "force-dynamic"
 
@@ -63,7 +64,15 @@ export default async function VerifyIdentityPage() {
   }
 
   // EMAIL_VERIFIED or REJECTED → show the upload form.
-  const type = await reviewTypeForEmail(user.email)
+  // A confirmed work email (added via the fast path) drives the review type, so
+  // an allowlisted address the member proved counts even when they signed up
+  // with a personal one.
+  const primaryMatched = await matchAllowedDomain(user.email)
+  const reviewEmail = user.workEmailVerifiedAt && user.workEmail ? user.workEmail : user.email
+  const type = await reviewTypeForEmail(reviewEmail)
+  // Offer the no-documents fast path only when the signup email isn't recognised
+  // and they haven't already added a work email.
+  const showAddWorkEmail = !user.workEmailVerifiedAt && !primaryMatched
 
   // On rejection, show the reviewer's note so the member knows what to fix.
   const lastRejection =
@@ -92,6 +101,23 @@ export default async function VerifyIdentityPage() {
           </p>
         </div>
       )}
+      {user.workEmailVerifiedAt && user.workEmail && (
+        <div className="mb-5 flex items-center gap-2 text-sm text-[var(--teal)] bg-[var(--teal-light)] border border-[var(--teal)]/30 rounded-md px-4 py-3">
+          <MailCheck size={16} className="flex-shrink-0" /> Work email verified: <span className="font-semibold">{user.workEmail}</span>
+        </div>
+      )}
+
+      {showAddWorkEmail && (
+        <div className="mb-5">
+          <AddWorkEmail />
+          <div className="flex items-center gap-3 my-6">
+            <span className="h-px flex-1 bg-[var(--hair)]" />
+            <span className="text-xs uppercase tracking-wider text-neutral">or upload documents</span>
+            <span className="h-px flex-1 bg-[var(--hair)]" />
+          </div>
+        </div>
+      )}
+
       <div className="bg-surface rounded-md border border-[var(--hair)] p-6 sm:p-8">
         <p className="text-sm text-neutral mb-6">
           {type === "fast_track"

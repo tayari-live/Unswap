@@ -50,7 +50,7 @@ export async function isAutoVerifyEmail(email: string): Promise<boolean> {
  * one-time "verified" points bonus, plus an audit entry flagged automatic. The
  * points grant is idempotent, so calling this more than once is harmless.
  */
-async function grantAutoVerifyRewards(user: { id: string; fullName: string; email: string }) {
+export async function grantAutoVerifyRewards(user: { id: string; fullName: string; email: string }) {
   await grantPointsOnce(user.id, "verified")
   await logAudit({
     action: "MEMBER_VERIFIED",

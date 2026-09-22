@@ -46,6 +46,12 @@ model User {
   // Verification: PENDING_EMAIL | EMAIL_VERIFIED | PENDING_ID_REVIEW |
   //               FULLY_VERIFIED | REJECTED | SUSPENDED
   verificationStatus String    @default("PENDING_EMAIL")
+  // Optional second, institutional email a member adds to prove affiliation when
+  // they signed up with a non-recognised address. Confirming it runs the same
+  // allowlist logic as the primary email (auto-verify / fast-track). Unique so a
+  // work address can back at most one account.
+  workEmail          String?   @unique
+  workEmailVerifiedAt DateTime?
   trustScore         Float?    // weighted average of host reviews
   stripeCustomerId   String?   @unique // Stripe customer for billing
 
@@ -85,6 +91,7 @@ model User {
   auditLogs          AuditLog[]               @relation("ActorRelation")
   resetTokens        PasswordResetToken[]
   emailTokens        EmailVerificationToken[]
+  workEmailTokens    WorkEmailToken[]
   loginTokens        LoginToken[]
   favourites         Favourite[]
   conversations      ConversationParticipant[]
@@ -196,6 +203,23 @@ model EmailVerificationToken {
   id        String    @id @default(uuid())
   token     String    @unique
   userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// Confirms a secondary, institutional email a member adds to prove affiliation.
+// Unlike EmailVerificationToken (which confirms the account's own email) this
+// carries the target address, since it is not the account's login email.
+model WorkEmailToken {
+  id        String    @id @default(uuid())
+  token     String    @unique
+  userId    String
+  email     String    // the institutional address being confirmed
   expiresAt DateTime
   usedAt    DateTime?
   createdAt DateTime  @default(now())
