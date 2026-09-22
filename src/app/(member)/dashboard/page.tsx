@@ -22,6 +22,7 @@ import { ResendEmailButton } from "@/components/ui/resend-email-button"
 import { PROFILE_COMPLETE_AT } from "@/server/services/profile"
 import { Greeting } from "./greeting"
 import { TrustScoreCard } from "./trust-score-card"
+import { RecommendedHomes } from "./recommended-homes"
 
 export const dynamic = "force-dynamic"
 
@@ -220,13 +221,6 @@ export default async function MemberDashboardPage() {
   } else if (!isVerified || profileIncomplete) {
     subtext = "Complete your profile and start exploring the UnSwap network."
   }
-
-  // Mock recommended homes
-  const recommendedHomes = [
-    { city: "Geneva", country: "Switzerland", image: "/images/residence-geneva.png", nights: 7, points: 1820 },
-    { city: "Mayfair, London", country: "United Kingdom", image: "/images/residence-mayfair.png", nights: 5, points: 1300 },
-    { city: "Singapore", country: "Singapore", image: "/images/residence-singapore.png", nights: 10, points: 2200 }
-  ];
 
   return (
     <div className="min-h-[calc(100vh-76px)] bg-[var(--canvas)]">
@@ -431,35 +425,8 @@ export default async function MemberDashboardPage() {
           </div>
         )}
 
-        {/* 6. Recommended Homes */}
-        <div className="mb-16">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="font-sans text-xs font-bold text-[var(--fg)] uppercase tracking-[0.14em]">
-              Recommended For You
-            </h3>
-            <Link href="/dashboard/browse" className="text-[13px] font-medium text-[var(--fg)]/70 hover:text-[var(--fg)] flex items-center gap-1 transition-colors">
-              View all <ChevronRight size={14} />
-            </Link>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {recommendedHomes.map((home, idx) => (
-              <Link key={idx} href={`/dashboard/browse?q=${home.city}`} className="group flex flex-col bg-[var(--surface)] rounded-[10px] overflow-hidden border border-[var(--hair)] hover:border-[var(--gold)] transition-colors">
-                <div className="aspect-[4/3] bg-[var(--navy)]/5 relative overflow-hidden">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={home.image} alt={home.city} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" />
-                </div>
-                <div className="p-5">
-                  <h4 className="font-display text-[24px] font-bold text-[var(--fg)] leading-none mb-1">{home.city}</h4>
-                  <div className="font-sans text-[13px] text-[var(--fg)]/70 mb-3">{home.country}</div>
-                  <div className="font-sans text-[13px] text-[var(--fg)] font-medium">
-                    {home.nights} nights · {home.points} points
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
+        {/* 6. Recommended Homes — real matches from the swap-matching engine. */}
+        <RecommendedHomes userId={userId} />
 
         {/* 8. Recent Activity */}
         <div>
