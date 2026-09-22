@@ -93,7 +93,7 @@ export default async function ListingDetailPage({
               <div className="aspect-[16/10] rounded-md overflow-hidden bg-[var(--navy)]/5 relative">
                 {listing.photos[0] && (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={`/api/photos/${listing.photos[0].id}`} alt="Home preview" className="w-full h-full object-cover blur-xl scale-110" />
+                  <img src={`/api/photos/${listing.photos[0].id}`} alt="Home preview" className="w-full h-full object-cover" />
                 )}
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-center px-6 pointer-events-none">
                   <Lock size={26} className="text-[var(--gold-dark)]" />

@@ -124,7 +124,7 @@ export default async function BrowsePage({
               <div className="relative h-44 bg-[var(--background)]">
                 {l.photoId ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={`/api/photos/${l.photoId}`} alt={blurred ? "Home preview" : l.title} loading="lazy" className={`w-full h-full object-cover ${blurred ? "blur-md scale-110" : ""}`} />
+                  <img src={`/api/photos/${l.photoId}`} alt={blurred ? "Home preview" : l.title} loading="lazy" className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-neutral/30">
                     <MapPin size={30} />
