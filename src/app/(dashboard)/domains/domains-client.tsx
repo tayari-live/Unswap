@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 import { Plus, Trash2, Globe, Zap, ShieldCheck } from "lucide-react"
+import { cn } from "@/lib/utils"
 import { LuxPageHeader } from "@/components/ui/lux"
-import { Badge } from "@/components/ui/badges"
 import { useToast } from "@/components/ui/toast"
 import { AvatarInitials } from "@/components/ui/avatar"
 import { EmptyState } from "@/components/ui/empty-state"
@@ -46,6 +46,33 @@ export default function DomainsClient({ initialDomains }: { initialDomains: Doma
   async function remove(id: string) {
     const res = await fetch(`/api/domains/${id}`, { method: "DELETE" })
     if (res.ok) setDomains((prev) => prev.filter((d) => d.id !== id))
+  }
+
+  // Flip a domain's fast-track / auto-verify flag. Optimistic, and mirrors the
+  // server rule that auto-verify implies fast-track; reverts on failure.
+  async function update(id: string, patch: { fastTrack?: boolean; autoVerify?: boolean }) {
+    const prev = domains
+    setDomains((ds) =>
+      ds.map((d) => {
+        if (d.id !== id) return d
+        const autoVerify = patch.autoVerify ?? d.autoVerify
+        const fastTrack = autoVerify ? true : (patch.fastTrack ?? d.fastTrack)
+        return { ...d, fastTrack, autoVerify }
+      }),
+    )
+    const res = await fetch(`/api/domains/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(patch),
+    })
+    if (!res.ok) {
+      setDomains(prev)
+      const data = await res.json().catch(() => ({}))
+      toast(data.error || "Could not update domain.", "error")
+      return
+    }
+    const updated = await res.json()
+    setDomains((ds) => ds.map((d) => (d.id === id ? updated : d)))
   }
 
   return (
@@ -116,14 +143,35 @@ export default function DomainsClient({ initialDomains }: { initialDomains: Doma
                 <div className="text-xs text-neutral">{d.label}</div>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              {d.autoVerify ? (
-                <Badge tone="gold"><ShieldCheck size={11} /> Auto-verify</Badge>
-              ) : d.fastTrack ? (
-                <Badge tone="teal"><Zap size={11} /> Fast track</Badge>
-              ) : (
-                <Badge tone="gold">Manual</Badge>
-              )}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => update(d.id, { fastTrack: !d.fastTrack })}
+                disabled={d.autoVerify}
+                title={d.autoVerify ? "Auto-verify already implies fast-track" : (d.fastTrack ? "Fast-track on — click to turn off" : "Fast-track off — click to turn on")}
+                className={cn(
+                  "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border transition-colors",
+                  d.fastTrack || d.autoVerify
+                    ? "border-[var(--teal)]/40 text-[var(--teal)] bg-[var(--teal)]/10"
+                    : "border-[var(--hair)] text-neutral hover:border-[var(--teal)]/40",
+                  d.autoVerify && "opacity-60 cursor-not-allowed",
+                )}
+              >
+                <Zap size={11} /> Fast-track
+              </button>
+              <button
+                type="button"
+                onClick={() => update(d.id, { autoVerify: !d.autoVerify })}
+                title={d.autoVerify ? "Auto-verify on (instant, no documents) — click to turn off" : "Auto-verify off — click to turn on (instant, no documents)"}
+                className={cn(
+                  "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border transition-colors",
+                  d.autoVerify
+                    ? "border-[var(--gold)]/40 text-[var(--gold-dark)] bg-[var(--gold)]/12"
+                    : "border-[var(--hair)] text-neutral hover:border-[var(--gold)]/40",
+                )}
+              >
+                <ShieldCheck size={11} /> Auto-verify
+              </button>
               <button onClick={() => remove(d.id)} className="p-1.5 rounded-lg text-[var(--crimson)] hover:bg-[var(--crimson)]/10" title="Remove">
                 <Trash2 size={16} />
               </button>

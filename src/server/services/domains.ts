@@ -32,6 +32,33 @@ export async function addDomain(input: {
   return created
 }
 
+export async function updateDomain(input: {
+  actorId: string
+  id: string
+  fastTrack?: boolean
+  autoVerify?: boolean
+}) {
+  const existing = await prisma.allowedDomain.findUnique({ where: { id: input.id } })
+  if (!existing) throw new ApiError(404, "Domain not found.")
+
+  const autoVerify = input.autoVerify ?? existing.autoVerify
+  // Auto-verify implies fast-track (it skips review entirely), so never let the
+  // pair land in a contradictory state.
+  const fastTrack = autoVerify ? true : (input.fastTrack ?? existing.fastTrack)
+
+  const updated = await prisma.allowedDomain.update({
+    where: { id: input.id },
+    data: { fastTrack, autoVerify },
+  })
+  await logAudit({
+    actorId: input.actorId,
+    action: "DOMAIN_UPDATED",
+    subject: `Updated ${existing.domain} (fastTrack=${fastTrack}, autoVerify=${autoVerify})`,
+    metadata: { domain: existing.domain, fastTrack, autoVerify },
+  })
+  return updated
+}
+
 export async function deleteDomain(input: { actorId: string; id: string }) {
   const existing = await prisma.allowedDomain.findUnique({ where: { id: input.id } })
   if (!existing) throw new ApiError(404, "Domain not found.")
