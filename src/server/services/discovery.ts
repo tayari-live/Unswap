@@ -1,5 +1,6 @@
 import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
+import { cityCoords } from "@/lib/geo"
 
 const OWNER_CARD = {
   select: {
@@ -94,6 +95,45 @@ export async function searchListings(p: SearchParams) {
     page,
     pageCount: Math.max(1, Math.ceil(total / BROWSE_PAGE_SIZE)),
   }
+}
+
+export type CityPin = { city: string; country: string; count: number; lng: number; lat: number }
+
+/**
+ * Active listings grouped into CITY pins for the map view — a count per city at
+ * the city centre, never a home's real location. Applies the same filters as
+ * the grid so the two views stay in sync. Cities without known coordinates are
+ * omitted from the map (they still appear in the list).
+ */
+export async function listingCityCounts(p: SearchParams): Promise<CityPin[]> {
+  const where: any = { status: "ACTIVE", ownerId: { not: p.viewerId } }
+  if (p.q?.trim()) {
+    const q = p.q.trim()
+    where.OR = [
+      { city: { contains: q, mode: "insensitive" } },
+      { country: { contains: q, mode: "insensitive" } },
+      { title: { contains: q, mode: "insensitive" } },
+      { neighbourhood: { contains: q, mode: "insensitive" } },
+    ]
+  }
+  if (p.propertyType) where.propertyType = p.propertyType
+  if (p.exchangeType) where.exchangeType = { in: [p.exchangeType, "either"] }
+  if (p.bedrooms) where.bedrooms = { gte: p.bedrooms }
+  if (p.guests) where.maxGuests = { gte: p.guests }
+
+  const groups = await prisma.listing.groupBy({
+    by: ["city", "country"],
+    where,
+    _count: { _all: true },
+  })
+
+  return groups
+    .map((g) => {
+      const coords = cityCoords(g.city)
+      return coords ? { city: g.city, country: g.country, count: g._count._all, lng: coords[0], lat: coords[1] } : null
+    })
+    .filter((x): x is CityPin => x !== null)
+    .sort((a, b) => b.count - a.count)
 }
 
 /** A single listing for the detail view. Only ACTIVE listings are browsable. */

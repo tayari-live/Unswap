@@ -3,11 +3,12 @@ import { redirect } from "next/navigation"
 import { MapPin, Star, BadgeCheck, SearchX, ChevronLeft, ChevronRight, Lock } from "lucide-react"
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
-import { searchListings } from "@/server/services/discovery"
+import { searchListings, listingCityCounts } from "@/server/services/discovery"
 import { effectiveNightly } from "@/lib/valuation"
 import { LuxPageHeader } from "@/components/ui/lux"
 import { PageTip } from "@/components/ui/page-tip"
 import { BrowseControls } from "./browse-controls"
+import { BrowseMap } from "./browse-map"
 import { FavouriteButton } from "./favourite-button"
 
 export const dynamic = "force-dynamic"
@@ -79,6 +80,30 @@ export default async function BrowsePage({
     return `/dashboard/browse${qs.toString() ? `?${qs}` : ""}`
   }
 
+  // Grid ⇄ Map toggle, preserving the active filters.
+  const isMap = sp.view === "map"
+  const viewHref = (map: boolean) => {
+    const qs = new URLSearchParams()
+    if (filters.q) qs.set("q", filters.q)
+    if (filters.propertyType) qs.set("type", filters.propertyType)
+    if (filters.bedrooms) qs.set("beds", filters.bedrooms)
+    if (filters.guests) qs.set("guests", filters.guests)
+    if (filters.exchangeType) qs.set("exchange", filters.exchangeType)
+    if (filters.savedOnly) qs.set("saved", "1")
+    if (map) qs.set("view", "map")
+    return `/dashboard/browse${qs.toString() ? `?${qs}` : ""}`
+  }
+  const cityPins = isMap
+    ? await listingCityCounts({
+        viewerId: userId,
+        q: filters.q,
+        propertyType: filters.propertyType || undefined,
+        bedrooms: filters.bedrooms ? Number(filters.bedrooms) : undefined,
+        guests: filters.guests ? Number(filters.guests) : undefined,
+        exchangeType: filters.exchangeType || undefined,
+      })
+    : []
+
   return (
     <div className="max-w-6xl mx-auto pb-12">
       <LuxPageHeader eyebrow="The Portfolio" title="Discover Homes" subtitle="Browse verified homes across the network." />
@@ -101,11 +126,21 @@ export default async function BrowsePage({
 
       <BrowseControls initial={filters} />
 
-      <p className="text-sm text-neutral mb-4">
-        {total} {total === 1 ? "home" : "homes"}{filters.savedOnly ? " saved" : " available"}
-      </p>
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-sm text-neutral">
+          {isMap
+            ? `${cityPins.length} ${cityPins.length === 1 ? "city" : "cities"} with homes`
+            : `${total} ${total === 1 ? "home" : "homes"}${filters.savedOnly ? " saved" : " available"}`}
+        </p>
+        <div className="inline-flex rounded-lg border border-[var(--hair)] overflow-hidden text-sm">
+          <Link href={viewHref(false)} className={`px-3.5 py-1.5 font-medium transition-colors ${!isMap ? "bg-[var(--navy)] text-white" : "text-[var(--fg)] hover:bg-[var(--gold)]/10"}`}>Grid</Link>
+          <Link href={viewHref(true)} className={`px-3.5 py-1.5 font-medium transition-colors ${isMap ? "bg-[var(--navy)] text-white" : "text-[var(--fg)] hover:bg-[var(--gold)]/10"}`}>Map</Link>
+        </div>
+      </div>
 
-      {listings.length === 0 ? (
+      {isMap ? (
+        <BrowseMap pins={cityPins} />
+      ) : listings.length === 0 ? (
         <div className="bg-surface rounded-md border border-[var(--hair)] p-12 text-center">
           <div className="mx-auto w-14 h-14 rounded-md bg-neutral-light text-neutral flex items-center justify-center mb-4">
             <SearchX size={26} />
@@ -171,7 +206,7 @@ export default async function BrowsePage({
         </div>
       )}
 
-      {pageCount > 1 && (
+      {!isMap && pageCount > 1 && (
         <nav className="mt-8 flex items-center justify-center gap-3" aria-label="Pagination">
           {page > 1 ? (
             <Link href={pageHref(page - 1)} className="inline-flex items-center gap-1 text-sm font-semibold text-[var(--fg)] px-4 py-2 rounded-xl border border-[var(--hair)] hover:border-[var(--navy)] transition-colors">
