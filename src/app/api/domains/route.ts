@@ -20,6 +20,7 @@ export async function POST(req: NextRequest) {
       domain: body.domain,
       label: body.label,
       fastTrack: body.fastTrack !== false,
+      autoVerify: body.autoVerify === true,
     })
     return NextResponse.json(created, { status: 201 })
   } catch (err) {

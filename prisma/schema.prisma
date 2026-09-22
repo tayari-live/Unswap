@@ -225,6 +225,12 @@ model AllowedDomain {
   domain    String   @unique // e.g. "un.org"
   label     String   // human-readable org name, e.g. "United Nations"
   fastTrack Boolean  @default(true)
+  // When true, confirming an institutional email on this domain IS the proof of
+  // affiliation: the member skips the document upload + officer review and
+  // becomes FULLY_VERIFIED the moment they click the confirmation link. Kept
+  // separate from fastTrack (which only lightens the document/review burden) so
+  // "no human at all" is an explicit, deliberate choice per domain.
+  autoVerify Boolean @default(false)
   createdAt DateTime @default(now())
 }
 

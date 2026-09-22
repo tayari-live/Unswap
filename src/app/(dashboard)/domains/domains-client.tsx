@@ -1,14 +1,14 @@
 "use client"
 
 import { useState } from "react"
-import { Plus, Trash2, Globe, Zap } from "lucide-react"
+import { Plus, Trash2, Globe, Zap, ShieldCheck } from "lucide-react"
 import { LuxPageHeader } from "@/components/ui/lux"
 import { Badge } from "@/components/ui/badges"
 import { useToast } from "@/components/ui/toast"
 import { AvatarInitials } from "@/components/ui/avatar"
 import { EmptyState } from "@/components/ui/empty-state"
 
-type Domain = { id: string; domain: string; label: string; fastTrack: boolean }
+type Domain = { id: string; domain: string; label: string; fastTrack: boolean; autoVerify: boolean }
 
 export default function DomainsClient({ initialDomains }: { initialDomains: Domain[] }) {
   const toast = useToast()
@@ -16,6 +16,7 @@ export default function DomainsClient({ initialDomains }: { initialDomains: Doma
   const [domain, setDomain] = useState("")
   const [label, setLabel] = useState("")
   const [fastTrack, setFastTrack] = useState(true)
+  const [autoVerify, setAutoVerify] = useState(false)
   const [busy, setBusy] = useState(false)
 
   async function add(e: React.FormEvent) {
@@ -25,7 +26,7 @@ export default function DomainsClient({ initialDomains }: { initialDomains: Doma
       const res = await fetch("/api/domains", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ domain, label, fastTrack }),
+        body: JSON.stringify({ domain, label, fastTrack, autoVerify }),
       })
       const data = await res.json()
       if (!res.ok) {
@@ -35,6 +36,7 @@ export default function DomainsClient({ initialDomains }: { initialDomains: Doma
       setDomains((prev) => [...prev, data].sort((a, b) => a.domain.localeCompare(b.domain)))
       setDomain("")
       setLabel("")
+      setAutoVerify(false)
       toast(`@${data.domain} added to the allowlist.`, "success")
     } finally {
       setBusy(false)
@@ -50,7 +52,7 @@ export default function DomainsClient({ initialDomains }: { initialDomains: Doma
     <div className="max-w-4xl mx-auto pb-12">
       <LuxPageHeader eyebrow="Access"
         title="Domain Allowlist"
-        subtitle="Institutional email domains that gate sign-up. Fast-track domains skip manual review."
+        subtitle="Institutional email domains that gate sign-up. Fast-track skips the extra proof-of-employment; auto-verify skips documents and review entirely — a confirmed email is the verification."
       />
 
       <form onSubmit={add} className="bg-surface rounded-md border border-[var(--navy)]/10 p-5 mb-6">
@@ -78,11 +80,22 @@ export default function DomainsClient({ initialDomains }: { initialDomains: Doma
             />
           </div>
         </div>
-        <div className="flex items-center justify-between mt-4">
-          <label className="flex items-center gap-2 text-sm text-neutral-dark cursor-pointer">
-            <input type="checkbox" checked={fastTrack} onChange={(e) => setFastTrack(e.target.checked)} className="accent-[var(--navy)]" />
-            Fast-track (skip manual review)
-          </label>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mt-4">
+          <div className="space-y-2">
+            <label className="flex items-center gap-2 text-sm text-neutral-dark cursor-pointer">
+              {/* Auto-verify implies fast-track (it skips the whole review), so
+                  reflect that in the checkbox state. */}
+              <input type="checkbox" checked={fastTrack || autoVerify} disabled={autoVerify} onChange={(e) => setFastTrack(e.target.checked)} className="accent-[var(--navy)] disabled:opacity-60" />
+              Fast-track (staff ID only, no proof of employment)
+            </label>
+            <label className="flex items-center gap-2 text-sm text-neutral-dark cursor-pointer">
+              <input type="checkbox" checked={autoVerify} onChange={(e) => setAutoVerify(e.target.checked)} className="accent-[var(--gold-dark)]" />
+              <span className="inline-flex items-center gap-1.5">
+                <ShieldCheck size={14} className="text-[var(--gold-dark)]" />
+                Auto-verify (confirmed email = verified, no documents, no review)
+              </span>
+            </label>
+          </div>
           <button
             type="submit"
             disabled={busy}
@@ -104,7 +117,9 @@ export default function DomainsClient({ initialDomains }: { initialDomains: Doma
               </div>
             </div>
             <div className="flex items-center gap-3">
-              {d.fastTrack ? (
+              {d.autoVerify ? (
+                <Badge tone="gold"><ShieldCheck size={11} /> Auto-verify</Badge>
+              ) : d.fastTrack ? (
                 <Badge tone="teal"><Zap size={11} /> Fast track</Badge>
               ) : (
                 <Badge tone="gold">Manual</Badge>

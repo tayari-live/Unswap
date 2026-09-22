@@ -8,7 +8,13 @@ export function listDomains() {
 
 const DOMAIN_RE = /^[a-z0-9.-]+\.[a-z]{2,}$/i
 
-export async function addDomain(input: { actorId: string; domain: string; label: string; fastTrack: boolean }) {
+export async function addDomain(input: {
+  actorId: string
+  domain: string
+  label: string
+  fastTrack: boolean
+  autoVerify?: boolean
+}) {
   const domain = input.domain.trim().toLowerCase().replace(/^@/, "")
   if (!DOMAIN_RE.test(domain)) throw new ApiError(400, "Enter a valid domain, e.g. un.org.")
   if (!input.label.trim()) throw new ApiError(400, "An organisation label is required.")
@@ -16,10 +22,13 @@ export async function addDomain(input: { actorId: string; domain: string; label:
   const existing = await prisma.allowedDomain.findUnique({ where: { domain } })
   if (existing) throw new ApiError(409, "That domain is already on the allowlist.")
 
+  const autoVerify = input.autoVerify === true
   const created = await prisma.allowedDomain.create({
-    data: { domain, label: input.label.trim(), fastTrack: input.fastTrack },
+    // autoVerify short-circuits the document + officer step, so it necessarily
+    // implies fast-track — coerce it so the row can't hold a contradictory state.
+    data: { domain, label: input.label.trim(), fastTrack: autoVerify || input.fastTrack, autoVerify },
   })
-  await logAudit({ actorId: input.actorId, action: "DOMAIN_ADDED", subject: `Allowlisted ${domain}`, metadata: { domain } })
+  await logAudit({ actorId: input.actorId, action: "DOMAIN_ADDED", subject: `Allowlisted ${domain}`, metadata: { domain, autoVerify } })
   return created
 }
 

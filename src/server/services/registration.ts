@@ -5,6 +5,7 @@ import { ApiError } from "@/server/http"
 import { sendEmail, renderEmail, esc } from "@/server/email"
 import { logAudit } from "@/server/services/audit"
 import { consumeRegisterGrant } from "@/server/services/waitlist"
+import { grantPointsOnce } from "@/server/services/points"
 import { kitTagAccountCreated } from "@/server/kit"
 import { registerSchema, passwordSchema, firstError } from "@/lib/validation/auth"
 
@@ -35,6 +36,27 @@ export async function matchAllowedDomain(email: string) {
 export async function reviewTypeForEmail(email: string): Promise<"fast_track" | "manual"> {
   const matched = await matchAllowedDomain(email)
   return matched?.fastTrack ? "fast_track" : "manual"
+}
+
+/** Whether a confirmed email on this address's domain auto-verifies the member. */
+export async function isAutoVerifyEmail(email: string): Promise<boolean> {
+  const matched = await matchAllowedDomain(email)
+  return matched?.autoVerify ?? false
+}
+
+/**
+ * Side-effects that accompany reaching FULLY_VERIFIED through an autoVerify
+ * domain — no officer, no documents. Mirrors what a human approval grants: the
+ * one-time "verified" points bonus, plus an audit entry flagged automatic. The
+ * points grant is idempotent, so calling this more than once is harmless.
+ */
+async function grantAutoVerifyRewards(user: { id: string; fullName: string; email: string }) {
+  await grantPointsOnce(user.id, "verified")
+  await logAudit({
+    action: "MEMBER_VERIFIED",
+    subject: `Auto-verified member: ${user.fullName}`,
+    metadata: { email: user.email, autoVerified: true },
+  })
 }
 
 export type RegisterInput = {
@@ -99,6 +121,7 @@ export async function registerMember(input: RegisterInput) {
 
   const matched = await matchAllowedDomain(email)
   const fastTrack = matched?.fastTrack ?? false
+  const autoVerify = matched?.autoVerify ?? false
 
   // A valid grant means this exact address was already verified (the waitlist
   // link was clicked from its inbox), so skip the account's own email step. This
@@ -121,7 +144,13 @@ export async function registerMember(input: RegisterInput) {
       fullName: `${firstName} ${lastName}`,
       role: "member",
       avatarInitials: initialsOf(firstName, lastName),
-      verificationStatus: preVerified ? "EMAIL_VERIFIED" : "PENDING_EMAIL",
+      // autoVerify only elevates once the email is confirmed. A pre-verified
+      // signup (the waitlist link was already clicked) has that proof now, so it
+      // lands FULLY_VERIFIED; a fresh signup still confirms its email first and
+      // verifyEmailToken elevates it at that point.
+      verificationStatus: preVerified
+        ? autoVerify ? "FULLY_VERIFIED" : "EMAIL_VERIFIED"
+        : "PENDING_EMAIL",
       organisation: waitlisted?.organisation ?? null,
       profileCompletion: waitlisted?.organisation ? 30 : 20,
     },
@@ -129,6 +158,12 @@ export async function registerMember(input: RegisterInput) {
 
   if (waitlisted && waitlisted.status !== "converted") {
     await prisma.waitlistEntry.update({ where: { email }, data: { status: "converted" } })
+  }
+
+  // Pre-verified + autoVerify => the account is FULLY_VERIFIED already; grant the
+  // same reward a human approval would.
+  if (preVerified && autoVerify) {
+    await grantAutoVerifyRewards({ id: user.id, fullName: user.fullName, email })
   }
 
   // Pre-verified accounts (arriving from the waitlist link) skip the email step;
@@ -141,7 +176,7 @@ export async function registerMember(input: RegisterInput) {
   await logAudit({
     action: "MEMBER_REGISTERED",
     subject: `New member registered: ${user.fullName}`,
-    metadata: { email, fastTrack, preVerified },
+    metadata: { email, fastTrack, autoVerify, preVerified },
   })
 
   return { fastTrack, emailSent, email, emailVerified: preVerified }
@@ -213,6 +248,9 @@ export async function beginPasswordlessMember(input: {
 
   let user = await prisma.user.findUnique({ where: { email } })
   if (!user) {
+    // The invite click already proved inbox ownership, so on an autoVerify
+    // domain that confirmation is the whole verification: create FULLY_VERIFIED.
+    const autoVerify = await isAutoVerifyEmail(email)
     const waitlisted = await prisma.waitlistEntry.findUnique({ where: { email } })
     user = await prisma.user.create({
       data: {
@@ -223,7 +261,7 @@ export async function beginPasswordlessMember(input: {
         fullName: `${firstName} ${lastName}`.trim(),
         role: "member",
         avatarInitials: initialsOf(firstName, lastName),
-        verificationStatus: "EMAIL_VERIFIED",
+        verificationStatus: autoVerify ? "FULLY_VERIFIED" : "EMAIL_VERIFIED",
         organisation: waitlisted?.organisation ?? null,
         profileCompletion: waitlisted?.organisation ? 30 : 20,
       },
@@ -234,8 +272,11 @@ export async function beginPasswordlessMember(input: {
     await logAudit({
       action: "MEMBER_REGISTERED",
       subject: `New member (passwordless): ${user.fullName}`,
-      metadata: { email, passwordless: true },
+      metadata: { email, passwordless: true, autoVerify },
     })
+    if (autoVerify) {
+      await grantAutoVerifyRewards({ id: user.id, fullName: user.fullName, email })
+    }
     // Move them into the 'account-created' Kit segment.
     await kitTagAccountCreated(email)
   }
@@ -338,23 +379,36 @@ export async function verifyEmailToken(rawToken: string) {
   if (record.usedAt) throw new ApiError(410, "This verification link has already been used.")
   if (record.expiresAt < new Date()) throw new ApiError(410, "This verification link has expired.")
 
+  // A confirmed email on an autoVerify domain IS the proof of affiliation, so
+  // this click alone verifies the member — no document, no officer. Everyone
+  // else advances only to EMAIL_VERIFIED and continues to the document step.
+  const autoVerify = await isAutoVerifyEmail(record.user.email)
+  const advancing = record.user.verificationStatus === "PENDING_EMAIL"
+  const nextStatus = autoVerify ? "FULLY_VERIFIED" : "EMAIL_VERIFIED"
+
   await prisma.$transaction([
     prisma.emailVerificationToken.update({
       where: { id: record.id },
       data: { usedAt: new Date() },
     }),
     // Only advance from the initial state; never downgrade a further-along member.
-    ...(record.user.verificationStatus === "PENDING_EMAIL"
+    ...(advancing
       ? [
           prisma.user.update({
             where: { id: record.userId },
-            data: { verificationStatus: "EMAIL_VERIFIED" },
+            data: { verificationStatus: nextStatus },
           }),
         ]
       : []),
   ])
 
-  return { firstName: record.user.firstName }
+  // Grant the verified reward once — only when this click actually elevated the
+  // member to FULLY_VERIFIED.
+  if (advancing && autoVerify) {
+    await grantAutoVerifyRewards({ id: record.userId, fullName: record.user.fullName, email: record.user.email })
+  }
+
+  return { firstName: record.user.firstName, autoVerified: advancing && autoVerify }
 }
 
 /**

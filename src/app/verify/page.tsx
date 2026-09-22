@@ -16,10 +16,12 @@ export default async function VerifyPage({
   let ok = false
   let message = ""
   let firstName = ""
+  let autoVerified = false
   try {
     const result = await verifyEmailToken(token ?? "")
     ok = true
     firstName = result.firstName
+    autoVerified = result.autoVerified
   } catch (err: any) {
     message = err?.message || "This verification link is invalid."
   }
@@ -27,7 +29,7 @@ export default async function VerifyPage({
   return (
     <AuthShell
       eyebrow={ok ? "Verified Access" : "Verification"}
-      title={ok ? "Email confirmed" : "Verification failed"}
+      title={ok ? (autoVerified ? "You're verified" : "Email confirmed") : "Verification failed"}
       logoHref={null}
       footer={
         <p className="text-sm text-wl-ivory-dim">
@@ -50,9 +52,20 @@ export default async function VerifyPage({
         {ok ? (
           <>
             <p className="text-sm text-wl-ivory-dim leading-relaxed">
-              Thank you{firstName ? `, ${firstName}` : ""}. Your email is confirmed.
-              Sign in to set up your profile and start exploring homes. You can verify
-              your identity later, when you are ready to request or accept a swap.
+              {autoVerified ? (
+                <>
+                  Thank you{firstName ? `, ${firstName}` : ""}. Your institutional email
+                  confirms your professional status, so you&apos;re fully verified. Sign
+                  in to set up your profile, list your home, and arrange exchanges with
+                  vetted peers.
+                </>
+              ) : (
+                <>
+                  Thank you{firstName ? `, ${firstName}` : ""}. Your email is confirmed.
+                  Sign in to set up your profile and start exploring homes. You can verify
+                  your identity later, when you are ready to request or accept a swap.
+                </>
+              )}
             </p>
             <Link
               href="/login"
