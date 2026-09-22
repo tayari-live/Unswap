@@ -1,7 +1,7 @@
 import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
 import { logAudit } from "@/server/services/audit"
-import { grantPointsOnce } from "@/server/services/points"
+import { grantPointsOnce, POINT_GRANTS } from "@/server/services/points"
 import { sendEmail, renderEmail, esc } from "@/server/email"
 
 const baseUrl = () => process.env.AUTH_URL || "http://localhost:3000"
@@ -43,7 +43,7 @@ export async function approveSubmission(input: { actorId: string; id: string; no
       heading: `Welcome to the network, ${esc(submission.member.firstName)}.`,
       preheader: "Your professional status has been verified.",
       body: `<p style="margin:0 0 14px">Your professional status has been verified. You now have full access to browse listings, list your home, and arrange exchanges with vetted peers.</p>
-             <p style="margin:0">Two points have been added to your balance to get you started.</p>`,
+             <p style="margin:0">${POINT_GRANTS.verified.amount} points have been added to your balance to get you started.</p>`,
       ctaLabel: "Sign in to UnSwap",
       ctaUrl: loginUrl(),
     }),
