@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import {
-  MapPin, Star, BadgeCheck, BedDouble, Bath, Users, ShieldAlert, ChevronRight, ArrowRight,
+  MapPin, Star, BadgeCheck, BedDouble, Bath, Users, ShieldAlert, ChevronRight, ArrowRight, Lock,
 } from "lucide-react"
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
@@ -43,14 +43,17 @@ export default async function ListingDetailPage({
     prisma.user.findUnique({ where: { id: userId } }),
     getListingDetail(userId, id),
   ])
-  // Walled garden: listing details require a confirmed email. The browse page
-  // shows the confirm-email explainer, so send unconfirmed members there.
-  if (viewer?.verificationStatus === "PENDING_EMAIL") redirect("/dashboard/browse")
   if (!listing) redirect("/dashboard/browse")
 
   const reviews = await listReviewsForListing(listing.id)
   const isOwner = listing.ownerId === userId
-  const canRequest = viewer?.verificationStatus === "FULLY_VERIFIED" && !isOwner
+  const fullyVerified = viewer?.verificationStatus === "FULLY_VERIFIED"
+  const canRequest = fullyVerified && !isOwner
+  // Preview mode for members who aren't fully verified: photos blurred, host
+  // identity and exact location withheld (server-side — masked values are never
+  // rendered, so they never reach the client). Owners always see their own.
+  const blurred = !fullyVerified && !isOwner
+  const unconfirmed = viewer?.verificationStatus === "PENDING_EMAIL"
 
   return (
     <div className="max-w-5xl mx-auto pb-12">
@@ -67,14 +70,42 @@ export default async function ListingDetailPage({
         </Link>
       </nav>
 
+      {blurred && (
+        <div className="mb-4 flex items-start gap-3 rounded-md bg-[var(--gold)]/10 border border-[var(--gold)]/30 px-4 py-3">
+          <Lock size={16} className="text-[var(--gold-dark)] flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-neutral-dark leading-snug">
+            <span className="font-semibold text-[var(--fg)]">Preview.</span>{" "}
+            {unconfirmed
+              ? "Confirm your email, then get verified to reveal the photos, the host, and the exact location."
+              : "Get verified to reveal the photos, the host, and the exact location."}{" "}
+            <Link href={unconfirmed ? "/dashboard" : "/verify-identity"} className="font-semibold text-[var(--gold-dark)] underline">
+              {unconfirmed ? "Confirm email" : "Verify now"}
+            </Link>
+          </p>
+        </div>
+      )}
+
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Main */}
         <div className="lg:col-span-2 space-y-6">
           <div className="relative">
-            <PhotoGallery
-              photos={listing.photos.map((p) => ({ url: `/api/photos/${p.id}`, caption: p.caption }))}
-              title={listing.title}
-            />
+            {blurred ? (
+              <div className="aspect-[16/10] rounded-md overflow-hidden bg-[var(--navy)]/5 relative">
+                {listing.photos[0] && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={`/api/photos/${listing.photos[0].id}`} alt="Home preview" className="w-full h-full object-cover blur-xl scale-110" />
+                )}
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-center px-6 pointer-events-none">
+                  <Lock size={26} className="text-[var(--gold-dark)]" />
+                  <p className="text-sm font-semibold text-[var(--fg)]">Photos are hidden until you&apos;re verified</p>
+                </div>
+              </div>
+            ) : (
+              <PhotoGallery
+                photos={listing.photos.map((p) => ({ url: `/api/photos/${p.id}`, caption: p.caption }))}
+                title={listing.title}
+              />
+            )}
             <div className="absolute top-4 right-4 z-10">
               <FavouriteButton listingId={listing.id} initial={listing.favourited} />
             </div>
@@ -82,7 +113,7 @@ export default async function ListingDetailPage({
 
           <div>
             <div className="flex items-center gap-1.5 text-sm text-neutral">
-              <MapPin size={15} /> {listing.neighbourhood ? `${listing.neighbourhood}, ` : ""}{listing.city}, {listing.country}
+              <MapPin size={15} /> {blurred ? "" : (listing.neighbourhood ? `${listing.neighbourhood}, ` : "")}{listing.city}, {listing.country}
             </div>
             <h1 className="mt-1 font-sans text-[40px] font-bold text-[var(--fg)]">{listing.title}</h1>
             <div className="mt-4 flex flex-wrap gap-5 text-sm text-neutral-dark">
@@ -158,8 +189,8 @@ export default async function ListingDetailPage({
                           {rv.author.avatarInitials}
                         </span>
                         <div>
-                          <div className="text-sm font-semibold text-[var(--fg)]">{rv.author.fullName}</div>
-                          <div className="text-xs text-neutral">{rv.author.organisation ?? ""}</div>
+                          <div className="text-sm font-semibold text-[var(--fg)]">{blurred ? "Verified member" : rv.author.fullName}</div>
+                          {!blurred && <div className="text-xs text-neutral">{rv.author.organisation ?? ""}</div>}
                         </div>
                       </div>
                       <div className="flex items-center gap-0.5">
@@ -183,16 +214,18 @@ export default async function ListingDetailPage({
           <div className="bg-surface rounded-md border border-[var(--hair)] p-6">
             <div className="flex items-center gap-3">
               <span className="w-12 h-12 rounded-full bg-[var(--navy)]/10 text-[var(--fg)] flex items-center justify-center font-bold">
-                {listing.owner.avatarInitials}
+                {blurred ? <Lock size={18} className="text-[var(--gold-dark)]" /> : listing.owner.avatarInitials}
               </span>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <span className="font-sans font-bold text-[var(--fg)]">{listing.owner.fullName}</span>
+                  <span className="font-sans font-bold text-[var(--fg)]">{blurred ? "Verified member" : listing.owner.fullName}</span>
                   {listing.owner.verificationStatus === "FULLY_VERIFIED" && (
                     <BadgeCheck size={15} className="text-[var(--teal)]" />
                   )}
                 </div>
-                <div className="text-xs text-neutral">{listing.owner.organisation ?? ""}{listing.owner.dutyStation ? ` · ${listing.owner.dutyStation}` : ""}</div>
+                {!blurred && (
+                  <div className="text-xs text-neutral">{listing.owner.organisation ?? ""}{listing.owner.dutyStation ? ` · ${listing.owner.dutyStation}` : ""}</div>
+                )}
               </div>
             </div>
             <div className="mt-4 flex items-center justify-between text-sm border-t border-[var(--hair)] pt-3">
@@ -227,9 +260,9 @@ export default async function ListingDetailPage({
               )}
             </div>
 
-            {listing.owner.bio && <p className="mt-3 text-xs text-neutral-dark leading-relaxed">{listing.owner.bio}</p>}
+            {!blurred && listing.owner.bio && <p className="mt-3 text-xs text-neutral-dark leading-relaxed">{listing.owner.bio}</p>}
 
-            {!isOwner && (
+            {!isOwner && !blurred && (
               <Link
                 href={`/dashboard/members/${listing.owner.id}`}
                 className="inline-flex items-center gap-1.5 mt-4 text-sm font-medium text-[var(--gold-soft)] hover:text-[var(--gold)] transition-colors"

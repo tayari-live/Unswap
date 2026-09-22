@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { MapPin, Star, BadgeCheck, SearchX, ChevronLeft, ChevronRight, MailWarning } from "lucide-react"
+import { MapPin, Star, BadgeCheck, SearchX, ChevronLeft, ChevronRight, Lock } from "lucide-react"
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
 import { searchListings } from "@/server/services/discovery"
@@ -9,7 +9,6 @@ import { LuxPageHeader } from "@/components/ui/lux"
 import { PageTip } from "@/components/ui/page-tip"
 import { BrowseControls } from "./browse-controls"
 import { FavouriteButton } from "./favourite-button"
-import { ResendMyVerification } from "./confirm-email-gate"
 
 export const dynamic = "force-dynamic"
 
@@ -40,29 +39,12 @@ export default async function BrowsePage({
     }),
     searchParams,
   ])
-  if (viewer?.verificationStatus === "PENDING_EMAIL") {
-    return (
-      <div className="max-w-2xl mx-auto pb-12">
-        <LuxPageHeader eyebrow="The Portfolio" title="Discover Homes" subtitle="Browse verified homes across the network." />
-      <PageTip id="discover">Every home here belongs to a verified peer. Save the ones you like, then send a swap request when your dates are set.</PageTip>
-        <div className="bg-surface rounded-md border border-[var(--hair)] p-10 text-center">
-          <div className="mx-auto w-14 h-14 rounded-md bg-[var(--navy)]/5 text-[var(--gold-dark)] flex items-center justify-center mb-5">
-            <MailWarning size={26} />
-          </div>
-          <h2 className="font-sans text-2xl font-semibold text-[var(--fg)]">Confirm your email to browse</h2>
-          <p className="mt-3 text-neutral leading-relaxed max-w-md mx-auto">
-            Member homes are only visible inside the verified network. Open the
-            confirmation link we sent to{" "}
-            <span className="font-semibold text-[var(--fg)]">{viewer.email}</span>{" "}
-            and this page unlocks instantly.
-          </p>
-          <div className="mt-7">
-            <ResendMyVerification email={viewer.email} />
-          </div>
-        </div>
-      </div>
-    )
-  }
+  // Progressive disclosure: members who aren't fully verified may browse, but
+  // homes are shown as previews — photos blurred, host names and exact location
+  // withheld — until they complete verification. Full clarity is a
+  // FULLY_VERIFIED privilege.
+  const blurred = viewer?.verificationStatus !== "FULLY_VERIFIED"
+  const unconfirmed = viewer?.verificationStatus === "PENDING_EMAIL"
 
   const filters = {
     q: sp.q ?? "",
@@ -101,6 +83,22 @@ export default async function BrowsePage({
     <div className="max-w-6xl mx-auto pb-12">
       <LuxPageHeader eyebrow="The Portfolio" title="Discover Homes" subtitle="Browse verified homes across the network." />
       <PageTip id="discover">Every home here belongs to a verified peer. Save the ones you like, then send a swap request when your dates are set.</PageTip>
+
+      {blurred && (
+        <div className="mb-4 flex items-start gap-3 rounded-md bg-[var(--gold)]/10 border border-[var(--gold)]/30 px-4 py-3">
+          <Lock size={16} className="text-[var(--gold-dark)] flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-neutral-dark leading-snug">
+            <span className="font-semibold text-[var(--fg)]">You&apos;re viewing previews.</span>{" "}
+            {unconfirmed
+              ? "Confirm your email, then get verified to reveal photos, host details, and exact locations."
+              : "Get verified to reveal photos, host details, and exact locations."}{" "}
+            <Link href={unconfirmed ? "/dashboard" : "/verify-identity"} className="font-semibold text-[var(--gold-dark)] underline">
+              {unconfirmed ? "Confirm email" : "Verify now"}
+            </Link>
+          </p>
+        </div>
+      )}
+
       <BrowseControls initial={filters} />
 
       <p className="text-sm text-neutral mb-4">
@@ -126,11 +124,18 @@ export default async function BrowsePage({
               <div className="relative h-44 bg-[var(--background)]">
                 {l.photoId ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={`/api/photos/${l.photoId}`} alt={l.title} loading="lazy" className="w-full h-full object-cover" />
+                  <img src={`/api/photos/${l.photoId}`} alt={blurred ? "Home preview" : l.title} loading="lazy" className={`w-full h-full object-cover ${blurred ? "blur-md scale-110" : ""}`} />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-neutral/30">
                     <MapPin size={30} />
                   </div>
+                )}
+                {blurred && (
+                  <span className="absolute inset-x-0 bottom-0 top-0 flex items-center justify-center pointer-events-none">
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide bg-[var(--surface)]/85 text-[var(--fg)] px-2.5 py-1 rounded-full">
+                      <Lock size={11} className="text-[var(--gold-dark)]" /> Preview
+                    </span>
+                  </span>
                 )}
                 <div className="absolute top-3 right-3">
                   <FavouriteButton listingId={l.id} initial={l.favourited} />
