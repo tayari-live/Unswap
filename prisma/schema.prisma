@@ -92,6 +92,7 @@ model User {
   resetTokens        PasswordResetToken[]
   emailTokens        EmailVerificationToken[]
   workEmailTokens    WorkEmailToken[]
+  conciergeLeads     ConciergeLead[]          @relation("ConciergeMember")
   loginTokens        LoginToken[]
   favourites         Favourite[]
   conversations      ConversationParticipant[]
@@ -210,6 +211,28 @@ model EmailVerificationToken {
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+// A Relocation Concierge request. Triaged on submission (category/priority/
+// summary drafted by the AI agent, with a static fallback) and routed to the
+// team. Only trust-eligible members can create one.
+model ConciergeLead {
+  id          String   @id @default(uuid())
+  memberId    String
+  destination String
+  timeframe   String?
+  needs       String   // the member's description of what they need
+  category    String   // AI-assigned: Housing | Schools & Family | Logistics | Local Setup | General
+  priority    String   // AI-assigned: high | medium | low
+  summary     String   // one-line triage summary
+  nextSteps   String?  // suggested next steps
+  status      String   @default("new") // new | in_progress | closed
+  trustScore  Int      // snapshot at request time
+  createdAt   DateTime @default(now())
+
+  member      User     @relation("ConciergeMember", fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt])
 }
 
 // Confirms a secondary, institutional email a member adds to prove affiliation.

@@ -7,7 +7,7 @@ import { signOut } from "next-auth/react"
 import {
   Search, ChevronDown, Menu, X, BadgeCheck, ShieldAlert, Clock,
   Home, MapPin, Sparkles, ArrowLeftRight, CalendarCheck, MessageSquare, Coins,
-  UserCircle, CreditCard, Settings, LogOut, type LucideIcon,
+  Compass, UserCircle, CreditCard, Settings, LogOut, type LucideIcon,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { MEMBERSHIP_ENABLED } from "@/lib/features"
@@ -195,6 +195,7 @@ export function AppNavbar({
     { name: "My exchanges", href: "/dashboard/exchanges", icon: CalendarCheck, desc: "Confirmed and completed" },
     { name: "Messages", href: "/dashboard/messages", icon: MessageSquare, badge: unread },
     { name: "Points", href: "/dashboard/points", icon: Coins },
+    { name: "Relocation Concierge", href: "/dashboard/concierge", icon: Compass, desc: "Hands-on help for your next move" },
   ]
 
   const v = VERIFY[verificationStatus]
