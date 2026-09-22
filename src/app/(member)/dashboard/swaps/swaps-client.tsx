@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Calendar, Users, Inbox, Send } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
+import { useConfirm } from "@/components/ui/confirm"
 
 const STATUS_MSG: Record<string, string> = {
   cancel: "Request cancelled",
@@ -71,10 +72,17 @@ function IncomingCard({ swap }: { swap: SwapRow }) {
 function OutgoingCard({ swap }: { swap: SwapRow }) {
   const router = useRouter()
   const toast = useToast()
+  const confirm = useConfirm()
   const [busy, setBusy] = useState(false)
 
   async function cancelRequest() {
-    if (!confirm("Are you sure you want to cancel this request?")) return
+    if (!(await confirm({
+      title: "Cancel request",
+      message: "Are you sure you want to cancel this request?",
+      confirmLabel: "Cancel request",
+      cancelLabel: "Keep it",
+      tone: "danger",
+    }))) return
     setBusy(true)
     try {
       const res = await fetch(`/api/swaps/${swap.id}`, {

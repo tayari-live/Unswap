@@ -6,6 +6,7 @@ import { Download, Send, CheckCircle2, Trophy, Upload, MailWarning, RefreshCw, C
 import { LuxPageHeader } from "@/components/ui/lux"
 import { StatusBadge } from "@/components/ui/badges"
 import { useToast } from "@/components/ui/toast"
+import { useConfirm } from "@/components/ui/confirm"
 import { EmptyState } from "@/components/ui/empty-state"
 import { AdminTable } from "@/components/ui/table"
 import { Modal } from "@/components/ui/modal"
@@ -26,6 +27,7 @@ type Entry = {
 export default function WaitlistClient({ initialEntries }: { initialEntries: Entry[] }) {
   const router = useRouter()
   const toast = useToast()
+  const confirm = useConfirm()
   const [entries, setEntries] = useState(initialEntries)
   const [busyId, setBusyId] = useState<string | null>(null)
   const [bulkBusy, setBulkBusy] = useState(false)
@@ -39,7 +41,11 @@ export default function WaitlistClient({ initialEntries }: { initialEntries: Ent
   const unconfirmedCount = entries.filter((e) => !e.confirmedAt).length
 
   async function inviteAll() {
-    if (!confirm(`Invite all ${pendingCount} pending members?`)) return
+    if (!(await confirm({
+      title: "Invite all pending",
+      message: `Invite all ${pendingCount} pending members? Each will receive a founder invitation email.`,
+      confirmLabel: "Invite all",
+    }))) return
     setBulkBusy(true)
     try {
       const res = await fetch("/api/waitlist/invite-all", { method: "POST" })
@@ -82,7 +88,11 @@ export default function WaitlistClient({ initialEntries }: { initialEntries: Ent
   }
 
   async function resendAll() {
-    if (!confirm(`Resend the confirmation email to all ${unconfirmedCount} unconfirmed people?`)) return
+    if (!(await confirm({
+      title: "Resend confirmations",
+      message: `Resend the confirmation email to all ${unconfirmedCount} unconfirmed people?`,
+      confirmLabel: "Resend all",
+    }))) return
     setResendAllBusy(true)
     try {
       const res = await fetch("/api/waitlist/resend-all", { method: "POST" })

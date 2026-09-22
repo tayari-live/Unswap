@@ -9,6 +9,7 @@ import { AvatarInitials } from "@/components/ui/avatar"
 import { EmptyState } from "@/components/ui/empty-state"
 import { FilterTabs } from "@/components/ui/filter-tabs"
 import { AdminTable } from "@/components/ui/table"
+import { useConfirm } from "@/components/ui/confirm"
 
 type Member = {
   id: string
@@ -212,14 +213,19 @@ function MemberActions({
   busy: boolean
   onPatch: (id: string, body: Record<string, string>) => void
 }) {
+  const confirm = useConfirm()
   return (
     <>
       {m.verificationStatus !== "FULLY_VERIFIED" && (
         <button
-          onClick={() => {
+          onClick={async () => {
             // Verifying grants full network access — confirm to prevent an
             // accidental one-click approval.
-            if (window.confirm(`Mark ${m.fullName} as fully verified?`)) {
+            if (await confirm({
+              title: "Verify member",
+              message: `Mark ${m.fullName} as fully verified? This grants full network access.`,
+              confirmLabel: "Mark verified",
+            })) {
               onPatch(m.id, { status: "FULLY_VERIFIED" })
             }
           }}
@@ -232,8 +238,13 @@ function MemberActions({
       )}
       {m.verificationStatus !== "SUSPENDED" ? (
         <button
-          onClick={() => {
-            if (window.confirm(`Suspend ${m.fullName}? They will lose access to the network.`)) {
+          onClick={async () => {
+            if (await confirm({
+              title: "Suspend member",
+              message: `Suspend ${m.fullName}? They will lose access to the network.`,
+              confirmLabel: "Suspend",
+              tone: "danger",
+            })) {
               onPatch(m.id, { status: "SUSPENDED" })
             }
           }}
@@ -245,8 +256,12 @@ function MemberActions({
         </button>
       ) : (
         <button
-          onClick={() => {
-            if (window.confirm(`Reinstate ${m.fullName} as fully verified?`)) {
+          onClick={async () => {
+            if (await confirm({
+              title: "Reinstate member",
+              message: `Reinstate ${m.fullName} as fully verified?`,
+              confirmLabel: "Reinstate",
+            })) {
               onPatch(m.id, { status: "FULLY_VERIFIED" })
             }
           }}

@@ -8,6 +8,7 @@ import {
   Trash2,
 } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
+import { useConfirm } from "@/components/ui/confirm"
 
 const STATUS_MSG: Record<string, string> = {
   ACTIVE: "Listing published",
@@ -43,6 +44,7 @@ export function ListingsClient({
 }) {
   const router = useRouter()
   const toast = useToast()
+  const confirm = useConfirm()
   const [busyId, setBusyId] = useState<string | null>(null)
 
   async function setStatus(id: string, status: string) {
@@ -66,7 +68,12 @@ export function ListingsClient({
   }
 
   async function remove(id: string) {
-    if (!confirm("Delete this listing permanently? This cannot be undone.")) return
+    if (!(await confirm({
+      title: "Delete listing",
+      message: "Delete this listing permanently? This cannot be undone.",
+      confirmLabel: "Delete",
+      tone: "danger",
+    }))) return
     setBusyId(id)
     try {
       const res = await fetch(`/api/listings/${id}`, { method: "DELETE" })

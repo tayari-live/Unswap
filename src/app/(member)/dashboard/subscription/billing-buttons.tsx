@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/components/ui/toast"
+import { useConfirm } from "@/components/ui/confirm"
 
 export function CheckoutButton({
   tier,
@@ -57,10 +58,17 @@ export function CheckoutButton({
 
 export function CancelButton() {
   const router = useRouter()
+  const confirm = useConfirm()
   const [loading, setLoading] = useState(false)
 
   async function cancel() {
-    if (!confirm("Cancel your membership? You'll keep access until the end of the current period.")) return
+    if (!(await confirm({
+      title: "Cancel membership",
+      message: "Cancel your membership? You'll keep access until the end of the current period.",
+      confirmLabel: "Cancel membership",
+      cancelLabel: "Keep membership",
+      tone: "danger",
+    }))) return
     setLoading(true)
     try {
       const res = await fetch("/api/billing/cancel", { method: "POST" })

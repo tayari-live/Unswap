@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Check, Trash2, MessageSquare, Star, ShieldX } from "lucide-react"
 import { LuxPageHeader } from "@/components/ui/lux"
 import { EmptyState } from "@/components/ui/empty-state"
+import { useConfirm } from "@/components/ui/confirm"
 
 export type ModReport = {
   id: string
@@ -21,11 +22,17 @@ function fmt(d: string) {
 
 export default function ModerationClient({ initial }: { initial: ModReport[] }) {
   const router = useRouter()
+  const confirm = useConfirm()
   const [reports, setReports] = useState(initial)
   const [busyId, setBusyId] = useState<string | null>(null)
 
   async function resolve(id: string, action: "dismiss" | "remove") {
-    if (action === "remove" && !confirm("Permanently remove this content?")) return
+    if (action === "remove" && !(await confirm({
+      title: "Remove content",
+      message: "Permanently remove this content? This cannot be undone.",
+      confirmLabel: "Remove",
+      tone: "danger",
+    }))) return
     setBusyId(id)
     try {
       const res = await fetch(`/api/reports/${id}`, {

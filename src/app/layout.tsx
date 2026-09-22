@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/toast";
+import { ConfirmProvider } from "@/components/ui/confirm";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 
 // Product UI — Inter. Carries every interface surface: dashboards, forms,
@@ -63,6 +64,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col font-sans bg-background text-foreground">
         <ThemeProvider>
           <ToastProvider>
+            <ConfirmProvider>
             {children}
           {/*
             No cookie-consent banner is mounted: the app only sets the
@@ -72,6 +74,7 @@ export default function RootLayout({
             from src/components/site/cookie-consent.tsx and gate the script on the
             stored choice. Cookieless analytics (Plausible/Fathom) need no banner.
           */}
+            </ConfirmProvider>
           </ToastProvider>
         </ThemeProvider>
       </body>
