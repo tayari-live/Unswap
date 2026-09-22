@@ -98,6 +98,7 @@ model User {
   emailTokens        EmailVerificationToken[]
   workEmailTokens    WorkEmailToken[]
   conciergeLeads     ConciergeLead[]          @relation("ConciergeMember")
+  guarantorRequests  GuarantorRequest[]       @relation("GuarantorMember")
   loginTokens        LoginToken[]
   favourites         Favourite[]
   conversations      ConversationParticipant[]
@@ -238,6 +239,25 @@ model ConciergeLead {
   member      User     @relation("ConciergeMember", fields: [memberId], references: [id], onDelete: Cascade)
 
   @@index([status, createdAt])
+}
+
+// A guarantor invitation: a member who can't verify via their own institutional
+// email names a UN/IO contact, who confirms (by receiving the emailed link) and
+// explicitly approves — vouching for the member's professional standing.
+model GuarantorRequest {
+  id             String    @id @default(uuid())
+  memberId       String
+  guarantorEmail String    // the invited contact's institutional address
+  guarantorName  String?
+  token          String    @unique
+  status         String    @default("pending") // pending | approved | declined
+  respondedAt    DateTime?
+  expiresAt      DateTime
+  createdAt      DateTime  @default(now())
+
+  member         User      @relation("GuarantorMember", fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@index([memberId])
 }
 
 // Confirms a secondary, institutional email a member adds to prove affiliation.

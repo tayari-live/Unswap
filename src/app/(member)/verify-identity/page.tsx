@@ -7,6 +7,7 @@ import { reviewTypeForEmail, matchAllowedDomain } from "@/server/services/regist
 import { LuxPageHeader } from "@/components/ui/lux"
 import { VerifyIdentityForm } from "./verify-identity-form"
 import { AddWorkEmail } from "./add-work-email"
+import { GuarantorInvite } from "./guarantor-invite"
 
 export const dynamic = "force-dynamic"
 
@@ -109,7 +110,10 @@ export default async function VerifyIdentityPage() {
 
       {showAddWorkEmail && (
         <div className="mb-5">
-          <AddWorkEmail />
+          <div className="space-y-4">
+            <AddWorkEmail />
+            <GuarantorInvite />
+          </div>
           <div className="flex items-center gap-3 my-6">
             <span className="h-px flex-1 bg-[var(--hair)]" />
             <span className="text-xs uppercase tracking-wider text-neutral">or upload documents</span>
