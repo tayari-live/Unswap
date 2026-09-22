@@ -21,6 +21,7 @@ import { LuxPageHeader, SectionLabel } from "@/components/ui/lux"
 import { ResendEmailButton } from "@/components/ui/resend-email-button"
 import { PROFILE_COMPLETE_AT } from "@/server/services/profile"
 import { Greeting } from "./greeting"
+import { TrustScoreCard } from "./trust-score-card"
 
 export const dynamic = "force-dynamic"
 
@@ -337,6 +338,9 @@ export default async function MemberDashboardPage() {
           {/* Subtle decorative background element for the navy block */}
           <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-gradient-to-l from-white/5 to-transparent pointer-events-none" />
         </div>
+
+        {/* 3b. Trust Score — the composite that gates higher-value homes. */}
+        <TrustScoreCard userId={userId} />
 
         {/* 4. Action Required / Your Next Steps — one consolidated module */}
         {showActions && (

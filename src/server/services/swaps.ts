@@ -4,6 +4,7 @@ import { logAudit } from "@/server/services/audit"
 import { sendEmail, renderEmail, esc } from "@/server/email"
 import { notifyAllowed } from "@/server/services/notify"
 import { getAvailablePoints } from "@/server/services/points"
+import { assertCanRequestListing } from "@/server/services/trust"
 import { effectiveNightly } from "@/lib/valuation"
 
 const APP = () => process.env.AUTH_URL || "http://localhost:3000"
@@ -268,6 +269,10 @@ export async function createSwapRequest(input: {
   // The home's nightly value, snapshotted onto the swap so a later listing edit
   // never changes this exchange's cost.
   const perNight = effectiveNightly(listing.nightlyPoints, listing.nightlyAdjustment)
+
+  // Autonomous trust gate: higher-value homes require a minimum trust score,
+  // regardless of exchange mode.
+  await assertCanRequestListing(input.requesterId, perNight)
 
   // A points stay is funded by the requester, so refuse one they cannot cover.
   if (input.mode === "points") {
