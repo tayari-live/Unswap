@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { signIn } from "next-auth/react"
-import { Eye, EyeOff, Info, ShieldCheck } from "lucide-react"
+import { Eye, EyeOff, Info } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
 import { ThemeToggleIcon } from "@/components/theme/theme-toggle"
 import { registerSchema, type RegisterInput } from "@/lib/validation/auth"
@@ -81,6 +81,21 @@ export default function RegisterPage() {
   }, [setValue])
 
   const status = domainStatus(email)
+  // An institutional address typed at signup is a work email — the account
+  // should use a personal one (unless they arrived from the waitlist grant).
+  const workEmailAtSignup = status === "fast" && !grant
+
+  // Carry a work email typed here into the later verification step (same
+  // browser), so the member doesn't have to retype it on /verify-identity.
+  useEffect(() => {
+    try {
+      if (workEmailAtSignup && email) {
+        window.localStorage.setItem("unswap.workEmailHint", email.trim().toLowerCase())
+      }
+    } catch {
+      /* private mode — the carry is a convenience, never required */
+    }
+  }, [workEmailAtSignup, email])
 
   const onSubmit = async (values: RegisterInput) => {
     try {
@@ -186,8 +201,8 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label htmlFor="email" className={labelCls}>Work email</label>
-              <input id="email" type="email" {...register("email")} aria-invalid={!!errors.email} aria-describedby={errors.email ? "email-error" : undefined} placeholder="Your work email" className={inputCls} />
+              <label htmlFor="email" className={labelCls}>Personal email</label>
+              <input id="email" type="email" {...register("email")} aria-invalid={!!errors.email} aria-describedby={errors.email ? "email-error" : undefined} placeholder="Your personal email" className={inputCls} />
               {errors.email && <p id="email-error" role="alert" className={errCls}>{errors.email.message}</p>}
             </div>
 
@@ -213,12 +228,16 @@ export default function RegisterPage() {
             {/* --panel, not a hardcoded white: the text colour flips with the
                 theme while a fixed white background does not, which left light
                 ivory text on white in dark mode. */}
-            <div className={`flex gap-2.5 p-3.5 text-sm border ${status === "fast" ? "border-wl-border bg-[rgba(201,168,76,0.1)] text-wl-gold" : "border-wl-border bg-[var(--panel)] text-wl-ivory-dim"}`}>
-              {status === "fast" ? <ShieldCheck size={18} className="flex-shrink-0 mt-0.5 text-wl-gold" /> : <Info size={18} className="flex-shrink-0 mt-0.5 text-wl-gold" />}
+            {/* Personal-email-first: steer a work email typed here toward a
+                personal one. The work email is confirmed later, at verification. */}
+            <div className={`flex gap-2.5 p-3.5 text-sm border ${workEmailAtSignup ? "border-[rgba(201,168,76,0.45)] bg-[rgba(201,168,76,0.1)] text-wl-gold" : "border-wl-border bg-[var(--panel)] text-wl-ivory-dim"}`}>
+              <Info size={18} className="flex-shrink-0 mt-0.5 text-wl-gold" />
               <span>
-                {status === "fast"
-                  ? "Recognised institutional email. You qualify for fast-track verification."
-                  : "Use your institutional email (@un.org, @undp.org, etc.) for fast-track verification. Other addresses enter manual review."}
+                {workEmailAtSignup ? (
+                  <>That looks like a <strong>work email</strong>. Sign up with a <strong>personal</strong> address — you&apos;ll confirm your institutional email later to get verified, and we only ever email your personal address.</>
+                ) : (
+                  <>Use a <strong>personal</strong> email for your account. You&apos;ll add your institutional (work) email later to get verified.</>
+                )}
               </span>
             </div>
 

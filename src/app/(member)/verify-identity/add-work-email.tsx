@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { MailCheck, ArrowRight, CheckCircle2 } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
 import { FIELD, LABEL } from "@/components/ui/form"
@@ -16,6 +16,20 @@ export function AddWorkEmail() {
   const [email, setEmail] = useState("")
   const [loading, setLoading] = useState(false)
   const [sentTo, setSentTo] = useState<string | null>(null)
+
+  // If they typed a work email at signup, we stashed it — pre-fill it here once,
+  // then clear it so it doesn't linger.
+  useEffect(() => {
+    try {
+      const hint = window.localStorage.getItem("unswap.workEmailHint")
+      if (hint) {
+        setEmail(hint)
+        window.localStorage.removeItem("unswap.workEmailHint")
+      }
+    } catch {
+      /* private mode — ignore */
+    }
+  }, [])
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()

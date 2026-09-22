@@ -123,6 +123,16 @@ export async function registerMember(input: RegisterInput) {
   const fastTrack = matched?.fastTrack ?? false
   const autoVerify = matched?.autoVerify ?? false
 
+  // Personal-email-first: the account email must be personal. An institutional
+  // (allowlisted) address is only used later, once, to verify — so reject it at
+  // signup unless it arrives with a waitlist grant (already inbox-verified).
+  if (matched && !input.grant) {
+    throw new ApiError(
+      400,
+      "Please sign up with a personal email address. You'll confirm your institutional email later to get verified, and we only ever email your personal address.",
+    )
+  }
+
   // A valid grant means this exact address was already verified (the waitlist
   // link was clicked from its inbox), so skip the account's own email step. This
   // consumes the grant (single use); we've already passed validation and the
