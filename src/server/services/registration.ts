@@ -153,6 +153,9 @@ export async function registerMember(input: RegisterInput) {
         : "PENDING_EMAIL",
       organisation: waitlisted?.organisation ?? null,
       profileCompletion: waitlisted?.organisation ? 30 : 20,
+      // Durable referral link (from the waitlist entry) for trust-scoring.
+      referralCode: waitlisted?.referralCode ?? null,
+      referredByCode: waitlisted?.referredBy ?? null,
     },
   })
 
@@ -264,6 +267,9 @@ export async function beginPasswordlessMember(input: {
         verificationStatus: autoVerify ? "FULLY_VERIFIED" : "EMAIL_VERIFIED",
         organisation: waitlisted?.organisation ?? null,
         profileCompletion: waitlisted?.organisation ? 30 : 20,
+        // Durable referral link (from the waitlist entry) for trust-scoring.
+        referralCode: waitlisted?.referralCode ?? null,
+        referredByCode: waitlisted?.referredBy ?? null,
       },
     })
     if (waitlisted && waitlisted.status !== "converted") {

@@ -32,20 +32,21 @@ async function verificationDepth(user: {
   return "none"
 }
 
-/** Was this member vouched for, and by whom. Read from the waitlist referral chain. */
-async function referralProvenance(email: string): Promise<ReferralProvenance> {
-  const wl = await prisma.waitlistEntry.findUnique({ where: { email }, select: { referredBy: true } })
-  if (!wl?.referredBy) return "organic"
-  const referrer = await prisma.waitlistEntry.findUnique({
-    where: { referralCode: wl.referredBy },
-    select: { email: true },
-  })
-  if (!referrer) return "organic"
-  const referrerUser = await prisma.user.findUnique({
-    where: { email: referrer.email },
+/**
+ * Was this member vouched for, and by whom. Resolved as a durable User<->User
+ * link: the member's `referredByCode` (stamped at registration) matched against
+ * the referrer's own `referralCode`. No email join, no waitlist read, no
+ * external call — so it can't drift when someone signs up with a different
+ * address than they waitlisted with.
+ */
+async function referralProvenance(referredByCode: string | null): Promise<ReferralProvenance> {
+  if (!referredByCode) return "organic"
+  const referrer = await prisma.user.findUnique({
+    where: { referralCode: referredByCode },
     select: { verificationStatus: true },
   })
-  return referrerUser?.verificationStatus === "FULLY_VERIFIED" ? "verified_referrer" : "referrer"
+  if (!referrer) return "referrer" // referred, but the referrer isn't a member yet
+  return referrer.verificationStatus === "FULLY_VERIFIED" ? "verified_referrer" : "referrer"
 }
 
 /**
@@ -56,13 +57,13 @@ async function referralProvenance(email: string): Promise<ReferralProvenance> {
 export async function getTrustScore(userId: string): Promise<TrustBreakdown> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { email: true, workEmail: true, verificationStatus: true, createdAt: true, trustScore: true },
+    select: { email: true, workEmail: true, verificationStatus: true, createdAt: true, trustScore: true, referredByCode: true },
   })
   if (!user) throw new ApiError(404, "User not found.")
 
   const [verification, referral, completedSwaps, reviewCount] = await Promise.all([
     verificationDepth(user),
-    referralProvenance(user.email),
+    referralProvenance(user.referredByCode),
     prisma.swapRequest.count({ where: { status: "COMPLETED", OR: [{ requesterId: userId }, { hostId: userId }] } }),
     prisma.review.count({ where: { subjectId: userId } }),
   ])

@@ -52,6 +52,11 @@ model User {
   // work address can back at most one account.
   workEmail          String?   @unique
   workEmailVerifiedAt DateTime?
+  // The member's own referral code and the code that referred them, captured at
+  // registration from their waitlist entry. Lets trust-scoring resolve the
+  // referrer as a durable User<->User link instead of re-deriving it by email.
+  referralCode       String?   @unique
+  referredByCode     String?
   trustScore         Float?    // weighted average of host reviews
   stripeCustomerId   String?   @unique // Stripe customer for billing
 
