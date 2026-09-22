@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import {
-  MapPin, Star, BadgeCheck, BedDouble, Bath, Users, ShieldAlert, ChevronRight, ArrowRight, Lock,
+  MapPin, Star, BadgeCheck, BedDouble, Bath, Users, ChevronRight, ArrowRight, Lock,
 } from "lucide-react"
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
@@ -11,6 +11,7 @@ import { listReviewsForListing } from "@/server/services/reviews"
 import { FavouriteButton } from "../favourite-button"
 import { ReportButton } from "@/components/report-button"
 import { SwapRequestForm } from "./swap-request-form"
+import { RequestSwapGate } from "./request-swap-gate"
 import { PhotoGallery } from "./photo-gallery"
 import { MessageButton } from "../../messages/message-button"
 
@@ -290,11 +291,7 @@ export default async function ListingDetailPage({
               <MessageButton otherUserId={listing.owner.id} label="Message host" />
             </div>
           ) : (
-            <div className="bg-[var(--navy)]/5 border border-[var(--gold)]/30 rounded-md p-5 text-center">
-              <ShieldAlert size={22} className="mx-auto text-[var(--gold-dark)]" />
-              <p className="mt-2 text-sm text-neutral-dark">Get verified to request a swap.</p>
-              <Link href="/verify-identity" className="mt-3 inline-block text-sm font-semibold text-[var(--gold-dark)] underline">Verify now</Link>
-            </div>
+            <RequestSwapGate />
           )}
         </div>
       </div>

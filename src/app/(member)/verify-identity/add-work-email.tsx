@@ -11,7 +11,15 @@ import { FIELD, LABEL } from "@/components/ui/form"
  * link; clicking it verifies them instantly (auto-verify domains) or moves them
  * to fast-track. Recognised-domain check happens server-side.
  */
-export function AddWorkEmail() {
+export function AddWorkEmail({
+  heading = "Have an institutional email?",
+  blurb = "Add your work address (e.g. an organisation domain) to verify faster — often instantly, with no documents. We'll email it a confirmation link.",
+  cta = "Send link",
+}: {
+  heading?: string
+  blurb?: string
+  cta?: string
+} = {}) {
   const toast = useToast()
   const [email, setEmail] = useState("")
   const [loading, setLoading] = useState(false)
@@ -76,11 +84,8 @@ export function AddWorkEmail() {
           <MailCheck size={20} />
         </div>
         <div>
-          <h2 className="font-sans text-lg font-semibold text-[var(--fg)]">Have an institutional email?</h2>
-          <p className="mt-1 text-sm text-neutral-dark leading-relaxed">
-            Add your work address (e.g. an organisation domain) to verify faster — often
-            instantly, with no documents. We&apos;ll email it a confirmation link.
-          </p>
+          <h2 className="font-sans text-lg font-semibold text-[var(--fg)]">{heading}</h2>
+          <p className="mt-1 text-sm text-neutral-dark leading-relaxed">{blurb}</p>
         </div>
       </div>
 
@@ -102,7 +107,7 @@ export function AddWorkEmail() {
           disabled={loading}
           className="inline-flex items-center justify-center gap-2 py-3 px-5 rounded-xl text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          {loading ? "Sending…" : <>Send link <ArrowRight size={16} /></>}
+          {loading ? "Sending…" : <>{cta} <ArrowRight size={16} /></>}
         </button>
       </form>
     </div>
