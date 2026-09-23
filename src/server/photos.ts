@@ -35,11 +35,14 @@ export function imageResponse(dataUrl: string): NextResponse {
  */
 export async function blurredImageResponse(dataUrl: string): Promise<NextResponse> {
   const { bytes } = decode(dataUrl)
+  // A larger base blurred hard reads as smooth "frosted glass" rather than the
+  // blocky pixelation of a tiny upscale — while still carrying no usable detail
+  // (faces, text and layout are all gone).
   const out = await sharp(bytes)
     .rotate() // honour EXIF orientation before we drop the metadata
-    .resize(96, 96, { fit: "inside", withoutEnlargement: true })
-    .blur(10)
-    .jpeg({ quality: 45 })
+    .resize(220, 220, { fit: "inside", withoutEnlargement: true })
+    .blur(14)
+    .jpeg({ quality: 50 })
     .toBuffer()
   return new NextResponse(new Uint8Array(out), {
     headers: {

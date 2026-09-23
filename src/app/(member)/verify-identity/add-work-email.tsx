@@ -89,8 +89,8 @@ export function AddWorkEmail({
         </div>
       </div>
 
-      <form onSubmit={submit} className="mt-5 flex flex-col sm:flex-row gap-3 sm:items-end">
-        <div className="flex-1">
+      <form onSubmit={submit} className="mt-5 space-y-3">
+        <div>
           <label htmlFor="work-email" className={LABEL}>Institutional email</label>
           <input
             id="work-email"
@@ -105,7 +105,7 @@ export function AddWorkEmail({
         <button
           type="submit"
           disabled={loading}
-          className="inline-flex items-center justify-center gap-2 py-3 px-5 rounded-xl text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="w-full inline-flex items-center justify-center gap-2 py-3 px-5 rounded-xl text-sm font-semibold text-white bg-[var(--gold-dark)] hover:bg-[var(--gold-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {loading ? "Sending…" : <>{cta} <ArrowRight size={16} /></>}
         </button>
