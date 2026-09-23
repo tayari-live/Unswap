@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { MapPin, Star, BadgeCheck, SearchX, ChevronLeft, ChevronRight, Lock } from "lucide-react"
+import { MapPin, Star, BadgeCheck, SearchX, ChevronLeft, ChevronRight, Lock, CalendarClock } from "lucide-react"
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
 import { searchListings, listingCityCounts } from "@/server/services/discovery"
@@ -54,6 +54,7 @@ export default async function BrowsePage({
     guests: sp.guests ?? "",
     exchangeType: sp.exchange ?? "",
     savedOnly: sp.saved === "1",
+    availableNow: sp.avail === "1",
   }
 
   const { items: listings, total, page, pageCount } = await searchListings({
@@ -64,6 +65,7 @@ export default async function BrowsePage({
     guests: filters.guests ? Number(filters.guests) : undefined,
     exchangeType: filters.exchangeType || undefined,
     savedOnly: filters.savedOnly,
+    availableNow: filters.availableNow,
     page: sp.page ? Number(sp.page) : 1,
   })
 
@@ -76,6 +78,7 @@ export default async function BrowsePage({
     if (filters.guests) qs.set("guests", filters.guests)
     if (filters.exchangeType) qs.set("exchange", filters.exchangeType)
     if (filters.savedOnly) qs.set("saved", "1")
+    if (filters.availableNow) qs.set("avail", "1")
     if (n > 1) qs.set("page", String(n))
     return `/dashboard/browse${qs.toString() ? `?${qs}` : ""}`
   }
@@ -90,9 +93,23 @@ export default async function BrowsePage({
     if (filters.guests) qs.set("guests", filters.guests)
     if (filters.exchangeType) qs.set("exchange", filters.exchangeType)
     if (filters.savedOnly) qs.set("saved", "1")
+    if (filters.availableNow) qs.set("avail", "1")
     if (map) qs.set("view", "map")
     return `/dashboard/browse${qs.toString() ? `?${qs}` : ""}`
   }
+  // "Available now" toggle link — preserves filters + the current view.
+  const availHref = (() => {
+    const qs = new URLSearchParams()
+    if (filters.q) qs.set("q", filters.q)
+    if (filters.propertyType) qs.set("type", filters.propertyType)
+    if (filters.bedrooms) qs.set("beds", filters.bedrooms)
+    if (filters.guests) qs.set("guests", filters.guests)
+    if (filters.exchangeType) qs.set("exchange", filters.exchangeType)
+    if (filters.savedOnly) qs.set("saved", "1")
+    if (!filters.availableNow) qs.set("avail", "1") // toggle on/off
+    if (isMap) qs.set("view", "map")
+    return `/dashboard/browse${qs.toString() ? `?${qs}` : ""}`
+  })()
   const cityPins = isMap
     ? await listingCityCounts({
         viewerId: userId,
@@ -101,6 +118,7 @@ export default async function BrowsePage({
         bedrooms: filters.bedrooms ? Number(filters.bedrooms) : undefined,
         guests: filters.guests ? Number(filters.guests) : undefined,
         exchangeType: filters.exchangeType || undefined,
+        availableNow: filters.availableNow,
       })
     : []
 
@@ -132,9 +150,17 @@ export default async function BrowsePage({
             ? `${cityPins.length} ${cityPins.length === 1 ? "city" : "cities"} with homes`
             : `${total} ${total === 1 ? "home" : "homes"}${filters.savedOnly ? " saved" : " available"}`}
         </p>
-        <div className="inline-flex rounded-lg border border-[var(--hair)] overflow-hidden text-sm">
-          <Link href={viewHref(false)} className={`px-3.5 py-1.5 font-medium transition-colors ${!isMap ? "bg-[var(--navy)] text-white" : "text-[var(--fg)] hover:bg-[var(--gold)]/10"}`}>Grid</Link>
-          <Link href={viewHref(true)} className={`px-3.5 py-1.5 font-medium transition-colors ${isMap ? "bg-[var(--navy)] text-white" : "text-[var(--fg)] hover:bg-[var(--gold)]/10"}`}>Map</Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href={availHref}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-medium transition-colors ${filters.availableNow ? "border-[var(--teal)]/40 bg-[var(--teal)]/10 text-[var(--teal)]" : "border-[var(--hair)] text-[var(--fg)] hover:border-[var(--teal)]/40"}`}
+          >
+            <CalendarClock size={14} /> Available now
+          </Link>
+          <div className="inline-flex rounded-lg border border-[var(--hair)] overflow-hidden text-sm">
+            <Link href={viewHref(false)} className={`px-3.5 py-1.5 font-medium transition-colors ${!isMap ? "bg-[var(--navy)] text-white" : "text-[var(--fg)] hover:bg-[var(--gold)]/10"}`}>Grid</Link>
+            <Link href={viewHref(true)} className={`px-3.5 py-1.5 font-medium transition-colors ${isMap ? "bg-[var(--navy)] text-white" : "text-[var(--fg)] hover:bg-[var(--gold)]/10"}`}>Map</Link>
+          </div>
         </div>
       </div>
 
@@ -170,6 +196,11 @@ export default async function BrowsePage({
                     <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide bg-[var(--surface)]/85 text-[var(--fg)] px-2.5 py-1 rounded-full">
                       <Lock size={11} className="text-[var(--gold-dark)]" /> Preview
                     </span>
+                  </span>
+                )}
+                {l.availableNow && (
+                  <span className="absolute top-3 left-3 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide bg-[var(--teal)] text-white px-2.5 py-1 rounded-full">
+                    <CalendarClock size={11} /> Available now
                   </span>
                 )}
                 <div className="absolute top-3 right-3">

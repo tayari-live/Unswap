@@ -64,7 +64,8 @@ export type WizardValues = {
   title: string; propertyType: string; fullAddress: string; city: string; neighbourhood: string; country: string
   bedrooms: number; bathrooms: number; maxGuests: number; description: string; amenities: string[]
   photos: { url: string; caption?: string }[]
-  swapDurations: string[]; exchangeType: string; nightlyAdjustment: number; blackouts: { startDate: string; endDate: string }[]
+  swapDurations: string[]; exchangeType: string; nightlyAdjustment: number
+  availability: { startDate: string; endDate: string }[]; blackouts: { startDate: string; endDate: string }[]
   houseRules: string; emergencyName: string; emergencyPhone: string; emergencyRelationship: string
 }
 
@@ -73,7 +74,7 @@ export type WizardValues = {
 const EMPTY: WizardValues = {
   title: "", propertyType: "", fullAddress: "", city: "", neighbourhood: "", country: "",
   bedrooms: 1, bathrooms: 1, maxGuests: 2, description: "", amenities: [],
-  photos: [], swapDurations: [], exchangeType: "", nightlyAdjustment: 0, blackouts: [],
+  photos: [], swapDurations: [], exchangeType: "", nightlyAdjustment: 0, availability: [], blackouts: [],
   houseRules: "", emergencyName: "", emergencyPhone: "", emergencyRelationship: "",
 }
 
@@ -591,19 +592,36 @@ export function ListingWizard({
           </div>
         )}
 
-        {/* 9 — Blackouts (optional) */}
+        {/* 9 — Availability calendar + blackouts (optional) */}
         {step === 9 && (
           <div>
-            <Heading title="Any dates you're unavailable?" sub="Guests can't request stays that overlap these ranges. You can change them anytime." />
-            {v.blackouts.map((b, i) => (
-              <div key={i} className="flex items-center gap-2 mb-2">
-                <input type="date" className={input} value={b.startDate} onChange={(e) => { const n = [...v.blackouts]; n[i] = { ...n[i], startDate: e.target.value }; set("blackouts", n) }} />
-                <span className="text-neutral text-sm">to</span>
-                <input type="date" className={input} value={b.endDate} onChange={(e) => { const n = [...v.blackouts]; n[i] = { ...n[i], endDate: e.target.value }; set("blackouts", n) }} />
-                <button type="button" onClick={() => set("blackouts", v.blackouts.filter((_, x) => x !== i))} className="text-neutral hover:text-[var(--crimson)]"><X size={16} /></button>
-              </div>
-            ))}
-            <button type="button" onClick={() => set("blackouts", [...v.blackouts, { startDate: "", endDate: "" }])} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--gold-dark)] hover:text-[var(--gold-hover)]"><Plus size={15} /> Add blackout range</button>
+            <Heading title="When is your home available?" sub="Add the windows your home is free for a swap — leave empty to stay open year-round. A home available soon shows an “Available now” tag. Blackouts block any specific dates on top." />
+
+            <div className="mb-7">
+              <p className="text-sm font-semibold text-[var(--fg)] mb-2">Available windows</p>
+              {v.availability.map((b, i) => (
+                <div key={i} className="flex items-center gap-2 mb-2">
+                  <input type="date" className={input} value={b.startDate} onChange={(e) => { const n = [...v.availability]; n[i] = { ...n[i], startDate: e.target.value }; set("availability", n) }} />
+                  <span className="text-neutral text-sm">to</span>
+                  <input type="date" className={input} value={b.endDate} onChange={(e) => { const n = [...v.availability]; n[i] = { ...n[i], endDate: e.target.value }; set("availability", n) }} />
+                  <button type="button" onClick={() => set("availability", v.availability.filter((_, x) => x !== i))} className="text-neutral hover:text-[var(--crimson)]"><X size={16} /></button>
+                </div>
+              ))}
+              <button type="button" onClick={() => set("availability", [...v.availability, { startDate: "", endDate: "" }])} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--gold-dark)] hover:text-[var(--gold-hover)]"><Plus size={15} /> Add available window</button>
+            </div>
+
+            <div>
+              <p className="text-sm font-semibold text-[var(--fg)] mb-2">Blackout dates</p>
+              {v.blackouts.map((b, i) => (
+                <div key={i} className="flex items-center gap-2 mb-2">
+                  <input type="date" className={input} value={b.startDate} onChange={(e) => { const n = [...v.blackouts]; n[i] = { ...n[i], startDate: e.target.value }; set("blackouts", n) }} />
+                  <span className="text-neutral text-sm">to</span>
+                  <input type="date" className={input} value={b.endDate} onChange={(e) => { const n = [...v.blackouts]; n[i] = { ...n[i], endDate: e.target.value }; set("blackouts", n) }} />
+                  <button type="button" onClick={() => set("blackouts", v.blackouts.filter((_, x) => x !== i))} className="text-neutral hover:text-[var(--crimson)]"><X size={16} /></button>
+                </div>
+              ))}
+              <button type="button" onClick={() => set("blackouts", [...v.blackouts, { startDate: "", endDate: "" }])} className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--gold-dark)] hover:text-[var(--gold-hover)]"><Plus size={15} /> Add blackout range</button>
+            </div>
           </div>
         )}
 

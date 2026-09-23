@@ -64,6 +64,7 @@ export type ListingInput = {
   exchangeType?: string
   nightlyAdjustment?: number
   blackouts?: BlackoutInput[]
+  availability?: BlackoutInput[]
   houseRules?: string
   emergencyName?: string
   emergencyPhone?: string
@@ -93,7 +94,11 @@ export function listMemberListings(ownerId: string) {
 export async function getMemberListing(ownerId: string, id: string) {
   const listing = await prisma.listing.findUnique({
     where: { id },
-    include: { photos: { orderBy: { position: "asc" } }, blackouts: { orderBy: { startDate: "asc" } } },
+    include: {
+      photos: { orderBy: { position: "asc" } },
+      blackouts: { orderBy: { startDate: "asc" } },
+      availability: { orderBy: { startDate: "asc" } },
+    },
   })
   if (!listing || listing.ownerId !== ownerId) throw new ApiError(404, "Listing not found.")
   return {
@@ -124,12 +129,12 @@ function cleanPhotos(photos: PhotoInput[] | undefined): PhotoInput[] {
   })
 }
 
-function cleanBlackouts(blackouts: BlackoutInput[] | undefined) {
-  return (blackouts ?? []).map((b) => {
+function cleanRanges(ranges: BlackoutInput[] | undefined, label: string) {
+  return (ranges ?? []).map((b) => {
     const start = new Date(b.startDate)
     const end = new Date(b.endDate)
     if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || end < start) {
-      throw new ApiError(400, "Each blackout range needs a valid start and end date.")
+      throw new ApiError(400, `Each ${label} range needs a valid start and end date.`)
     }
     return { startDate: start, endDate: end }
   })
@@ -153,8 +158,9 @@ function validateFull(input: ListingInput) {
   if (input.exchangeType && !EXCHANGE_TYPES.includes(input.exchangeType)) throw new ApiError(400, "Choose a valid exchange preference.")
   if (!input.emergencyName?.trim() || !input.emergencyPhone?.trim()) throw new ApiError(400, "Emergency contact name and phone are required.")
   const photos = cleanPhotos(input.photos)
-  const blackouts = cleanBlackouts(input.blackouts)
-  return { title, city, country, description, amenities, durations, photos, blackouts }
+  const blackouts = cleanRanges(input.blackouts, "blackout")
+  const availability = cleanRanges(input.availability, "availability")
+  return { title, city, country, description, amenities, durations, photos, blackouts, availability }
 }
 
 /** The three upload gates: verified, 80% profile, active subscription. */
@@ -202,6 +208,7 @@ export async function createListing(ownerId: string, input: ListingInput) {
         emergencyRelationEnc: encryptField(input.emergencyRelationship),
         photos: { create: v.photos.map((p, i) => ({ url: p.url, caption: p.caption, position: i })) },
         blackouts: { create: v.blackouts },
+        availability: { create: v.availability },
       },
     })
     return created
@@ -251,6 +258,7 @@ export async function updateMemberListing(ownerId: string, id: string, input: Li
   await prisma.$transaction(async (tx) => {
     await tx.listingPhoto.deleteMany({ where: { listingId: id } })
     await tx.blackoutDate.deleteMany({ where: { listingId: id } })
+    await tx.availabilityWindow.deleteMany({ where: { listingId: id } })
     await tx.listing.update({
       where: { id },
       data: {
@@ -277,6 +285,7 @@ export async function updateMemberListing(ownerId: string, id: string, input: Li
         emergencyRelationEnc: encryptField(input.emergencyRelationship),
         photos: { create: v.photos.map((p, i) => ({ url: p.url, caption: p.caption, position: i })) },
         blackouts: { create: v.blackouts },
+        availability: { create: v.availability },
       },
     })
   })

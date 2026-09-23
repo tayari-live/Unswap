@@ -383,6 +383,7 @@ model Listing {
   reviews         Review[]
   photos          ListingPhoto[]
   blackouts       BlackoutDate[]
+  availability    AvailabilityWindow[]
 
   @@index([status])
   @@index([city])
@@ -429,6 +430,22 @@ model ListingPhoto {
 
 // An unavailable date range on a listing's calendar.
 model BlackoutDate {
+  id        String   @id @default(uuid())
+  listingId String
+  startDate DateTime
+  endDate   DateTime
+  createdAt DateTime @default(now())
+
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId])
+}
+
+// Positive availability: date ranges the home is open for a swap (the Vacation
+// Swap Calendar). A listing with none is treated as open year-round (subject to
+// blackouts); a listing with windows is available only within them, and drives
+// the "Available Now" tag and vacation-window matching.
+model AvailabilityWindow {
   id        String   @id @default(uuid())
   listingId String
   startDate DateTime

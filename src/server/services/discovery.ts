@@ -21,8 +21,13 @@ export type SearchParams = {
   guests?: number
   exchangeType?: string
   savedOnly?: boolean
+  availableNow?: boolean
   page?: number
 }
+
+// A home is "Available Now" when it has an availability window active today or
+// starting within the next 30 days.
+const AVAILABLE_SOON_DAYS = 30
 
 export const BROWSE_PAGE_SIZE = 12
 
@@ -51,6 +56,10 @@ export async function searchListings(p: SearchParams) {
   if (p.exchangeType) where.exchangeType = { in: [p.exchangeType, "either"] }
   if (p.bedrooms) where.bedrooms = { gte: p.bedrooms }
   if (p.guests) where.maxGuests = { gte: p.guests }
+
+  const now = new Date()
+  const soon = new Date(now.getTime() + AVAILABLE_SOON_DAYS * 86_400_000)
+  if (p.availableNow) where.availability = { some: { startDate: { lte: soon }, endDate: { gte: now } } }
 
   const favs = await prisma.favourite.findMany({
     where: { userId: p.viewerId },
@@ -81,14 +90,17 @@ export async function searchListings(p: SearchParams) {
         nightlyAdjustment: true,
         owner: OWNER_CARD,
         photos: { select: { id: true }, orderBy: { position: "asc" }, take: 1 },
+        // Only the windows that make it "available now" — presence is the flag.
+        availability: { where: { startDate: { lte: soon }, endDate: { gte: now } }, select: { id: true }, take: 1 },
       },
     }),
   ])
 
   return {
-    items: listings.map(({ photos, ...l }) => ({
+    items: listings.map(({ photos, availability, ...l }) => ({
       ...l,
       photoId: photos[0]?.id ?? null,
+      availableNow: availability.length > 0,
       favourited: favSet.has(l.id),
     })),
     total,
@@ -120,6 +132,11 @@ export async function listingCityCounts(p: SearchParams): Promise<CityPin[]> {
   if (p.exchangeType) where.exchangeType = { in: [p.exchangeType, "either"] }
   if (p.bedrooms) where.bedrooms = { gte: p.bedrooms }
   if (p.guests) where.maxGuests = { gte: p.guests }
+  if (p.availableNow) {
+    const now = new Date()
+    const soon = new Date(now.getTime() + AVAILABLE_SOON_DAYS * 86_400_000)
+    where.availability = { some: { startDate: { lte: soon }, endDate: { gte: now } } }
+  }
 
   const groups = await prisma.listing.groupBy({
     by: ["city", "country"],
@@ -157,6 +174,7 @@ export async function getListingDetail(viewerId: string, id: string) {
       },
       photos: { select: { id: true, caption: true }, orderBy: { position: "asc" } },
       blackouts: { orderBy: { startDate: "asc" } },
+      availability: { orderBy: { startDate: "asc" } },
     },
   })
   if (!listing) return null
@@ -186,6 +204,10 @@ export async function getListingDetail(viewerId: string, id: string) {
     amenities: listing.amenities ? listing.amenities.split(",").filter(Boolean) : [],
     swapDurations: listing.swapDurations ? listing.swapDurations.split(",").filter(Boolean) : [],
     blackouts: listing.blackouts.map((b) => ({
+      start: b.startDate.toISOString().slice(0, 10),
+      end: b.endDate.toISOString().slice(0, 10),
+    })),
+    availability: listing.availability.map((b) => ({
       start: b.startDate.toISOString().slice(0, 10),
       end: b.endDate.toISOString().slice(0, 10),
     })),

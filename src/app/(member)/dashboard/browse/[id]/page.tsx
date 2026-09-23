@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import {
-  MapPin, Star, BadgeCheck, BedDouble, Bath, Users, ChevronRight, ArrowRight, Lock,
+  MapPin, Star, BadgeCheck, BedDouble, Bath, Users, ChevronRight, ArrowRight, Lock, CalendarClock,
 } from "lucide-react"
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
@@ -30,6 +30,13 @@ const AMENITY_LABEL: Record<string, string> = {
   washing_machine: "Washing machine", air_conditioning: "Air conditioning", lift: "Lift access", pet_friendly: "Pet-friendly", accessible: "Accessible",
 }
 
+function fmtDateRange(start: string, end: string) {
+  const opts: Intl.DateTimeFormatOptions = { day: "numeric", month: "short" }
+  const s = new Date(start).toLocaleDateString(undefined, opts)
+  const e = new Date(end).toLocaleDateString(undefined, { ...opts, year: "numeric" })
+  return `${s} – ${e}`
+}
+
 export default async function ListingDetailPage({
   params,
 }: {
@@ -55,6 +62,11 @@ export default async function ListingDetailPage({
   // rendered, so they never reach the client). Owners always see their own.
   const blurred = !fullyVerified && !isOwner
   const unconfirmed = viewer?.verificationStatus === "PENDING_EMAIL"
+
+  // "Available now" = a window active today or starting within 30 days.
+  const today = new Date().toISOString().slice(0, 10)
+  const soon = new Date(Date.now() + 30 * 86_400_000).toISOString().slice(0, 10)
+  const availableNow = listing.availability.some((w) => w.end >= today && w.start <= soon)
 
   return (
     <div className="max-w-5xl mx-auto pb-12">
@@ -122,12 +134,19 @@ export default async function ListingDetailPage({
               <span className="inline-flex items-center gap-1.5"><Bath size={16} className="text-neutral" /> {listing.bathrooms} {listing.bathrooms === 1 ? "bathroom" : "bathrooms"}</span>
               <span className="inline-flex items-center gap-1.5"><Users size={16} className="text-neutral" /> up to {listing.maxGuests} guests</span>
             </div>
-            {listing.exchangeType !== "simultaneous" && (
-              <div className="mt-4 inline-flex items-baseline gap-2 rounded-md bg-[var(--gold)]/10 border border-[var(--gold)]/30 px-3.5 py-2">
-                <span className="font-sans text-2xl font-bold text-[var(--gold-dark)]">{effectiveNightly(listing.nightlyPoints, listing.nightlyAdjustment)}</span>
-                <span className="text-sm text-neutral-dark">points / night</span>
-              </div>
-            )}
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              {listing.exchangeType !== "simultaneous" && (
+                <div className="inline-flex items-baseline gap-2 rounded-md bg-[var(--gold)]/10 border border-[var(--gold)]/30 px-3.5 py-2">
+                  <span className="font-sans text-2xl font-bold text-[var(--gold-dark)]">{effectiveNightly(listing.nightlyPoints, listing.nightlyAdjustment)}</span>
+                  <span className="text-sm text-neutral-dark">points / night</span>
+                </div>
+              )}
+              {availableNow && (
+                <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide bg-[var(--teal)]/10 text-[var(--teal)] px-3 py-1.5 rounded-full">
+                  <CalendarClock size={13} /> Available now
+                </span>
+              )}
+            </div>
           </div>
 
           {listing.description && (
@@ -147,6 +166,16 @@ export default async function ListingDetailPage({
                 {listing.swapDurations.map((d) => (
                   <span key={d} className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[var(--navy)]/10 text-[var(--fg)]">{DURATION_LABEL[d] ?? d}</span>
                 ))}
+              </div>
+            )}
+            {listing.availability.length > 0 && (
+              <div>
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--fg)] mb-2">Available windows</h3>
+                <div className="flex flex-wrap gap-2">
+                  {listing.availability.map((w, i) => (
+                    <span key={i} className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[var(--teal)]/10 text-[var(--teal)]">{fmtDateRange(w.start, w.end)}</span>
+                  ))}
+                </div>
               </div>
             )}
             {listing.amenities.length > 0 && (
