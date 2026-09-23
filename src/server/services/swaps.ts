@@ -6,6 +6,7 @@ import { notifyAllowed } from "@/server/services/notify"
 import { getAvailablePoints } from "@/server/services/points"
 import { assertCanRequestListing } from "@/server/services/trust"
 import { effectiveNightly } from "@/lib/valuation"
+import { MEMBERSHIP_ENABLED } from "@/lib/features"
 
 const APP = () => process.env.AUTH_URL || "http://localhost:3000"
 const fmtD = (d: Date) =>
@@ -148,13 +149,17 @@ async function assertConfirmable(
       ? "Verify your identity before you can confirm this swap."
       : "The requester must be verified before this swap can be confirmed.")
   }
-  const sub = await prisma.subscription.findUnique({ where: { userId: swap.requesterId } })
-  if (!sub || sub.status !== "active") {
-    throw new ApiError(402, actor === "requester"
-      ? "An active subscription is required to confirm a swap."
-      : "The requester needs an active subscription before this swap can be confirmed.")
+  // The subscription requirement + exchange-limit only apply once membership is
+  // live; until then, confirming a swap is free.
+  if (MEMBERSHIP_ENABLED) {
+    const sub = await prisma.subscription.findUnique({ where: { userId: swap.requesterId } })
+    if (!sub || sub.status !== "active") {
+      throw new ApiError(402, actor === "requester"
+        ? "An active subscription is required to confirm a swap."
+        : "The requester needs an active subscription before this swap can be confirmed.")
+    }
+    await assertWithinExchangeLimit(swap.requesterId)
   }
-  await assertWithinExchangeLimit(swap.requesterId)
 }
 
 /**

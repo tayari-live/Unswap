@@ -112,6 +112,11 @@ export async function createCheckout(userId: string, tierKey: TierKey) {
   const t = TIERS[tierKey]
 
   if (!stripe) {
+    // Dev-only convenience: activate directly so the flow stays exercisable
+    // without Stripe. In production this must never grant a free subscription.
+    if (process.env.NODE_ENV === "production") {
+      throw new ApiError(503, "Payments aren't available right now. Please try again shortly.")
+    }
     await activateSubscription(userId, tierKey)
     return { url: `${baseUrl()}/dashboard/subscription?activated=${tierKey}`, dev: true }
   }
