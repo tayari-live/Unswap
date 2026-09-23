@@ -34,6 +34,7 @@ export default async function EditListingPage({ params }: { params: Promise<{ id
     maxGuests: listing.maxGuests,
     description: listing.description ?? "",
     amenities: listing.amenities,
+    wifiSpeed: listing.wifiSpeed ?? "",
     photos: listing.photos.map((p) => ({ url: p.url, caption: p.caption ?? "" })),
     swapDurations: listing.swapDurations,
     exchangeType: listing.exchangeType,

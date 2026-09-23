@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
 import {
-  MapPin, Star, BadgeCheck, BedDouble, Bath, Users, ChevronRight, ArrowRight, Lock, CalendarClock,
+  MapPin, Star, BadgeCheck, BedDouble, Bath, Users, ChevronRight, ArrowRight, Lock, CalendarClock, Wifi,
 } from "lucide-react"
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
@@ -28,6 +28,11 @@ const DURATION_LABEL: Record<string, string> = {
 const AMENITY_LABEL: Record<string, string> = {
   wifi: "Wi-Fi", home_office: "Home office", parking: "Parking", garden: "Garden", pool: "Pool", dishwasher: "Dishwasher",
   washing_machine: "Washing machine", air_conditioning: "Air conditioning", lift: "Lift access", pet_friendly: "Pet-friendly", accessible: "Accessible",
+}
+
+const WIFI_SPEED_LABEL: Record<string, string> = {
+  under_50: "Wi-Fi up to 50 Mbps", "50_200": "Fast Wi-Fi (50–200 Mbps)",
+  "200_plus": "Very fast Wi-Fi (200+ Mbps)", gigabit: "Gigabit fibre",
 }
 
 function fmtDateRange(start: string, end: string) {
@@ -133,6 +138,9 @@ export default async function ListingDetailPage({
               <span className="inline-flex items-center gap-1.5"><BedDouble size={16} className="text-neutral" /> {listing.bedrooms} {listing.bedrooms === 1 ? "bedroom" : "bedrooms"}</span>
               <span className="inline-flex items-center gap-1.5"><Bath size={16} className="text-neutral" /> {listing.bathrooms} {listing.bathrooms === 1 ? "bathroom" : "bathrooms"}</span>
               <span className="inline-flex items-center gap-1.5"><Users size={16} className="text-neutral" /> up to {listing.maxGuests} guests</span>
+              {listing.wifiSpeed && WIFI_SPEED_LABEL[listing.wifiSpeed] && (
+                <span className="inline-flex items-center gap-1.5"><Wifi size={16} className="text-neutral" /> {WIFI_SPEED_LABEL[listing.wifiSpeed]}</span>
+              )}
             </div>
             <div className="mt-4 flex flex-wrap items-center gap-3">
               {listing.exchangeType !== "simultaneous" && (

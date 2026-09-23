@@ -38,6 +38,10 @@ export const AMENITIES = [
   "wifi", "home_office", "parking", "garden", "pool", "dishwasher",
   "washing_machine", "air_conditioning", "lift", "pet_friendly", "accessible",
 ]
+// Internet quality — matters for the remote-working membership. Stored on the
+// listing (schema column wifiSpeed).
+export const WIFI_SPEEDS = ["under_50", "50_200", "200_plus", "gigabit"]
+const cleanWifi = (v: string | undefined) => (v && WIFI_SPEEDS.includes(v) ? v : null)
 const IMAGE_DATA_URL = /^data:image\/(png|jpe?g|webp);base64,/
 const MAX_PHOTO_CHARS = 14_000_000 // ~10 MB encoded
 const MIN_PHOTOS = 5
@@ -59,6 +63,7 @@ export type ListingInput = {
   maxGuests?: number
   description?: string
   amenities?: string[]
+  wifiSpeed?: string
   photos?: PhotoInput[]
   swapDurations?: string[]
   exchangeType?: string
@@ -195,6 +200,7 @@ export async function createListing(ownerId: string, input: ListingInput) {
         maxGuests: clampInt(input.maxGuests, 2, 1, 12),
         description: v.description,
         amenities: v.amenities.join(",") || null,
+        wifiSpeed: cleanWifi(input.wifiSpeed),
         swapDurations: v.durations.join(","),
         exchangeType: input.exchangeType || "either",
         nightlyPoints: computeNightlyPoints({ city: v.city, bedrooms: clampInt(input.bedrooms, 1, 1, 10), maxGuests: clampInt(input.maxGuests, 2, 1, 12), amenities: v.amenities }),
@@ -272,6 +278,7 @@ export async function updateMemberListing(ownerId: string, id: string, input: Li
         maxGuests: clampInt(input.maxGuests, existing.maxGuests, 1, 12),
         description: v.description,
         amenities: v.amenities.join(",") || null,
+        wifiSpeed: cleanWifi(input.wifiSpeed),
         swapDurations: v.durations.join(","),
         exchangeType: input.exchangeType || existing.exchangeType,
         nightlyPoints: computeNightlyPoints({ city: v.city, bedrooms: clampInt(input.bedrooms, existing.bedrooms, 1, 10), maxGuests: clampInt(input.maxGuests, existing.maxGuests, 1, 12), amenities: v.amenities }),

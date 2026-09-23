@@ -62,7 +62,7 @@ const TOTAL_BUDGET = 3_800_000 // combined data-URL chars across all photos
 export type WizardValues = {
   id?: string
   title: string; propertyType: string; fullAddress: string; city: string; neighbourhood: string; country: string
-  bedrooms: number; bathrooms: number; maxGuests: number; description: string; amenities: string[]
+  bedrooms: number; bathrooms: number; maxGuests: number; description: string; amenities: string[]; wifiSpeed: string
   photos: { url: string; caption?: string }[]
   swapDurations: string[]; exchangeType: string; nightlyAdjustment: number
   availability: { startDate: string; endDate: string }[]; blackouts: { startDate: string; endDate: string }[]
@@ -73,9 +73,17 @@ export type WizardValues = {
 // property type and exchange mode before they can continue.
 const EMPTY: WizardValues = {
   title: "", propertyType: "", fullAddress: "", city: "", neighbourhood: "", country: "",
-  bedrooms: 1, bathrooms: 1, maxGuests: 2, description: "", amenities: [],
+  bedrooms: 1, bathrooms: 1, maxGuests: 2, description: "", amenities: [], wifiSpeed: "",
   photos: [], swapDurations: [], exchangeType: "", nightlyAdjustment: 0, availability: [], blackouts: [],
   houseRules: "", emergencyName: "", emergencyPhone: "", emergencyRelationship: "",
+}
+
+// Internet speed tiers — matters for the remote-working membership.
+const WIFI_SPEED_LABEL: Record<string, string> = {
+  under_50: "Basic — up to 50 Mbps",
+  "50_200": "Fast — 50 to 200 Mbps",
+  "200_plus": "Very fast — 200+ Mbps",
+  gigabit: "Gigabit fibre",
 }
 
 
@@ -447,6 +455,13 @@ export function ListingWizard({
               <div><span className={label}>Bedrooms</span><Stepper label="bedrooms" value={v.bedrooms} set={(n) => set("bedrooms", n)} min={1} max={10} /></div>
               <div><span className={label}>Bathrooms</span><Stepper label="bathrooms" value={v.bathrooms} set={(n) => set("bathrooms", n)} min={1} max={6} /></div>
               <div><span className={label}>Max guests</span><Stepper label="max guests" value={v.maxGuests} set={(n) => set("maxGuests", n)} min={1} max={12} /></div>
+            </div>
+            <div className="mt-8 max-w-xs">
+              <label htmlFor="wifi" className={label}>Internet speed <span className="text-neutral normal-case font-normal">(helps remote workers)</span></label>
+              <select id="wifi" value={v.wifiSpeed} onChange={(e) => set("wifiSpeed", e.target.value)} className={input}>
+                <option value="">Not specified</option>
+                {Object.entries(WIFI_SPEED_LABEL).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
+              </select>
             </div>
           </div>
         )}
