@@ -25,7 +25,7 @@ export default async function NewListingPage() {
 
   return (
     <div className="max-w-2xl mx-auto pb-12">
-      <LuxPageHeader eyebrow="New Listing" title="Add a listing" subtitle="List a home for exchange across the network." />
+      <LuxPageHeader eyebrow="New Listing" title="Add a listing" subtitle="List a home for exchange across the network." back="/dashboard/listings" />
       {canList ? (
         <ListingWizard mode="create" />
       ) : (

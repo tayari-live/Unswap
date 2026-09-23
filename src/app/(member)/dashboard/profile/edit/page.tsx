@@ -27,7 +27,7 @@ export default async function EditProfilePage() {
 
   return (
     <div className="max-w-2xl mx-auto pb-12">
-      <LuxPageHeader eyebrow="Your Profile" title="Edit Profile" subtitle="How you appear to other members of the network." />
+      <LuxPageHeader eyebrow="Your Profile" title="Edit Profile" subtitle="How you appear to other members of the network." back="/dashboard/profile" />
       <ProfileWizard initial={initial} redirectTo="/dashboard/profile" />
     </div>
   )

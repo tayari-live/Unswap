@@ -140,6 +140,7 @@ function Shell({ children }: { children: React.ReactNode }) {
       <LuxPageHeader eyebrow="Verification"
         title="Verify your identity"
         subtitle="Complete verification to unlock the full UnSwap network."
+        back="/dashboard"
       />
       {children}
     </div>

@@ -1,3 +1,5 @@
+import Link from "next/link"
+import { ArrowLeft } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 /*
@@ -104,15 +106,26 @@ export function LuxPageHeader({
   title,
   subtitle,
   action,
+  back,
 }: {
   eyebrow: string
   title: string
   subtitle?: string
   action?: React.ReactNode
+  /** When set, renders a "Back" link above the eyebrow to this href. */
+  back?: string
 }) {
   return (
     <div className="flex items-end justify-between gap-4 mb-8">
       <div>
+        {back && (
+          <Link
+            href={back}
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--muted)] hover:text-[var(--fg)] transition-colors mb-3"
+          >
+            <ArrowLeft size={15} /> Back
+          </Link>
+        )}
         <SectionLabel>{eyebrow}</SectionLabel>
         <h1 className="font-sans font-bold leading-tight tracking-tight text-[var(--foreground)] text-[32px] lg:text-[40px]">
           {title}

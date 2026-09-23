@@ -48,7 +48,7 @@ export default async function EditListingPage({ params }: { params: Promise<{ id
 
   return (
     <div className="max-w-2xl mx-auto pb-12">
-      <LuxPageHeader eyebrow="Edit Listing" title="Edit listing" subtitle="Update the details of your home." />
+      <LuxPageHeader eyebrow="Edit Listing" title="Edit listing" subtitle="Update the details of your home." back="/dashboard/listings" />
       <ListingWizard mode="edit" initial={initial} />
     </div>
   )

@@ -128,7 +128,7 @@ export default async function BrowsePage({
       <PageTip id="discover">Every home here belongs to a verified peer. Save the ones you like, then send a swap request when your dates are set.</PageTip>
 
       {blurred && (
-        <div className="mb-4 flex items-start gap-3 rounded-md bg-[var(--gold)]/10 border border-[var(--gold)]/30 px-4 py-3">
+        <div className="sticky top-[72px] md:top-[76px] z-30 mb-4 flex items-start gap-3 rounded-md bg-[var(--gold)]/10 backdrop-blur-md border border-[var(--gold)]/30 px-4 py-3 shadow-sm">
           <Lock size={16} className="text-[var(--gold-dark)] flex-shrink-0 mt-0.5" />
           <p className="text-sm text-neutral-dark leading-snug">
             <span className="font-semibold text-[var(--fg)]">You&apos;re viewing previews.</span>{" "}

@@ -27,7 +27,7 @@ export default async function NotificationSettingsPage() {
       >
         <ChevronLeft size={16} /> Settings
       </Link>
-      <LuxPageHeader eyebrow="Preferences" title="Notification preferences" subtitle="Choose which emails you receive from UnSwap." />
+      <LuxPageHeader eyebrow="Preferences" title="Notification preferences" subtitle="Choose which emails you receive from UnSwap." back="/dashboard/settings" />
       <NotificationPrefs initial={user} />
     </div>
   )
