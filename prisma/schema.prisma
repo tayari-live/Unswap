@@ -99,6 +99,7 @@ model User {
   workEmailTokens    WorkEmailToken[]
   conciergeLeads     ConciergeLead[]          @relation("ConciergeMember")
   guarantorRequests  GuarantorRequest[]       @relation("GuarantorMember")
+  identityChecks     IdentityCheck[]          @relation("IdentityMember")
   loginTokens        LoginToken[]
   favourites         Favourite[]
   conversations      ConversationParticipant[]
@@ -239,6 +240,23 @@ model ConciergeLead {
   member      User     @relation("ConciergeMember", fields: [memberId], references: [id], onDelete: Cascade)
 
   @@index([status, createdAt])
+}
+
+// An automated ID-verification attempt via a third-party IDV provider (Stripe
+// Identity): the raw document/selfie is handled by the provider ("verify and
+// forget") — we only store the session id and its pass/fail outcome.
+model IdentityCheck {
+  id         String    @id @default(uuid())
+  memberId   String
+  sessionId  String    @unique // provider VerificationSession id
+  provider   String    @default("stripe")
+  status     String    @default("pending") // pending | verified | requires_input | canceled
+  verifiedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  member     User      @relation("IdentityMember", fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@index([memberId])
 }
 
 // A guarantor invitation: a member who can't verify via their own institutional

@@ -5,9 +5,11 @@ import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
 import { reviewTypeForEmail, matchAllowedDomain } from "@/server/services/registration"
 import { LuxPageHeader } from "@/components/ui/lux"
+import { identityEnabled } from "@/server/services/identity"
 import { VerifyIdentityForm } from "./verify-identity-form"
 import { AddWorkEmail } from "./add-work-email"
 import { GuarantorInvite } from "./guarantor-invite"
+import { IdentityVerify } from "./identity-verify"
 
 export const dynamic = "force-dynamic"
 
@@ -74,6 +76,7 @@ export default async function VerifyIdentityPage() {
   // Offer the no-documents fast path only when the signup email isn't recognised
   // and they haven't already added a work email.
   const showAddWorkEmail = !user.workEmailVerifiedAt && !primaryMatched
+  const idvEnabled = identityEnabled()
 
   // On rejection, show the reviewer's note so the member knows what to fix.
   const lastRejection =
@@ -102,6 +105,17 @@ export default async function VerifyIdentityPage() {
           </p>
         </div>
       )}
+      {idvEnabled && (
+        <div className="mb-5">
+          <IdentityVerify />
+          <div className="flex items-center gap-3 my-6">
+            <span className="h-px flex-1 bg-[var(--hair)]" />
+            <span className="text-xs uppercase tracking-wider text-neutral">or verify another way</span>
+            <span className="h-px flex-1 bg-[var(--hair)]" />
+          </div>
+        </div>
+      )}
+
       {user.workEmailVerifiedAt && user.workEmail && (
         <div className="mb-5 flex items-center gap-2 text-sm text-[var(--teal)] bg-[var(--teal-light)] border border-[var(--teal)]/30 rounded-md px-4 py-3">
           <MailCheck size={16} className="flex-shrink-0" /> Work email verified: <span className="font-semibold">{user.workEmail}</span>

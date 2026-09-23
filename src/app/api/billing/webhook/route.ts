@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { stripe, handleWebhookEvent } from "@/server/services/billing"
+import { handleIdentityEvent } from "@/server/services/identity"
 
 // POST /api/billing/webhook — Stripe events. Verifies the signature against
 // STRIPE_WEBHOOK_SECRET, then applies the event to subscription state.
@@ -21,7 +22,12 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    await handleWebhookEvent(event)
+    // The same endpoint receives both billing and Identity events.
+    if (event.type.startsWith("identity.")) {
+      await handleIdentityEvent(event)
+    } else {
+      await handleWebhookEvent(event)
+    }
   } catch (err) {
     console.error("Webhook handling error:", err)
     return NextResponse.json({ error: "Webhook handler failed." }, { status: 500 })
