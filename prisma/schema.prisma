@@ -361,6 +361,18 @@ model Subscription {
   user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+// Geocoded city centres, cached so the map can plot any city — not just the
+// built-in duty-station set. Keyed by a normalised "city|country".
+model CityGeo {
+  id        String   @id @default(uuid())
+  key       String   @unique // lowercased "city|country"
+  city      String
+  country   String
+  lng       Float
+  lat       Float
+  createdAt DateTime @default(now())
+}
+
 // A home listing.
 model Listing {
   id              String   @id @default(uuid())

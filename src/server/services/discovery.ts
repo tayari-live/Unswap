@@ -1,6 +1,6 @@
 import { prisma } from "@/server/prisma"
 import { ApiError } from "@/server/http"
-import { cityCoords } from "@/lib/geo"
+import { resolveCityCoords } from "@/server/services/geocode"
 
 const OWNER_CARD = {
   select: {
@@ -144,11 +144,16 @@ export async function listingCityCounts(p: SearchParams): Promise<CityPin[]> {
     _count: { _all: true },
   })
 
-  return groups
-    .map((g) => {
-      const coords = cityCoords(g.city)
+  // Resolve each city's centre (built-in table → cache → Mapbox geocode), so
+  // any city plots — not just the built-in duty stations. Unknown cities are
+  // omitted from the map (they still appear in the grid/list).
+  const pins = await Promise.all(
+    groups.map(async (g) => {
+      const coords = await resolveCityCoords(g.city, g.country)
       return coords ? { city: g.city, country: g.country, count: g._count._all, lng: coords[0], lat: coords[1] } : null
-    })
+    }),
+  )
+  return pins
     .filter((x): x is CityPin => x !== null)
     .sort((a, b) => b.count - a.count)
 }
