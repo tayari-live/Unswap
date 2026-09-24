@@ -42,6 +42,34 @@ export async function createIdentitySession(userId: string): Promise<{ url: stri
 }
 
 /**
+ * Apply a verified ID check: record it, flip the member to FULLY_VERIFIED, and
+ * grant the standard reward. Shared by the webhook and the success-return
+ * confirmation so both paths behave identically. Idempotent — a repeat call on
+ * an already-verified member is a no-op.
+ */
+async function applyVerified(userId: string | undefined, sessionId: string) {
+  await prisma.identityCheck.updateMany({
+    where: { sessionId },
+    data: { status: "verified", verifiedAt: new Date() },
+  })
+  if (!userId) return
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { fullName: true, email: true, verificationStatus: true },
+  })
+  if (!user || user.verificationStatus === "FULLY_VERIFIED") return
+
+  await prisma.user.update({ where: { id: userId }, data: { verificationStatus: "FULLY_VERIFIED" } })
+  await grantAutoVerifyRewards({ id: userId, fullName: user.fullName, email: user.email })
+  await logAudit({
+    action: "MEMBER_VERIFIED",
+    subject: `ID verified (automated): ${user.fullName}`,
+    metadata: { email: user.email, method: "stripe_identity", sessionId },
+  })
+}
+
+/**
  * Apply a Stripe Identity webhook event. On `verified` the member becomes
  * FULLY_VERIFIED (with the same one-time reward other verification paths give);
  * other outcomes just record their status.
@@ -59,24 +87,54 @@ export async function handleIdentityEvent(event: Stripe.Event) {
   const status = statusByType[event.type]
   if (!status) return // not an event we act on
 
-  await prisma.identityCheck.updateMany({
-    where: { sessionId: session.id },
-    data: { status, ...(status === "verified" ? { verifiedAt: new Date() } : {}) },
-  })
+  if (status === "verified") {
+    await applyVerified(userId, session.id)
+    return
+  }
+  await prisma.identityCheck.updateMany({ where: { sessionId: session.id }, data: { status } })
+}
 
-  if (status !== "verified" || !userId) return
+/**
+ * Confirm the member's ID check on the return from the Stripe-hosted flow — a
+ * fallback so verification completes even if the webhook is delayed or not
+ * delivered, mirroring the billing confirmation. Idempotent and safe to run
+ * alongside the webhook. Returns the resolved status
+ * ("verified" | "pending" | "requires_input" | "canceled"), or null when
+ * there's nothing to confirm.
+ */
+export async function confirmIdentitySession(userId: string): Promise<string | null> {
+  if (!stripe) return null
 
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { fullName: true, email: true, verificationStatus: true },
+  const check = await prisma.identityCheck.findFirst({
+    where: { memberId: userId },
+    orderBy: { createdAt: "desc" },
   })
-  if (!user || user.verificationStatus === "FULLY_VERIFIED") return
+  if (!check) return null
+  if (check.status === "verified") return "verified"
 
-  await prisma.user.update({ where: { id: userId }, data: { verificationStatus: "FULLY_VERIFIED" } })
-  await grantAutoVerifyRewards({ id: userId, fullName: user.fullName, email: user.email })
-  await logAudit({
-    action: "MEMBER_VERIFIED",
-    subject: `ID verified (automated): ${user.fullName}`,
-    metadata: { email: user.email, method: "stripe_identity", sessionId: session.id },
-  })
+  let s: Stripe.Identity.VerificationSession
+  try {
+    s = await stripe.identity.verificationSessions.retrieve(check.sessionId)
+  } catch {
+    return null
+  }
+  // Never trust a session that isn't this member's.
+  if ((s.metadata as Record<string, string> | null)?.userId !== userId) return null
+
+  if (s.status === "verified") {
+    await applyVerified(userId, s.id)
+    return "verified"
+  }
+
+  // Record the interim status (still processing / needs another try / abandoned).
+  const map: Record<string, string> = {
+    processing: "pending",
+    requires_input: "requires_input",
+    canceled: "canceled",
+  }
+  const mapped = map[s.status ?? ""] ?? check.status
+  if (mapped !== check.status) {
+    await prisma.identityCheck.updateMany({ where: { sessionId: s.id }, data: { status: mapped } })
+  }
+  return mapped
 }

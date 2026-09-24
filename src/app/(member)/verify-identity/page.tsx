@@ -5,7 +5,7 @@ import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
 import { reviewTypeForEmail, matchAllowedDomain } from "@/server/services/registration"
 import { LuxPageHeader } from "@/components/ui/lux"
-import { identityEnabled } from "@/server/services/identity"
+import { identityEnabled, confirmIdentitySession } from "@/server/services/identity"
 import { VerifyIdentityForm } from "./verify-identity-form"
 import { AddWorkEmail } from "./add-work-email"
 import { GuarantorInvite } from "./guarantor-invite"
@@ -13,10 +13,21 @@ import { IdentityVerify } from "./identity-verify"
 
 export const dynamic = "force-dynamic"
 
-export default async function VerifyIdentityPage() {
+export default async function VerifyIdentityPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ idv?: string }>
+}) {
   const session = await auth()
   const userId = (session?.user as any)?.id as string | undefined
   if (!userId) redirect("/login")
+
+  // Returning from the Stripe-hosted ID flow: confirm the result directly so a
+  // verified member is flipped on this load, even if the webhook hasn't landed.
+  const sp = await searchParams
+  if (sp.idv === "complete") {
+    await confirmIdentitySession(userId).catch((e) => console.error("Identity confirmation failed:", e))
+  }
 
   const user = await prisma.user.findUnique({ where: { id: userId } })
   if (!user) redirect("/login")
