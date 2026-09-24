@@ -5,6 +5,7 @@ import { prisma } from "@/server/prisma"
 import { LuxPageHeader } from "@/components/ui/lux"
 import { CheckoutButton, CancelButton } from "./billing-buttons"
 import { MEMBERSHIP_ENABLED } from "@/lib/features"
+import { confirmCheckoutSession } from "@/server/services/billing"
 
 export const dynamic = "force-dynamic"
 
@@ -28,7 +29,7 @@ function fmt(d: Date | null) {
 export default async function SubscriptionPage({
   searchParams,
 }: {
-  searchParams: Promise<{ activated?: string; cancelled?: string }>
+  searchParams: Promise<{ activated?: string; cancelled?: string; session_id?: string }>
 }) {
   if (!MEMBERSHIP_ENABLED) redirect("/dashboard")
 
@@ -36,13 +37,22 @@ export default async function SubscriptionPage({
   const userId = (session?.user as any)?.id as string | undefined
   if (!userId) redirect("/login")
 
+  const sp = await searchParams
+
+  // Returning from Stripe Checkout: confirm the session directly so the plan is
+  // active on this first load, even if the webhook hasn't been delivered yet.
+  if (sp.session_id) {
+    await confirmCheckoutSession(userId, sp.session_id).catch((e) =>
+      console.error("Checkout confirmation failed:", e),
+    )
+  }
+
   const user = await prisma.user.findUnique({ where: { id: userId }, include: { subscription: true } })
   if (!user) redirect("/login")
   const sub = user.subscription
   const currentKey = sub?.tier ?? null
   const isLifetime = currentKey === "lifetime"
 
-  const sp = await searchParams
   const activated = sp.activated && TIER_LABELS[sp.activated]
 
   return (

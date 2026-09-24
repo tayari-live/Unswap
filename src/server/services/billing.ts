@@ -49,6 +49,12 @@ export async function activateSubscription(
   const t = TIERS[tierKey]
   const renewsAt = tierKey === "lifetime" ? null : new Date(Date.now() + YEAR_MS)
 
+  // Detect whether this is a genuine new activation. Both the Stripe webhook and
+  // the success-return confirmation can call this for the same checkout, so the
+  // one-time side effects (welcome email, audit, points) must not fire twice.
+  const existing = await prisma.subscription.findUnique({ where: { userId } })
+  const alreadyActive = existing?.status === "active" && existing?.tier === tierKey
+
   await prisma.subscription.upsert({
     where: { userId },
     create: {
@@ -68,6 +74,10 @@ export async function activateSubscription(
   // Restore any listings that a previous lapse auto-paused.
   await restoreAutoPausedListings(userId)
 
+  // Already-active → the plan record is refreshed above, but skip the one-time
+  // side effects so a duplicate call (webhook + return confirmation) is silent.
+  if (alreadyActive) return
+
   const user = await prisma.user.findUnique({ where: { id: userId } })
   if (user) {
     await sendEmail({
@@ -82,7 +92,7 @@ export async function activateSubscription(
         ctaUrl: `${process.env.AUTH_URL || "http://localhost:3000"}/dashboard/browse`,
       }),
       text: `Your UnSwap ${t.name} membership is now active.`,
-    })
+    }).catch((e) => console.error("Activation email failed:", e))
   }
   await logAudit({ actorId: userId, action: "SUBSCRIPTION_ACTIVATED", subject: `Activated ${t.name}`, metadata: { tier: tierKey } })
   // First paid subscription grants a point bonus (idempotent — renewals don't re-pay).
@@ -129,12 +139,40 @@ export async function createCheckout(userId: string, tierKey: TierKey) {
     mode: t.mode,
     customer,
     line_items: [{ price: priceId, quantity: 1 }],
-    success_url: `${baseUrl()}/dashboard/subscription?activated=${tierKey}`,
+    // {CHECKOUT_SESSION_ID} lets the success page confirm the payment directly,
+    // as a fallback in case the webhook is delayed or not delivered.
+    success_url: `${baseUrl()}/dashboard/subscription?activated=${tierKey}&session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${baseUrl()}/dashboard/subscription?cancelled=1`,
     metadata: { userId, tier: tierKey },
     ...(t.mode === "subscription" ? { subscription_data: { metadata: { userId, tier: tierKey } } } : {}),
   })
   return { url: session.url, dev: false }
+}
+
+/**
+ * Confirm a completed Checkout Session on the success return — a fallback so a
+ * paid member is activated even if the Stripe webhook is delayed or
+ * misconfigured. Idempotent and safe to run alongside the webhook. Guards on
+ * ownership (the session's metadata userId must match) and real payment, so a
+ * forged or foreign session id can't grant a membership.
+ */
+export async function confirmCheckoutSession(userId: string, sessionId: string): Promise<boolean> {
+  if (!stripe) return false
+  let s: Stripe.Checkout.Session
+  try {
+    s = await stripe.checkout.sessions.retrieve(sessionId)
+  } catch {
+    return false
+  }
+  if (s.metadata?.userId !== userId) return false
+  const tier = s.metadata?.tier
+  if (!isTierKey(tier)) return false
+  const paid =
+    s.status === "complete" &&
+    (s.payment_status === "paid" || s.payment_status === "no_payment_required")
+  if (!paid) return false
+  await activateSubscription(userId, tier, typeof s.subscription === "string" ? s.subscription : null)
+  return true
 }
 
 /** Cancel an active subscription (at period end in Stripe; immediate in DB state). */
