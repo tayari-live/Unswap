@@ -1,5 +1,5 @@
 import { prisma } from "@/server/prisma"
-import { cityCoords } from "@/lib/geo"
+import { cityCoords, countryIso } from "@/lib/geo"
 
 // Server-side geocoding uses the Mapbox token. The public map token works for
 // the Geocoding API too; a dedicated MAPBOX_TOKEN can override it server-side.
@@ -8,7 +8,7 @@ const mapboxToken = () => process.env.MAPBOX_TOKEN || process.env.NEXT_PUBLIC_MA
 // Bump when the geocoding query changes, so previously cached (possibly wrong)
 // results are re-resolved instead of being read back. v2: settlement-only,
 // non-fuzzy — v1 fuzzy-matched "Diani, Kenya" to a street "Diana Close".
-const GEOCODE_VERSION = "v2"
+const GEOCODE_VERSION = "v3"
 const keyOf = (city: string, country: string) =>
   `${GEOCODE_VERSION}|${city.trim().toLowerCase()}|${country.trim().toLowerCase()}`
 
@@ -64,6 +64,10 @@ async function mapboxGeocode(
   const query = encodeURIComponent(`${city}, ${country}`.trim())
   const params = new URLSearchParams({ limit: "1", fuzzyMatch: "false", access_token: token })
   if (types) params.set("types", types)
+  // Hard-constrain to the country when we know its ISO code — Mapbox otherwise
+  // treats the country in the text query as a soft hint and can drift abroad.
+  const iso = countryIso(country)
+  if (iso) params.set("country", iso.toLowerCase())
   const res = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${query}.json?${params}`)
   if (!res.ok) return null
   const data = await res.json()
