@@ -215,12 +215,12 @@ export default function LoginPage() {
             <>
               <form onSubmit={handleEmailContinue} className="space-y-5">
                 <div>
-                  <label htmlFor="email" className={labelCls}>Work email</label>
+                  <label htmlFor="email" className={labelCls}>Email</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
                       <Mail size={18} className="text-wl-muted" />
                     </div>
-                    <input id="email" name="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Your work email" className={`${inputCls} pr-11`} />
+                    <input id="email" name="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Your email address" className={`${inputCls} pr-11`} />
                   </div>
                 </div>
                 <button type="submit" disabled={loading} className="w-full bg-wl-gold hover:bg-wl-gold-light text-wl-navy text-sm font-medium tracking-[0.08em] uppercase py-4 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_4px_24px_rgba(201,168,76,0.25)]">
