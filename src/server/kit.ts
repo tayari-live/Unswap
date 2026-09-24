@@ -81,13 +81,13 @@ export async function kitTag(email: string, tagId: string | undefined) {
 // env var; any unset var makes that tag a no-op.
 // Blanket source tag applied the moment anyone is added to Kit from the app, so
 // every UnSwap subscriber is distinguishable from any other list.
-export const kitTagUnswap = (email: string) => kitTag(email, process.env.KIT_TAG_UNSWAP)
-export const kitTagJoined = (email: string) => kitTag(email, process.env.KIT_TAG_JOINED)
-export const kitTagConfirmed = (email: string) => kitTag(email, process.env.KIT_TAG_CONFIRMED)
-export const kitTagAccountCreated = (email: string) => kitTag(email, process.env.KIT_TAG_ACCOUNT_CREATED)
-export const kitTagHomeListed = (email: string) => kitTag(email, process.env.KIT_TAG_HOME_LISTED)
-export const kitTagSubscribed = (email: string) => kitTag(email, process.env.KIT_TAG_SUBSCRIBED)
-export const kitTagReferrer = (email: string) => kitTag(email, process.env.KIT_TAG_REFERRER)
+export const kitTagUnswap = (email: string) => kitTag(email, process.env.KIT_TAG_ID_UNSWAP)
+export const kitTagJoined = (email: string) => kitTag(email, process.env.KIT_TAG_ID_WAITLIST_JOINED)
+export const kitTagConfirmed = (email: string) => kitTag(email, process.env.KIT_TAG_ID_WAITLIST_CONFIRMED)
+export const kitTagAccountCreated = (email: string) => kitTag(email, process.env.KIT_TAG_ID_ACCOUNT_CREATED)
+export const kitTagHomeListed = (email: string) => kitTag(email, process.env.KIT_TAG_ID_HOME_LISTED)
+export const kitTagSubscribed = (email: string) => kitTag(email, process.env.KIT_TAG_ID_SUBSCRIBED)
+export const kitTagReferrer = (email: string) => kitTag(email, process.env.KIT_TAG_ID_REFERRER)
 
 /** Mirror a referrer's verified-referral count into Kit for campaigns. */
 export async function kitUpdateReferralCount(email: string, count: number) {
