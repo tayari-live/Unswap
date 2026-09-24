@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { MessageCircleQuestion, Send, X, Sparkles, Check, CheckCheck, LifeBuoy } from "lucide-react"
+import { Send, X, Sparkles, Check, CheckCheck, LifeBuoy } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
 
 type Msg = { role: "user" | "assistant"; content: string; at: number; escalate?: boolean }
@@ -133,7 +133,7 @@ export function AppAssistant() {
           open ? "hidden md:block" : ""
         }`}
       >
-        {open ? <X size={22} /> : <MessageCircleQuestion size={22} />}
+        {open ? <X size={22} /> : <Sparkles size={22} />}
       </button>
 
       {open && (
