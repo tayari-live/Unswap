@@ -119,7 +119,7 @@ export function LandingNavbar({ forceLight = false }: { forceLight?: boolean }) 
             </Link>
 
             <Link
-              href="/register"
+              href="/waitlist"
               className="hidden sm:inline-flex items-center justify-center h-[42px] px-6 rounded-md bg-gold hover:bg-gold-hover text-navy text-[13px] font-bold uppercase tracking-[0.07em] transition-colors duration-150"
             >
               Request Access
@@ -180,7 +180,7 @@ export function LandingNavbar({ forceLight = false }: { forceLight?: boolean }) 
               Log in
             </Link>
             <Link
-              href="/register"
+              href="/waitlist"
               onClick={() => setMenuOpen(false)}
               className="mt-3 flex items-center justify-center h-[50px] rounded-md bg-gold hover:bg-gold-hover text-navy text-[13px] font-bold uppercase tracking-[0.07em] transition-colors duration-150"
             >

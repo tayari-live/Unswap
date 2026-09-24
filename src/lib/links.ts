@@ -9,7 +9,9 @@
  * "Request access", never "Join" or "Sign up": the network is closed and
  * verified, and the label should say so before anyone reaches the form.
  */
-export const REQUEST_ACCESS = "/register";
+// Public "Request access" CTAs send people to the waitlist — the network is
+// invite-only, so the open /register form is reserved for invited members.
+export const REQUEST_ACCESS = "/waitlist";
 export const LOGIN = "/login";
 export const ABOUT = "/about";
 export const PRIVACY = "/privacy";

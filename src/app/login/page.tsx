@@ -291,10 +291,10 @@ export default function LoginPage() {
               {EmailPill}
               <p className="text-wl-ivory-dim text-sm leading-relaxed mb-6">
                 We couldn&apos;t find an account for <span className="text-wl-ivory font-medium break-all">{email}</span>.
-                Create one to join the network.
+                The network is invite-only — request access to join the waitlist.
               </p>
-              <Link href={`/register?email=${encodeURIComponent(email)}`} className="block w-full text-center bg-wl-gold hover:bg-wl-gold-light text-wl-navy text-sm font-medium tracking-[0.08em] uppercase py-4 transition-all duration-200 shadow-[0_4px_24px_rgba(201,168,76,0.25)]">
-                Create an account
+              <Link href="/waitlist" className="block w-full text-center bg-wl-gold hover:bg-wl-gold-light text-wl-navy text-sm font-medium tracking-[0.08em] uppercase py-4 transition-all duration-200 shadow-[0_4px_24px_rgba(201,168,76,0.25)]">
+                Request access
               </Link>
             </>
           )}
@@ -305,7 +305,7 @@ export default function LoginPage() {
             {stage === "email" && (
               <p className="text-sm text-wl-ivory-dim">
                 Don&apos;t have an account?{" "}
-                <Link href="/register" className="font-semibold text-wl-gold hover:text-wl-gold-light transition-colors">Sign up</Link>
+                <Link href="/waitlist" className="font-semibold text-wl-gold hover:text-wl-gold-light transition-colors">Request access</Link>
               </p>
             )}
             <p className="text-[11px] text-wl-muted">
