@@ -34,7 +34,7 @@ export default async function VerifyPage({
       footer={
         <p className="text-sm text-wl-ivory-dim">
           Need an account?{" "}
-          <Link href="/register" className="text-wl-gold hover:text-wl-gold-light transition-colors">
+          <Link href="/waitlist" className="text-wl-gold hover:text-wl-gold-light transition-colors">
             Request access
           </Link>
         </p>

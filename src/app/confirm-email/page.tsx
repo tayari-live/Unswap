@@ -48,8 +48,8 @@ function ConfirmEmailCard() {
       footer={
         <p className="text-sm text-wl-ivory-dim">
           Wrong email address?{" "}
-          <Link href="/register" className="text-wl-gold hover:text-wl-gold-light transition-colors">
-            Sign up again
+          <Link href="/waitlist" className="text-wl-gold hover:text-wl-gold-light transition-colors">
+            Request access again
           </Link>
         </p>
       }
