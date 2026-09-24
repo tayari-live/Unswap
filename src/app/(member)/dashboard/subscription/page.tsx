@@ -3,7 +3,7 @@ import { Check, BadgeCheck, Info, CheckCircle2 } from "lucide-react"
 import { auth } from "@/server/auth"
 import { prisma } from "@/server/prisma"
 import { LuxPageHeader } from "@/components/ui/lux"
-import { CheckoutButton, CancelButton } from "./billing-buttons"
+import { CheckoutButton, CancelButton, ResumeButton } from "./billing-buttons"
 import { MEMBERSHIP_ENABLED } from "@/lib/features"
 import { confirmCheckoutSession } from "@/server/services/billing"
 
@@ -89,14 +89,22 @@ export default async function SubscriptionPage({
           </div>
           {sub && (
             <div className="text-sm sm:text-right">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--teal)]/20 text-[var(--teal)] text-xs font-bold uppercase tracking-wide">
-                {sub.status}
+              <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${
+                sub.cancelAtPeriodEnd
+                  ? "bg-[var(--gold)]/20 text-[var(--gold)]"
+                  : "bg-[var(--teal)]/20 text-[var(--teal)]"
+              }`}>
+                {sub.cancelAtPeriodEnd ? "Cancelling" : sub.status}
               </div>
               <div className="text-xs text-white/50 mt-2">
-                {isLifetime ? "Lifetime — never expires" : `Renews ${fmt(sub.renewsAt)}`}
+                {isLifetime
+                  ? "Lifetime — never expires"
+                  : sub.cancelAtPeriodEnd
+                    ? `Access until ${fmt(sub.renewsAt)} — won't renew`
+                    : `Renews ${fmt(sub.renewsAt)}`}
               </div>
               {!isLifetime && sub.status === "active" && (
-                <div className="mt-2"><CancelButton /></div>
+                <div className="mt-2">{sub.cancelAtPeriodEnd ? <ResumeButton /> : <CancelButton />}</div>
               )}
             </div>
           )}

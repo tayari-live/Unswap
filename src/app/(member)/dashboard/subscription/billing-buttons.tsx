@@ -89,3 +89,29 @@ export function CancelButton() {
     </button>
   )
 }
+
+export function ResumeButton() {
+  const router = useRouter()
+  const [loading, setLoading] = useState(false)
+
+  async function resume() {
+    setLoading(true)
+    try {
+      const res = await fetch("/api/billing/resume", { method: "POST" })
+      if (res.ok) router.refresh()
+      else setLoading(false)
+    } catch {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <button
+      onClick={resume}
+      disabled={loading}
+      className="text-xs font-semibold text-[var(--gold)] hover:text-white underline disabled:opacity-50"
+    >
+      {loading ? "Resuming…" : "Resume membership"}
+    </button>
+  )
+}

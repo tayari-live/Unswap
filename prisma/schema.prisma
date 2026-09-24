@@ -349,6 +349,7 @@ model Subscription {
   userId            String   @unique
   tier              String   // limited_1x | standard_2x | professional_4x | unlimited_pro | lifetime
   status            String   @default("active") // active | past_due | cancelled
+  cancelAtPeriodEnd Boolean  @default(false) // set when cancelled but still paid through the period
   exchangesPerYear  Int      // -1 for unlimited
   priceAnnual       Int      // in whole currency units (annual; one-time for lifetime)
   propertyGuarantee Int      // guarantee amount

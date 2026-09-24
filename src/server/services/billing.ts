@@ -23,6 +23,8 @@ const key = process.env.STRIPE_SECRET_KEY
 export const stripe = key ? new Stripe(key) : null
 const baseUrl = () => process.env.AUTH_URL || "http://localhost:3000"
 const YEAR_MS = 365 * 24 * 60 * 60 * 1000
+const fmtDate = (d: Date) =>
+  new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric" }).format(d)
 
 /** On subscription lapse: pause the member's ACTIVE listings (flagged auto-paused). */
 async function pauseListingsForLapse(userId: string) {
@@ -64,7 +66,7 @@ export async function activateSubscription(
       stripeSubscriptionId: stripeSubscriptionId ?? null,
     },
     update: {
-      tier: tierKey, status: "active",
+      tier: tierKey, status: "active", cancelAtPeriodEnd: false,
       exchangesPerYear: t.exchangesPerYear, priceAnnual: t.priceAnnual,
       propertyGuarantee: t.propertyGuarantee, renewsAt,
       ...(stripeSubscriptionId !== undefined ? { stripeSubscriptionId } : {}),
@@ -175,32 +177,51 @@ export async function confirmCheckoutSession(userId: string, sessionId: string):
   return true
 }
 
-/** Cancel an active subscription (at period end in Stripe; immediate in DB state). */
+/**
+ * Cancel at period end. The member keeps full access until their paid period
+ * runs out; Stripe's `customer.subscription.deleted` webhook then does the
+ * actual downgrade (status → cancelled + listings paused). We only flag the
+ * pending cancellation here — nothing the member has paid for is touched.
+ */
 export async function cancelSubscription(userId: string) {
   const sub = await prisma.subscription.findUnique({ where: { userId } })
   if (!sub) throw new ApiError(404, "No active subscription.")
   if (sub.tier === "lifetime") throw new ApiError(400, "Lifetime access cannot be cancelled.")
+  if (sub.cancelAtPeriodEnd) return { ok: true } // already scheduled
 
   if (stripe && sub.stripeSubscriptionId) {
     await stripe.subscriptions.update(sub.stripeSubscriptionId, { cancel_at_period_end: true })
   }
-  await prisma.subscription.update({ where: { userId }, data: { status: "cancelled" } })
-  await pauseListingsForLapse(userId)
-  await logAudit({ actorId: userId, action: "SUBSCRIPTION_CANCELLED", subject: "Cancelled subscription" })
+  await prisma.subscription.update({ where: { userId }, data: { cancelAtPeriodEnd: true } })
+  await logAudit({ actorId: userId, action: "SUBSCRIPTION_CANCEL_SCHEDULED", subject: "Scheduled cancellation at period end" })
 
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true, firstName: true } })
   if (user) {
     await sendEmail({
       to: user.email,
-      subject: "Your UnSwap membership is cancelled",
+      subject: "Your UnSwap membership won't renew",
       html: renderEmail({
-        heading: "Membership cancelled",
-        body: `<p>Hello ${esc(user.firstName)},</p><p>Your membership won't renew. You'll keep access until the end of the current period. You can resubscribe any time.</p>`,
+        heading: "Membership set to cancel",
+        body: `<p>Hello ${esc(user.firstName)},</p><p>Your membership won't renew${sub.renewsAt ? ` after <strong>${fmtDate(sub.renewsAt)}</strong>` : ""}. You keep full access until then — listings, browsing and exchanges all stay live — and you can resume any time before it ends.</p>`,
         ctaLabel: "View membership",
         ctaUrl: `${baseUrl()}/dashboard/subscription`,
       }),
     }).catch((e) => console.error("Cancel email failed:", e))
   }
+  return { ok: true }
+}
+
+/** Undo a scheduled cancellation before the paid period ends. */
+export async function resumeSubscription(userId: string) {
+  const sub = await prisma.subscription.findUnique({ where: { userId } })
+  if (!sub) throw new ApiError(404, "No active subscription.")
+  if (!sub.cancelAtPeriodEnd) return { ok: true } // nothing to resume
+
+  if (stripe && sub.stripeSubscriptionId) {
+    await stripe.subscriptions.update(sub.stripeSubscriptionId, { cancel_at_period_end: false })
+  }
+  await prisma.subscription.update({ where: { userId }, data: { cancelAtPeriodEnd: false } })
+  await logAudit({ actorId: userId, action: "SUBSCRIPTION_RESUMED", subject: "Resumed subscription" })
   return { ok: true }
 }
 
@@ -221,7 +242,7 @@ export async function handleWebhookEvent(event: Stripe.Event) {
       const subId = inv.subscription
       if (typeof subId === "string") {
         const sub = await prisma.subscription.findFirst({ where: { stripeSubscriptionId: subId } })
-        if (sub) await prisma.subscription.update({ where: { id: sub.id }, data: { status: "active", renewsAt: new Date(Date.now() + YEAR_MS) } })
+        if (sub) await prisma.subscription.update({ where: { id: sub.id }, data: { status: "active", cancelAtPeriodEnd: false, renewsAt: new Date(Date.now() + YEAR_MS) } })
       }
       break
     }
