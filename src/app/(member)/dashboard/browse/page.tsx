@@ -55,6 +55,7 @@ export default async function BrowsePage({
     exchangeType: sp.exchange ?? "",
     savedOnly: sp.saved === "1",
     availableNow: sp.avail === "1",
+    newOnly: sp.new === "1",
   }
 
   const { items: listings, total, page, pageCount } = await searchListings({
@@ -66,6 +67,7 @@ export default async function BrowsePage({
     exchangeType: filters.exchangeType || undefined,
     savedOnly: filters.savedOnly,
     availableNow: filters.availableNow,
+    recentOnly: filters.newOnly,
     page: sp.page ? Number(sp.page) : 1,
   })
 
@@ -79,6 +81,7 @@ export default async function BrowsePage({
     if (filters.exchangeType) qs.set("exchange", filters.exchangeType)
     if (filters.savedOnly) qs.set("saved", "1")
     if (filters.availableNow) qs.set("avail", "1")
+    if (filters.newOnly) qs.set("new", "1")
     if (n > 1) qs.set("page", String(n))
     return `/dashboard/browse${qs.toString() ? `?${qs}` : ""}`
   }
@@ -94,6 +97,7 @@ export default async function BrowsePage({
     if (filters.exchangeType) qs.set("exchange", filters.exchangeType)
     if (filters.savedOnly) qs.set("saved", "1")
     if (filters.availableNow) qs.set("avail", "1")
+    if (filters.newOnly) qs.set("new", "1")
     if (map) qs.set("view", "map")
     return `/dashboard/browse${qs.toString() ? `?${qs}` : ""}`
   }
@@ -107,6 +111,7 @@ export default async function BrowsePage({
     if (filters.exchangeType) qs.set("exchange", filters.exchangeType)
     if (filters.savedOnly) qs.set("saved", "1")
     if (!filters.availableNow) qs.set("avail", "1") // toggle on/off
+    if (filters.newOnly) qs.set("new", "1")
     if (isMap) qs.set("view", "map")
     return `/dashboard/browse${qs.toString() ? `?${qs}` : ""}`
   })()
@@ -119,6 +124,7 @@ export default async function BrowsePage({
         guests: filters.guests ? Number(filters.guests) : undefined,
         exchangeType: filters.exchangeType || undefined,
         availableNow: filters.availableNow,
+        recentOnly: filters.newOnly,
       })
     : []
 
@@ -148,7 +154,7 @@ export default async function BrowsePage({
         <p className="text-sm text-neutral">
           {isMap
             ? `${cityPins.length} ${cityPins.length === 1 ? "city" : "cities"} with homes`
-            : `${total} ${total === 1 ? "home" : "homes"}${filters.savedOnly ? " saved" : " available"}`}
+            : `${total} ${total === 1 ? "home" : "homes"}${filters.savedOnly ? " saved" : filters.newOnly ? " added recently" : " available"}`}
         </p>
         <div className="flex items-center gap-2">
           <Link

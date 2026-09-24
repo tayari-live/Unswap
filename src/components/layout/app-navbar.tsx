@@ -30,8 +30,8 @@ type Item = { name: string; href: string; icon: LucideIcon; desc?: string; badge
 
 const EXPLORE: Item[] = [
   { name: "Homes", href: "/dashboard/browse", icon: Home, desc: "Browse available homes" },
-  { name: "Destinations", href: "/dashboard/browse?view=destinations", icon: MapPin, desc: "Browse cities and duty stations" },
-  { name: "New listings", href: "/dashboard/browse?sort=new", icon: Sparkles, desc: "Recently added to the network" },
+  { name: "Destinations", href: "/dashboard/browse?view=map", icon: MapPin, desc: "Browse cities and duty stations" },
+  { name: "New listings", href: "/dashboard/browse?new=1", icon: Sparkles, desc: "Recently added to the network" },
 ]
 
 const VERIFY: Record<string, { label: string; tone: string; icon: LucideIcon }> = {

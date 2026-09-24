@@ -22,12 +22,15 @@ export type SearchParams = {
   exchangeType?: string
   savedOnly?: boolean
   availableNow?: boolean
+  recentOnly?: boolean
   page?: number
 }
 
 // A home is "Available Now" when it has an availability window active today or
 // starting within the next 30 days.
 const AVAILABLE_SOON_DAYS = 30
+// "New listings" scopes to homes added within this window (newest first).
+const NEW_LISTING_DAYS = 30
 
 export const BROWSE_PAGE_SIZE = 12
 
@@ -60,6 +63,8 @@ export async function searchListings(p: SearchParams) {
   const now = new Date()
   const soon = new Date(now.getTime() + AVAILABLE_SOON_DAYS * 86_400_000)
   if (p.availableNow) where.availability = { some: { startDate: { lte: soon }, endDate: { gte: now } } }
+  // "New listings" — only homes added within the recent window.
+  if (p.recentOnly) where.createdAt = { gte: new Date(now.getTime() - NEW_LISTING_DAYS * 86_400_000) }
 
   const favs = await prisma.favourite.findMany({
     where: { userId: p.viewerId },
@@ -136,6 +141,9 @@ export async function listingCityCounts(p: SearchParams): Promise<CityPin[]> {
     const now = new Date()
     const soon = new Date(now.getTime() + AVAILABLE_SOON_DAYS * 86_400_000)
     where.availability = { some: { startDate: { lte: soon }, endDate: { gte: now } } }
+  }
+  if (p.recentOnly) {
+    where.createdAt = { gte: new Date(Date.now() - NEW_LISTING_DAYS * 86_400_000) }
   }
 
   const groups = await prisma.listing.groupBy({

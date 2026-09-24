@@ -5,8 +5,12 @@ import { cityCoords } from "@/lib/geo"
 // the Geocoding API too; a dedicated MAPBOX_TOKEN can override it server-side.
 const mapboxToken = () => process.env.MAPBOX_TOKEN || process.env.NEXT_PUBLIC_MAPBOX_TOKEN || ""
 
+// Bump when the geocoding query changes, so previously cached (possibly wrong)
+// results are re-resolved instead of being read back. v2: settlement-only,
+// non-fuzzy — v1 fuzzy-matched "Diani, Kenya" to a street "Diana Close".
+const GEOCODE_VERSION = "v2"
 const keyOf = (city: string, country: string) =>
-  `${city.trim().toLowerCase()}|${country.trim().toLowerCase()}`
+  `${GEOCODE_VERSION}|${city.trim().toLowerCase()}|${country.trim().toLowerCase()}`
 
 /**
  * City-centre coordinates [lng, lat] for the map. Resolves in order:
@@ -31,21 +35,41 @@ export async function resolveCityCoords(city: string, country: string): Promise<
   if (!token) return null
 
   try {
-    const query = encodeURIComponent(`${city}, ${country}`.trim())
-    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${query}.json?limit=1&access_token=${token}`
-    const res = await fetch(url)
-    if (!res.ok) return null
-    const data = await res.json()
-    const center = data?.features?.[0]?.center
-    if (!Array.isArray(center) || center.length < 2) return null
-    const lng = Number(center[0])
-    const lat = Number(center[1])
-    if (!Number.isFinite(lng) || !Number.isFinite(lat)) return null
+    // Prefer settlement types (never streets/addresses/POIs); fall back to an
+    // unrestricted lookup if that finds nothing. Both disable fuzzy matching, so
+    // "Diani, Kenya" resolves to the town — not a similarly spelled street like
+    // "Diana Close" (the v1 fuzzy bug).
+    const coords =
+      (await mapboxGeocode(city, country, token, "place,locality,region,district,neighborhood")) ??
+      (await mapboxGeocode(city, country, token, null))
+    if (!coords) return null
 
     // Cache for next time; ignore a race on the unique key.
-    await prisma.cityGeo.create({ data: { key, city: city.trim(), country: country.trim(), lng, lat } }).catch(() => {})
-    return [lng, lat]
+    await prisma.cityGeo
+      .create({ data: { key, city: city.trim(), country: country.trim(), lng: coords[0], lat: coords[1] } })
+      .catch(() => {})
+    return coords
   } catch {
     return null
   }
+}
+
+/** One Mapbox Geocoding lookup; `types` null means unrestricted. */
+async function mapboxGeocode(
+  city: string,
+  country: string,
+  token: string,
+  types: string | null,
+): Promise<[number, number] | null> {
+  const query = encodeURIComponent(`${city}, ${country}`.trim())
+  const params = new URLSearchParams({ limit: "1", fuzzyMatch: "false", access_token: token })
+  if (types) params.set("types", types)
+  const res = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${query}.json?${params}`)
+  if (!res.ok) return null
+  const data = await res.json()
+  const center = data?.features?.[0]?.center
+  if (!Array.isArray(center) || center.length < 2) return null
+  const lng = Number(center[0])
+  const lat = Number(center[1])
+  return Number.isFinite(lng) && Number.isFinite(lat) ? [lng, lat] : null
 }
