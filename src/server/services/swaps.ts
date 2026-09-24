@@ -5,6 +5,7 @@ import { sendEmail, renderEmail, esc } from "@/server/email"
 import { notifyAllowed } from "@/server/services/notify"
 import { getAvailablePoints } from "@/server/services/points"
 import { assertCanRequestListing } from "@/server/services/trust"
+import { PROFILE_ACTIVE_AT } from "@/server/services/profile"
 import { effectiveNightly } from "@/lib/valuation"
 import { MEMBERSHIP_ENABLED } from "@/lib/features"
 
@@ -226,8 +227,13 @@ export async function createSwapRequest(input: {
   message?: string
 }) {
   const requester = await prisma.user.findUnique({ where: { id: input.requesterId } })
-  if (requester?.verificationStatus !== "FULLY_VERIFIED") {
+  if (!requester || requester.verificationStatus !== "FULLY_VERIFIED") {
     throw new ApiError(403, "You must be fully verified to request a swap.")
+  }
+  // "Go Active" gate: a substantially complete profile is required to exchange,
+  // so hosts only ever receive requests from fully-presented members.
+  if (requester.profileCompletion < PROFILE_ACTIVE_AT) {
+    throw new ApiError(403, `Complete your profile to at least ${PROFILE_ACTIVE_AT}% to request a swap.`)
   }
 
   // Requesting is free — no subscription needed. Subscription and the exchange

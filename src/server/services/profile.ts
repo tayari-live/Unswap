@@ -23,6 +23,15 @@ type ProfileShape = {
 export const PROFILE_COMPLETE_AT = 100
 
 /**
+ * The score a member must reach to "go Active" — publish a listing (DRAFT →
+ * ACTIVE) and send swap requests. Onboarding only needs 50% + a draft listing;
+ * this higher bar gates the outward-facing actions, so peers only ever see and
+ * exchange with members who have a substantially filled-out profile. (With 7
+ * scored fields, 80% means 6 of 7.)
+ */
+export const PROFILE_ACTIVE_AT = 80
+
+/**
  * Profile completion as a percentage of filled fields.
  * Only fields the wizard treats as expected count toward the total — LinkedIn is
  * explicitly optional, so including it would put 100% out of reach for anyone

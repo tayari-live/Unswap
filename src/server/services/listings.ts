@@ -5,6 +5,7 @@ import { grantPointsOnce } from "@/server/services/points"
 import { encryptField, decryptField } from "@/server/crypto"
 import { kitTagHomeListed } from "@/server/kit"
 import { computeNightlyPoints, clampAdjustment } from "@/lib/valuation"
+import { PROFILE_ACTIVE_AT } from "@/server/services/profile"
 
 // Admin moderation grid. Card fields only — photos are served via
 // /api/photos/:id, so photo bytes never travel with the listing rows.
@@ -168,16 +169,33 @@ function validateFull(input: ListingInput) {
   return { title, city, country, description, amenities, durations, photos, blackouts, availability }
 }
 
-/** The three upload gates: verified, 80% profile, active subscription. */
+/**
+ * Gate for creating/editing a listing at all (including a DRAFT). Open to any
+ * member who has confirmed their email — institutional verification and a
+ * subscription are only required later, when a swap confirms. Publishing a
+ * listing ACTIVE has a higher bar; see assertCanPublish.
+ */
 async function assertCanList(ownerId: string) {
   const owner = await prisma.user.findUnique({ where: { id: ownerId } })
   if (!owner) throw new ApiError(404, "Account not found.")
-  // Listing is open to any member who has confirmed their email. Institutional
-  // verification and a subscription are only required later, when a swap confirms.
   if (owner.verificationStatus === "PENDING_EMAIL") {
     throw new ApiError(403, "Confirm your email address to list a property.")
   }
   return owner
+}
+
+/**
+ * Gate for taking a listing ACTIVE ("go Active"). A member must have a
+ * substantially complete profile so peers only ever browse and exchange with
+ * fully-presented members. A draft can be created before this bar is met.
+ */
+function assertCanPublish(owner: { profileCompletion: number }) {
+  if (owner.profileCompletion < PROFILE_ACTIVE_AT) {
+    throw new ApiError(
+      403,
+      `Complete your profile to at least ${PROFILE_ACTIVE_AT}% before publishing your listing.`,
+    )
+  }
 }
 
 /** Create a listing (status DRAFT, or ACTIVE if requested and gates pass). */
@@ -185,6 +203,7 @@ export async function createListing(ownerId: string, input: ListingInput) {
   const owner = await assertCanList(ownerId)
   const v = validateFull(input)
   const status = input.status === "ACTIVE" ? "ACTIVE" : "DRAFT"
+  if (status === "ACTIVE") assertCanPublish(owner)
 
   const listing = await prisma.$transaction(async (tx) => {
     const created = await tx.listing.create({
@@ -246,7 +265,8 @@ export async function updateMemberListing(ownerId: string, id: string, input: Li
 
   // Publishing (going ACTIVE) requires the gates + minimum content.
   if (input.status === "ACTIVE" && existing.status !== "ACTIVE") {
-    await assertCanList(ownerId)
+    const owner = await assertCanList(ownerId)
+    assertCanPublish(owner)
     const photoCount = isStatusOnly ? existing._count.photos : (input.photos?.length ?? 0)
     const durations = isStatusOnly ? existing.swapDurations : (input.swapDurations ?? []).join(",")
     if (photoCount < MIN_PHOTOS) throw new ApiError(400, `At least ${MIN_PHOTOS} photos are required to publish.`)
