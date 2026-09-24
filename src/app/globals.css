@@ -196,6 +196,12 @@
 
   --fg: #f3eee4;
 
+  /* Teal success surfaces must flip too: the light mint (#d7efeb) left the
+     card's light text (fg / neutral-dark) and teal text unreadable on dark.
+     A deep teal keeps every text colour used on it (fg, neutral-dark, teal)
+     above AA contrast. */
+  --teal-light: #0e2a24;
+
   /* Navy lifts a few stops so navy buttons/rails stay visible on obsidian. */
   --navy: #22304f;
   --navy-light: #30416a;
@@ -213,6 +219,7 @@
   --color-foreground: #f3eee4;
   --color-surface: #121a2b;
   --color-border: rgba(233, 201, 122, 0.14);
+  --color-teal-light: #0e2a24;
   --color-neutral: #98a2b6;
   --color-neutral-light: #1e2740;
   /* In light mode this is a strong dark grey for prominent secondary text; on
