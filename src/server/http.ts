@@ -7,9 +7,15 @@ import { auth } from "@/server/auth"
  */
 export class ApiError extends Error {
   status: number
-  constructor(status: number, message: string) {
+  /** Optional machine-readable code so the client can branch (e.g. show a modal). */
+  code?: string
+  /** Optional structured payload for the client (e.g. tier + limit for an upsell). */
+  data?: Record<string, unknown>
+  constructor(status: number, message: string, code?: string, data?: Record<string, unknown>) {
     super(message)
     this.status = status
+    this.code = code
+    this.data = data
     this.name = "ApiError"
   }
 }
@@ -17,7 +23,10 @@ export class ApiError extends Error {
 /** Map any thrown value to a NextResponse. ApiError keeps its status/message. */
 export function toErrorResponse(err: unknown): NextResponse {
   if (err instanceof ApiError) {
-    return NextResponse.json({ error: err.message }, { status: err.status })
+    return NextResponse.json(
+      { error: err.message, ...(err.code ? { code: err.code } : {}), ...(err.data ? { data: err.data } : {}) },
+      { status: err.status },
+    )
   }
   console.error("Unhandled API error:", err)
   return NextResponse.json({ error: "Internal server error" }, { status: 500 })

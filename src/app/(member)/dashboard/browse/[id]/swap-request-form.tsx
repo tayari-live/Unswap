@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { CalendarCheck, CheckCircle2, CalendarX2 } from "lucide-react"
 import { useToast } from "@/components/ui/toast"
 import { FIELD, LABEL, TEXTAREA } from "@/components/ui/form"
+import { UpgradeModal } from "@/components/billing/upgrade-modal"
 
 // Field styling lives in components/ui/form so all forms stay in step.
 const inputCls = FIELD
@@ -73,6 +74,8 @@ export function SwapRequestForm({
   const [message, setMessage] = useState("")
   const [loading, setLoading] = useState(false)
   const [done, setDone] = useState(false)
+  // Set when the member hits their plan's exchange limit — opens the upsell modal.
+  const [upsell, setUpsell] = useState<{ tier?: string; exchangesPerYear?: number } | null>(null)
 
   const today = new Date().toISOString().slice(0, 10)
   const offeredBands = swapDurations.map((d) => DURATION_BANDS[d]).filter(Boolean)
@@ -112,6 +115,12 @@ export function SwapRequestForm({
       })
       const data = await res.json()
       if (!res.ok) {
+        // Exchange-limit reached → show the upgrade modal instead of a toast.
+        if (res.status === 402 && data.code === "EXCHANGE_LIMIT") {
+          setUpsell({ tier: data.data?.tier, exchangesPerYear: data.data?.exchangesPerYear })
+          setLoading(false)
+          return
+        }
         toast(data.error || "Could not send your request.", "error")
         setLoading(false)
         return
@@ -157,6 +166,7 @@ export function SwapRequestForm({
     : []
 
   return (
+    <>
     <form onSubmit={handleSubmit} className="bg-surface border border-[var(--hair)] rounded-md p-5 space-y-4">
       <h3 className="font-sans text-xl font-semibold text-[var(--fg)]">Request a swap</h3>
 
@@ -245,5 +255,12 @@ export function SwapRequestForm({
         </button>
       </div>
     </form>
+    <UpgradeModal
+      open={!!upsell}
+      onClose={() => setUpsell(null)}
+      tier={upsell?.tier}
+      exchangesPerYear={upsell?.exchangesPerYear}
+    />
+    </>
   )
 }

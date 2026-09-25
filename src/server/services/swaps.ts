@@ -123,6 +123,8 @@ async function assertWithinExchangeLimit(requesterId: string) {
     throw new ApiError(
       402,
       `You've used all ${sub.exchangesPerYear} exchange${sub.exchangesPerYear === 1 ? "" : "s"} in your plan this period. Upgrade your membership to request more.`,
+      "EXCHANGE_LIMIT",
+      { tier: sub.tier, exchangesPerYear: sub.exchangesPerYear, used },
     )
   }
 }
@@ -236,8 +238,11 @@ export async function createSwapRequest(input: {
     throw new ApiError(403, `Complete your profile to at least ${PROFILE_ACTIVE_AT}% to request a swap.`)
   }
 
-  // Requesting is free — no subscription needed. Subscription and the exchange
-  // limit are enforced when the swap is confirmed (see assertConfirmable).
+  // Requesting is free — no subscription needed. The subscription requirement
+  // is enforced at confirmation (see assertConfirmable), but the per-plan
+  // exchange allowance is enforced here at request time so the requester meets
+  // the limit — and the upsell — when they send, not the host on accept.
+  if (MEMBERSHIP_ENABLED) await assertWithinExchangeLimit(input.requesterId)
 
   const listing = await prisma.listing.findUnique({
     where: { id: input.listingId },
