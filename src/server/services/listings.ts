@@ -185,11 +185,15 @@ async function assertCanList(ownerId: string) {
 }
 
 /**
- * Gate for taking a listing ACTIVE ("go Active"). A member must have a
- * substantially complete profile so peers only ever browse and exchange with
- * fully-presented members. A draft can be created before this bar is met.
+ * Gate for taking a listing ACTIVE ("go Active"). Only a fully-verified member
+ * with a substantially complete profile can publish, so peers only ever browse
+ * and exchange with verified, fully-presented members. A draft can be created
+ * before either bar is met (e.g. during onboarding).
  */
-function assertCanPublish(owner: { profileCompletion: number }) {
+function assertCanPublish(owner: { verificationStatus: string; profileCompletion: number }) {
+  if (owner.verificationStatus !== "FULLY_VERIFIED") {
+    throw new ApiError(403, "You must be fully verified to publish a listing.")
+  }
   if (owner.profileCompletion < PROFILE_ACTIVE_AT) {
     throw new ApiError(
       403,
