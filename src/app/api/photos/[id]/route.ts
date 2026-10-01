@@ -1,7 +1,7 @@
-import { NextRequest } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/server/prisma"
 import { requireSession, toErrorResponse, ApiError } from "@/server/http"
-import { imageResponse, blurredImageResponse } from "@/server/photos"
+import { imageResponse, blurredImageResponse, isHttpUrl } from "@/server/photos"
 
 // GET /api/photos/:id — serve a listing photo as a cacheable image.
 // Visible to any signed-in member while the listing is ACTIVE; the owner and
@@ -34,7 +34,12 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       })
       preview = me?.verificationStatus !== "FULLY_VERIFIED"
     }
-    return preview ? await blurredImageResponse(photo.url) : imageResponse(photo.url)
+    // Unverified viewers: always server-blurred (bytes fetched + blurred here,
+    // so the original is never exposed). Full-image viewers of a CDN-hosted
+    // photo are redirected to the Blob URL so bytes stream from the CDN, not us.
+    if (preview) return await blurredImageResponse(photo.url)
+    if (isHttpUrl(photo.url)) return NextResponse.redirect(photo.url, 307)
+    return imageResponse(photo.url)
   } catch (err) {
     return toErrorResponse(err)
   }

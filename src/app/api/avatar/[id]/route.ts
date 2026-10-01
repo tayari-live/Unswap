@@ -20,6 +20,10 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   const dataUrl = row?.imageUrl
   if (!dataUrl) return new NextResponse(null, { status: 404 })
 
+  // Migrated photos live on the CDN (Vercel Blob) — redirect so bytes stream
+  // from there. Legacy rows are still inline base64 and served below.
+  if (/^https?:\/\//i.test(dataUrl)) return NextResponse.redirect(dataUrl, 307)
+
   const m = /^data:(image\/[a-zA-Z+.-]+);base64,([\s\S]*)$/.exec(dataUrl)
   if (!m) return new NextResponse(null, { status: 404 })
 
